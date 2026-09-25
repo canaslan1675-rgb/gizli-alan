@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
+import 'second_phone_service.dart';
 
 /// Non-secret user preferences (stored in SharedPreferences, app sandbox).
 ///
@@ -17,6 +18,8 @@ class SettingsService {
   static const _kLockTimeout = 'lock_timeout_sec';
   static const _kLang = 'lang';
   static const _kWallpaper = 'wallpaper';
+  static const _kSecondPhoneClose = 'second_phone_close';
+  static const _kSecondPhoneClosedBy = 'second_phone_closed_by';
 
   static const lockTimeoutChoices = [0, 15, 60, 300];
 
@@ -49,6 +52,24 @@ class SettingsService {
   int get wallpaper => _prefs.getInt(_kWallpaper) ?? 0;
 
   Future<void> setWallpaper(int i) => _prefs.setInt(_kWallpaper, i);
+
+  /// What the Lock button does to the second phone (work profile).
+  SecondPhoneCloseMode get secondPhoneCloseMode =>
+      SecondPhoneCloseMode.parse(_prefs.getString(_kSecondPhoneClose));
+
+  Future<void> setSecondPhoneCloseMode(SecondPhoneCloseMode m) =>
+      _prefs.setString(_kSecondPhoneClose, m.name);
+
+  /// How the second phone was closed at the last lock (null = not closed by
+  /// us), so the next unlock can re-open it the same way.
+  SecondPhoneCloseMode? get secondPhoneClosedBy {
+    final v = _prefs.getString(_kSecondPhoneClosedBy);
+    return v == null ? null : SecondPhoneCloseMode.parse(v);
+  }
+
+  Future<void> setSecondPhoneClosedBy(SecondPhoneCloseMode? m) => m == null
+      ? _prefs.remove(_kSecondPhoneClosedBy)
+      : _prefs.setString(_kSecondPhoneClosedBy, m.name);
 
   String get language => _prefs.getString(_kLang) ?? 'tr';
 

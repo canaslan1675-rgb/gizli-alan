@@ -9,12 +9,17 @@ import '../theme.dart';
 import 'decoy_calculator_screen.dart';
 import 'files_screen.dart';
 import 'gallery_screen.dart';
+import '../services/second_phone_service.dart';
+import '../widgets/profile_app_tile.dart';
 import 'notes_list_screen.dart';
+import 'second_phone_screen.dart';
 import 'settings_screen.dart';
 
 /// "Virtual phone" home inside the vault: wallpaper, clock and an app-icon
-/// grid (Gallery, Notes, Files, Calculator, Settings) plus a dock with Lock.
-/// The decoy vault looks identical but is empty.
+/// grid (Gallery, Notes, Files, Calculator, Second phone, Settings) plus a
+/// dock with Lock. Below the built-in icons it lists the apps of the owner's
+/// "second phone" (Android work profile) if one was set up, and launches them
+/// in that profile. The decoy vault has no second phone.
 class VaultHomeScreen extends StatefulWidget {
   const VaultHomeScreen({super.key});
 
@@ -25,6 +30,8 @@ class VaultHomeScreen extends StatefulWidget {
 class _VaultHomeScreenState extends State<VaultHomeScreen> {
   Timer? _clock;
   DateTime _now = DateTime.now();
+  List<ProfileApp> _profileApps = const [];
+  ValueNotifier<int>? _spChanged;
 
   @override
   void initState() {
@@ -35,9 +42,30 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_spChanged == null) {
+      _spChanged = GizliAlanApp.of(context).secondPhoneChanged
+        ..addListener(_loadProfileApps);
+      _loadProfileApps();
+    }
+  }
+
+  @override
   void dispose() {
     _clock?.cancel();
+    _spChanged?.removeListener(_loadProfileApps);
     super.dispose();
+  }
+
+  Future<void> _loadProfileApps() async {
+    final sp = GizliAlanApp.of(context).secondPhoneIfUnlocked;
+    if (sp == null) return;
+    final st = await sp.status();
+    final apps = st.availability == SecondPhoneAvailability.ready
+        ? await sp.listApps()
+        : const <ProfileApp>[];
+    if (mounted) setState(() => _profileApps = apps);
   }
 
   void _open(Widget screen) {
@@ -45,7 +73,21 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       _,
     ) {
       if (mounted) setState(() {}); // e.g. wallpaper changed in settings
+      _loadProfileApps();
     });
+  }
+
+  /// Launches a second-phone app in the work profile. The vault then goes to
+  /// the background and auto-locks as usual; the app keeps running.
+  Future<void> _launchProfileApp(ProfileApp a) async {
+    final sp = GizliAlanApp.of(context).secondPhoneIfUnlocked;
+    if (sp == null) return;
+    final r = await sp.launch(a);
+    if (r != 'ok' && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(L10n.current('spFailed').replaceAll('{s}', r))),
+      );
+    }
   }
 
   @override
@@ -79,6 +121,13 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         const Color(0xFF9AA8BC),
         () => _open(const DecoyCalculatorScreen()),
       ),
+      if (!(app.session?.isDecoy ?? true))
+        _AppIcon(
+          Icons.phone_android_outlined,
+          t('secondPhone'),
+          const Color(0xFF6FD6FF),
+          () => _open(const SecondPhoneScreen()),
+        ),
       _AppIcon(
         Icons.settings_outlined,
         t('settings'),
@@ -90,7 +139,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) app.lockVault();
+        if (!didPop) app.lockVaultExplicit();
       },
       child: Scaffold(
         body: Container(
@@ -127,13 +176,45 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                 ),
                 const SizedBox(height: 32),
                 Expanded(
-                  child: GridView.count(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 18,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 0.78,
-                    children: apps.map((a) => _AppTile(icon: a)).toList(),
+                  child: CustomScrollView(
+                    slivers: [
+                      _grid(apps.map((a) => _AppTile(icon: a)).toList()),
+                      if (_profileApps.isNotEmpty) ...[
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.work_outline,
+                                  size: 16,
+                                  color: GizliTheme.textSecondary,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  t('secondPhoneApps'),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    letterSpacing: 1.1,
+                                    color: GizliTheme.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        _grid(
+                          _profileApps
+                              .map(
+                                (a) => ProfileAppTile(
+                                  app: a,
+                                  onTap: () => _launchProfileApp(a),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 // Dock
@@ -164,7 +245,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                         key: const ValueKey('lock_button'),
                         icon: Icons.lock_outline,
                         tooltip: t('lock'),
-                        onTap: app.lockVault,
+                        onTap: app.lockVaultExplicit,
                         highlight: true,
                       ),
                     ],
@@ -178,6 +259,17 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
     );
   }
 }
+
+Widget _grid(List<Widget> children) => SliverPadding(
+  padding: const EdgeInsets.symmetric(horizontal: 20),
+  sliver: SliverGrid.count(
+    crossAxisCount: 4,
+    mainAxisSpacing: 18,
+    crossAxisSpacing: 8,
+    childAspectRatio: 0.78,
+    children: children,
+  ),
+);
 
 class _AppIcon {
   const _AppIcon(this.icon, this.label, this.color, this.onTap);

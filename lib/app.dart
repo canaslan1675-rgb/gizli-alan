@@ -11,6 +11,7 @@ import 'screens/vault_home_screen.dart';
 import 'services/auth_service.dart';
 import 'services/biometric_service.dart';
 import 'services/legacy_migration.dart';
+import 'services/second_phone_service.dart';
 import 'services/settings_service.dart';
 import 'services/vault_session.dart';
 import 'services/vault_space.dart';
@@ -28,6 +29,7 @@ class GizliAlanApp extends StatefulWidget {
     required this.auth,
     required this.biometrics,
     this.baseDirProvider,
+    this.secondPhone,
   });
 
   final SettingsService settings;
@@ -36,6 +38,9 @@ class GizliAlanApp extends StatefulWidget {
 
   /// Where vault data lives. Defaults to the app-private support directory.
   final Future<Directory> Function()? baseDirProvider;
+
+  /// Android work-profile "second phone" bridge (injectable for tests).
+  final SecondPhoneService? secondPhone;
 
   @override
   State<GizliAlanApp> createState() => GizliAlanAppState();
@@ -60,6 +65,14 @@ class GizliAlanAppState extends State<GizliAlanApp>
   SettingsService get settings => widget.settings;
   AuthService get auth => widget.auth;
   BiometricService get biometrics => widget.biometrics;
+
+  late final SecondPhoneService _secondPhone =
+      widget.secondPhone ?? SecondPhoneService();
+
+  /// The second phone is only reachable while the REAL vault is unlocked
+  /// (never from the calculator, the PIN screen or the decoy vault).
+  SecondPhoneService? get secondPhoneIfUnlocked =>
+      (_session != null && !_session!.isDecoy) ? _secondPhone : null;
 
   VaultSession? get session => _session;
   bool get isUnlocked => _session != null;
@@ -87,6 +100,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    secondPhoneChanged.dispose();
     _session?.close();
     super.dispose();
   }
@@ -156,6 +170,38 @@ class GizliAlanAppState extends State<GizliAlanApp>
       MaterialPageRoute(builder: (_) => const VaultHomeScreen()),
       (r) => r.isFirst,
     );
+    if (space == VaultSpace.real) _reopenSecondPhone();
+  }
+
+  /// If the Lock button closed the second phone, open it again on unlock.
+  Future<void> _reopenSecondPhone() async {
+    final closedBy = settings.secondPhoneClosedBy;
+    if (closedBy == null) return;
+    // Opening may briefly start a system/profile activity: don't auto-lock.
+    final ok = await withExternalUi(() => _secondPhone.open(closedBy));
+    if (ok) await settings.setSecondPhoneClosedBy(null);
+    secondPhoneChanged.value++;
+  }
+
+  /// Bumped when the second phone opens/closes so the home grid reloads.
+  final ValueNotifier<int> secondPhoneChanged = ValueNotifier(0);
+
+  /// Lock button: lock the vault and, if enabled, close the second phone.
+  /// Auto-lock in the background does NOT close it, because the owner is
+  /// most likely using a second-phone app that was launched from the vault.
+  void lockVaultExplicit() {
+    final wasReal = _session != null && !_session!.isDecoy;
+    lockVault();
+    if (wasReal) _closeSecondPhone();
+  }
+
+  Future<void> _closeSecondPhone() async {
+    final mode = settings.secondPhoneCloseMode;
+    if (mode == SecondPhoneCloseMode.off) return;
+    final st = await _secondPhone.status();
+    if (st.availability != SecondPhoneAvailability.ready) return;
+    final applied = await _secondPhone.close(mode);
+    if (applied != null) await settings.setSecondPhoneClosedBy(applied);
   }
 
   /// Biometric unlock of the real vault. Returns true on success.
