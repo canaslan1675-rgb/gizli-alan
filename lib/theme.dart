@@ -35,7 +35,7 @@ class GizliTheme {
         elevation: 0,
         centerTitle: false,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: bgCard,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -59,7 +59,9 @@ class GizliTheme {
           backgroundColor: mint,
           foregroundColor: bg,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),

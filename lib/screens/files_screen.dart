@@ -1,15 +1,15 @@
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as p;
 
 import '../app.dart';
 import '../l10n/l10n.dart';
+import '../services/vault_storage.dart';
 import '../theme.dart';
+import '../widgets/vault_actions.dart';
+import 'photo_viewer_screen.dart';
 
-/// File vault — imports via system file picker only (user-initiated).
-/// No broad storage scrape. AES optional via settings.
+/// Encrypted document vault (PDFs, any file). Imports only via the system
+/// file picker (user-initiated, Storage Access Framework, no permission).
 class FilesScreen extends StatefulWidget {
   const FilesScreen({super.key});
 
@@ -18,129 +18,173 @@ class FilesScreen extends StatefulWidget {
 }
 
 class _FilesScreenState extends State<FilesScreen> {
-  late Future<List<FileSystemEntity>> _future;
+  VaultStorage? _storeRef;
+  VaultStorage get _store => _storeRef!;
+  late Future<List<VaultItem>> _future;
 
   @override
-  void initState() {
-    super.initState();
-    _reload();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_storeRef == null) {
+      _storeRef = GizliAlanApp.of(context).session!.files;
+      _future = _store.list();
+    }
   }
 
-  void _reload() {
-    _future = GizliAlanApp.of(context).vault.listFiles();
-    setState(() {});
-  }
+  void _reload() => setState(() => _future = _store.list());
 
   Future<void> _import() async {
     final app = GizliAlanApp.of(context);
-    final result = await FilePicker.platform.pickFiles(withData: true);
-    if (result == null || result.files.isEmpty) return;
-    final f = result.files.first;
-    final bytes = f.bytes;
-    if (bytes == null) return;
-    await app.vault.importBytes(
-      fileName: f.name,
-      bytes: bytes,
-      encrypt: app.settings.encryptionEnabled,
-    );
+    final t = L10n.current;
+    final messenger = ScaffoldMessenger.of(context);
+    final picked = await app.withExternalUi(() => FilePicker.pickFiles());
+    if (picked.isEmpty || !mounted) return;
+    var count = 0;
+    var tooBig = 0;
+    await runWithProgress(context, t('importing'), () async {
+      for (final f in picked) {
+        try {
+          final len = await f.length();
+          if (len != null && len > VaultStorage.maxItemBytes) {
+            tooBig++;
+            continue;
+          }
+          await _store.add(name: f.name, bytes: await f.readAsBytes());
+          count++;
+        } catch (e) {
+          debugPrint('file import failed: $e');
+        }
+      }
+      await FilePicker.clearTemporaryFiles();
+    });
+    if (!mounted) return;
+    var msg = t('importedFilesN').replaceAll('{n}', '$count');
+    if (tooBig > 0) msg += ' ${t('tooBig')}';
+    messenger.showSnackBar(SnackBar(content: Text(msg)));
     _reload();
+  }
+
+  Future<void> _itemMenu(VaultItem item, List<VaultItem> all) async {
+    final t = L10n.current;
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(item.name, overflow: TextOverflow.ellipsis),
+              subtitle: Text(VaultActions.formatSize(item.size)),
+            ),
+            if (item.isImage)
+              ListTile(
+                leading: const Icon(Icons.visibility_outlined),
+                title: Text(t('view')),
+                onTap: () => Navigator.pop(ctx, 'view'),
+              ),
+            ListTile(
+              leading: const Icon(Icons.ios_share),
+              title: Text(t('export')),
+              onTap: () => Navigator.pop(ctx, 'export'),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.delete_outline,
+                color: GizliTheme.danger,
+              ),
+              title: Text(t('delete')),
+              onTap: () => Navigator.pop(ctx, 'delete'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || action == null) return;
+    switch (action) {
+      case 'view':
+        final images = all.where((i) => i.isImage).toList();
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => PhotoViewerScreen(
+              store: _store,
+              items: images,
+              initialIndex: images.indexOf(item),
+            ),
+          ),
+        );
+        _reload();
+        break;
+      case 'export':
+        await VaultActions.export(context, _store, item);
+        break;
+      case 'delete':
+        if (await VaultActions.confirmDelete(context)) {
+          await _store.delete(item);
+          _reload();
+        }
+        break;
+    }
+  }
+
+  IconData _iconFor(VaultItem i) {
+    if (i.isImage) return Icons.image_outlined;
+    if (i.mime == 'application/pdf') return Icons.picture_as_pdf_outlined;
+    if (i.mime.startsWith('video/')) return Icons.movie_outlined;
+    if (i.mime.startsWith('text/')) return Icons.description_outlined;
+    return Icons.insert_drive_file_outlined;
   }
 
   @override
   Widget build(BuildContext context) {
-    final t = L10n.current;
-    final app = GizliAlanApp.of(context);
-
+    final t = L10n.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t('files')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: t('importFile'),
-            onPressed: _import,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          if (app.settings.encryptionEnabled)
-            Container(
-              width: double.infinity,
-              color: GizliTheme.bgCard,
-              padding: const EdgeInsets.all(10),
-              child: Text(
-                t('encryptionHint'),
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: GizliTheme.mint,
-                ),
-              ),
-            ),
-          Expanded(
-            child: FutureBuilder<List<FileSystemEntity>>(
-              future: _future,
-              builder: (context, snap) {
-                if (!snap.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final files = snap.data!.whereType<File>().toList();
-                if (files.isEmpty) {
-                  return Center(
-                    child: Text(
-                      t('emptyFiles'),
-                      style: const TextStyle(color: GizliTheme.textSecondary),
-                    ),
-                  );
-                }
-                return ListView.builder(
-                  itemCount: files.length,
-                  itemBuilder: (context, i) {
-                    final file = files[i];
-                    return FutureBuilder<String?>(
-                      future: app.vault.displayName(file),
-                      builder: (context, nameSnap) {
-                        final name =
-                            nameSnap.data ?? p.basename(file.path);
-                        return ListTile(
-                          leading: Icon(
-                            file.path.endsWith('.gaenc')
-                                ? Icons.lock
-                                : Icons.insert_drive_file_outlined,
-                            color: GizliTheme.mint,
-                          ),
-                          title: Text(name),
-                          subtitle: Text(
-                            '${(file.lengthSync() / 1024).toStringAsFixed(1)} KB',
-                            style: const TextStyle(
-                              color: GizliTheme.textSecondary,
-                              fontSize: 12,
-                            ),
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              color: GizliTheme.danger,
-                            ),
-                            onPressed: () async {
-                              await app.vault.deleteFile(file);
-                              _reload();
-                            },
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text(t('files'))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _import,
         icon: const Icon(Icons.file_upload_outlined),
         label: Text(t('importFile')),
+      ),
+      body: FutureBuilder<List<VaultItem>>(
+        future: _future,
+        builder: (context, snap) {
+          if (snap.hasError) return Center(child: Text('${snap.error}'));
+          if (!snap.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final items = snap.data!;
+          if (items.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Text(
+                  t('emptyFiles'),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: GizliTheme.textSecondary),
+                ),
+              ),
+            );
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.only(bottom: 88),
+            itemCount: items.length,
+            itemBuilder: (context, i) {
+              final item = items[i];
+              return ListTile(
+                leading: Icon(_iconFor(item), color: GizliTheme.mint),
+                title: Text(item.name, overflow: TextOverflow.ellipsis),
+                subtitle: Text(
+                  VaultActions.formatSize(item.size),
+                  style: const TextStyle(
+                    color: GizliTheme.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+                trailing: const Icon(Icons.more_vert),
+                onTap: () => _itemMenu(item, items),
+              );
+            },
+          );
+        },
       ),
     );
   }
