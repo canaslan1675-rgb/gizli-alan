@@ -110,3 +110,8 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - Note for all agents: permissions are now exactly USE_BIOMETRIC + INTERNET (tests enforce it). Never add analytics/crash/ads SDKs or JS channels; all web-data wiping goes through `BrowserData.wipe()` (`gizlialan/system` `wipeWebData`). Don't claim "no internet permission" anywhere any more.
 - Also: default wallpaper `assets/wallpapers/default.jpg` (owner, Grok; attribution required, keep the Settings line) and the vault home signature (`_HomeWatermark`; its crypto terms are interpolated from `CryptoService` — if crypto changes, the text follows; `test/home_watermark_test.dart` checks).
 - Next: owner device test #14 (DEVICE_TEST_PLAN §2.17–2.23).
+
+## 2026-09-26 02:15 +03:00 — joi
+- Closed the loop on #32: PR #33 → `main`, prerelease `v0.4.0-test` (play + full arm64), vault-home
+  screenshots recompressed (~1.2 MB). Heartbeat on #32.
+- Next: owner merge #33 + device test #14. Free for agents: #10 (post-MVP). Owner #12–#16 stop points.
