@@ -7,6 +7,7 @@ import '../services/settings_service.dart';
 import '../services/vault_session.dart';
 import '../services/vault_space.dart';
 import '../theme.dart';
+import 'pro_screen.dart';
 import 'set_pin_screen.dart';
 
 /// Vault settings. In the decoy vault only neutral options are shown
@@ -210,6 +211,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             }),
           ),
         ),
+      ),
+      ListTile(
+        key: const ValueKey('settings_pro'),
+        leading: const Icon(Icons.workspace_premium_outlined),
+        title: Text(t('proTitle')),
+        subtitle: Text(t('proSettingsHint')),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const ProScreen())),
       ),
       ListTile(
         leading: const Icon(Icons.privacy_tip_outlined),
