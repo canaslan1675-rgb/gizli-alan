@@ -13,6 +13,7 @@ import 'screens/vault_home_screen.dart';
 import 'services/auth_service.dart';
 import 'services/biometric_service.dart';
 import 'services/browser_engine.dart';
+import 'services/pro_entitlement.dart';
 import 'services/legacy_migration.dart';
 import 'services/second_phone_service.dart';
 import 'services/settings_service.dart';
@@ -378,7 +379,8 @@ class GizliAlanAppState extends State<GizliAlanApp>
         // Key on entry mode so switching it swaps the root screen cleanly.
         home: KeyedSubtree(
           key: ValueKey(
-            '${_needsOnboarding}_${settings.calculatorEntryEnabled}',
+            '${_needsOnboarding}_${settings.calculatorEntryEnabled}_'
+            '${ProEntitlement.hideCalculatorInfo(settings)}',
           ),
           child: _home(),
         ),

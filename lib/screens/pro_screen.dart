@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../l10n/l10n.dart';
+import '../services/pro_entitlement.dart';
 import '../theme.dart';
 
 /// "GizliAlan Pro" plans — UI stub only.
@@ -61,6 +62,7 @@ class _ProScreenState extends State<ProScreen> {
   @override
   Widget build(BuildContext context) {
     final t = L10n.of(context);
+    final app = GizliAlanApp.of(context);
     final usage = _items == null
         ? null
         : t('proUsage')
@@ -91,7 +93,21 @@ class _ProScreenState extends State<ProScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          // Test builds only: simulate an active Pro entitlement (no billing).
+          SwitchListTile(
+            key: const ValueKey('pro_stub_toggle'),
+            contentPadding: EdgeInsets.zero,
+            title: Text(t('proStubToggle')),
+            subtitle: Text(t('proStubToggleHint')),
+            value: ProEntitlement.isActive(app.settings),
+            onChanged: (v) async {
+              await app.settings.setProStubActive(v);
+              app.refresh();
+              setState(() {});
+            },
+          ),
+          const SizedBox(height: 8),
           _PlanCard(
             key: const ValueKey('plan_free'),
             title: t('proFree'),

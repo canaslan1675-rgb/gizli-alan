@@ -1,12 +1,13 @@
-import '../app_version.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../app.dart';
+import '../app_version.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
 import '../services/browser_logic.dart';
 import '../services/privacy_link.dart';
+import '../services/pro_entitlement.dart';
 import '../services/settings_service.dart';
 import '../services/vault_session.dart';
 import '../services/vault_space.dart';
@@ -175,6 +176,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (s == 0) return t('lockImmediately');
     if (s < 60) return t('lockAfterSec').replaceAll('{n}', '$s');
     return t('lockAfterMin').replaceAll('{n}', '${s ~/ 60}');
+  }
+
+  /// "Hide info icon on calculator": Pro-only opt-in (default off).
+  /// Pro active → switch. Pro obtainable but inactive → locked with a Pro
+  /// badge, tap opens the Pro screen. No Pro in this build (`play`) →
+  /// locked, "Pro yakında", not tappable.
+  Widget _hideCalcInfoTile() {
+    final t = L10n.of(context);
+    final app = GizliAlanApp.of(context);
+    final s = app.settings;
+    const icon = Icon(Icons.info_outline);
+    if (ProEntitlement.isActive(s)) {
+      return SwitchListTile(
+        key: const ValueKey('settings_hide_calc_info'),
+        secondary: icon,
+        title: Text(t('hideCalcInfo')),
+        subtitle: Text(t('hideCalcInfoHint')),
+        value: s.hideCalcInfoIcon,
+        onChanged: (v) async {
+          await s.setHideCalcInfoIcon(v);
+          app.refresh();
+          setState(() {});
+        },
+      );
+    }
+    final canGetPro = ProEntitlement.available;
+    return ListTile(
+      key: const ValueKey('settings_hide_calc_info'),
+      leading: icon,
+      enabled: canGetPro,
+      title: Text(t('hideCalcInfo')),
+      subtitle: Text(canGetPro ? t('hideCalcInfoLocked') : t('proSoon')),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            key: const ValueKey('settings_hide_calc_info_pro_badge'),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: GizliTheme.warning.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: GizliTheme.warning.withValues(alpha: 0.6),
+              ),
+            ),
+            child: const Text(
+              'PRO',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: GizliTheme.warning,
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          const Icon(Icons.lock_outline, size: 18),
+        ],
+      ),
+      onTap: canGetPro
+          ? () async {
+              await Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const ProScreen()));
+              if (mounted) setState(() {});
+            }
+          : null,
+    );
   }
 
   Widget _header(String text) => Padding(
@@ -472,6 +540,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
               app.refresh();
               setState(() {});
             },
+          ),
+          _hideCalcInfoTile(),
+          // Help stays reachable even when the ⓘ button is hidden.
+          ListTile(
+            key: const ValueKey('settings_calc_help'),
+            leading: const Icon(Icons.help_outline),
+            title: Text(t('calcHelpTitle')),
+            subtitle: Text(t('calcHelpHint')),
+            onTap: () => showDialog<void>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: Text(t('calcInfoTitle')),
+                content: Text(t('calcInfoBody')),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(t('ok')),
+                  ),
+                ],
+              ),
+            ),
           ),
           if (Flavor.hasSecondPhone) ...[
             _header(t('secondPhone')),
