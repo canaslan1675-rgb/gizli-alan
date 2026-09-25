@@ -26,8 +26,8 @@ gh pr list
   `status:blocked`) or a `handoff` one. Add `agent:cursor` (or `agent:joi`) + `status:in-progress`
   and comment `CLAIM <agent> <ISO time>` with a plan and branch name. Earlier CLAIM wins a race.
   Ideally 1 claimed issue per side, max 2.
-- **Branch:** `cursor/<issue#>-<slug>` or `joi/<issue#>-<slug>`, from the branch with the latest
-  work; push WIP often so the other side can continue.
+- **Integration branch = `main`.** Branch `cursor/<issue#>-<slug>` or `joi/<issue#>-<slug>` from
+  up-to-date `origin/main`, PR into `main`; push WIP often so the other side can continue.
 - **Heartbeat:** at least one `HEARTBEAT` comment per session (done / branch + sha / next / questions).
 - **Stopping unfinished:** `HANDOFF` comment with exact state, branch and remaining steps; swap
   labels to `handoff`.
