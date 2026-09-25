@@ -17,6 +17,13 @@ debug/profile manifests only). **Verify with**
 `aapt2 dump permissions build/app/outputs/flutter-apk/app-release.apk`
 before every upload.
 
+Verified 2026-09-25 on the MVP v1 release APK:
+```
+uses-permission: android.permission.USE_BIOMETRIC
+uses-permission: com.offerforge.gizlialan.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION  (AndroidX-internal, signature-level, not user-visible)
+```
+No INTERNET, no storage/media/camera/mic permissions.
+
 Not used anywhere: Accessibility Service, Device Admin, Notification Listener,
 SMS/Call log, Contacts, Location, `QUERY_ALL_PACKAGES`, overlays.
 
