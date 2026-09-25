@@ -1,6 +1,8 @@
 /// English strings.
 const Map<String, String> en = {
   'appName': 'GizliAlan',
+  // Launcher / recents label (Android string resource says the same).
+  'launcherName': 'Calculator',
   'appNameVault': 'GizliAlan Vault',
   'decoyTitle': 'Calculator',
   // Onboarding
@@ -23,8 +25,9 @@ const Map<String, String> en = {
       '(if enabled).',
   'entryDisclosure':
       'This is a disclosed feature, described in the store listing and in '
-      'the calculator\'s ⓘ button. The app icon and name in your launcher '
-      'stay "GizliAlan". You can switch it off any time in Settings.',
+      'the calculator\'s ⓘ button. In your app list this app appears as '
+      '"Calculator" with a simple calculator icon — that icon is GizliAlan. '
+      'You can switch the calculator entry off any time in Settings.',
   'calculatorEntry': 'Open as calculator',
   'calculatorEntryOn':
       'App starts as a calculator — PIN then "=" opens the vault',
@@ -45,9 +48,10 @@ const Map<String, String> en = {
   'calcInfoTitle': 'About this calculator',
   'calcInfoBody':
       'This is a real calculator and also the entrance to your GizliAlan '
-      'vault: type your vault PIN and press "=" to open it. Long-press "=" '
-      'for biometric unlock if enabled. You can turn the calculator entry off '
-      'in the vault settings.',
+      'vault (it is listed as "Calculator" in your app list): type your '
+      'vault PIN and press "=" to open it. Long-press "=" for biometric '
+      'unlock if enabled. You can turn the calculator entry off in the vault '
+      'settings.',
   // Lock
   'unlock': 'Enter PIN',
   'wrongPin': 'Wrong PIN',

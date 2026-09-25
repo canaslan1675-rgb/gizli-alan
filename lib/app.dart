@@ -215,7 +215,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
     return L10nScope(
       lang: L10n.lang,
       child: MaterialApp(
-        title: L10n.current('appName'),
+        title: L10n.current('launcherName'),
         debugShowCheckedModeBanner: false,
         theme: GizliTheme.dark(),
         navigatorKey: navKey,

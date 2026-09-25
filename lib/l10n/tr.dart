@@ -1,6 +1,8 @@
 /// Turkish strings (default locale).
 const Map<String, String> tr = {
   'appName': 'GizliAlan',
+  // Launcher / recents label (Android string resource says the same).
+  'launcherName': 'Hesap Makinesi',
   'appNameVault': 'GizliAlan Kasa',
   'decoyTitle': 'Hesap Makinesi',
   // Onboarding
@@ -23,8 +25,10 @@ const Map<String, String> tr = {
       'tuşuna uzun bas (açıksa).',
   'entryDisclosure':
       'Bu gizlenmiş bir özellik değildir; mağaza açıklamasında ve hesap '
-      'makinesindeki ⓘ düğmesinde anlatılır. Uygulama simgesi ve adı '
-      '"GizliAlan" olarak kalır. Ayarlar\'dan istediğin zaman kapatabilirsin.',
+      'makinesindeki ⓘ düğmesinde anlatılır. Telefonunun uygulama listesinde '
+      'bu uygulama sade bir hesap makinesi simgesiyle "Hesap Makinesi" adıyla '
+      'görünür — o simge GizliAlan\'dır. Hesap makinesi girişini Ayarlar\'dan '
+      'istediğin zaman kapatabilirsin.',
   'calculatorEntry': 'Hesap makinesi olarak aç',
   'calculatorEntryOn':
       'Uygulama hesap makinesiyle açılır — PIN ve "=" kasayı açar',
@@ -45,9 +49,10 @@ const Map<String, String> tr = {
   'calcInfoTitle': 'Bu hesap makinesi hakkında',
   'calcInfoBody':
       'Bu gerçek bir hesap makinesidir ve aynı zamanda GizliAlan kasanın '
-      'girişidir: kasa PIN\'ini yazıp "=" tuşuna basarak kasayı açarsın. '
-      'Biyometrik açıksa "=" tuşuna uzun bas. Hesap makinesi girişini kasa '
-      'ayarlarından kapatabilirsin.',
+      'girişidir (uygulama listesinde "Hesap Makinesi" adıyla görünür): kasa '
+      'PIN\'ini yazıp "=" tuşuna basarak kasayı açarsın. Biyometrik açıksa '
+      '"=" tuşuna uzun bas. Hesap makinesi girişini kasa ayarlarından '
+      'kapatabilirsin.',
   // Lock
   'unlock': 'PIN gir',
   'wrongPin': 'Yanlış PIN',
