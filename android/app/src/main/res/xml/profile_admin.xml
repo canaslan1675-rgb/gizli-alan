@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Profile owner of the user's own work profile only. No device-admin
+     policies are requested (no password/wipe/lock control over the device). -->
+<device-admin>
+    <uses-policies />
+</device-admin>
