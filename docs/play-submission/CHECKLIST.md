@@ -32,7 +32,7 @@ Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not 
 | B8 | No Advertising ID (`AD_ID`) permission | ✅ | declare "No" in Console |
 | B9 | Release signing with **upload key** (RSA ≥ 2048), `android/key.properties` local only | 👤 #13 | [Play App Signing](https://support.google.com/googleplay/android-developer/answer/9842756). Config ready (PR #21). Back up the keystore + passwords offline |
 | B10 | Enrol in **Play App Signing** (accept ToS when creating the app) | 👤 | mandatory for new apps with AAB |
-| B11 | versionCode increments for every upload | ✅ | pubspec `0.3.1+4`; bump `+N` per upload |
+| B11 | versionCode increments for every upload | ✅ | pubspec `0.3.2+5`; bump `+N` per upload |
 | B12 | Crash-free on Android 16 device (targetSdk 36 behaviour: edge-to-edge, predictive back) + Android 9 (minSdk) | ⚠️ 👤 #14 | `docs/DEVICE_TEST_PLAN.md`; pre-launch report will also run |
 | B13 | FLAG_SECURE unconditional | ✅ | pre-launch report screenshots will be black — expected, mention in reviewer notes |
 | B14 | No code that changes behaviour by locale/date/reviewer | ✅ | no network, no remote config |

@@ -53,12 +53,38 @@ class SettingsService {
 
   Future<void> setWallpaper(int i) => _prefs.setInt(_kWallpaper, i);
 
-  /// What the Lock button does to the second phone (work profile).
+  /// What happens to the second phone (work profile) while the real vault
+  /// is locked. Default [SecondPhoneCloseMode.freeze] (hide work apps).
   SecondPhoneCloseMode get secondPhoneCloseMode =>
       SecondPhoneCloseMode.parse(_prefs.getString(_kSecondPhoneClose));
 
   Future<void> setSecondPhoneCloseMode(SecondPhoneCloseMode m) =>
       _prefs.setString(_kSecondPhoneClose, m.name);
+
+  /// "Kilitliyken iş uygulamalarını gizle" / "Hide work apps while locked"
+  /// (issue #30). Default on.
+  bool get hideWorkAppsWhenLocked =>
+      secondPhoneCloseMode != SecondPhoneCloseMode.off;
+
+  Future<void> setHideWorkAppsWhenLocked(bool v) => setSecondPhoneCloseMode(
+    !v
+        ? SecondPhoneCloseMode.off
+        : (secondPhoneCloseMode == SecondPhoneCloseMode.quiet
+              ? SecondPhoneCloseMode.quiet
+              : SecondPhoneCloseMode.freeze),
+  );
+
+  /// Additionally try to pause the work profile (quiet mode) when hiding.
+  bool get pauseWorkProfileWhenLocked =>
+      secondPhoneCloseMode == SecondPhoneCloseMode.quiet;
+
+  /// Only meaningful while [hideWorkAppsWhenLocked] is on.
+  Future<void> setPauseWorkProfileWhenLocked(bool v) async {
+    if (!hideWorkAppsWhenLocked) return;
+    await setSecondPhoneCloseMode(
+      v ? SecondPhoneCloseMode.quiet : SecondPhoneCloseMode.freeze,
+    );
+  }
 
   /// How the second phone was closed at the last lock (null = not closed by
   /// us), so the next unlock can re-open it the same way.
@@ -80,7 +106,13 @@ class SettingsService {
 
   Future<void> resetAll() async {
     final lang = language;
+    // Keep "the work apps are currently hidden by us" across a vault reset,
+    // so the next real unlock still unhides them (#30).
+    final closedBy = _prefs.getString(_kSecondPhoneClosedBy);
     await _prefs.clear();
     await setLanguage(lang);
+    if (closedBy != null) {
+      await _prefs.setString(_kSecondPhoneClosedBy, closedBy);
+    }
   }
 }

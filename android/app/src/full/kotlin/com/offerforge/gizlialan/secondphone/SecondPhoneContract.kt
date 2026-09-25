@@ -45,7 +45,7 @@ object SecondPhoneContract {
     const val OP_OPEN_STORE = "open_store"
     const val OP_REMOVE = "remove"
 
-    const val PLAY_STORE = "com.android.vending"
+    const val PLAY_STORE = HidePolicy.PLAY_STORE
 
     private const val PREFS = "second_phone"
     private const val KEY_SECRET = "secret"

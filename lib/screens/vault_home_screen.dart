@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -52,6 +53,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         ..addListener(_loadProfileApps);
       _loadProfileApps();
       _loadUnread();
+      _loadBackground();
     }
   }
 
@@ -67,6 +69,15 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
     _clock?.cancel();
     _spChanged?.removeListener(_loadProfileApps);
     super.dispose();
+  }
+
+  Uint8List? _background;
+
+  /// Vault-home background photo chosen in Settings (decrypted in memory).
+  Future<void> _loadBackground() async {
+    final session = GizliAlanApp.of(context).session;
+    final bytes = await session?.homeBackgroundBytes();
+    if (mounted) setState(() => _background = bytes);
   }
 
   Future<void> _loadProfileApps() async {
@@ -86,6 +97,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       if (mounted) setState(() {}); // e.g. wallpaper changed in settings
       _loadProfileApps();
       _loadUnread();
+      _loadBackground();
     });
   }
 
@@ -163,9 +175,23 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       },
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            gradient: GizliTheme.wallpaper(app.settings.wallpaper),
-          ),
+          key: const ValueKey('vault_home_background'),
+          decoration: _background != null
+              ? BoxDecoration(
+                  color: GizliTheme.bg,
+                  image: DecorationImage(
+                    image: MemoryImage(_background!),
+                    fit: BoxFit.cover,
+                    // Scrim keeps the clock, labels and dock readable.
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withValues(alpha: GizliTheme.homePhotoScrim),
+                      BlendMode.srcATop,
+                    ),
+                  ),
+                )
+              : BoxDecoration(
+                  gradient: GizliTheme.wallpaper(app.settings.wallpaper),
+                ),
           child: SafeArea(
             child: Column(
               children: [
@@ -213,12 +239,15 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                                   color: GizliTheme.textSecondary,
                                 ),
                                 const SizedBox(width: 6),
-                                Text(
-                                  t('secondPhoneApps'),
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    letterSpacing: 1.1,
-                                    color: GizliTheme.textSecondary,
+                                Flexible(
+                                  child: Text(
+                                    t('secondPhoneApps'),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      letterSpacing: 1.1,
+                                      color: GizliTheme.textSecondary,
+                                    ),
                                   ),
                                 ),
                               ],

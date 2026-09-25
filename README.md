@@ -23,15 +23,17 @@ Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculato
 - **Sanal telefon ana ekranı:** saat, ikon ızgarası, dock, duvar kağıdı seçimi
 - **Bildirimler (yalnızca kasa içinde):** içe/dışa aktarma, silme, İkinci telefon değişiklikleri ve son girişten beri hatalı PIN sayısı; şifreli, kasa başına ayrı; sistem bildirimi yok (izin de yok)
 - **GizliAlan Pro ekranı (yalnızca arayüz):** Ayarlar → planlar ve planlanan fiyatlar (Ücretsiz 50 öğe, Pro 249 TL tek seferlik / 449 TL yıllık); satın alma yok, ödeme kodu yok
+- **v0.3.2 — Ana ekran arka planı:** Galeri → fotoğrafa uzun bas → "Ana ekran arka planı yap" (menüde ayrıca Aç / Dışa aktar / Sil). Yalnızca kasa ana ekranında, okunabilirlik için karartma katmanıyla; fotoğraf kasada şifreli kalır, yalnızca bellekte çözülür. Ayarlar → "Ana ekran arka planı" durumu gösterir ve "Arka planı kaldır" sunar. Varsayılan: düz renk geçişi (paketli görsel yok; `assets/wallpapers/` ileride varsayılan görsel için ayrılmış). Her kasanın (gerçek/sahte) kendi arka planı.
 - **Sahte PIN (isteğe bağlı):** ayrı anahtarla ayrı, boş bir kasa
 - **TR / EN** arayüz
 - **v0.2 — Nötr başlatıcı adı/simgesi:** uygulama listesinde "Hesap Makinesi" / "Calculator" adı ve özgün hesap makinesi simgesi (adaptive + monochrome). Kasa; onboarding, ⓘ ve mağaza metninde açıkça belirtilir.
-- **v0.2 — İkinci telefon (iş profili):** Android iş profili (Shelter/Island yöntemi) kurulur; kendi Play Store'u ve ayrı Google hesabıyla izole uygulamalar. Kasa içinden: kur, durum, kilitleyince uygulamaları gizle / profili kapat (seçenek), ana telefondan uygulama ekle, Play Store'u aç, uygulamaları listele/başlat, profili kaldır. Xiaomi MIUI/HyperOS'ta engellenebilir → İkinci alan / Özel alan önerisi.
+- **v0.2 — İkinci telefon (iş profili):** Android iş profili (Shelter/Island yöntemi) kurulur; kendi Play Store'u ve ayrı Google hesabıyla izole uygulamalar. Kasa içinden: kur, durum, **kilitliyken iş uygulamalarını gizle** (varsayılan açık; #30 — ana ekrandaki "İş" klasöründen de kalkar, gerçek PIN/parmak iziyle açınca geri gelir, bkz. `docs/SECOND_PHONE_HIDING.md`), isteğe bağlı iş profilini duraklatmayı dene, ana telefondan uygulama ekle, Play Store'u aç, uygulamaları listele/başlat, profili kaldır. Xiaomi MIUI/HyperOS'ta engellenebilir → İkinci alan / Özel alan önerisi.
 
 ### Ne yapmaz
 SMS/arama okuma, konum, rehber, mikrofon/kamera, Erişilebilirlik Hizmeti,
-ana cihaz yöneticisi, bildirim dinleyici, sunucuya yükleme, ikon gizleme — **yok**.
-(İkinci telefon: yalnızca kullanıcının kendi oluşturduğu iş profilinin profil sahibi.)
+ana cihaz yöneticisi, bildirim dinleyici, sunucuya yükleme, kendi simgesini gizleme — **yok**.
+(İkinci telefon: yalnızca kullanıcının kendi oluşturduğu iş profilinin profil sahibi; kilitliyken
+yalnızca **o profilin içindeki** uygulamaları gizler, ana profildeki hiçbir uygulamaya dokunmaz.)
 
 ---
 
@@ -63,7 +65,7 @@ Both keep the launcher label "Calculator"/"Hesap Makinesi", FLAG_SECURE and only
 `android/app/build.gradle.kts`; the Second phone manifest entries, Kotlin code, strings and
 `profile_admin.xml` live only in `android/app/src/full/`. Dart: `lib/flavor.dart` reads
 Flutter's `appFlavor` (set by `--flavor`), then `--dart-define=FLAVOR=play|full`; unknown or
-missing → `play` (safe default). Settings → footer shows "GizliAlan 0.3.1 · Play/Full".
+missing → `play` (safe default). Settings → footer shows "GizliAlan 0.3.2 · Play/Full".
 On Android always pass a flavor, e.g.
 `flutter run --flavor full` (or `play`).
 
@@ -187,7 +189,12 @@ docs/PLAY_COMPLIANCE.md        permissions, Data safety answers, listing TR/EN, 
   Makinesi" (a real calculator; vault disclosed). It is not Android Private Space.
 - Second phone isolation is Android's work profile; GizliAlan is its profile
   owner only. Work-profile apps show a briefcase badge and appear in the
-  launcher's Work tab — it is separation, not invisibility.
+  launcher's Work tab / "İş" folder while unlocked. **Since v0.3.2 (#30, full
+  flavor):** while the vault is locked GizliAlan hides the profile's launchable
+  apps from inside the profile (`setApplicationHidden`) and unhides exactly
+  those on a real unlock — see `docs/SECOND_PHONE_HIDING.md` for what is kept,
+  timing (background auto-lock hides on next open) and limitations (hidden apps
+  get no notifications). The main profile's apps are never touched.
 - No PIN recovery.
 
 See `PRIVACY.md`, `docs/PLAY_COMPLIANCE.md`, `DECISIONS.md`.

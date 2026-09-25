@@ -100,6 +100,8 @@ class GizliAlanAppState extends State<GizliAlanApp>
       _needsOnboarding = !onboarded;
       _ready = true;
     });
+    // App start while locked: make sure the work apps are hidden (#30).
+    if (onboarded) ensureWorkAppsHiddenWhileLocked();
   }
 
   @override
@@ -114,7 +116,19 @@ class GizliAlanAppState extends State<GizliAlanApp>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!isUnlocked || _externalUi > 0) return;
+    if (_externalUi > 0) return;
+    if (!isUnlocked) {
+      // Back in the foreground while locked: hide the work apps if a
+      // background auto-lock could not (#30). A new foreground visit may try
+      // again, so reset the per-visit guard when we really leave.
+      if (state == AppLifecycleState.resumed) {
+        ensureWorkAppsHiddenWhileLocked();
+      } else if (state == AppLifecycleState.paused ||
+          state == AppLifecycleState.hidden) {
+        _hideTriedThisVisit = false;
+      }
+      return;
+    }
     switch (state) {
       case AppLifecycleState.paused:
       case AppLifecycleState.hidden:
@@ -128,6 +142,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
             DateTime.now().difference(since).inSeconds >=
                 settings.lockTimeoutSec) {
           lockVault();
+          ensureWorkAppsHiddenWhileLocked();
         }
         break;
       case AppLifecycleState.detached:
@@ -186,13 +201,24 @@ class GizliAlanAppState extends State<GizliAlanApp>
     if (space == VaultSpace.real) _reopenSecondPhone();
   }
 
-  /// If the Lock button closed the second phone, open it again on unlock.
+  /// Real vault unlocked (PIN/biometric): unhide the work apps we hid.
+  /// If our "hidden" marker was lost but hiding is enabled, ask the profile
+  /// anyway — it only unhides packages it recorded itself (#30).
   Future<void> _reopenSecondPhone() async {
-    if (!Flavor.hasSecondPhone) return;
-    final closedBy = settings.secondPhoneClosedBy;
-    if (closedBy == null) return;
+    // A hide still in flight re-opens by itself when it finishes.
+    if (!Flavor.hasSecondPhone || _closing) return;
+    var closedBy = settings.secondPhoneClosedBy;
+    if (closedBy == null) {
+      if (!settings.hideWorkAppsWhenLocked) return;
+      final st = await _secondPhone.status();
+      if (st.availability != SecondPhoneAvailability.ready) return;
+      closedBy = st.quietMode
+          ? SecondPhoneCloseMode.quiet
+          : SecondPhoneCloseMode.freeze;
+    }
+    final mode = closedBy;
     // Opening may briefly start a system/profile activity: don't auto-lock.
-    final ok = await withExternalUi(() => _secondPhone.open(closedBy));
+    final ok = await withExternalUi(() => _secondPhone.open(mode));
     if (ok) await settings.setSecondPhoneClosedBy(null);
     secondPhoneChanged.value++;
   }
@@ -200,23 +226,64 @@ class GizliAlanAppState extends State<GizliAlanApp>
   /// Bumped when the second phone opens/closes so the home grid reloads.
   final ValueNotifier<int> secondPhoneChanged = ValueNotifier(0);
 
-  /// Lock button: lock the vault and, if enabled, close the second phone.
-  /// Auto-lock in the background does NOT close it, because the owner is
-  /// most likely using a second-phone app that was launched from the vault.
+  /// Lock button: lock the vault and, if enabled, hide the work apps.
   void lockVaultExplicit() {
     final wasReal = _session != null && !_session!.isDecoy;
     lockVault();
     if (wasReal) _closeSecondPhone();
   }
 
+  bool _closing = false;
+  bool _hideTriedThisVisit = false;
+  DateTime? _lastHideAttempt;
+
+  /// Minimum gap between automatic hide attempts. Each attempt briefly
+  /// starts a (translucent) activity in the work profile, which pauses and
+  /// resumes us; this guard prevents a resume → hide → resume loop.
+  static const hideCooldown = Duration(seconds: 10);
+
+  /// "Hide work apps while locked" (#30): called on app start, when the app
+  /// returns to the foreground while locked, and after auto-lock on resume.
+  ///
+  /// Android does not let a backgrounded app start the cross-profile
+  /// request, so a background auto-lock cannot hide immediately; it happens
+  /// the next time GizliAlan is in the foreground while locked. Does nothing
+  /// while unlocked, when the toggle is off, when already hidden by us, or
+  /// in the `play` flavor.
+  Future<void> ensureWorkAppsHiddenWhileLocked() async {
+    if (!Flavor.hasSecondPhone || isUnlocked) return;
+    if (!settings.hideWorkAppsWhenLocked) return;
+    if (settings.secondPhoneClosedBy != null) return;
+    if (_closing || _hideTriedThisVisit) return;
+    final last = _lastHideAttempt;
+    if (last != null && DateTime.now().difference(last) < hideCooldown) return;
+    final lc = WidgetsBinding.instance.lifecycleState;
+    if (lc != null && lc != AppLifecycleState.resumed) return;
+    _hideTriedThisVisit = true;
+    _lastHideAttempt = DateTime.now();
+    await _closeSecondPhone();
+  }
+
   Future<void> _closeSecondPhone() async {
-    if (!Flavor.hasSecondPhone) return;
+    if (!Flavor.hasSecondPhone || _closing) return;
     final mode = settings.secondPhoneCloseMode;
     if (mode == SecondPhoneCloseMode.off) return;
-    final st = await _secondPhone.status();
-    if (st.availability != SecondPhoneAvailability.ready) return;
-    final applied = await _secondPhone.close(mode);
-    if (applied != null) await settings.setSecondPhoneClosedBy(applied);
+    _closing = true;
+    _lastHideAttempt = DateTime.now();
+    try {
+      final st = await _secondPhone.status();
+      if (st.availability != SecondPhoneAvailability.ready) return;
+      // Starts a translucent activity in the work profile: don't let the
+      // resulting pause/resume count as leaving the app.
+      final applied = await withExternalUi(() => _secondPhone.close(mode));
+      // Unlocked again meanwhile? Then re-open right away.
+      if (applied != null) await settings.setSecondPhoneClosedBy(applied);
+      if (applied != null && isUnlocked && !_session!.isDecoy) {
+        await _reopenSecondPhone();
+      }
+    } finally {
+      _closing = false;
+    }
   }
 
   /// Biometric unlock of the real vault. Returns true on success.
@@ -235,6 +302,11 @@ class GizliAlanAppState extends State<GizliAlanApp>
     final s = _session;
     if (s == null) return;
     s.close();
+    // Drop decoded vault photos (gallery thumbnails, home background) from
+    // Flutter's in-memory image cache.
+    PaintingBinding.instance.imageCache
+      ..clear()
+      ..clearLiveImages();
     _backgroundedAt = null;
     setState(() => _session = null);
     navKey.currentState?.popUntil((r) => r.isFirst);

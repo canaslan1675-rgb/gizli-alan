@@ -98,3 +98,8 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
   `PrivacyLink.open` / the `gizlialan/system` channel. Play AAB: add `--dart-define=PRIVACY_URL=…` once #12 is hosted.
 - Next: owner items #11–#16; #10 (post-MVP) is free.
 
+
+## 2026-09-26 01:41 +03:00 — joi
+- Finished: #30 on `joi/30-hide-work-apps` (PR #31, owner-authorised self-merge). While the vault is locked, the Second phone's work apps are hidden (full only; see docs/SECOND_PHONE_HIDING.md). Also vault home background from a vault photo (Gallery long-press menu; both flavors). Version 0.3.2+5, prerelease `v0.3.2-test` with both APKs.
+- Note for all agents: profile-side hide rules live in `secondphone/HidePolicy.kt` (JVM tests: `cd android && ./gradlew :app:testFullDebugUnitTest`). Anything in `src/play`/`src/main` that mentions DevicePolicyManager now fails `test/flavor_sources_test.dart`. The home background id is stored encrypted in `spaces/<space>/home_background.gae`. `assets/wallpapers/` is an empty slot kept for a future bundled default; it is not in pubspec.
+- Next: owner device test #14 (DEVICE_TEST_PLAN §2.16, §3.15–3.20 on Xiaomi).

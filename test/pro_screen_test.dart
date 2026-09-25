@@ -100,6 +100,8 @@ void main() {
               )
               .first,
         );
+        await tester.ensureVisible(find.byKey(const ValueKey('settings_pro')));
+        await settle(tester);
         await tester.tap(find.byKey(const ValueKey('settings_pro')));
         await settle(tester);
 

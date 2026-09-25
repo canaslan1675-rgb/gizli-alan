@@ -58,7 +58,7 @@ Not present in the `play` flavor (see §0). Only relevant if the owner submits `
 |-----------|---------|
 | `secondphone.ProfileAdminReceiver` (`BIND_DEVICE_ADMIN`, `<uses-policies/>` empty) | Profile owner of the work profile the user creates in "Second phone". Never device owner; if activated as a main-profile device admin it deactivates itself. |
 | `secondphone.ProvisioningDoneActivity` (`PROVISIONING_SUCCESSFUL`, `BIND_DEVICE_ADMIN`) | Finishes setup inside the new profile. |
-| `secondphone.ProfileActionActivity` (disabled except inside the profile) | HMAC-signed requests from the vault: hide/unhide profile apps, add app, open profile Play Store, remove profile. |
+| `secondphone.ProfileActionActivity` (disabled except inside the profile) | HMAC-signed requests from the vault: hide/unhide profile apps (while the vault is locked, #30; `HidePolicy` never-hide list), add app, open profile Play Store, remove profile. |
 | `<queries>` MAIN/LAUNCHER intent | Lists launchable apps for the second-phone grid and the "add app" picker (names + icons only, on device). |
 | `uses-feature managed_users / device_admin` (`required=false`) | Feature is optional; app installs everywhere. |
 | Launcher label `@string/app_name` = "Calculator" / "Hesap Makinesi", original icon | Discreet name; app is a real calculator; vault disclosed (§3, §4). |

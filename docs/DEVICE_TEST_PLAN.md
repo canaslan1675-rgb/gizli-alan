@@ -15,7 +15,7 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 
 | | |
 |---|---|
-| Build | Latest test APK from GitHub Releases (e.g. `v0.3.1-test`: `GizliAlan-v0.3.1-play.apk` = no Second phone, `GizliAlan-v0.3.1-full.apk` = with Second phone; arm64, debug-signed; they install side by side) or a newer one built from `main` (`flutter build apk --release --flavor play|full --target-platform android-arm64`). §3 applies to the **full** APK only; on the play APK check that no Second phone tile/setting exists and GizliAlan never appears under Device admin apps. |
+| Build | Latest test APK from GitHub Releases (e.g. `v0.3.2-test`: `GizliAlan-v0.3.2-play.apk` = no Second phone, `GizliAlan-v0.3.2-full.apk` = with Second phone; arm64, debug-signed; they install side by side) or a newer one built from `main` (`flutter build apk --release --flavor play|full --target-platform android-arm64`). §3 applies to the **full** APK only; on the play APK check that no Second phone tile/setting exists and GizliAlan never appears under Device admin apps. |
 | Install | `adb install -r GizliAlan-test-*.apk` or open the APK on the phone (allow "install unknown apps" for the file manager/browser — that is a phone setting, not an app permission). |
 | Reset between runs | Settings → Apps → Calculator (GizliAlan) → Storage → Clear data. If a work profile was created: remove it in-app (§3.9) or Settings → Accounts/Passwords → Work → Remove work profile. |
 | Record | Device model, Android version, OEM skin + version (MIUI/HyperOS/One UI), build/tag, date. |
@@ -49,10 +49,11 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 | 2.13 | Unlock the real vault after 2.12. | **Notifications** tile shows a badge; list says "N wrong PIN attempt(s) since your last unlock". Imports/exports/deletes from 2.7–2.8 are listed. Mark all read / Clear all work. No system notification was ever shown. (Needs PR #19.) |
 | 2.14 | Settings → GizliAlan Pro → Buy / Subscribe. | Plans + prices shown; dialog "Not available yet"; no Play purchase sheet, no network. (Needs PR #20.) |
 | 2.15 | Settings → Language TR/EN. | All screens switch language. |
+| 2.16 | Gallery → long-press a photo. | Sheet: Open / Set as home background / Export / Delete. "Set as home background" → vault home shows the photo (darkened, clock/labels readable); calculator, gallery and other screens unchanged. Settings → Home screen background → "Remove background" → plain gradient again. Decoy vault has its own (none by default). Deleting that photo → plain gradient. |
 
 ## 3. Second phone (work profile) — main focus
 
-Run on each device. Note the exact messages on failure.
+Run on each device. Note the exact messages on failure. Hiding work apps while locked (#30): details and limitations in `docs/SECOND_PHONE_HIDING.md`; Xiaomi-specific steps 3.15–3.20 (owner issue #14).
 
 | # | Step | Expected |
 |---|------|----------|
@@ -62,14 +63,20 @@ Run on each device. Note the exact messages on failure.
 | 3.4 | "Open Play Store (second account)". | The work profile's Play Store opens; you can add a second Google account there. |
 | 3.5 | "Add an app from the main phone" → pick a system app (e.g. Chrome/Calculator) and a normal Play app. | System app: "… was added to the second phone" (enableSystemApp). Play app: the profile Play Store opens on that app (fallback). No "install unknown apps" prompt. |
 | 3.6 | Vault home → second-phone app grid → tap an app. | App starts in the work profile (work badge). The vault goes to background and auto-locks, but the app keeps running. |
-| 3.7 | Settings → "Second phone on lock" = "Hide its apps" → press **Lock**. | Work apps disappear from the phone launcher. Unlock the real vault → they come back ("Second phone opened"). |
-| 3.8 | Same with "Turn work profile off". | Either the work profile turns off, or the app shows "Android did not allow… apps were hidden instead" (expected on most phones; quiet mode is limited to the default launcher). |
-| 3.9 | Background auto-lock while a work app is open. | The second phone is **not** closed by auto-lock (only by the Lock button). |
+| 3.7 | Second phone screen → "Hide work apps while locked" is **on** (default) → press **Lock**. | Work apps disappear from the phone launcher (Work tab / "İş" folder, app drawer, search). Unlock the real vault → they come back. |
+| 3.8 | Turn on "Also try to pause the work profile" → Lock. | Apps are hidden; additionally either the profile pauses, or (expected on most phones) nothing more happens. Second phone screen → "Close now" shows "Apps hidden. Android did not allow pausing…". Unlock → apps back, profile running. |
+| 3.9 | Launch a work app from the vault grid (vault auto-locks in the background), use it, then open GizliAlan again. | While the work app is in use it keeps running. When GizliAlan opens (locked calculator), the work apps are hidden (the work app is closed). |
 | 3.10 | Decoy vault (`1111=`). | No Second phone tile; locking the decoy does not change the work profile. |
 | 3.11 | "Remove second phone" → confirm. | Work profile and its apps/accounts are removed; "Second phone removed". |
 | 3.12 | Xiaomi only: if 3.2 fails or is blocked. | App shows the blocked message with the **Second space** (MIUI) / **Private space** (Android 15+) alternative. The app must not crash or loop. |
 | 3.13 | Samsung only: with Secure Folder set up. | Work profile setup still works or fails cleanly with the "not allowed" message; Secure Folder is not affected. |
 | 3.14 | Security check of the trampoline (optional, adb): `adb shell am start --user <workUserId> -n com.offerforge.gizlialan/.secondphone.ProfileActionActivity` without extras. | Activity finishes immediately and does nothing (unsigned/expired requests are rejected). |
+| 3.15 | **Xiaomi (#14):** set up the second phone, install 2 apps from its Play Store. Note where MIUI/HyperOS puts them. | Apps appear in an "İş"/"Work" folder with briefcase badges (record the exact behaviour). |
+| 3.16 | Xiaomi: press **Lock** in the vault, go to the home screen, app drawer and search. | No work app icons, no briefcase badges; the "İş" folder is gone or empty (record which). Play Store (work) is hidden too; personal Play Store is untouched. |
+| 3.17 | Xiaomi: unlock with the real PIN, then with biometrics (repeat 3.16 in between). | All previously visible work apps come back (check the "İş" folder and positions; record if they moved). Personal apps and their positions unchanged. |
+| 3.18 | Xiaomi: unlock with the decoy PIN `1111`. | Work apps stay hidden. |
+| 3.19 | Xiaomi: Home button from the unlocked vault (no Lock), wait, reopen GizliAlan. | Icons remain visible while GizliAlan is in the background (known limitation), and disappear when GizliAlan opens locked. |
+| 3.20 | Xiaomi: turn the toggle off, Lock, then on again. Force-stop GizliAlan while hidden and reopen; reboot the phone while hidden. | Off: apps stay visible after Lock. Force-stop / reboot while hidden: apps stay hidden until the next real unlock, then all come back. Also note whether work-app notifications arrive while hidden (expected: no). |
 
 ## 4. Device matrix / Cihaz matrisi
 
