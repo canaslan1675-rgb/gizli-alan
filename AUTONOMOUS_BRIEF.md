@@ -44,11 +44,11 @@
 
 ### Hafta 3: Sanal telefon arayüzü ve Play hazırlığı
 - [x] Kasa içi "ana ekran": ikon ızgarası (Galeri, Notlar, Dosyalar, Ayarlar), duvar kağıdı seçimi
-- [x] Uygulama içi bildirim izolasyonu: yalnızca kasa içinde görünen bildirim listesi, sistem bildiriminde içerik gösterilmez — #4, PR #19 (sahibinin birleştirmesini bekliyor)
+- [x] Uygulama içi bildirim izolasyonu: yalnızca kasa içinde görünen bildirim listesi, sistem bildiriminde içerik gösterilmez — #4, PR #19 (birleştirildi)
 - [x] Ayarlar: PIN değiştir, biyometri aç/kapa, sahte PIN, otomatik kilit süresi
 - [x] Play hazırlığı: gizlilik politikası, Data safety notları, TR+EN mağaza metni taslağı, ekran görüntüsü planı, minimum izin listesi — `PRIVACY.md`, `docs/PLAY_COMPLIANCE.md` (ekran görüntüsü *planı* dahil). Açık: ekran görüntülerinin kendisi #6, HTTPS'te barındırma + destek e-postası #12 (sahibi)
-- [x] Ödeme için yalnızca stub/arayüz (gerçek entegrasyon yok, bkz. §5) — #5, PR #20 (sahibinin birleştirmesini bekliyor); gerçek ödeme #15 (sahibi, DUR)
-- [x] Release derlemesi (mümkünse APK), hafta sonu PR'ı — `v0.2.0-test` ön sürümü (arm64 APK, debug imzalı). İmzalama yapılandırması #8 / PR #21; yükleme anahtarı #13 (sahibi)
+- [x] Ödeme için yalnızca stub/arayüz (gerçek entegrasyon yok, bkz. §5) — #5, PR #20 (birleştirildi); gerçek ödeme #15 (sahibi, DUR)
+- [x] Release derlemesi (mümkünse APK), hafta sonu PR'ı — `v0.2.0-test` ön sürümü (arm64 APK, debug imzalı). İmzalama yapılandırması #8 / PR #21 (birleştirildi); yükleme anahtarı #13 (sahibi)
 
 ---
 
@@ -84,17 +84,18 @@
 - [ ] **Riskli veya geri alınamaz adımlarda DUR ve not düş** (`BLOCKERS.md`): Play Store'a yükleme veya yayın, gerçek ödeme / Play Billing entegrasyonu, herhangi bir harcama, hesap açma, dış servislere kişisel veri gönderme, force push veya geçmişi yeniden yazma.
 - [ ] Günlük ilerleme `PROGRESS.md` dosyasına tek paragraf olarak yazılır.
 
-## 6. Mevcut durum (25 Eylül 2026, güncellendi)
+## 6. Mevcut durum (26 Eylül 2026, güncellendi)
 
 - Repo: GitHub'da özel repo `canaslan1675-rgb/gizli-alan`. **Entegrasyon dalı `main`**: MVP v1 (PR #1), v0.2 hesap makinesi markası + "İkinci telefon" (PR #2), Cursor kuralları + koordinasyon protokolü (PR #3) birleştirildi. `mvp-v1`, `v0.2-calculator-workprofile`, `cursor-rules` artık tarihsel.
 - Sürüm 0.2.0+2; test ön sürümü `v0.2.0-test` (arm64 APK, debug imzalı, mağaza için değil).
-- Açık PR'lar (sahibinin birleştirmesini bekliyor): #18 (main = entegrasyon dalı), #19 kasa içi bildirimler (#4), #20 Pro arayüz stub'ı (#5), #21 release imzalama (#8) ve bu doküman senkronu (#9).
-- İki ajan grubu (Joi ve Cursor ajanları) `COORDINATION.md` protokolüyle çalışır: işler `task` etiketli GitHub issue'ları, günlük `docs/AGENT_LOG.md`. Kalan işler ve sahibi kararları issue olarak açık (#6, #7, #10; sahibi: #11–#16).
+- **PR #18–#23 `main`'e birleştirildi:** #18 entegrasyon dalı notu, #19 kasa içi bildirimler (#4), #20 Pro arayüz stub'ı (#5), #21 release imzalama (#8), #22 docs sync (#9), #23 cihaz test planı (#7 plan kısmı).
+- Açık ajan işi: **#6** mağaza ekran görüntüleri (`agent:cursor` + `status:in-progress`; Cursor yerelde bitirdi ama GitHub'a push edemiyor — dal uzak repoda yok), **#7** emülatör kapanışı (bu oturum / PR). Post-MVP #10 henüz üstlenilmez (#6 açık). Sahibi: **#11–#16** (ajanlar üstlenmez).
+- İki ajan grubu (Joi ve Cursor ajanları) `COORDINATION.md` protokolüyle çalışır: işler `task` etiketli GitHub issue'ları, günlük `docs/AGENT_LOG.md`.
 - GitHub girişi tamamlandı; önceki "giriş bekleniyor" notu geçersiz.
 
 ## 7. Bitti tanımı (3. hafta sonu)
 
 - [x] Uygulama derleniyor, analyze ve testler temiz
-- [x] Hafta 1–3 kontrol listelerinin tamamı işaretli ya da `BLOCKERS.md` dosyasında gerekçeli (açık kalanlar issue'lara bağlı; PR #19/#20 birleşince tamam)
+- [x] Hafta 1–3 kontrol listelerinin tamamı işaretli ya da `BLOCKERS.md` dosyasında gerekçeli (açık kalanlar issue'lara bağlı; PR #19/#20 birleştirildi)
 - [ ] 3 haftalık PR geçmişi ve güncel `PROGRESS.md` (PROGRESS güncel; 3 haftalık geçmiş henüz tamamlanmadı — 3. hafta sonunda yeniden kontrol edilecek)
 - [x] Play hazırlık paketi (politika, Data safety, mağaza metni) repoda (`PRIVACY.md`, `docs/PLAY_COMPLIANCE.md`; barındırma #12)
