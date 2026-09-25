@@ -156,9 +156,11 @@ void main() {
     expect(find.text(url), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('privacy_open')));
     await tester.pumpAndSettle();
-    expect(calls, hasLength(1));
-    expect(calls.single.method, 'openUrl');
-    expect(calls.single.arguments, {'url': url});
+    // The same channel also carries the browser wipe (#32) — ignore it.
+    final opens = calls.where((c) => c.method == 'openUrl').toList();
+    expect(opens, hasLength(1));
+    expect(opens.single.method, 'openUrl');
+    expect(opens.single.arguments, {'url': url});
   });
 
   testWidgets('no browser: falls back to copying the link', (tester) async {
@@ -198,19 +200,24 @@ void main() {
     );
   });
 
-  test('manifests: still no INTERNET permission, no url_launcher', () {
-    for (final f in [
+  test('manifests: INTERNET only in main (browser, #32), no url_launcher', () {
+    // v0.4.0: INTERNET is declared once, in the shared main manifest, for
+    // the in-vault private browser only. The full flavor adds nothing.
+    final main = File(
       'android/app/src/main/AndroidManifest.xml',
-      'android/app/src/full/AndroidManifest.xml',
-    ]) {
-      final m = File(f);
-      if (!m.existsSync()) continue;
-      expect(
-        m.readAsStringSync().contains('android.permission.INTERNET'),
-        isFalse,
-        reason: f,
-      );
-    }
+    ).readAsStringSync();
+    expect(
+      '<uses-permission android:name="android.permission.INTERNET" />'
+          .allMatches(main)
+          .length,
+      1,
+    );
+    expect(
+      File(
+        'android/app/src/full/AndroidManifest.xml',
+      ).readAsStringSync().contains('android.permission.INTERNET'),
+      isFalse,
+    );
     expect(
       File('pubspec.yaml').readAsStringSync().contains('url_launcher'),
       isFalse,

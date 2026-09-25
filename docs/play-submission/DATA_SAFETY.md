@@ -1,7 +1,7 @@
 # Data safety form — suggested answers
 
 > **TR özet.** Önerilen cevap: **"Uygulama zorunlu kullanıcı veri türlerinden hiçbirini toplamıyor veya paylaşmıyor."** Gerekçe: Google'ın tanımına göre yalnızca cihazda işlenen ve
-> cihazdan çıkmayan veri "toplanmış" sayılmaz; GizliAlan'ın release derlemesinde internet izni yok, veri toplayan SDK yok. Form yine de **zorunlu** ve gizlilik politikası URL'si
+> cihazdan çıkmayan veri "toplanmış" sayılmaz; GizliAlan geliştiriciye/üçüncü tarafa hiçbir veri göndermez, veri toplayan SDK yok. 0.4.0'dan itibaren INTERNET izni var ama yalnızca kasa içi tarayıcı içindir: kullanıcının kendi açtığı sitelere giden trafik, geliştiricinin veri toplaması değildir (tarayıcı uygulamalarındaki gibi). Form yine de **zorunlu** ve gizlilik politikası URL'si
 > ile birlikte doldurulmalı. `full` flavor'u için de cevap aynı (iş profili uygulamalarının verisi okunmaz, başka uygulamaya kullanıcı verisi aktarılmaz).
 > Faturalama (Play Billing), çökme raporlama veya yedekleme SDK'sı eklenirse form **yeniden** doldurulmalı.
 
@@ -18,9 +18,10 @@ Source: [Provide information for Google Play's Data safety section](https://supp
 
 | Check | Result |
 |---|---|
-| Release permissions | `USE_BIOMETRIC` only (+ AndroidX signature-level internal permission) — verified 2026-09-26 with `aapt2 dump badging` on `app-play-release.apk` |
-| INTERNET permission | absent in release → no off-device transfer possible |
-| SDKs | `flutter_secure_storage`, `local_auth`, `image_picker`, `file_picker`, `path_provider`, `shared_preferences`, `cryptography(_flutter)`, `crypto`, `intl`, `path`, `uuid` — none collect or transmit data |
+| Release permissions | `USE_BIOMETRIC` + `INTERNET` (+ AndroidX signature-level internal permission) — verified 2026-09-26 with `aapt2 dump permissions` on the v0.4.0 APKs of both flavors |
+| INTERNET permission | present since 0.4.0, used **only** by the in-vault private browser (Android System WebView via `webview_flutter`). The app has no server, no analytics/telemetry/crash reporting, no ads; no app code opens network connections. Traffic goes only to sites the user types/opens. WebView metrics opt-out is set (`android.webkit.WebView.MetricsOptOut=true`); Safe Browsing is left at the WebView default (Google Play services may check visited URLs against Google's list — a platform component, not our SDK). |
+| User-initiated browsing | **[Judgement]** Web pages the user chooses to visit receive the user's IP and whatever the user types into them, exactly like any browser. Google's definition of *collection* is data transmitted off device *by your app* to you or a third party; browsing sites the user deliberately opens is user-initiated and not collected by the developer. Browsers on Play (e.g. DuckDuckGo) declare data they themselves collect, not the content of sites visited. Answer stays **no data collected/shared**; describe the browser in the privacy policy. If a reviewer disagrees, the conservative fallback is "Web browsing history — collected — ephemeral, not shared" — but we store none off device. |
+| SDKs | `webview_flutter(_android)` (system WebView wrapper, no telemetry), `flutter_secure_storage`, `local_auth`, `image_picker`, `file_picker`, `path_provider`, `shared_preferences`, `cryptography(_flutter)`, `crypto`, `intl`, `path`, `uuid` — none collect or transmit data |
 | Backup | `allowBackup=false`, data-extraction rules exclude everything → no Google cloud backup of vault data |
 | Sharing to other apps | Only when the **user** exports a file via the system "save as" dialog (user-initiated, user chooses the destination). **[Judgement]** This is the user moving their own file, not the app sharing data with a third party; Google's examples of sharing are app-initiated transfers. If a reviewer disagrees, declare "Files and docs / Photos — shared — user-initiated" (optional disclosure is allowed to be conservative). |
 
@@ -60,6 +61,6 @@ When the answer is **No**, Play shows "No data collected" and "No data shared wi
 ## Consistency checks before submitting
 
 - [ ] `PRIVACY.md` (hosted) says the same: nothing collected, nothing shared, on-device only.
-- [ ] Listing says "No account, no server, no ads, no analytics, no internet permission".
+- [ ] Listing says "No account, no server, no ads, no analytics, no tracking" and mentions the browser only talks to sites you open (no "no internet permission" claim any more).
 - [ ] App content → Ads = **No**; Advertising ID = **No**.
 - [ ] Re-do this form **before** adding Play Billing (#15) — Play Billing itself: purchase history is handled by Google Play; the app would still not collect data unless it sends purchase info to a server. Re-check Google's guidance then.

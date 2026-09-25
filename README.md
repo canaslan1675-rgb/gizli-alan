@@ -1,11 +1,11 @@
 # GizliAlan
 
-Personal, offline **"hidden virtual phone" vault** for the device owner:
+Personal, on-device **"hidden virtual phone" vault** for the device owner:
 encrypted photos, files and notes behind a PIN / biometrics, with an optional
 (disclosed) calculator entry and an optional decoy PIN.
 
 **Package:** `com.offerforge.gizlialan` · **Flutter** 3.47 (stable) · **Android** 9+ (minSdk 28)
-**No spyware. No cloud. No SMS/calls. No Accessibility. No main-device admin. No INTERNET in release.**
+**No spyware. No cloud. No SMS/calls. No Accessibility. No main-device admin. No tracking, no ads, no analytics; INTERNET only for the in-vault private browser.**
 
 Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculator icon (v0.2).
 
@@ -24,6 +24,9 @@ Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculato
 - **Bildirimler (yalnızca kasa içinde):** içe/dışa aktarma, silme, İkinci telefon değişiklikleri ve son girişten beri hatalı PIN sayısı; şifreli, kasa başına ayrı; sistem bildirimi yok (izin de yok)
 - **GizliAlan Pro ekranı (yalnızca arayüz):** Ayarlar → planlar ve planlanan fiyatlar (Ücretsiz 50 öğe, Pro 249 TL tek seferlik / 449 TL yıllık); satın alma yok, ödeme kodu yok
 - **v0.3.2 — Ana ekran arka planı:** Galeri → fotoğrafa uzun bas → "Ana ekran arka planı yap" (menüde ayrıca Aç / Dışa aktar / Sil). Yalnızca kasa ana ekranında, okunabilirlik için karartma katmanıyla; fotoğraf kasada şifreli kalır, yalnızca bellekte çözülür. Ayarlar → "Ana ekran arka planı" durumu gösterir ve "Arka planı kaldır" sunar. Varsayılan: düz renk geçişi (paketli görsel yok; `assets/wallpapers/` ileride varsayılan görsel için ayrılmış). Her kasanın (gerçek/sahte) kendi arka planı.
+- **v0.4.0 — Gizli tarayıcı (Tarayıcı):** kasa ana ekranında, Android System WebView (`webview_flutter`). Adres/arama çubuğu (varsayılan DuckDuckGo; Ayarlar'dan Startpage/Brave/Google/Bing; öneri API'si yok), geri/ileri/yenile, tek sekme. Çerez/önbellek/site verisi uygulamaya özel depoda, **kasa kilitlenince silinir** (Ayarlar → "Kilitlenince temizle", varsayılan açık; "Şimdi temizle"). Geçmiş yalnızca bellekte. Üçüncü taraf çerezler engelli; dosya/içerik erişimi, JS köprüsü, konum/kamera/mikrofon izni, indirme ve dosya yükleme **kapalı**. FLAG_SECURE tarayıcıyı da kapsar. Uygulama hiçbir yere veri göndermez; tek trafik açtığın sayfalaradır. Bkz. `docs/PRIVATE_BROWSER.md`.
+- **v0.4.0 — Varsayılan arka plan görseli:** `assets/wallpapers/default.jpg` (sahibi tarafından Grok/xAI ile üretildi; Ayarlar'ın altında "Varsayılan arka plan: Created with Grok"). Kasa fotoğrafı seçilirse onun yerine o gösterilir; "Arka planı kaldır" bu görsele döner; Ayarlar → Duvar kağıdı'nda ilk yuvarlak = görsel, diğerleri = düz renk. Açık renkli görsel için üst/alt koyu geçiş, koyu yarı saydam kutucuk/dock ve metin gölgesi.
+- **v0.4.0 — Ana ekran imzası:** kasa ana ekranında, dock'un üstünde düşük opaklıkta, tek aralıklı (terminal tarzı) 3 satır: `GizliAlan Vault · v0.4.0 (build 6) · play|full` / `AES-256-GCM · PIN: PBKDF2-SHA256 120k · FLAG_SECURE` / `● vault: unlocked · © OfferForge`. Sürüm/derleme çalışma anında APK'dan (PackageManager), çeşit derleme anında, şifre/KDF değerleri `CryptoService` sabitlerinden gelir; dokunulamaz, erişilebilirlikte gizli; hesap makinesinde asla yok.
 - **Sahte PIN (isteğe bağlı):** ayrı anahtarla ayrı, boş bir kasa
 - **TR / EN** arayüz
 - **v0.2 — Nötr başlatıcı adı/simgesi:** uygulama listesinde "Hesap Makinesi" / "Calculator" adı ve özgün hesap makinesi simgesi (adaptive + monochrome). Kasa; onboarding, ⓘ ve mağaza metninde açıkça belirtilir.
@@ -31,7 +34,8 @@ Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculato
 
 ### Ne yapmaz
 SMS/arama okuma, konum, rehber, mikrofon/kamera, Erişilebilirlik Hizmeti,
-ana cihaz yöneticisi, bildirim dinleyici, sunucuya yükleme, kendi simgesini gizleme — **yok**.
+ana cihaz yöneticisi, bildirim dinleyici, sunucuya yükleme, analitik/telemetri/reklam, kendi simgesini gizleme — **yok**.
+(INTERNET izni yalnızca kasa içi tarayıcı içindir; uygulamanın kendi sunucusu yoktur.)
 (İkinci telefon: yalnızca kullanıcının kendi oluşturduğu iş profilinin profil sahibi; kilitliyken
 yalnızca **o profilin içindeki** uygulamaları gizler, ana profildeki hiçbir uygulamaya dokunmaz.)
 
@@ -61,18 +65,18 @@ flutter build apk --release --flavor full --target-platform android-arm64
 | `full` | `com.offerforge.gizlialan.full` | yes (side-load / test) | `build/app/outputs/flutter-apk/app-full-release.apk` |
 
 Both keep the launcher label "Calculator"/"Hesap Makinesi", FLAG_SECURE and only the
-`USE_BIOMETRIC` permission, and install side by side. Android: `productFlavors` in
+`USE_BIOMETRIC` + `INTERNET` (in-vault browser only, since 0.4.0) permissions, and install side by side. Android: `productFlavors` in
 `android/app/build.gradle.kts`; the Second phone manifest entries, Kotlin code, strings and
 `profile_admin.xml` live only in `android/app/src/full/`. Dart: `lib/flavor.dart` reads
 Flutter's `appFlavor` (set by `--flavor`), then `--dart-define=FLAVOR=play|full`; unknown or
-missing → `play` (safe default). Settings → footer shows "GizliAlan 0.3.2 · Play/Full".
+missing → `play` (safe default). Settings → footer shows "GizliAlan 0.4.0 · Play/Full".
 On Android always pass a flavor, e.g.
 `flutter run --flavor full` (or `play`).
 
 Build-time options (#28):
 - `--dart-define=PRIVACY_URL=https://…` — Settings → Privacy & permissions then also shows the
   hosted privacy policy with "Open in browser" (plain `ACTION_VIEW` intent via the
-  `gizlialan/system` channel, no url_launcher, still **no INTERNET permission**) and "Copy link".
+  `gizlialan/system` channel, no url_launcher dependency) and "Copy link".
   Without it (or with a non-https value) only the built-in privacy text is shown.
 - The "GizliAlan Pro" UI stub is shown only in `full`; `--dart-define=PRO_STUB=true` shows it in
   `play` too (review only). No billing either way; the 50-item free limit is displayed, not enforced.

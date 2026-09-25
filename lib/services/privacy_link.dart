@@ -7,8 +7,9 @@ import 'package:flutter/services.dart';
 /// Set at build time: `--dart-define=PRIVACY_URL=https://…`. Only `https`
 /// URLs with a host are accepted; otherwise the app shows its built-in privacy
 /// text only (as before). Opening the link hands it to the browser with a
-/// plain `ACTION_VIEW` intent via [channel] — no url_launcher, so the app
-/// still has **no INTERNET permission** and no `<queries>` entries.
+/// plain `ACTION_VIEW` intent via [channel] — no url_launcher and no
+/// `<queries>` entries. (Since v0.4.0 the app has INTERNET for the in-vault
+/// browser only; the policy link still opens in the user's own browser.)
 class PrivacyLink {
   PrivacyLink._();
 

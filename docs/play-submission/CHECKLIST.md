@@ -2,7 +2,7 @@
 
 > **TR özet.** Bu liste Play'e göndermeden önce yapılacak her şeyi repo durumuna göre işaretler (`main` @ 13562b8, 26 Eylül 2026).
 > ✅ = repoda hazır/doğrulandı · ⚠️ = kısmen / ajan takip işi · ❌ = eksik · 👤 = **sahibinin işi** (hesap, para, anahtar, Play Console).
-> Teknik taraf büyük ölçüde hazır: `play` AAB bu kutuda derlendi, **targetSdk 36**, 64-bit + **16 KB hizalı** kütüphaneler, yalnızca `USE_BIOMETRIC`, cihaz yöneticisi bileşeni yok.
+> Teknik taraf büyük ölçüde hazır: `play` AAB bu kutuda derlendi, **targetSdk 36**, 64-bit + **16 KB hizalı** kütüphaneler, yalnızca `USE_BIOMETRIC` + `INTERNET` (0.4.0'dan beri, yalnızca kasa içi tarayıcı), cihaz yöneticisi bileşeni yok.
 > Açık kalanlar: yükleme anahtarı (#13), gizlilik politikasını HTTPS'te barındırma + destek e-postası (#12), öne çıkan görsel 1024×500, Pro taslağının Play derlemesinde gizlenmesi (öneri), uygulama içine politika URL'si, 12+ test kullanıcısıyla 14 günlük kapalı test ve tüm Play Console formları.
 
 Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not in this docs PR) · ❌ missing · 👤 owner task
@@ -28,14 +28,14 @@ Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not 
 | B4 | **AAB** builds | ✅ verified | `flutter build appbundle --release --flavor play` → `app-play-release.aab` (53.7 MB, debug-signed on the box) |
 | B5 | **64-bit** native libs | ✅ verified | AAB contains `arm64-v8a`, `armeabi-v7a`, `x86_64` |
 | B6 | **16 KB page size** | ✅ verified | all 64-bit `.so` have LOAD alignment ≥ 16384 (`libflutter/libapp` 65536; `libdartjni`, `libdatastore_shared_counter` 16384). Re-check in Play Console → App bundle explorer after upload |
-| B7 | Permissions = `USE_BIOMETRIC` only, no INTERNET, no admin | ✅ verified | + AndroidX-internal `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`; xmltree has 0 `admin`/`secondphone` matches |
+| B7 | Permissions = `USE_BIOMETRIC` + `INTERNET` (browser only, since 0.4.0), no admin, no location | ✅ verified v0.4.0 | + AndroidX-internal `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`; xmltree has 0 `admin`/`secondphone` matches |
 | B8 | No Advertising ID (`AD_ID`) permission | ✅ | declare "No" in Console |
 | B9 | Release signing with **upload key** (RSA ≥ 2048), `android/key.properties` local only | 👤 #13 | [Play App Signing](https://support.google.com/googleplay/android-developer/answer/9842756). Config ready (PR #21). Back up the keystore + passwords offline |
 | B10 | Enrol in **Play App Signing** (accept ToS when creating the app) | 👤 | mandatory for new apps with AAB |
-| B11 | versionCode increments for every upload | ✅ | pubspec `0.3.2+5`; bump `+N` per upload |
+| B11 | versionCode increments for every upload | ✅ | pubspec `0.4.0+6`; bump `+N` per upload |
 | B12 | Crash-free on Android 16 device (targetSdk 36 behaviour: edge-to-edge, predictive back) + Android 9 (minSdk) | ⚠️ 👤 #14 | `docs/DEVICE_TEST_PLAN.md`; pre-launch report will also run |
 | B13 | FLAG_SECURE unconditional | ✅ | pre-launch report screenshots will be black — expected, mention in reviewer notes |
-| B14 | No code that changes behaviour by locale/date/reviewer | ✅ | no network, no remote config |
+| B14 | No code that changes behaviour by locale/date/reviewer | ✅ | no developer server, no remote config (network only for user-opened pages in the in-vault browser) |
 
 ## C. Policy-relevant app behaviour
 
@@ -49,7 +49,7 @@ Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not 
 | C6 | Original launcher + store icon, no vendor look-alike | ✅ | `tool/gen_launcher_icon.py`, `docs/store_icon_512.png` |
 | C7 | No icon hiding / alias switching | ✅ | |
 | C8 | **Pro UI stub** hidden in `play` | ✅ #28 (v0.3.1) | `Flavor.hasProStub` = `full` only (`--dart-define=PRO_STUB=true` to review); tests in `test/pro_screen_test.dart` |
-| C9 | Privacy policy reachable **inside the app** | ✅ #28 (needs URL) | In-app privacy text + link when built with `--dart-define=PRIVACY_URL=https://…` (ACTION_VIEW intent, no INTERNET). 👤 set the URL after #12 |
+| C9 | Privacy policy reachable **inside the app** | ✅ #28 (needs URL) | In-app privacy text + link when built with `--dart-define=PRIVACY_URL=https://…` (ACTION_VIEW intent to the user's browser app). 👤 set the URL after #12 |
 | C10 | Decoy PIN described honestly | ✅ | "separate, empty vault" |
 | C11 | "Delete everything" / uninstall removes all data | ✅ | backups disabled |
 

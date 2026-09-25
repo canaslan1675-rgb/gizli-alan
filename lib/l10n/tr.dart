@@ -12,7 +12,7 @@ const Map<String, String> tr = {
       'fotoğraflar, notlar ve dosyalar PIN (ve isteğe bağlı parmak izi/yüz) '
       'ile korunur ve bu cihazda şifrelenir.',
   'onboardingPrivacy':
-      'İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve hiçbir şey yüklemez — sunucu yoktur. (İsteğe bağlı "İkinci telefon" yalnızca senin oluşturduğun ayrı iş profilini yönetir.) Yalnızca kendi cihazında, kendi içeriğin için kullan.',
+      'İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve sunucusu yoktur: senin hakkında hiçbir yere bir şey göndermez (dahili tarayıcı yalnızca senin açtığın sayfaları yükler). (İsteğe bağlı "İkinci telefon" yalnızca senin oluşturduğun ayrı iş profilini yönetir.) Yalnızca kendi cihazında, kendi içeriğin için kullan.',
   'ownDeviceConfirm':
       'Bu benim kendi cihazım ve yalnızca kendi içeriğimi saklayacağım.',
   'entryTitle': 'Hesap makinesi girişi',
@@ -129,22 +129,45 @@ const Map<String, String> tr = {
   'wallpaper': 'Duvar kağıdı',
   'homeBackground': 'Ana ekran arka planı',
   'homeBackgroundDefault':
-      'Varsayılan (aşağıdaki renk). Fotoğraf kullanmak için: Galeri → fotoğrafa uzun bas → "Ana ekran arka planı yap".',
+      'Varsayılan (aşağıdaki görsel veya renk). Fotoğraf kullanmak için: Galeri → fotoğrafa uzun bas → "Ana ekran arka planı yap".',
   'homeBackgroundPhoto':
-      'Kasadaki bir fotoğraf. Kaldırınca aşağıdaki renge dönülür.',
+      'Kasadaki bir fotoğraf. Kaldırınca aşağıdaki varsayılana dönülür.',
+  'wallpaperDefaultImage': 'Varsayılan görsel',
+  'wallpaperAttribution': 'Varsayılan arka plan: Created with Grok',
+  'wallpaperPlain': 'Düz renk',
   'homeBackgroundRemove': 'Arka planı kaldır',
   'homeBackgroundSet':
       'Kasa ana ekranı arka planı yapıldı. Fotoğraf kasada şifreli kalır.',
   'setAsHomeBackground': 'Ana ekran arka planı yap',
   'open': 'Aç',
+  'browser': 'Tarayıcı',
+  'browserHint': 'Ara veya web adresi yaz',
+  'browserSearchWith':
+      'Aramalar {engine} ile yapılır. Yazarken arama önerisi gönderilmez.',
+  'browserPrivacyNote':
+      'Kasa içinde gizli tarayıcı. GizliAlan izleme, analitik veya reklam eklemez; yalnızca açtığın sitelerle bağlantı kurulur. Üçüncü taraf çerezler engellenir, geçmiş yalnızca bu ekran açıkken tutulur; çerezler, önbellek ve site verileri kasa kilitlenince silinir (Ayarlar → Tarayıcı). Her tarayıcıda olduğu gibi siteler IP adresini görebilir. İndirme, dosya yükleme, konum, kamera ve mikrofon kapalıdır. Android System WebView sayfaları Google Güvenli Tarama ile denetleyebilir (Android varsayılanı).',
+  'browserBack': 'Geri',
+  'browserForward': 'İleri',
+  'browserReload': 'Yenile',
+  'browserBlockedLink':
+      'Bu tür bağlantılar (uygulama, telefon, e-posta, dosya…) kasa tarayıcısından açılmaz.',
+  'browserEngine': 'Arama motoru',
+  'browserWipeOnLock': 'Kilitlenince temizle',
+  'browserWipeOnLockHint':
+      'Kasa her kilitlendiğinde tarayıcı çerezlerini, önbelleğini ve site verilerini sil.',
+  'browserWipeNow': 'Tarayıcı verilerini şimdi temizle',
+  'browserWiped': 'Tarayıcı verileri temizlendi.',
   'privacyTitle': 'Gizlilik ve izinler',
   'privacyBody':
       '• Tüm kasa içeriği (fotoğraf, dosya, not) Android Keystore destekli '
       'güvenli depoda tutulan bir anahtarla AES-256-GCM ile şifrelenir.\n'
       '• PIN\'in yalnızca tuzlanmış PBKDF2 özeti olarak saklanır.\n'
-      '• Yayın sürümünde internet izni yok; hesap, analitik, reklam yok. Sen '
-      'dışa aktarmadıkça hiçbir şey cihazdan çıkmaz.\n'
-      '• İzinler: yalnızca biyometrik (isteğe bağlı kilit açma). Fotoğraf ve '
+      '• Hesap, analitik, telemetri, reklam ve bize ait sunucu yok. Sen dışa '
+      'aktarmadıkça ya da dahili gizli tarayıcıda bir web sayfası açmadıkça '
+      'hiçbir şey cihazdan çıkmaz; tarayıcı yalnızca açtığın siteyle konuşur '
+      '(internet izninin tek nedeni).\n'
+      '• İzinler: biyometrik (isteğe bağlı kilit açma) ve internet (yalnızca '
+      'tarayıcı). Fotoğraf ve '
       'dosyaları sistem seçicileriyle sen seçersin — depolama/medya izni '
       'yok.\n'
       '• SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik veya '
@@ -166,7 +189,7 @@ const Map<String, String> tr = {
   'spIntro':
       'İkinci telefon, Android\'in kendi "iş profili" özelliğiyle bu cihazda ayrı bir alan oluşturur (Shelter/Island ile aynı yöntem). İçinde kendi Play Store\'u vardır; oraya ayrı bir Google hesabı ekleyip uygulama kurabilirsin. Uygulamalar, hesaplar ve dosyalar ana telefonundan ayrı tutulur.',
   'spDisclosure':
-      'Nasıl çalışır: GizliAlan yalnızca kendi oluşturduğu bu iş profilinin "profil sahibi" olur. Ana profilin veya cihazın yöneticisi olmaz; hiçbir şeyi izlemez, başka uygulamaların verisini okumaz, hiçbir şey yüklemez. Android kurulumda kendi bilgilendirmesini gösterir. Profildeki uygulamalar çanta rozetiyle, telefonun uygulama listesindeki "İş" sekmesinde de görünür. Kurulum ve yönetim yalnızca kasa açıkken yapılabilir.',
+      'Nasıl çalışır: GizliAlan yalnızca kendi oluşturduğu bu iş profilinin "profil sahibi" olur. Ana profilin veya cihazın yöneticisi olmaz; hiçbir şeyi izlemez, başka uygulamaların verisini okumaz, hiçbir yere bir şey göndermez. Android kurulumda kendi bilgilendirmesini gösterir. Profildeki uygulamalar çanta rozetiyle, telefonun uygulama listesindeki "İş" sekmesinde de görünür. Kurulum ve yönetim yalnızca kasa açıkken yapılabilir.',
   'spSetUp': 'İkinci telefonu kur',
   'spSetUpConfirm':
       'Android şimdi iş profili kurulumunu başlatacak. Birkaç dakika sürebilir ve sistem ekranları gösterilir. Devam edilsin mi?',
@@ -265,14 +288,17 @@ const Map<String, String> tr = {
       'GizliAlan hesap istemez ve hiçbir veriyi sunucuya göndermez. Uygulama Gumroad vb. yerlerde satılmaz.',
   // `play` flavor variants (no Second phone in that build), see L10n.t.
   'onboardingPrivacy_play':
-      'İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve hiçbir şey yüklemez — sunucu yoktur. Yalnızca kendi cihazında, kendi içeriğin için kullan.',
+      'İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve sunucusu yoktur: senin hakkında hiçbir yere bir şey göndermez (dahili tarayıcı yalnızca senin açtığın sayfaları yükler). Yalnızca kendi cihazında, kendi içeriğin için kullan.',
   'privacyBody_play':
       '• Tüm kasa içeriği (fotoğraf, dosya, not) Android Keystore destekli '
       'güvenli depoda tutulan bir anahtarla AES-256-GCM ile şifrelenir.\n'
       '• PIN\'in yalnızca tuzlanmış PBKDF2 özeti olarak saklanır.\n'
-      '• Yayın sürümünde internet izni yok; hesap, analitik, reklam yok. Sen '
-      'dışa aktarmadıkça hiçbir şey cihazdan çıkmaz.\n'
-      '• İzinler: yalnızca biyometrik (isteğe bağlı kilit açma). Fotoğraf ve '
+      '• Hesap, analitik, telemetri, reklam ve bize ait sunucu yok. Sen dışa '
+      'aktarmadıkça ya da dahili gizli tarayıcıda bir web sayfası açmadıkça '
+      'hiçbir şey cihazdan çıkmaz; tarayıcı yalnızca açtığın siteyle konuşur '
+      '(internet izninin tek nedeni).\n'
+      '• İzinler: biyometrik (isteğe bağlı kilit açma) ve internet (yalnızca '
+      'tarayıcı). Fotoğraf ve '
       'dosyaları sistem seçicileriyle sen seçersin — depolama/medya izni '
       'yok.\n'
       '• SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik veya '

@@ -25,8 +25,23 @@ class GizliTheme {
   /// Readability scrim over a photo background on the vault home.
   static const double homePhotoScrim = 0.45;
 
-  // Slot for a bundled default background (assets/wallpapers/, see the
-  // README there). Empty for now: default = the gradient below.
+  /// Bundled default vault-home background (owner-provided, light image).
+  static const String defaultWallpaperAsset = 'assets/wallpapers/default.jpg';
+
+  /// Top/bottom darkening over image backgrounds so the clock, tiles, dock
+  /// and the signature stay readable on light photos.
+  static const LinearGradient homeImageScrim = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      Color(0x8C000000),
+      Color(0x33000000),
+      Color(0x26000000),
+      Color(0x40000000),
+      Color(0xA6000000),
+    ],
+    stops: [0.0, 0.3, 0.55, 0.78, 1.0],
+  );
 
   static LinearGradient wallpaper(int i) => LinearGradient(
     begin: Alignment.topLeft,

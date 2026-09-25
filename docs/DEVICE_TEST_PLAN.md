@@ -15,7 +15,7 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 
 | | |
 |---|---|
-| Build | Latest test APK from GitHub Releases (e.g. `v0.3.2-test`: `GizliAlan-v0.3.2-play.apk` = no Second phone, `GizliAlan-v0.3.2-full.apk` = with Second phone; arm64, debug-signed; they install side by side) or a newer one built from `main` (`flutter build apk --release --flavor play|full --target-platform android-arm64`). §3 applies to the **full** APK only; on the play APK check that no Second phone tile/setting exists and GizliAlan never appears under Device admin apps. |
+| Build | Latest test APK from GitHub Releases (e.g. `v0.4.0-test`: `GizliAlan-v0.4.0-play.apk` = no Second phone, `GizliAlan-v0.4.0-full.apk` = with Second phone; arm64, debug-signed; they install side by side) or a newer one built from `main` (`flutter build apk --release --flavor play|full --target-platform android-arm64`). §3 applies to the **full** APK only; on the play APK check that no Second phone tile/setting exists and GizliAlan never appears under Device admin apps. |
 | Install | `adb install -r GizliAlan-test-*.apk` or open the APK on the phone (allow "install unknown apps" for the file manager/browser — that is a phone setting, not an app permission). |
 | Reset between runs | Settings → Apps → Calculator (GizliAlan) → Storage → Clear data. If a work profile was created: remove it in-app (§3.9) or Settings → Accounts/Passwords → Work → Remove work profile. |
 | Record | Device model, Android version, OEM skin + version (MIUI/HyperOS/One UI), build/tag, date. |
@@ -27,7 +27,7 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 |---|------|----------|
 | 1.1 | Look at the launcher after install. | One icon: original calculator icon, label "Calculator" (EN) / "Hesap Makinesi" (TR). No second icon. Themed (monochrome) icon works on Android 13+ if enabled. |
 | 1.2 | Settings → Apps → Calculator → Permissions. | No permissions requested (biometric is not a runtime permission). Nothing about storage, camera, mic, location, SMS, contacts, notifications. |
-| 1.3 | Optional, with adb: `adb shell dumpsys package com.offerforge.gizlialan \| grep permission` | Only `USE_BIOMETRIC` (+ AndroidX internal `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`). No `INTERNET`. |
+| 1.3 | Optional, with adb: `adb shell dumpsys package com.offerforge.gizlialan \| grep permission` | Only `USE_BIOMETRIC` + `INTERNET` (in-vault browser, since 0.4.0) (+ AndroidX internal `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`). No location/camera/mic. |
 | 1.4 | Settings → Security → Device admin apps. | GizliAlan is **not** listed as an active device admin of the main profile. |
 
 ## 2. Core vault (all devices)
@@ -50,64 +50,10 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 | 2.14 | Settings → GizliAlan Pro → Buy / Subscribe. | Plans + prices shown; dialog "Not available yet"; no Play purchase sheet, no network. (Needs PR #20.) |
 | 2.15 | Settings → Language TR/EN. | All screens switch language. |
 | 2.16 | Gallery → long-press a photo. | Sheet: Open / Set as home background / Export / Delete. "Set as home background" → vault home shows the photo (darkened, clock/labels readable); calculator, gallery and other screens unchanged. Settings → Home screen background → "Remove background" → plain gradient again. Decoy vault has its own (none by default). Deleting that photo → plain gradient. |
-
-## 3. Second phone (work profile) — main focus
-
-Run on each device. Note the exact messages on failure. Hiding work apps while locked (#30): details and limitations in `docs/SECOND_PHONE_HIDING.md`; Xiaomi-specific steps 3.15–3.20 (owner issue #14).
-
-| # | Step | Expected |
-|---|------|----------|
-| 3.1 | Real vault → "Second phone" tile. | Screen explains the feature. On Xiaomi/Redmi/POCO a warning is shown before setup. |
-| 3.2 | "Set up second phone" → confirm → Android's own work-profile setup. | System setup runs and finishes; back in the app "Second phone created" (or "pending" then ready after a few seconds). A work badge/tab appears in the phone launcher. |
-| 3.3 | Settings → Security → Device admin apps (main profile). | GizliAlan still **not** an active admin of the main profile (only profile owner inside the work profile). |
-| 3.4 | "Open Play Store (second account)". | The work profile's Play Store opens; you can add a second Google account there. |
-| 3.5 | "Add an app from the main phone" → pick a system app (e.g. Chrome/Calculator) and a normal Play app. | System app: "… was added to the second phone" (enableSystemApp). Play app: the profile Play Store opens on that app (fallback). No "install unknown apps" prompt. |
-| 3.6 | Vault home → second-phone app grid → tap an app. | App starts in the work profile (work badge). The vault goes to background and auto-locks, but the app keeps running. |
-| 3.7 | Second phone screen → "Hide work apps while locked" is **on** (default) → press **Lock**. | Work apps disappear from the phone launcher (Work tab / "İş" folder, app drawer, search). Unlock the real vault → they come back. |
-| 3.8 | Turn on "Also try to pause the work profile" → Lock. | Apps are hidden; additionally either the profile pauses, or (expected on most phones) nothing more happens. Second phone screen → "Close now" shows "Apps hidden. Android did not allow pausing…". Unlock → apps back, profile running. |
-| 3.9 | Launch a work app from the vault grid (vault auto-locks in the background), use it, then open GizliAlan again. | While the work app is in use it keeps running. When GizliAlan opens (locked calculator), the work apps are hidden (the work app is closed). |
-| 3.10 | Decoy vault (`1111=`). | No Second phone tile; locking the decoy does not change the work profile. |
-| 3.11 | "Remove second phone" → confirm. | Work profile and its apps/accounts are removed; "Second phone removed". |
-| 3.12 | Xiaomi only: if 3.2 fails or is blocked. | App shows the blocked message with the **Second space** (MIUI) / **Private space** (Android 15+) alternative. The app must not crash or loop. |
-| 3.13 | Samsung only: with Secure Folder set up. | Work profile setup still works or fails cleanly with the "not allowed" message; Secure Folder is not affected. |
-| 3.14 | Security check of the trampoline (optional, adb): `adb shell am start --user <workUserId> -n com.offerforge.gizlialan/.secondphone.ProfileActionActivity` without extras. | Activity finishes immediately and does nothing (unsigned/expired requests are rejected). |
-| 3.15 | **Xiaomi (#14):** set up the second phone, install 2 apps from its Play Store. Note where MIUI/HyperOS puts them. | Apps appear in an "İş"/"Work" folder with briefcase badges (record the exact behaviour). |
-| 3.16 | Xiaomi: press **Lock** in the vault, go to the home screen, app drawer and search. | No work app icons, no briefcase badges; the "İş" folder is gone or empty (record which). Play Store (work) is hidden too; personal Play Store is untouched. |
-| 3.17 | Xiaomi: unlock with the real PIN, then with biometrics (repeat 3.16 in between). | All previously visible work apps come back (check the "İş" folder and positions; record if they moved). Personal apps and their positions unchanged. |
-| 3.18 | Xiaomi: unlock with the decoy PIN `1111`. | Work apps stay hidden. |
-| 3.19 | Xiaomi: Home button from the unlocked vault (no Lock), wait, reopen GizliAlan. | Icons remain visible while GizliAlan is in the background (known limitation), and disappear when GizliAlan opens locked. |
-| 3.20 | Xiaomi: turn the toggle off, Lock, then on again. Force-stop GizliAlan while hidden and reopen; reboot the phone while hidden. | Off: apps stay visible after Lock. Force-stop / reboot while hidden: apps stay hidden until the next real unlock, then all come back. Also note whether work-app notifications arrive while hidden (expected: no). |
-
-## 4. Device matrix / Cihaz matrisi
-
-| Device | Why | Must pass | Known risk |
-|--------|-----|-----------|------------|
-| **Pixel** (Android 14/15) or Pixel emulator (AOSP image with Play) | Reference AOSP behaviour | §1–§3 all | Quiet mode falls back to hiding apps |
-| **Samsung** (One UI 6/7) | Largest market share in TR; Secure Folder coexists | §1–§3 (3.13) | OEM may block a second managed profile if Secure Folder/Knox uses one |
-| **Xiaomi / Redmi / POCO** (MIUI 14 / HyperOS) | Often blocks or half-finishes work-profile provisioning | §1–§2 all; §3 either works or 3.12 fallback is shown cleanly | Provisioning blocked; Second space/Private space fallback |
-
-## 5. Emulator run status (agents)
-
-- **2026-09-25, Joi:** not run. This box has no Android emulator package or system image
-  (~2 GB download) and the box user has no `/dev/kvm` access (hardware acceleration), so an
-  emulator would be unusably slow. The emulator part of #7 is handed off: any agent with an
-  emulator (Pixel, API 34/35, Google Play image) can run §1–§3 and fill in §6.
-- **2026-09-26 re-check, Joi:** `/dev/kvm` **exists** (`crw-rw---- root:103`) but the box
-  user (`uid=1000(box)`, groups=`box` only) **cannot read or write** it — no membership in
-  group `103`. `ANDROID_HOME=/workspace/tools/android-sdk` has no usable `emulator` binary or
-  system images for this agent. Without root (or a group/udev change the agent must not do),
-  there is still **no usable emulator path** on this box. **Agent-side emulator part of #7 is
-  closed** with this documented reason. Physical-device runs remain owner issue **#14**.
-- Unit/widget tests on this box cover the Dart side (second phone service/flow with fakes,
-  real vs decoy, Xiaomi fallback), but not the Android/Kotlin side.
-
-## 6. Results / Sonuçlar
-
-Copy a row per device and run. Mark each section ✅ / ❌ (+ step numbers) / ⏭ (skipped).
-
-| Date | Tester | Device | Android / skin | Build | §1 | §2 | §3 | Notes |
-|------|--------|--------|----------------|-------|----|----|----|-------|
-| 2026-09-26 | joi (agent) | Pixel emulator (planned) | N/A | N/A | ⏭ | ⏭ | ⏭ | Not run — `/dev/kvm` present but inaccessible to `box` (root:103); no emulator/system image usable without root. Agent-side #7 closed; physical devices → #14. |
-| | | | | | | | | |
-
-Turn every ❌ into a new `task` issue (steps, expected, actual, device) — no personal data.
+| 2.17 | Vault home → **Tarayıcı / Browser** (v0.4.0). Type `example.com`, then `gizlilik` (a search). | Page loads over https; the search opens DuckDuckGo (default). Back/forward/reload work; system Back goes back in page history, then leaves the browser. |
+| 2.18 | Settings → Browser → search engine → Startpage; search again. | Search goes to Startpage. No suggestions appear while typing. |
+| 2.19 | In the browser, try a screenshot and open Recents. | Blocked / black preview (FLAG_SECURE). |
+| 2.20 | Log in to a test site (cookie), Lock, unlock, open the site again. | Logged out (cookies wiped because "Kilitlenince temizle" is on). With the switch off, the login survives a lock; "Şimdi temizle" wipes it. |
+| 2.21 | Tap a download link (e.g. a PDF/zip), a `tel:`/`intent:` link and a page asking for location/camera. | Download does nothing (downloads disabled); non-web links show "blocked" snackbar; permission requests are denied silently, no system permission dialog. |
+| 2.22 | Settings → Apps → Calculator → Data usage. | Traffic only while using the browser; none from the rest of the app. |
+| 2.23 | Vault home on a 1080×2400 phone (v0.4.0). | Default sunset/sea picture fills the screen without visible pixelation; clock, tiles, labels, dock readable. Bottom signature (monospace, faint): `GizliAlan Vault · v0.4.0 (build 6) · play/full`, `AES-256-GCM · PIN: PBKDF2-SHA256 120k · FLAG_SECURE`, `● vault: unlocked · © OfferForge`; not tappable, not over tiles. Not on the calculator. Settings → Wallpaper colour swatch → plain gradient; picture swatch → back. Settings bottom shows "Varsayılan arka plan: Created with Grok". |

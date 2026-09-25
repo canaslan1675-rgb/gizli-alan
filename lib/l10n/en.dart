@@ -12,7 +12,7 @@ const Map<String, String> en = {
       'photos, notes and files, protected by a PIN (and optionally your '
       'fingerprint/face), encrypted on this device.',
   'onboardingPrivacy':
-      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and uploads nothing — there is no server. (The optional "Second phone" only manages the separate work profile you create yourself.) Only use it for your own content on your own device.',
+      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and has no server: it sends nothing about you anywhere (the built-in browser only loads the pages you open). (The optional "Second phone" only manages the separate work profile you create yourself.) Only use it for your own content on your own device.',
   'ownDeviceConfirm':
       'This is my own device and I will only store my own content.',
   'entryTitle': 'Calculator entry',
@@ -130,22 +130,45 @@ const Map<String, String> en = {
   'wallpaper': 'Wallpaper',
   'homeBackground': 'Home screen background',
   'homeBackgroundDefault':
-      'Default (colour below). To use a photo: Gallery → long-press a photo → "Set as home background".',
+      'Default (picture or colour below). To use a photo: Gallery → long-press a photo → "Set as home background".',
   'homeBackgroundPhoto':
-      'A photo from this vault. Remove it to go back to the colour below.',
+      'A photo from this vault. Remove it to go back to the default below.',
+  'wallpaperDefaultImage': 'Default picture',
+  'wallpaperAttribution': 'Default background: Created with Grok',
+  'wallpaperPlain': 'Plain colour',
   'homeBackgroundRemove': 'Remove background',
   'homeBackgroundSet':
       'Set as the vault home background. The photo stays encrypted in the vault.',
   'setAsHomeBackground': 'Set as home background',
   'open': 'Open',
+  'browser': 'Browser',
+  'browserHint': 'Search or type a web address',
+  'browserSearchWith':
+      'Searches use {engine}. No search suggestions are sent while you type.',
+  'browserPrivacyNote':
+      'Private browser inside the vault. GizliAlan adds no tracking, analytics or ads — only the sites you open are contacted. Third-party cookies are blocked, history is kept only while this screen is open, and cookies, cache and site data are erased when the vault locks (Settings → Browser). Sites can still see your IP address, like any browser. Downloads, file uploads, location, camera and microphone are off. Android System WebView may check pages with Google Safe Browsing (Android default).',
+  'browserBack': 'Back',
+  'browserForward': 'Forward',
+  'browserReload': 'Reload',
+  'browserBlockedLink':
+      'This kind of link (app, phone, e-mail, file…) is not opened from the vault browser.',
+  'browserEngine': 'Search engine',
+  'browserWipeOnLock': 'Clear on lock',
+  'browserWipeOnLockHint':
+      'Erase browser cookies, cache and site data whenever the vault locks.',
+  'browserWipeNow': 'Clear browser data now',
+  'browserWiped': 'Browser data cleared.',
   'privacyTitle': 'Privacy & permissions',
   'privacyBody':
       '• All vault content (photos, files, notes) is encrypted with AES-256-GCM '
       'using a key kept in Android Keystore-backed secure storage.\n'
       '• Your PIN is stored only as a salted PBKDF2 hash.\n'
-      '• No internet permission in the release build, no account, no '
-      'analytics, no ads. Nothing leaves your device unless you export it.\n'
-      '• Permissions: biometric (optional unlock) only. Photos and files are '
+      '• No account, no analytics, no telemetry, no ads, no server of ours. '
+      'Nothing leaves your device unless you export it — or open a web page '
+      'in the built-in private browser, which then talks only to that site '
+      '(the reason for the internet permission).\n'
+      '• Permissions: biometric (optional unlock) and internet (browser '
+      'only). Photos and files are '
       'chosen by you through the system pickers — no storage/media '
       'permission.\n'
       '• No SMS, calls, contacts, location, microphone, camera, Accessibility '
@@ -167,7 +190,7 @@ const Map<String, String> en = {
   'spIntro':
       'Second phone creates a separate space on this device using Android\'s own "work profile" feature (the same method Shelter/Island use). It has its own Play Store where you can add a separate Google account and install apps. Apps, accounts and files stay separate from your main phone.',
   'spDisclosure':
-      'How it works: GizliAlan becomes the "profile owner" only of this work profile it creates. It is not an admin of your main profile or of the device; it monitors nothing, reads no other app\'s data and uploads nothing. Android shows its own notice during setup. Profile apps carry a briefcase badge and also appear in the "Work" tab of your app list. Setup and management are only possible while the vault is unlocked.',
+      'How it works: GizliAlan becomes the "profile owner" only of this work profile it creates. It is not an admin of your main profile or of the device; it monitors nothing, reads no other app\'s data and sends nothing anywhere. Android shows its own notice during setup. Profile apps carry a briefcase badge and also appear in the "Work" tab of your app list. Setup and management are only possible while the vault is unlocked.',
   'spSetUp': 'Set up second phone',
   'spSetUpConfirm':
       'Android will now start work profile setup. It can take a few minutes and shows system screens. Continue?',
@@ -266,14 +289,17 @@ const Map<String, String> en = {
       'GizliAlan needs no account and sends no data to any server. The app is not sold on Gumroad or elsewhere.',
   // `play` flavor variants (no Second phone in that build), see L10n.t.
   'onboardingPrivacy_play':
-      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and uploads nothing — there is no server. Only use it for your own content on your own device.',
+      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and has no server: it sends nothing about you anywhere (the built-in browser only loads the pages you open). Only use it for your own content on your own device.',
   'privacyBody_play':
       '• All vault content (photos, files, notes) is encrypted with AES-256-GCM '
       'using a key kept in Android Keystore-backed secure storage.\n'
       '• Your PIN is stored only as a salted PBKDF2 hash.\n'
-      '• No internet permission in the release build, no account, no '
-      'analytics, no ads. Nothing leaves your device unless you export it.\n'
-      '• Permissions: biometric (optional unlock) only. Photos and files are '
+      '• No account, no analytics, no telemetry, no ads, no server of ours. '
+      'Nothing leaves your device unless you export it — or open a web page '
+      'in the built-in private browser, which then talks only to that site '
+      '(the reason for the internet permission).\n'
+      '• Permissions: biometric (optional unlock) and internet (browser '
+      'only). Photos and files are '
       'chosen by you through the system pickers — no storage/media '
       'permission.\n'
       '• No SMS, calls, contacts, location, microphone, camera, Accessibility '

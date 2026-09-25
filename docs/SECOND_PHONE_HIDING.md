@@ -104,4 +104,4 @@ where the ROM offers it.
 - Dart: `SecondPhoneService.close/open`, `SettingsService.hideWorkAppsWhenLocked` /
   `pauseWorkProfileWhenLocked`, `GizliAlanAppState.ensureWorkAppsHiddenWhileLocked`,
   `WorkAppsHideSwitches` (Second phone screen + Settings).
-- No new permissions, no INTERNET, FLAG_SECURE unchanged, nothing is read from other apps.
+- #30 added no permissions (INTERNET arrived later in 0.4.0, only for the in-vault browser), FLAG_SECURE unchanged, nothing is read from other apps.

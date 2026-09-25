@@ -17,7 +17,7 @@ import io.flutter.plugin.common.MethodChannel
  * Also hosts the flavor-specific native feature ([FlavorFeatures]): the
  * "second phone" (own work profile) channel in the `full` flavor, nothing in
  * the `play` flavor — and [SystemChannel] (open the privacy-policy URL in
- * the browser via ACTION_VIEW; no INTERNET permission).
+ * the browser via ACTION_VIEW; wipe the in-vault browser's WebView data).
  */
 class MainActivity : FlutterFragmentActivity() {
     private var flavorFeature: FlavorFeature? = null

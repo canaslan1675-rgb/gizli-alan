@@ -1,3 +1,5 @@
+import '../services/crypto_service.dart';
+import '../app_version.dart';
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -8,6 +10,7 @@ import '../app.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
 import '../theme.dart';
+import 'browser_screen.dart';
 import 'decoy_calculator_screen.dart';
 import 'files_screen.dart';
 import 'gallery_screen.dart';
@@ -140,6 +143,12 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         () => _open(const FilesScreen()),
       ),
       _AppIcon(
+        Icons.travel_explore,
+        t('browser'),
+        const Color(0xFF7CFFB2),
+        () => _open(const BrowserScreen()),
+      ),
+      _AppIcon(
         Icons.calculate_outlined,
         t('decoyTitle'),
         const Color(0xFF9AA8BC),
@@ -182,6 +191,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                   image: DecorationImage(
                     image: MemoryImage(_background!),
                     fit: BoxFit.cover,
+                    filterQuality: FilterQuality.medium,
                     // Scrim keeps the clock, labels and dock readable.
                     colorFilter: ColorFilter.mode(
                       Colors.black.withValues(alpha: GizliTheme.homePhotoScrim),
@@ -189,120 +199,147 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                     ),
                   ),
                 )
+              : app.settings.wallpaperImage
+              ? const BoxDecoration(
+                  color: GizliTheme.bg,
+                  image: DecorationImage(
+                    image: AssetImage(GizliTheme.defaultWallpaperAsset),
+                    fit: BoxFit.cover,
+                    // Low-res owner image: smooth (not pixelated) upscale.
+                    filterQuality: FilterQuality.medium,
+                  ),
+                )
               : BoxDecoration(
                   gradient: GizliTheme.wallpaper(app.settings.wallpaper),
                 ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 36),
-                Text(
-                  DateFormat.Hm(locale).format(_now),
-                  style: const TextStyle(
-                    fontSize: 64,
-                    fontWeight: FontWeight.w200,
-                    color: GizliTheme.textPrimary,
+          child: DecoratedBox(
+            // Top/bottom scrim for light pictures (clock, dock, signature).
+            decoration: _background != null || app.settings.wallpaperImage
+                ? const BoxDecoration(gradient: GizliTheme.homeImageScrim)
+                : const BoxDecoration(),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  const SizedBox(height: 36),
+                  Text(
+                    DateFormat.Hm(locale).format(_now),
+                    style: const TextStyle(
+                      fontSize: 64,
+                      fontWeight: FontWeight.w200,
+                      color: GizliTheme.textPrimary,
+                      shadows: _homeTextShadow,
+                    ),
                   ),
-                ),
-                Text(
-                  DateFormat.MMMMEEEEd(locale).format(_now),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: GizliTheme.textSecondary,
+                  Text(
+                    DateFormat.MMMMEEEEd(locale).format(_now),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: GizliTheme.textSecondary,
+                      shadows: _homeTextShadow,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  t('appNameVault'),
-                  style: TextStyle(
-                    fontSize: 12,
-                    letterSpacing: 1.2,
-                    color: GizliTheme.mint.withValues(alpha: 0.8),
+                  const SizedBox(height: 8),
+                  Text(
+                    t('appNameVault'),
+                    style: TextStyle(
+                      fontSize: 12,
+                      letterSpacing: 1.2,
+                      color: GizliTheme.mint.withValues(alpha: 0.8),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                Expanded(
-                  child: CustomScrollView(
-                    slivers: [
-                      _grid(
-                        apps.map((a) => _AppTile(key: a.key, icon: a)).toList(),
-                      ),
-                      if (_profileApps.isNotEmpty) ...[
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.work_outline,
-                                  size: 16,
-                                  color: GizliTheme.textSecondary,
-                                ),
-                                const SizedBox(width: 6),
-                                Flexible(
-                                  child: Text(
-                                    t('secondPhoneApps'),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      letterSpacing: 1.1,
-                                      color: GizliTheme.textSecondary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                  const SizedBox(height: 32),
+                  Expanded(
+                    child: CustomScrollView(
+                      slivers: [
                         _grid(
-                          _profileApps
-                              .map(
-                                (a) => ProfileAppTile(
-                                  app: a,
-                                  onTap: () => _launchProfileApp(a),
-                                ),
-                              )
+                          apps
+                              .map((a) => _AppTile(key: a.key, icon: a))
                               .toList(),
                         ),
+                        if (_profileApps.isNotEmpty) ...[
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                24,
+                                20,
+                                24,
+                                12,
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.work_outline,
+                                    size: 16,
+                                    color: GizliTheme.textSecondary,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: Text(
+                                      t('secondPhoneApps'),
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        letterSpacing: 1.1,
+                                        color: GizliTheme.textSecondary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          _grid(
+                            _profileApps
+                                .map(
+                                  (a) => ProfileAppTile(
+                                    app: a,
+                                    onTap: () => _launchProfileApp(a),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                ),
-                // Dock
-                Container(
-                  margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 12,
+                  const _HomeWatermark(),
+                  // Dock
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      // Translucent dark dock (readable on light pictures).
+                      color: Colors.black.withValues(alpha: 0.28),
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _DockButton(
+                          icon: Icons.photo_library_outlined,
+                          tooltip: t('gallery'),
+                          onTap: () => _open(const GalleryScreen()),
+                        ),
+                        _DockButton(
+                          icon: Icons.sticky_note_2_outlined,
+                          tooltip: t('notes'),
+                          onTap: () => _open(const NotesListScreen()),
+                        ),
+                        _DockButton(
+                          key: const ValueKey('lock_button'),
+                          icon: Icons.lock_outline,
+                          tooltip: t('lock'),
+                          onTap: app.lockVaultExplicit,
+                          highlight: true,
+                        ),
+                      ],
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _DockButton(
-                        icon: Icons.photo_library_outlined,
-                        tooltip: t('gallery'),
-                        onTap: () => _open(const GalleryScreen()),
-                      ),
-                      _DockButton(
-                        icon: Icons.sticky_note_2_outlined,
-                        tooltip: t('notes'),
-                        onTap: () => _open(const NotesListScreen()),
-                      ),
-                      _DockButton(
-                        key: const ValueKey('lock_button'),
-                        icon: Icons.lock_outline,
-                        tooltip: t('lock'),
-                        onTap: app.lockVaultExplicit,
-                        highlight: true,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -355,7 +392,11 @@ class _AppTile extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: icon.color.withValues(alpha: 0.18),
+              // Dark base keeps tiles readable on light pictures.
+              color: Color.alphaBlend(
+                icon.color.withValues(alpha: 0.18),
+                Colors.black.withValues(alpha: 0.30),
+              ),
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: icon.color.withValues(alpha: 0.45)),
             ),
@@ -371,7 +412,11 @@ class _AppTile extends StatelessWidget {
             icon.label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, color: GizliTheme.textPrimary),
+            style: const TextStyle(
+              fontSize: 12,
+              color: GizliTheme.textPrimary,
+              shadows: _homeTextShadow,
+            ),
           ),
         ],
       ),
@@ -408,3 +453,91 @@ class _DockButton extends StatelessWidget {
     );
   }
 }
+
+/// Subtle terminal-style signature above the dock (vault home only, never
+/// on the calculator). Every term is taken from the code it describes:
+/// version/build from the installed APK ([AppInfo]), flavor from
+/// [Flavor.current], cipher and PIN-hash parameters from [CryptoService].
+/// Not interactive and excluded from accessibility.
+class _HomeWatermark extends StatefulWidget {
+  const _HomeWatermark();
+
+  @override
+  State<_HomeWatermark> createState() => _HomeWatermarkState();
+}
+
+class _HomeWatermarkState extends State<_HomeWatermark> {
+  AppInfo _info = AppInfo.fallback;
+
+  @override
+  void initState() {
+    super.initState();
+    AppInfo.load().then((i) {
+      if (mounted) setState(() => _info = i);
+    });
+  }
+
+  static String get cipherLine {
+    const bits = CryptoService.keyLength * 8;
+    const k = CryptoService.defaultPbkdf2Iterations ~/ 1000;
+    return 'AES-$bits-GCM  ·  PIN: PBKDF2-SHA256 ${k}k  ·  FLAG_SECURE';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final style = TextStyle(
+      fontFamily: 'monospace',
+      fontFamilyFallback: const ['RobotoMono', 'Courier New', 'Courier'],
+      fontSize: 9.5,
+      height: 1.45,
+      letterSpacing: 0.2,
+      color: Colors.white.withValues(alpha: 0.42),
+      shadows: [
+        Shadow(color: Colors.black.withValues(alpha: 0.55), blurRadius: 3),
+      ],
+    );
+    return IgnorePointer(
+      child: ExcludeSemantics(
+        child: Padding(
+          key: const ValueKey('home_watermark'),
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+          child: DefaultTextStyle(
+            style: style,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.fade,
+            softWrap: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'GizliAlan Vault  ·  v${_info.version} (build ${_info.build})'
+                  '  ·  ${Flavor.current.name}',
+                ),
+                Text(cipherLine),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '● ',
+                        style: TextStyle(
+                          color: GizliTheme.mint.withValues(alpha: 0.7),
+                        ),
+                      ),
+                      const TextSpan(text: 'vault: unlocked  ·  © OfferForge'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Soft shadow for text drawn directly on the home background.
+const List<Shadow> _homeTextShadow = [
+  Shadow(color: Color(0x99000000), blurRadius: 6, offset: Offset(0, 1)),
+];

@@ -24,7 +24,7 @@ Encrypted vault for photos, files and notes behind a working calculator.
 
 **Full description (1935/4000):**
 ```
-GizliAlan is an offline personal vault for the owner of the phone. Your photos, documents and notes are protected by a PIN (plus optional fingerprint/face unlock) and encrypted with AES-256-GCM on your device only.
+GizliAlan is a private, on-device personal vault for the owner of the phone. Your photos, documents and notes are protected by a PIN (plus optional fingerprint/face unlock) and encrypted with AES-256-GCM on your device only.
 
 CALCULATOR ENTRY – DISCLOSED
 On your phone the app is named "Calculator" and has an original calculator icon. That icon is GizliAlan. It opens as a fully working calculator. Type your vault PIN and press "=" to open the vault; if you enabled biometrics, long-press "=". This is explained during setup, behind the ⓘ button on the calculator and in this description. You can turn it off in Settings so the app opens straight at the PIN screen.
@@ -41,8 +41,8 @@ FEATURES
 
 PRIVACY
 • No account, no server, no ads, no analytics
-• No internet permission: the app cannot send your data anywhere
-• One permission only: optional biometric unlock. You pick photos and files yourself; no storage permission
+• No tracking, no ads: the app sends none of your data anywhere. The built-in private browser only connects to sites you open, and its cookies/cache are wiped when the vault locks
+• Minimal permissions: optional biometric unlock, and internet only for the built-in browser. You pick photos and files yourself; no storage permission
 • Cloud backup is disabled; uninstalling deletes the vault
 • There is no PIN recovery. If you forget your PIN, the content cannot be decrypted
 
@@ -67,7 +67,7 @@ Privacy policy and support e-mail are on this page.
 
 **Release notes (first release):**
 ```
-First release: encrypted gallery, notes and files; calculator entry (PIN + "="); biometric unlock; no internet permission.
+First release: encrypted gallery, notes and files; calculator entry (PIN + "="); biometric unlock.
 ```
 
 ---
@@ -86,7 +86,7 @@ Encrypted calculator vault + a separate space via Android work profile.
 
 **Full description (3073/4000):**
 ```
-GizliAlan is an offline personal vault for the owner of the phone. Your photos, documents and notes are protected by a PIN (plus optional fingerprint/face unlock) and encrypted with AES-256-GCM on your device only.
+GizliAlan is a private, on-device personal vault for the owner of the phone. Your photos, documents and notes are protected by a PIN (plus optional fingerprint/face unlock) and encrypted with AES-256-GCM on your device only.
 
 CALCULATOR ENTRY – DISCLOSED
 On your phone the app is named "Calculator" and has an original calculator icon. That icon is GizliAlan. It opens as a fully working calculator. Type your vault PIN and press "=" to open the vault; if you enabled biometrics, long-press "=". This is explained during setup, behind the ⓘ button on the calculator and in this description. You can turn it off in Settings so the app opens straight at the PIN screen.
@@ -112,7 +112,7 @@ SECOND PHONE (OPTIONAL, ANDROID WORK PROFILE)
 
 PRIVACY
 • No account, no server, no ads, no analytics
-• No internet permission: the app cannot send your data anywhere
+• No tracking, no ads: the app sends none of your data anywhere. The built-in private browser only connects to sites you open, and its cookies/cache are wiped when the vault locks
 • One permission only: optional biometric unlock (the work profile needs no extra permission). You pick photos and files yourself; no storage permission
 • Cloud backup is disabled; uninstalling deletes the vault
 • There is no PIN recovery. If you forget your PIN, the content cannot be decrypted
