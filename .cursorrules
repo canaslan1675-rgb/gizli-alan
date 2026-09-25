@@ -3,7 +3,11 @@
 Main brief: AUTONOMOUS_BRIEF.md. When unsure: brief > docs/research > your own judgement.
 Log decisions in DECISIONS.md, daily progress in PROGRESS.md, and stop-points in BLOCKERS.md.
 
+COORDINATION (other agents work here too): read COORDINATION.md and .cursor/rules/05-coordination.mdc.
+Every session: git fetch, read docs/AGENT_LOG.md, `gh issue list --label task`, CLAIM before working, heartbeat, log at end.
+
 Detailed rules:
+- .cursor/rules/05-coordination.mdc
 - .cursor/rules/00-project-overview.mdc
 - .cursor/rules/10-hard-bans-and-security.mdc
 - .cursor/rules/20-architecture.mdc
