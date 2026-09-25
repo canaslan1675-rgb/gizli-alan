@@ -172,7 +172,7 @@ config, no geo/reviewer detection).
 - [x] Data safety answers drafted
 - [x] Onboarding: "own device only" confirmation
 - [ ] Real support e-mail + hosted policy URL
-- [ ] Screenshots (plan: calculator with ⓘ dialog, onboarding step 2, vault home, gallery grid, notes, settings)
+- [x] Screenshots: `docs/store/screenshots/{tr,en}/01_calculator_info.png … 06_settings.png` (1080×1920 RGB PNG; calculator with ⓘ dialog, onboarding step 2, vault home, gallery grid, notes, settings). Widget-rendered with demo content by `tool/gen_store_screenshots.sh`; no Second phone frame until #11 is decided
 - [x] Release signing config (`android/key.properties`, README "Release signing") — [ ] owner still has to create the upload keystore (#13); until then release builds use debug keys
 - [ ] Subscriptions/IAP: not in this build (see DECISIONS.md). Settings → "GizliAlan Pro" is a **UI stub only** (planned prices, buttons say "not available in this test build"; no billing library, no network). Real Play Billing = owner decision (#15).
 

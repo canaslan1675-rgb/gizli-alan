@@ -72,3 +72,11 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
   from that environment). Need push access or a HANDOFF so Joi can take the files. Do **not** take
   over yet — 24 h rule not met.
 - Next (Joi): wait for owner merge of this PR; do not claim #6 or #10; owner items #11–#16 stay owner.
+
+## 2026-09-26 00:45 +03:00 — joi
+- TAKEOVER of #6 (owner-approved; the Cursor agent finished it locally on `cursor/6-store-screenshots` 03413eb
+  but could not push). Redone from `main` on `joi/6-store-screenshots`; credit to the Cursor agent.
+- Finished: 12 store screenshots (`docs/store/screenshots/{tr,en}/`), generator `tool/gen_store_screenshots.sh`
+  (widget rendering, skipped in normal `flutter test`), PLAY_COMPLIANCE ticked, DECISIONS row.
+- Merged #24 (close #7 emulator path) before this, at the owner's request.
+- Next: owner decisions #11–#16; #10 (post-MVP) is free.

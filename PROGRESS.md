@@ -17,3 +17,5 @@
 **2026-09-25 (Fri, #7):** Device test plan docs/DEVICE_TEST_PLAN.md (TR+EN) for Xiaomi/Samsung/Pixel with a results table; emulator run handed off (no emulator/KVM on the box).
 
 **2026-09-26 (Sat, #7 close):** Re-checked emulator path on the agent box (`/dev/kvm` exists but root:103 only — `box` cannot use it; no emulator/system image) → documented in DEVICE_TEST_PLAN §5/§6 and closed the agent-side of #7. Brief §6 refreshed (PRs #18–#23 merged). #6 left with Cursor (push blocked locally).
+
+**2026-09-26 (Sat, #6):** Store screenshots TR+EN (6 frames each, 1080×1920 RGB) rendered from the real screens in a skipped-by-default widget test with demo content; generator script + README note; FLAG_SECURE unchanged. Taken over from the Cursor agent (owner-approved).
