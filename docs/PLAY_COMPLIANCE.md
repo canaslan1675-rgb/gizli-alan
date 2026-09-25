@@ -174,7 +174,7 @@ config, no geo/reviewer detection).
 - [ ] Real support e-mail + hosted policy URL
 - [ ] Screenshots (plan: calculator with ⓘ dialog, onboarding step 2, vault home, gallery grid, notes, settings)
 - [ ] Release signing config (currently debug keys)
-- [ ] Subscriptions/IAP: not in this build (see DECISIONS.md)
+- [ ] Subscriptions/IAP: not in this build (see DECISIONS.md). Settings → "GizliAlan Pro" is a **UI stub only** (planned prices, buttons say "not available in this test build"; no billing library, no network). Real Play Billing = owner decision (#15).
 
 ## 6. Play policy risk — v0.2 (calculator label + work-profile DPC)
 

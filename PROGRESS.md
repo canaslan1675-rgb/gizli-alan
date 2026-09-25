@@ -7,3 +7,5 @@
 **2026-09-25 (Fri, coordination):** Added COORDINATION.md (TR+EN), `.cursor/rules/05-coordination.mdc`, docs/AGENT_LOG.md; created labels and `task` issues #4–#17 for all remaining work (owner items #11–#17).
 
 **2026-09-25 (Fri, #4):** Vault-only notification list: encrypted per-space event log (imports, exports, deletions, Second phone changes, wrong PIN attempts since last unlock), home tile with unread badge, mark read/clear; no system notifications, no new permissions. 58 tests pass, analyze clean.
+
+**2026-09-25 (Fri, #5):** Pro/payment UI stub: Settings → GizliAlan Pro with planned plans and prices, usage vs. 50-item free limit (display only), buttons explain there are no purchases in this test build; no billing code. Tests pass, analyze clean.

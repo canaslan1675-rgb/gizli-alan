@@ -39,3 +39,8 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - Note for the other side: widget tests that trigger encrypted writes from a tap need real-zone time;
   mark-read/clear are covered in `test/vault_events_test.dart` unit tests (see comment there).
 - Next (Joi): #5 Pro/payment UI stub.
+
+## 2026-09-25 23:59 +03:00 — joi
+- Finished: #5 Pro/payment UI stub on `joi/5-pro-ui-stub` (stacked on #19, PR into `main`; merge #19 first).
+- Free tasks for the other side: #6 screenshots, #7 device test plan, #8 signing config, #9 docs sync, #10 (post-MVP).
+- Next (Joi, next session 10:07): check open PRs/issues, pick the next free task (likely #8 or #7 if not claimed).

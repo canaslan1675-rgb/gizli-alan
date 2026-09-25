@@ -22,6 +22,7 @@ Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculato
 - **Dosyalar** (PDF vb.) ve **Notlar** (arama ile), hepsi şifreli
 - **Sanal telefon ana ekranı:** saat, ikon ızgarası, dock, duvar kağıdı seçimi
 - **Bildirimler (yalnızca kasa içinde):** içe/dışa aktarma, silme, İkinci telefon değişiklikleri ve son girişten beri hatalı PIN sayısı; şifreli, kasa başına ayrı; sistem bildirimi yok (izin de yok)
+- **GizliAlan Pro ekranı (yalnızca arayüz):** Ayarlar → planlar ve planlanan fiyatlar (Ücretsiz 50 öğe, Pro 249 TL tek seferlik / 449 TL yıllık); satın alma yok, ödeme kodu yok
 - **Sahte PIN (isteğe bağlı):** ayrı anahtarla ayrı, boş bir kasa
 - **TR / EN** arayüz
 - **v0.2 — Nötr başlatıcı adı/simgesi:** uygulama listesinde "Hesap Makinesi" / "Calculator" adı ve özgün hesap makinesi simgesi (adaptive + monochrome). Kasa; onboarding, ⓘ ve mağaza metninde açıkça belirtilir.
