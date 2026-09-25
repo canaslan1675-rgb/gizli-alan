@@ -67,8 +67,9 @@ CLAIM kazanır. Aynı anda ideal 1, en fazla 2 issue.)
 ## 4. Branches and heartbeat / Dallar ve heartbeat
 
 - Branch name: `joi/<issue#>-<slug>` or `cursor/<issue#>-<slug>`, based on the branch with the
-  **latest work** (today: `cursor-rules` → `v0.2-calculator-workprofile`; after the owner merges,
-  the merged base). PR into that base branch.
+  **integration branch `main`** (PRs #1–#3 were merged into `main` on 2026-09-25; `mvp-v1`,
+  `v0.2-calculator-workprofile` and `cursor-rules` are historical). Always branch from an up-to-date
+  `origin/main` and open the PR **into `main`**.
 - **Push work in progress often** (at least at the end of every session), even if unfinished, so
   the other side can continue it. WIP commits must still build; mark them `wip:` if tests are not
   yet green, and make the final commits pass the gates (`flutter analyze` clean, `flutter test` green).
