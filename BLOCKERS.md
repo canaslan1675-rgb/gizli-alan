@@ -1,7 +1,7 @@
 # Blockers / owner decisions needed
 
 - **Play Console / publishing:** not done (needs owner account, fee, real support e-mail, hosted HTTPS privacy policy URL).
-- **Release signing:** release APK is signed with the debug key. Owner must create an upload keystore (never commit it).
+- **Release signing:** signing config is ready (`android/key.properties`, see README "Release signing"; falls back to the debug key when the file is missing). Owner must create the upload keystore and key.properties locally (#13; never commit them).
 - **Payments:** Play Billing / Pro tier not integrated (brief §5: real payment = stop and ask). Only pricing notes exist.
 - **Play policy risk — Second phone (v0.2):** the app now contains a `DeviceAdminReceiver` used as profile owner of a user-created work profile, plus a neutral "Calculator" launcher label. Play may ask for justification or reject (Device Admin / managed-profile DPCs are reviewed more strictly; calculator-looking vaults draw Deceptive Behavior scrutiny). **Owner decision needed before submission:** (a) submit with full disclosure (docs/PLAY_COMPLIANCE.md §6) and accept review friction, or (b) build a Play flavor without the second phone and distribute the second phone only as a side-loaded APK (Shelter model; F-Droid/GitHub releases). Not submitted anywhere.
 - **Second phone not yet device-tested:** provisioning, the signed cross-profile trampoline, freeze/unfreeze, clone fallback and removal are implemented against AOSP APIs but untested on a real phone (no device on this box). Especially test Xiaomi (MIUI/HyperOS), Samsung (Secure Folder coexists) and a Pixel.

@@ -53,6 +53,38 @@ On this box the Android toolchain lives in `/workspace/tools/android-sdk` and
 `/workspace/tools/jdk17` (see `flutter config`). The `android/` project is
 committed; `bootstrap.sh` only re-creates it if missing.
 
+### Release signing / Release imzalama (owner only / yalnızca sahibi)
+
+Release builds are signed with the **upload key** from `android/key.properties`.
+If that file is missing, the build prints a warning and signs with the **debug
+key** — fine for test APKs (GitHub pre-releases), **not** for Google Play.
+
+1. On your own machine, create the upload keystore **outside the repo** and back
+   it up somewhere safe (password manager + offline copy). Losing it means you
+   can't update the app without Play support.
+   ```bash
+   keytool -genkeypair -v -keystore ~/keys/gizlialan-upload.jks \
+     -alias upload -keyalg RSA -keysize 2048 -validity 10000
+   ```
+2. `cp android/key.properties.example android/key.properties` and fill in
+   `storeFile` (absolute path, or relative to `android/`), `storePassword`,
+   `keyAlias`, `keyPassword`. Missing values fail the build with a clear message.
+3. `flutter build appbundle --release` (Play) or `flutter build apk --release`.
+   Check the signer: `apksigner verify --print-certs build/app/outputs/flutter-apk/app-release.apk`
+   (must **not** say `CN=Android Debug`).
+4. Recommended: enable **Play App Signing** when creating the app in Play Console
+   (Google keeps the app signing key, your keystore is only the upload key).
+
+`android/key.properties`, `*.jks` and `*.keystore` are git-ignored. **Never**
+commit them or paste passwords/paths into issues, PRs, logs or chat. Agents never
+create or handle the real keystore (issue #13).
+
+TR: Yayın derlemesi `android/key.properties` içindeki yükleme anahtarıyla imzalanır;
+dosya yoksa uyarı verilir ve debug anahtarı kullanılır (yalnızca test APK'ları için,
+Play için değil). Anahtar deposunu repo dışında oluştur ve yedekle, şablonu kopyalayıp
+doldur, imzayı `apksigner` ile doğrula. Anahtar/parola asla repoya, issue'ya veya
+sohbete konmaz.
+
 ### Architecture
 
 ```
