@@ -4,6 +4,7 @@ import '../app.dart';
 import '../l10n/l10n.dart';
 import '../services/auth_service.dart';
 import '../services/calculator_engine.dart';
+import '../services/pro_entitlement.dart';
 import '../services/vault_space.dart';
 import '../theme.dart';
 
@@ -63,7 +64,12 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(t('calcInfoTitle')),
-        content: Text(t('calcInfoBody')),
+        content: Text(
+          ProEntitlement.available
+              ? '${t('calcInfoBody')}\n\n${t('calcInfoProHint')}'
+              : t('calcInfoBody'),
+          key: const ValueKey('calc_info_body'),
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t('ok'))),
         ],
@@ -113,8 +119,14 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
       appBar: AppBar(
         title: Text(t('decoyTitle')),
         actions: [
-          if (widget.vaultEntry)
+          // Pro members may opt in to hide this button (ProEntitlement);
+          // when hidden it is removed entirely (no empty tap target).
+          if (widget.vaultEntry &&
+              !ProEntitlement.hideCalculatorInfo(
+                GizliAlanApp.of(context).settings,
+              ))
             IconButton(
+              key: const ValueKey('calc_info'),
               icon: const Icon(Icons.info_outline),
               tooltip: t('calcInfoTitle'),
               onPressed: _showInfo,

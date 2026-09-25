@@ -42,6 +42,16 @@ const Map<String, String> en = {
   'dataSafetyShort':
       'Data stays on this device, encrypted. No account, no cloud, no ads, no analytics.',
   // Calculator
+  'calcInfoProHint': 'Pro members can hide this icon in Settings.',
+  'hideCalcInfo': 'Hide info icon on calculator',
+  'hideCalcInfoHint':
+      'Removes the ⓘ button from the calculator. Help: Settings → About calculator entry.',
+  'hideCalcInfoLocked': 'Pro feature. Tap to open the Pro screen.',
+  'proSoon': 'Pro coming soon',
+  'calcHelpTitle': 'About calculator entry',
+  'calcHelpHint': 'How the vault opens (same text as ⓘ)',
+  'proStubToggle': 'Simulate Pro (test build)',
+  'proStubToggleHint': 'No purchase; a local switch to try Pro features only.',
   'calcInfoTitle': 'About this calculator',
   'calcInfoBody':
       'This is a real calculator and also the entrance to your GizliAlan '

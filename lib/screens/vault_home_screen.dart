@@ -1,5 +1,3 @@
-import '../services/crypto_service.dart';
-import '../app_version.dart';
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -7,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../app.dart';
+import '../app_version.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
+import '../services/crypto_service.dart';
 import '../theme.dart';
 import 'browser_screen.dart';
 import 'decoy_calculator_screen.dart';

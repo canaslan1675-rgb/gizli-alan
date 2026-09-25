@@ -20,6 +20,8 @@ class SettingsService {
   static const _kLang = 'lang';
   static const _kWallpaper = 'wallpaper';
   static const _kWallpaperImage = 'wallpaper_image';
+  static const _kProStub = 'pro_stub_active';
+  static const _kHideCalcInfo = 'hide_calc_info_icon';
   static const _kBrowserEngine = 'browser_engine';
   static const _kBrowserWipe = 'browser_wipe_on_lock';
   static const _kSecondPhoneClose = 'second_phone_close';
@@ -40,6 +42,19 @@ class SettingsService {
 
   Future<void> setCalculatorEntryEnabled(bool v) =>
       _prefs.setBool(_kCalculatorEntry, v);
+
+  /// Test-only Pro entitlement for builds with the Pro UI stub (no billing).
+  /// Read through [ProEntitlement], never directly by UI.
+  bool get proStubActive => _prefs.getBool(_kProStub) ?? false;
+
+  Future<void> setProStubActive(bool v) => _prefs.setBool(_kProStub, v);
+
+  /// User opt-in (Pro only): hide the ⓘ button on the calculator. Must be
+  /// readable before unlock, so it lives in app settings (like the
+  /// calculator-entry switch). Effective value: ProEntitlement.
+  bool get hideCalcInfoIcon => _prefs.getBool(_kHideCalcInfo) ?? false;
+
+  Future<void> setHideCalcInfoIcon(bool v) => _prefs.setBool(_kHideCalcInfo, v);
 
   /// Biometric unlock for the real vault (never opens the decoy vault).
   bool get biometricEnabled => _prefs.getBool(_kBiometric) ?? false;

@@ -43,6 +43,17 @@ const Map<String, String> tr = {
   'dataSafetyShort':
       'Veriler bu cihazda, şifreli kalır. Hesap yok, bulut yok, reklam yok, analitik yok.',
   // Calculator
+  'calcInfoProHint': "Pro üyeler bu simgeyi Ayarlar'dan gizleyebilir.",
+  'hideCalcInfo': 'Hesap makinesinde bilgi simgesini gizle',
+  'hideCalcInfoHint':
+      'ⓘ düğmesi hesap makinesinden kalkar. Yardım: Ayarlar → Hesap makinesi girişi hakkında.',
+  'hideCalcInfoLocked': 'Pro özelliği. Pro ekranını açmak için dokun.',
+  'proSoon': 'Pro yakında',
+  'calcHelpTitle': 'Hesap makinesi girişi hakkında',
+  'calcHelpHint': 'Kasanın nasıl açıldığı (ⓘ ile aynı açıklama)',
+  'proStubToggle': "Pro'yu simüle et (test sürümü)",
+  'proStubToggleHint':
+      'Satın alma yok; yalnızca Pro özelliklerini denemek için yerel bir anahtar.',
   'calcInfoTitle': 'Bu hesap makinesi hakkında',
   'calcInfoBody':
       'Bu gerçek bir hesap makinesidir ve aynı zamanda GizliAlan kasanın '
