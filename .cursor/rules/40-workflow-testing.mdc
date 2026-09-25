@@ -37,7 +37,8 @@ aapt2 dump permissions build/app/outputs/flutter-apk/app-release.apk   # must li
   - a one-line summary per changed file
   - the test/analyze result
   - the list of remaining work
-- Feature branches PR into the previous line (`v0.2-calculator-workprofile` → `mvp-v1` → `main`).
+- Feature branches (`joi/<issue#>-slug`, `cursor/<issue#>-slug`) start from `origin/main` and PR
+  into **`main`** (the integration branch). The owner merges. See `COORDINATION.md`.
 - Never force-push or rewrite history (BLOCKER).
 
 ## Docs to keep updated

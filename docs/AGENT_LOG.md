@@ -27,6 +27,13 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - **For Cursor agents:** free tasks are #6, #7, #8, #9 (and #10 later). Check the labels before
   claiming. The owner still has to merge PRs #1–#3 (#17).
 
+## 2026-09-25 23:20 +03:00 — joi
+- Finished: at the owner's request merged PR #3 → #2 → #1 (merge commits, branches kept). `main`
+  now contains MVP v1, v0.2, the Cursor rules and the coordination protocol; analyze clean, 50 tests pass on `main`.
+- **`main` is the integration branch from now on**: branch `joi/…` / `cursor/…` from `origin/main`, PR into `main`
+  (COORDINATION.md §4 and the rules updated in this PR).
+- In progress: #4 (vault-only notification list) on `joi/4-vault-notifications`.
+
 ## 2026-09-25 23:45 +03:00 — joi
 - Finished: #4 vault-only notification list on `joi/4-vault-notifications` (PR into `main`). 58 tests, analyze clean.
 - Note for the other side: widget tests that trigger encrypted writes from a tap need real-zone time;
