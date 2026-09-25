@@ -55,6 +55,23 @@ android {
         versionName = flutter.versionName
     }
 
+    // Two distributions (issue #11):
+    //  - play: vault + calculator only. NO Second phone: no device-admin
+    //    receiver, no work-profile code (src/full is not compiled in).
+    //  - full: everything incl. the Second phone (work profile), side-load/test.
+    // Distinct applicationIds so both can be installed side by side.
+    // Build with `flutter build apk --flavor play|full` (Dart reads appFlavor).
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("play") {
+            dimension = "distribution"
+        }
+        create("full") {
+            dimension = "distribution"
+            applicationIdSuffix = ".full"
+        }
+    }
+
     signingConfigs {
         if (hasReleaseKeystore) {
             create("release") {

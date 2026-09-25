@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../flavor.dart';
 import 'en.dart';
 import 'tr.dart';
 
@@ -29,7 +30,15 @@ class L10n {
     return current;
   }
 
-  String t(String key) => _map[key] ?? _fallback[key] ?? key;
+  /// Keys may have a `<key>_play` variant used by the `play` flavor (texts
+  /// that would otherwise mention the Second phone, which that build lacks).
+  String t(String key) {
+    if (!Flavor.hasSecondPhone) {
+      final v = _map['${key}_play'] ?? _fallback['${key}_play'];
+      if (v != null) return v;
+    }
+    return _map[key] ?? _fallback[key] ?? key;
+  }
 
   String call(String key) => t(key);
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../app.dart';
+import '../flavor.dart';
 import '../l10n/l10n.dart';
 import '../theme.dart';
 import 'decoy_calculator_screen.dart';
@@ -140,7 +141,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         badge: _unread,
         key: const ValueKey('tile_notifications'),
       ),
-      if (!(app.session?.isDecoy ?? true))
+      if (Flavor.hasSecondPhone && !(app.session?.isDecoy ?? true))
         _AppIcon(
           Icons.phone_android_outlined,
           t('secondPhone'),

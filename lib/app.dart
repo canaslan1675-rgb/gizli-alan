@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'flavor.dart';
 import 'l10n/l10n.dart';
 import 'models/vault_event.dart';
 import 'screens/decoy_calculator_screen.dart';
@@ -71,9 +72,12 @@ class GizliAlanAppState extends State<GizliAlanApp>
       widget.secondPhone ?? SecondPhoneService();
 
   /// The second phone is only reachable while the REAL vault is unlocked
-  /// (never from the calculator, the PIN screen or the decoy vault).
+  /// (never from the calculator, the PIN screen or the decoy vault), and only
+  /// in the `full` flavor (the `play` build has no Second phone at all).
   SecondPhoneService? get secondPhoneIfUnlocked =>
-      (_session != null && !_session!.isDecoy) ? _secondPhone : null;
+      (Flavor.hasSecondPhone && _session != null && !_session!.isDecoy)
+      ? _secondPhone
+      : null;
 
   VaultSession? get session => _session;
   bool get isUnlocked => _session != null;
@@ -184,6 +188,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
 
   /// If the Lock button closed the second phone, open it again on unlock.
   Future<void> _reopenSecondPhone() async {
+    if (!Flavor.hasSecondPhone) return;
     final closedBy = settings.secondPhoneClosedBy;
     if (closedBy == null) return;
     // Opening may briefly start a system/profile activity: don't auto-lock.
@@ -205,6 +210,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
   }
 
   Future<void> _closeSecondPhone() async {
+    if (!Flavor.hasSecondPhone) return;
     final mode = settings.secondPhoneCloseMode;
     if (mode == SecondPhoneCloseMode.off) return;
     final st = await _secondPhone.status();

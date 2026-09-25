@@ -19,8 +19,10 @@ export PATH=/workspace/tools/flutter/bin:$PATH   # Flutter 3.47 stable
 flutter pub get
 flutter analyze
 flutter test
-flutter build apk --release                                    # universal (~55 MB); debug-signed unless android/key.properties exists
-flutter build apk --release --target-platform android-arm64    # arm64-only APK (v0.2 test build)
+flutter build apk --release --flavor play --target-platform android-arm64   # Play candidate, no Second phone
+flutter build apk --release --flavor full --target-platform android-arm64   # with Second phone
+# (a flavor is required; debug-signed unless android/key.properties exists)
+# Flavor gating tests: test/second_phone_flow_test.dart (Flavor.debugOverride)
 aapt2 dump permissions build/app/outputs/flutter-apk/app-release.apk   # must list only USE_BIOMETRIC (+ AndroidX internal)
 ```
 - The Android SDK is in `/workspace/tools/android-sdk`, and JDK 17 is in `/workspace/tools/jdk17`.

@@ -44,12 +44,14 @@ The app really is a working calculator. The listing and in-app behaviour must te
   - empty admin policies, self-deactivation as a main-profile admin
   - Second phone gated behind the vault and fully described
   - no new permissions, no network, no reading of other apps' data
-- **Fallback (split build):** a Play flavor **without** the `secondphone` components (vault +
-  calculator only), with the Second phone build distributed as a signed side-loaded APK
-  (GitHub releases / F-Droid style, like Shelter). The Play title can optionally be made more
+- **Split build — implemented in v0.3 (#11):** flavor `play` (`com.offerforge.gizlialan`)
+  has **no** `secondphone` components (vault + calculator only); flavor `full`
+  (`com.offerforge.gizlialan.full`) has the Second phone and is distributed as a side-loaded APK
+  (GitHub releases / F-Droid style, like Shelter). Never add Second phone code/manifest entries
+  to `src/main` — only `src/full`. Play listing screenshots: `docs/store/screenshots/play/`. The Play title can optionally be made more
   explicit, e.g. "GizliAlan: Calculator Vault".
-- **Owner decision is required before any Play submission:**
-  (a) submit with full disclosure and accept review friction, or (b) use the split build.
+- **Owner decision is required before any Play submission:** which flavor to submit
+  (recommended: `play`).
   Nothing has been submitted anywhere. Do not submit, publish or set up Play Console.
 
 ## Closed testing (context from Google Play rules, NOT from the repo docs)

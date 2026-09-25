@@ -254,4 +254,22 @@ const Map<String, String> en = {
       'There are no purchases in this test build and no payment is taken. Pro may be offered through Google Play later.',
   'proFooter':
       'GizliAlan needs no account and sends no data to any server. The app is not sold on Gumroad or elsewhere.',
+  // `play` flavor variants (no Second phone in that build), see L10n.t.
+  'onboardingPrivacy_play':
+      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and uploads nothing — there is no server. Only use it for your own content on your own device.',
+  'privacyBody_play':
+      '• All vault content (photos, files, notes) is encrypted with AES-256-GCM '
+      'using a key kept in Android Keystore-backed secure storage.\n'
+      '• Your PIN is stored only as a salted PBKDF2 hash.\n'
+      '• No internet permission in the release build, no account, no '
+      'analytics, no ads. Nothing leaves your device unless you export it.\n'
+      '• Permissions: biometric (optional unlock) only. Photos and files are '
+      'chosen by you through the system pickers — no storage/media '
+      'permission.\n'
+      '• No SMS, calls, contacts, location, microphone, camera, Accessibility '
+      'or device admin.\n'
+      '• App backup is disabled, so vault data is not copied to the cloud. '
+      'Uninstalling or "Clear data" deletes the vault.',
+  'notifEmpty_play':
+      'No notifications yet. Imports, exports, deletions and wrong PIN attempts are listed here.',
 };

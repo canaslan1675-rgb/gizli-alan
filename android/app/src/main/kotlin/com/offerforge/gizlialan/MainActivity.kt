@@ -3,7 +3,6 @@ package com.offerforge.gizlialan
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
-import com.offerforge.gizlialan.secondphone.SecondPhoneChannel
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 
@@ -14,10 +13,12 @@ import io.flutter.embedding.engine.FlutterEngine
  * the app content in the recent-apps preview. This only protects GizliAlan's
  * own window; it does not observe or affect any other app.
  *
- * Also hosts the "second phone" (own work profile) platform channel.
+ * Also hosts the flavor-specific native feature ([FlavorFeatures]): the
+ * "second phone" (own work profile) channel in the `full` flavor, nothing in
+ * the `play` flavor.
  */
 class MainActivity : FlutterFragmentActivity() {
-    private var secondPhone: SecondPhoneChannel? = null
+    private var flavorFeature: FlavorFeature? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(
@@ -29,18 +30,18 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        secondPhone = SecondPhoneChannel(this, flutterEngine.dartExecutor.binaryMessenger)
+        flavorFeature = FlavorFeatures.attach(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
-        secondPhone?.dispose()
-        secondPhone = null
+        flavorFeature?.dispose()
+        flavorFeature = null
         super.cleanUpFlutterEngine(flutterEngine)
     }
 
     @Deprecated("Needed to receive provisioning / cross-profile results")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (secondPhone?.onActivityResult(requestCode, resultCode, data) == true) return
+        if (flavorFeature?.onActivityResult(requestCode, resultCode, data) == true) return
         @Suppress("DEPRECATION")
         super.onActivityResult(requestCode, resultCode, data)
     }

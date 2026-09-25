@@ -27,9 +27,11 @@ lib/
     second_phone_service.dart  Second phone channel client + availability logic
   screens/                     decoy_calculator, pin_lock, onboarding, vault_home, gallery, photo_viewer,
                                files, notes_list, note_edit, settings, set_pin, second_phone
-android/app/src/main/kotlin/com/offerforge/gizlialan/secondphone/
+  flavor.dart                  AppFlavor play|full; Flavor.hasSecondPhone gates all Second phone UI
+android/app/src/full/kotlin/com/offerforge/gizlialan/secondphone/   (full flavor only)
                                ProfileAdminReceiver, ProfileSetup, ProvisioningDoneActivity,
                                ProfileActionActivity, SecondPhoneChannel, SecondPhoneContract
+android/app/src/{full,play}/…/FlavorFeatures.kt   full → SecondPhoneChannel, play → null
 tool/gen_launcher_icon.py      generates the original launcher icon
 ```
 

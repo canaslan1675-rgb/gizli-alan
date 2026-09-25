@@ -1,4 +1,18 @@
-# Play Store readiness — GizliAlan v0.2 (MVP v1 + calculator launcher + second phone)
+# Play Store readiness — GizliAlan v0.3 (two build flavors: `play` + `full`)
+
+## 0. Build flavors (#11, owner: "ikisini de üretip deneyelim")
+
+| Flavor | applicationId | Second phone | For |
+|--------|---------------|--------------|-----|
+| **`play`** | `com.offerforge.gizlialan` | **No.** Merged manifest has **no** `DeviceAdminReceiver`, no `BIND_DEVICE_ADMIN`, no provisioning/profile-action activities, no `profile_admin.xml`, no `managed_users`/`device_admin` uses-feature, no LAUNCHER `<queries>`. The Kotlin code (`secondphone/`) is not compiled in; the Dart UI hides every Second phone entry. | Google Play candidate |
+| `full` | `com.offerforge.gizlialan.full` | Yes (v0.2 behaviour, components in `android/app/src/full/`) | Side-load / GitHub test builds |
+
+Both: launcher label "Calculator"/"Hesap Makinesi", FLAG_SECURE, only `USE_BIOMETRIC`,
+same `key.properties` release signing. They install side by side. Which flavor is
+submitted to Play is still the **owner's** choice after device testing (#11 keeps the
+`owner` label); this document assumes **`play`** for the listing, screenshots and
+reviewer notes. Build: `flutter build appbundle --release --flavor play`.
+
 
 Status: **draft, not submitted.** Publishing, Console setup and any purchase
 integration are out of scope for this branch (owner decision required).
@@ -14,7 +28,7 @@ Explicitly removed with `tools:node="remove"`: `READ_EXTERNAL_STORAGE`,
 `READ_MEDIA_VISUAL_USER_SELECTED`, `MANAGE_EXTERNAL_STORAGE`, `CAMERA`,
 `RECORD_AUDIO`, `USE_FINGERPRINT`. No `INTERNET` in release (Flutter adds it to
 debug/profile manifests only). **Verify with**
-`aapt2 dump permissions build/app/outputs/flutter-apk/app-release.apk`
+`aapt2 dump permissions build/app/outputs/flutter-apk/app-play-release.apk` (and `app-full-release.apk`)
 before every upload.
 
 Verified 2026-09-25 on the MVP v1 release APK:
@@ -27,11 +41,18 @@ No INTERNET, no storage/media/camera/mic permissions.
 Re-verified 2026-09-25 on the v0.2 arm64 release APK (`aapt2 dump permissions`):
 same list — v0.2 adds **no permissions**.
 
+Re-verified 2026-09-26 on the v0.3 arm64 release APKs of **both** flavors: same list
+(`com.offerforge.gizlialan[.full].DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` + `USE_BIOMETRIC`).
+`aapt2 dump xmltree` of the `play` APK has no `DeviceAdminReceiver`, `BIND_DEVICE_ADMIN`,
+`device_admin` or `secondphone` entries; the `full` APK has them.
+
 Not used anywhere: Accessibility Service, Notification Listener, SMS/Call log,
 Contacts, Location, `QUERY_ALL_PACKAGES`, `REQUEST_INSTALL_PACKAGES`, overlays,
 device-owner / main-profile device-admin policies.
 
-### v0.2 components that need declaring / explaining
+### `full` flavor only: components that need declaring / explaining
+
+Not present in the `play` flavor (see §0). Only relevant if the owner submits `full`.
 
 | Component | Purpose |
 |-----------|---------|
@@ -55,7 +76,7 @@ device-owner / main-profile device-admin policies.
 
 Re-check if any SDK (billing, crash reporting, backup) is added later.
 
-## 3. Store listing drafts
+## 3. Store listing drafts (`play` flavor — no Second phone)
 
 ### TR
 - **Başlık (≤30):** `GizliAlan: Özel Kasa & Notlar`
@@ -77,13 +98,6 @@ cihazında AES-256 ile şifrelenir.
   yazıp "=" tuşuna basınca GizliAlan kasası açılır (ⓘ düğmesinde de yazar).
   İstersen Ayarlar'dan doğrudan PIN ekranıyla açılmasını seçebilirsin.
 • İsteğe bağlı sahte PIN: ayrı, boş bir kasa açar
-• İsteğe bağlı "İkinci telefon": Android'in iş profili özelliğiyle ayrı bir alan
-  kurar (Shelter/Island yöntemi). Kendi Play Store'una ikinci bir Google hesabı
-  ekleyip uygulama kurabilirsin; uygulamalar, hesaplar ve dosyalar ana
-  telefondan ayrı kalır. Kasayı kilitleyince ikinci telefonun uygulamalarını
-  gizleyebilir, kasadan bu uygulamaları başlatabilirsin. GizliAlan yalnızca bu
-  iş profilinin profil sahibidir; telefonunun yöneticisi olmaz. Bazı cihazlarda
-  (ör. Xiaomi MIUI/HyperOS) iş profili desteklenmeyebilir.
 
 GİZLİLİK
 • Hesap yok, sunucu yok, reklam yok, analitik yok; internet izni yok
@@ -93,7 +107,7 @@ GİZLİLİK
 NE DEĞİLDİR
 • Başkasını izleme, takip etme veya dinleme aracı değildir
 • SMS, arama, konum, rehber okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonun
-  cihaz yöneticisi olmaz; ikinci telefondaki uygulamaların verisini okumaz
+  cihaz yöneticisi olmaz
 • Yalnızca kendi cihazında, kendi içeriğin için kullan
 ```
 
@@ -117,13 +131,6 @@ FEATURES
   to open the GizliAlan vault (also explained behind the ⓘ button). You can
   switch to opening straight at the PIN screen in Settings.
 • Optional decoy PIN: opens a separate, empty vault
-• Optional "Second phone": creates a separate space with Android's work profile
-  feature (the Shelter/Island method). Add a second Google account in its own
-  Play Store and install apps; apps, accounts and files stay separate from your
-  main phone. Hide the second phone's apps when you lock the vault, and launch
-  them from inside the vault. GizliAlan is only the profile owner of that work
-  profile — never an admin of your phone. Some devices (e.g. Xiaomi
-  MIUI/HyperOS) may not support work profiles.
 
 PRIVACY
 • No account, no server, no ads, no analytics, no internet permission
@@ -133,8 +140,30 @@ PRIVACY
 WHAT IT IS NOT
 • Not a tool to monitor, track or listen to anyone
 • Does not read SMS, calls, location or contacts; no Accessibility Service, never a
-  device admin of your phone; does not read data of apps in the second phone
+  device admin of your phone
 • Use it only on your own device, for your own content
+```
+
+### `full` flavor only (if the owner ever submits it)
+
+Add to FEATURES and to "NE DEĞİLDİR / WHAT IT IS NOT" (… "ikinci telefondaki
+uygulamaların verisini okumaz" / "does not read data of apps in the second phone"):
+```
+• İsteğe bağlı "İkinci telefon": Android'in iş profili özelliğiyle ayrı bir alan
+  kurar (Shelter/Island yöntemi). Kendi Play Store'una ikinci bir Google hesabı
+  ekleyip uygulama kurabilirsin; uygulamalar, hesaplar ve dosyalar ana
+  telefondan ayrı kalır. Kasayı kilitleyince ikinci telefonun uygulamalarını
+  gizleyebilir, kasadan bu uygulamaları başlatabilirsin. GizliAlan yalnızca bu
+  iş profilinin profil sahibidir; telefonunun yöneticisi olmaz. Bazı cihazlarda
+  (ör. Xiaomi MIUI/HyperOS) iş profili desteklenmeyebilir.
+
+• Optional "Second phone": creates a separate space with Android's work profile
+  feature (the Shelter/Island method). Add a second Google account in its own
+  Play Store and install apps; apps, accounts and files stay separate from your
+  main phone. Hide the second phone's apps when you lock the vault, and launch
+  them from inside the vault. GizliAlan is only the profile owner of that work
+  profile — never an admin of your phone. Some devices (e.g. Xiaomi
+  MIUI/HyperOS) may not support work profiles.
 ```
 
 ## 4. App access / reviewer instructions (App content → App access)
@@ -150,6 +179,7 @@ The app is fully functional without an account.
 5. Launcher: the app is labelled "Calculator" (EN) / "Hesap Makinesi" (TR) with an original
    calculator icon. It is a working calculator; the vault entry is disclosed in onboarding step 2,
    in the ⓘ dialog and in this listing.
+[full flavor only — omit for the play build]
 6. Second phone (optional, needs a device that supports work profiles, e.g. Pixel emulator):
    Vault → "Second phone" → "Set up second phone" → Android's own work-profile setup runs.
    The app becomes profile owner of that work profile ONLY (DeviceAdminReceiver with no
@@ -165,18 +195,24 @@ config, no geo/reviewer detection).
 
 - [x] Listing and in-app behaviour tell the same story (vault; calculator entry disclosed)
 - [x] Launcher name "Calculator"/"Hesap Makinesi" + original icon; app is a real calculator, vault disclosed; no icon hiding, no alias switching, no copied vendor branding
-- [x] Device admin used only as profile owner of a user-created work profile (empty policies, self-removes as main-profile admin); disclosed in app, listing, reviewer notes
+- [x] `play` flavor: **no device admin at all** (verified in the merged manifest / APK, §0–§1)
+- [x] `full` flavor: device admin used only as profile owner of a user-created work profile (empty policies, self-removes as main-profile admin); disclosed in app, listing, reviewer notes
 - [x] No stalkerware/monitoring features or wording ("spy", "track", "hide from partner")
 - [x] Minimal permissions; no broad storage
 - [x] Privacy policy (PRIVACY.md) — **host on HTTPS before submission**
 - [x] Data safety answers drafted
 - [x] Onboarding: "own device only" confirmation
 - [ ] Real support e-mail + hosted policy URL
-- [x] Screenshots: `docs/store/screenshots/{tr,en}/01_calculator_info.png … 06_settings.png` (1080×1920 RGB PNG; calculator with ⓘ dialog, onboarding step 2, vault home, gallery grid, notes, settings). Widget-rendered with demo content by `tool/gen_store_screenshots.sh`; no Second phone frame until #11 is decided
+- [x] Screenshots: **Play listing uses `docs/store/screenshots/play/{tr,en}/`** `01_calculator_info.png … 06_settings.png` (no Second phone anywhere); `full/{tr,en}/` is the same set for the side-load build (vault home shows the Second phone tile) (1080×1920 RGB PNG; calculator with ⓘ dialog, onboarding step 2, vault home, gallery grid, notes, settings). Widget-rendered with demo content by `tool/gen_store_screenshots.sh`
 - [x] Release signing config (`android/key.properties`, README "Release signing") — [ ] owner still has to create the upload keystore (#13); until then release builds use debug keys
 - [ ] Subscriptions/IAP: not in this build (see DECISIONS.md). Settings → "GizliAlan Pro" is a **UI stub only** (planned prices, buttons say "not available in this test build"; no billing library, no network). Real Play Billing = owner decision (#15).
 
-## 6. Play policy risk — v0.2 (calculator label + work-profile DPC)
+## 6. Play policy risk — calculator label (+ work-profile DPC in `full`)
+
+**v0.3:** the `play` flavor removes risk 1 below entirely (no admin component);
+risk 2 (calculator label) remains and is mitigated by disclosure. Risk 1 only applies
+if the `full` flavor is submitted.
+
 
 **Risk: medium–high review friction.** Not a policy violation by design, but:
 
@@ -197,9 +233,9 @@ main-profile admin; second phone gated behind the vault and fully described;
 no new permissions; no reading of other apps' data; no network.
 
 **If Play objects (fallback):**
-- Build a Play flavor without the `secondphone` components (vault + calculator
-  only) and distribute the second-phone build as a signed APK (GitHub releases
-  / F-Droid-style), like Shelter. Owner decision — see BLOCKERS.md.
+- ~~Build a Play flavor without the `secondphone` components~~ — **done in v0.3
+  (#11):** `play` flavor (no Second phone) + `full` flavor (side-load, GitHub
+  releases). Final submission choice: owner, after testing — see BLOCKERS.md.
 - Optionally make the Play listing title more explicit, e.g.
   "GizliAlan: Calculator Vault".
 - Store icon: use `docs/store_icon_512.png` (same original icon as the launcher)

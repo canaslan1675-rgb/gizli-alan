@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gizlialan/app.dart';
+import 'package:gizlialan/flavor.dart';
 import 'package:gizlialan/l10n/l10n.dart';
 import 'package:gizlialan/screens/vault_home_screen.dart';
 import 'package:gizlialan/services/auth_service.dart';
@@ -63,9 +64,11 @@ void main() {
     auth = AuthService(storage: MemorySecureKv(), pbkdf2Iterations: 1000);
     sp = FakeSecondPhone();
     tmp = await Directory.systemTemp.createTemp('gizlialan_sp');
+    Flavor.debugOverride = AppFlavor.full;
   });
 
   tearDown(() async {
+    Flavor.debugOverride = null;
     L10n.setLang('tr');
     if (await tmp.exists()) await tmp.delete(recursive: true);
   });
@@ -181,5 +184,103 @@ void main() {
     expect(find.textContaining('Second space'), findsOneWidget);
     expect(find.textContaining('Private space'), findsWidgets);
     expect(find.byKey(const ValueKey('sp_setup')), findsNothing);
+  });
+
+  group('flavor gating (#11)', () {
+    Future<GizliAlanAppState> openRealVault(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2340);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await tester.runAsync(() => auth.setPin('2580'));
+      await tester.pumpWidget(
+        GizliAlanApp(
+          settings: settings,
+          auth: auth,
+          biometrics: FakeBiometrics(),
+          baseDirProvider: () async => tmp,
+          secondPhone: sp,
+        ),
+      );
+      await settle(tester);
+      await typePin(tester, '2580');
+      expect(find.byType(VaultHomeScreen), findsOneWidget);
+      return tester.state<GizliAlanAppState>(find.byType(GizliAlanApp));
+    }
+
+    Future<void> openSettings(WidgetTester tester) async {
+      await tester.tap(find.byIcon(Icons.settings_outlined));
+      await settle(tester);
+    }
+
+    test('parse: unknown/missing flavor defaults to play', () {
+      expect(Flavor.parse('full'), AppFlavor.full);
+      expect(Flavor.parse('play'), AppFlavor.play);
+      expect(Flavor.parse(''), AppFlavor.play);
+      expect(Flavor.parse(null), AppFlavor.play);
+      expect(Flavor.parse('Full'), AppFlavor.play);
+    });
+
+    testWidgets('play: no Second phone anywhere', (tester) async {
+      Flavor.debugOverride = AppFlavor.play;
+      expect(Flavor.hasSecondPhone, isFalse);
+      final state = await openRealVault(tester);
+      expect(find.textContaining('Second phone'), findsNothing);
+      expect(find.text('Chat'), findsNothing); // no profile apps grid
+      expect(state.secondPhoneIfUnlocked, isNull);
+
+      await openSettings(tester);
+      expect(find.byKey(const ValueKey('sp_close_mode')), findsNothing);
+      expect(find.textContaining('Second phone'), findsNothing);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('settings_version')),
+        300,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.text('GizliAlan 0.3.0 · Play'), findsOneWidget);
+      await tester.pageBack();
+      await settle(tester);
+
+      // Locking in play never touches the (absent) second phone.
+      await tester.tap(find.byKey(const ValueKey('lock_button')));
+      await settle(tester);
+      expect(sp.closes, isEmpty);
+      await typePin(tester, '2580');
+      expect(sp.opens, isEmpty);
+
+      // Texts that mention the Second phone use their play variants.
+      final l = L10n.current;
+      for (final k in ['onboardingPrivacy', 'privacyBody', 'notifEmpty']) {
+        expect(l.t(k), isNot(contains('Second phone')), reason: k);
+        expect(l.t(k), isNot(contains('work profile')), reason: k);
+      }
+      L10n.setLang('tr');
+      for (final k in ['onboardingPrivacy', 'privacyBody', 'notifEmpty']) {
+        expect(L10n.current.t(k), isNot(contains('İkinci telefon')));
+        expect(L10n.current.t(k), isNot(contains('iş profili')));
+      }
+    });
+
+    testWidgets('full: Second phone tile, grid and settings', (tester) async {
+      Flavor.debugOverride = AppFlavor.full;
+      final state = await openRealVault(tester);
+      expect(find.text('Second phone'), findsOneWidget);
+      expect(find.text('Chat'), findsOneWidget);
+      expect(state.secondPhoneIfUnlocked, same(sp));
+      expect(L10n.current.t('notifEmpty'), contains('Second phone'));
+
+      await openSettings(tester);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('sp_close_mode')),
+        300,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.byKey(const ValueKey('sp_close_mode')), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('settings_version')),
+        300,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.text('GizliAlan 0.3.0 · Full'), findsOneWidget);
+    });
   });
 }

@@ -8,7 +8,8 @@
 // It pumps the REAL app screens (GizliAlanApp) with fabricated demo content
 // (generated pattern images, neutral fake notes) in a widget test, renders
 // them through a RepaintBoundary and writes 1080×1920 RGB PNGs (no alpha) to
-// docs/store/screenshots/{tr,en}/. No emulator, no device, and no change to
+// docs/store/screenshots/{play,full}/{tr,en}/ (one set per build flavor,
+// issue #11; the Play listing uses play/). No emulator, no device, and no change to
 // FLAG_SECURE (which stays unconditional in MainActivity).
 import 'dart:io';
 import 'dart:math' as math;
@@ -20,6 +21,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gizlialan/app.dart';
+import 'package:gizlialan/flavor.dart';
 import 'package:gizlialan/l10n/l10n.dart';
 import 'package:gizlialan/services/auth_service.dart';
 import 'package:gizlialan/services/biometric_service.dart';
@@ -94,6 +96,7 @@ void main() {
   });
 
   tearDown(() async {
+    Flavor.debugOverride = null;
     L10n.setLang('tr');
     if (await tmp.exists()) await tmp.delete(recursive: true);
   });
@@ -139,6 +142,7 @@ void main() {
   }
 
   Future<void> capture(WidgetTester tester, String lang, String name) async {
+    final flavor = Flavor.current.name;
     await tester.runAsync(() async {
       final boundary =
           boundaryKey.currentContext!.findRenderObject()!
@@ -149,7 +153,7 @@ void main() {
       ))!.buffer.asUint8List();
       expect(image.width, _w);
       expect(image.height, _h);
-      final dir = Directory('${outRoot.path}/$lang')
+      final dir = Directory('${outRoot.path}/$flavor/$lang')
         ..createSync(recursive: true);
       File(
         '${dir.path}/$name.png',
@@ -163,72 +167,76 @@ void main() {
     await settle(tester);
   }
 
-  for (final lang in ['tr', 'en']) {
-    group('store screenshots $lang', skip: !_enabled, () {
-      testWidgets('01 calculator with info dialog', (tester) async {
-        await start(tester, lang);
-        for (final k in ['1', '2', '4', '8', '×', '3', '=']) {
-          await tester.tap(find.byKey(ValueKey('calc_$k')));
+  for (final flavor in AppFlavor.values) {
+    for (final lang in ['tr', 'en']) {
+      group('store screenshots ${flavor.name}/$lang', skip: !_enabled, () {
+        setUp(() => Flavor.debugOverride = flavor);
+
+        testWidgets('01 calculator with info dialog', (tester) async {
+          await start(tester, lang);
+          for (final k in ['1', '2', '4', '8', '×', '3', '=']) {
+            await tester.tap(find.byKey(ValueKey('calc_$k')));
+            await tester.pump();
+          }
+          await tester.tap(find.byIcon(Icons.info_outline));
+          await settle(tester, 2);
+          await capture(tester, lang, '01_calculator_info');
+        });
+
+        testWidgets('02 onboarding calculator disclosure', (tester) async {
+          await start(tester, lang, onboarded: false);
+          await tester.tap(find.byKey(const ValueKey('own_device')));
           await tester.pump();
-        }
-        await tester.tap(find.byIcon(Icons.info_outline));
-        await settle(tester, 2);
-        await capture(tester, lang, '01_calculator_info');
-      });
-
-      testWidgets('02 onboarding calculator disclosure', (tester) async {
-        await start(tester, lang, onboarded: false);
-        await tester.tap(find.byKey(const ValueKey('own_device')));
-        await tester.pump();
-        await tester.tap(find.text(L10n.current('continue')).first);
-        await settle(tester, 2);
-        await capture(tester, lang, '02_onboarding_disclosure');
-      });
-
-      testWidgets('03 vault home', (tester) async {
-        final (app, _) = await start(tester, lang);
-        await openVault(tester, app);
-        await capture(tester, lang, '03_vault_home');
-      });
-
-      testWidgets('04 gallery', (tester) async {
-        final (app, _) = await start(tester, lang);
-        await openVault(tester, app);
-        await tester.runAsync(() async {
-          for (var i = 0; i < 12; i++) {
-            await app.session!.gallery.add(
-              name: 'demo_$i.png',
-              bytes: await _patternPng(i),
-              mime: 'image/png',
-            );
-          }
+          await tester.tap(find.text(L10n.current('continue')).first);
+          await settle(tester, 2);
+          await capture(tester, lang, '02_onboarding_disclosure');
         });
-        await tester.tap(find.text(L10n.current('gallery')).first);
-        await settle(tester, 12);
-        await capture(tester, lang, '04_gallery');
-      });
 
-      testWidgets('05 notes', (tester) async {
-        final (app, _) = await start(tester, lang);
-        await openVault(tester, app);
-        await tester.runAsync(() async {
-          for (final (title, body) in _notes[lang]!.reversed) {
-            await app.session!.notes.create(title: title, body: body);
-          }
+        testWidgets('03 vault home', (tester) async {
+          final (app, _) = await start(tester, lang);
+          await openVault(tester, app);
+          await capture(tester, lang, '03_vault_home');
         });
-        await tester.tap(find.text(L10n.current('notes')).first);
-        await settle(tester);
-        await capture(tester, lang, '05_notes');
-      });
 
-      testWidgets('06 settings', (tester) async {
-        final (app, _) = await start(tester, lang);
-        await openVault(tester, app);
-        await tester.tap(find.text(L10n.current('settings')).first);
-        await settle(tester);
-        await capture(tester, lang, '06_settings');
+        testWidgets('04 gallery', (tester) async {
+          final (app, _) = await start(tester, lang);
+          await openVault(tester, app);
+          await tester.runAsync(() async {
+            for (var i = 0; i < 12; i++) {
+              await app.session!.gallery.add(
+                name: 'demo_$i.png',
+                bytes: await _patternPng(i),
+                mime: 'image/png',
+              );
+            }
+          });
+          await tester.tap(find.text(L10n.current('gallery')).first);
+          await settle(tester, 12);
+          await capture(tester, lang, '04_gallery');
+        });
+
+        testWidgets('05 notes', (tester) async {
+          final (app, _) = await start(tester, lang);
+          await openVault(tester, app);
+          await tester.runAsync(() async {
+            for (final (title, body) in _notes[lang]!.reversed) {
+              await app.session!.notes.create(title: title, body: body);
+            }
+          });
+          await tester.tap(find.text(L10n.current('notes')).first);
+          await settle(tester);
+          await capture(tester, lang, '05_notes');
+        });
+
+        testWidgets('06 settings', (tester) async {
+          final (app, _) = await start(tester, lang);
+          await openVault(tester, app);
+          await tester.tap(find.text(L10n.current('settings')).first);
+          await settle(tester);
+          await capture(tester, lang, '06_settings');
+        });
       });
-    });
+    }
   }
 }
 

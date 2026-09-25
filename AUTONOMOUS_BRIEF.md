@@ -87,7 +87,7 @@
 ## 6. Mevcut durum (26 Eylül 2026, güncellendi)
 
 - Repo: GitHub'da özel repo `canaslan1675-rgb/gizli-alan`. **Entegrasyon dalı `main`**: MVP v1 (PR #1), v0.2 hesap makinesi markası + "İkinci telefon" (PR #2), Cursor kuralları + koordinasyon protokolü (PR #3) birleştirildi. `mvp-v1`, `v0.2-calculator-workprofile`, `cursor-rules` artık tarihsel.
-- Sürüm 0.2.0+2; test ön sürümü `v0.2.0-test` (arm64 APK, debug imzalı, mağaza için değil).
+- Sürüm 0.3.0+3; test ön sürümü `v0.3.0-test` (iki arm64 APK, debug imzalı, mağaza için değil): `play` çeşidi (`com.offerforge.gizlialan`, İkinci telefon yok, cihaz yöneticisi bileşeni yok) ve `full` çeşidi (`com.offerforge.gizlialan.full`, İkinci telefon). #11: sahibi "ikisini de üretip deneyelim" dedi; Play'e hangisinin gideceği test sonrası sahibin kararı. Önceki: `v0.2.0-test`.
 - **PR #18–#23 `main`'e birleştirildi:** #18 entegrasyon dalı notu, #19 kasa içi bildirimler (#4), #20 Pro arayüz stub'ı (#5), #21 release imzalama (#8), #22 docs sync (#9), #23 cihaz test planı (#7 plan kısmı).
 - Açık ajan işi: **#6** mağaza ekran görüntüleri (`agent:cursor` + `status:in-progress`; Cursor yerelde bitirdi ama GitHub'a push edemiyor — dal uzak repoda yok), **#7** emülatör kapanışı (bu oturum / PR). Post-MVP #10 henüz üstlenilmez (#6 açık). Sahibi: **#11–#16** (ajanlar üstlenmez).
 - İki ajan grubu (Joi ve Cursor ajanları) `COORDINATION.md` protokolüyle çalışır: işler `task` etiketli GitHub issue'ları, günlük `docs/AGENT_LOG.md`.
