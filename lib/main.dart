@@ -12,7 +12,9 @@ import 'services/settings_service.dart';
 /// PLAY COMPLIANCE:
 /// - Not spyware / stalkerware; nothing about other people is collected.
 /// - No SMS/call access, no Accessibility Service, no main-device admin, no
-///   Notification Listener, no network upload (release build has no INTERNET).
+///   Notification Listener, no analytics/telemetry/ads/own server. INTERNET
+///   (v0.4.0, #32) is used only by the in-vault private browser for pages the
+///   user opens.
 /// - The calculator entry is disclosed in onboarding, in-app and in the
 ///   store listing; reviewers see exactly what users see. The launcher
 ///   label is "Calculator"/"Hesap Makinesi" (a real calculator).

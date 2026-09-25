@@ -4,9 +4,11 @@
     <!--
       PERMISSIONS (minimal, see PRIVACY.md / Data safety):
         - USE_BIOMETRIC: optional biometric unlock (merged from local_auth).
+        - INTERNET (since v0.4.0, #32): ONLY for the in-vault private browser
+          (Android System WebView) to load pages the user opens. The app has
+          no analytics, telemetry, crash reporting, ads or own servers.
       Photos/files are chosen via the system Photo Picker / Storage Access
-      Framework, which need no permission. The release build has NO INTERNET
-      permission (Flutter only adds it to debug/profile for tooling).
+      Framework, which need no permission.
       The removals below guarantee no plugin can sneak in broad permissions.
 
       SECOND PHONE lives only in the `full` flavor (src/full/AndroidManifest.xml).
@@ -14,6 +16,9 @@
       components at all.
     -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" tools:node="remove" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" tools:node="remove" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
@@ -33,6 +38,12 @@
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"
         tools:targetApi="31">
+        <!-- Private browser (#32): opt out of WebView usage/crash metrics
+             uploads to Google. Safe Browsing keeps the WebView default
+             (see docs/PRIVATE_BROWSER.md). -->
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

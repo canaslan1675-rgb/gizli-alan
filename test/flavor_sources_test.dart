@@ -77,15 +77,28 @@ void main() {
     );
   });
 
-  test('no new permissions, no INTERNET, FLAG_SECURE stays', () {
+  test('only USE_BIOMETRIC + INTERNET (browser), FLAG_SECURE stays', () {
     final main = File('$src/main/AndroidManifest.xml').readAsStringSync();
     final full = File('$src/full/AndroidManifest.xml').readAsStringSync();
     final granted = RegExp(
       r'<uses-permission android:name="([^"]+)"\s*/>',
     ).allMatches(main + full).map((m) => m.group(1)).toSet();
-    expect(granted, {'android.permission.USE_BIOMETRIC'});
-    expect(main + full, isNot(contains('android.permission.INTERNET')));
+    // #32: INTERNET is the only permission added since v0.3 (in-vault
+    // browser). Nothing else may appear, and location stays removed.
+    expect(granted, {
+      'android.permission.USE_BIOMETRIC',
+      'android.permission.INTERNET',
+    });
     expect(full, isNot(contains('uses-permission')));
+    for (final p in ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION']) {
+      expect(
+        main,
+        contains(
+          '<uses-permission android:name="android.permission.$p" tools:node="remove" />',
+        ),
+      );
+    }
+    expect(main, contains('android.webkit.WebView.MetricsOptOut'));
     final activity = File(
       '$src/main/kotlin/com/offerforge/gizlialan/MainActivity.kt',
     ).readAsStringSync();

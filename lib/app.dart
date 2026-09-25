@@ -12,6 +12,7 @@ import 'screens/pin_lock_screen.dart';
 import 'screens/vault_home_screen.dart';
 import 'services/auth_service.dart';
 import 'services/biometric_service.dart';
+import 'services/browser_engine.dart';
 import 'services/legacy_migration.dart';
 import 'services/second_phone_service.dart';
 import 'services/settings_service.dart';
@@ -32,6 +33,8 @@ class GizliAlanApp extends StatefulWidget {
     required this.biometrics,
     this.baseDirProvider,
     this.secondPhone,
+    this.browserEngineFactory,
+    this.wipeBrowserData,
   });
 
   final SettingsService settings;
@@ -43,6 +46,12 @@ class GizliAlanApp extends StatefulWidget {
 
   /// Android work-profile "second phone" bridge (injectable for tests).
   final SecondPhoneService? secondPhone;
+
+  /// Private browser engine (injectable for tests; default Android WebView).
+  final BrowserEngineFactory? browserEngineFactory;
+
+  /// Wipes browser cookies/cache/storage (injectable for tests).
+  final Future<bool> Function()? wipeBrowserData;
 
   @override
   State<GizliAlanApp> createState() => GizliAlanAppState();
@@ -79,6 +88,18 @@ class GizliAlanAppState extends State<GizliAlanApp>
       ? _secondPhone
       : null;
 
+  BrowserEngineFactory get browserEngineFactory =>
+      widget.browserEngineFactory ?? WebViewBrowserEngine.new;
+
+  Future<bool> wipeBrowserData() =>
+      (widget.wipeBrowserData ?? BrowserData.wipe)();
+
+  /// "Kilitlenince temizle" (#32): on lock and on app start (in case the
+  /// app was killed while unlocked).
+  void _wipeBrowserIfEnabled() {
+    if (settings.browserWipeOnLock) wipeBrowserData();
+  }
+
   VaultSession? get session => _session;
   bool get isUnlocked => _session != null;
 
@@ -100,6 +121,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
       _needsOnboarding = !onboarded;
       _ready = true;
     });
+    _wipeBrowserIfEnabled();
     // App start while locked: make sure the work apps are hidden (#30).
     if (onboarded) ensureWorkAppsHiddenWhileLocked();
   }
@@ -302,6 +324,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
     final s = _session;
     if (s == null) return;
     s.close();
+    _wipeBrowserIfEnabled();
     // Drop decoded vault photos (gallery thumbnails, home background) from
     // Flutter's in-memory image cache.
     PaintingBinding.instance.imageCache

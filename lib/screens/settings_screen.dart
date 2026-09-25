@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../app.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
+import '../services/browser_logic.dart';
 import '../services/privacy_link.dart';
 import '../services/settings_service.dart';
 import '../services/vault_session.dart';
@@ -194,6 +195,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final app = GizliAlanApp.of(context);
     final s = app.settings;
 
+    final browser = <Widget>[
+      _header(t('browser')),
+      ListTile(
+        key: const ValueKey('settings_browser_engine'),
+        leading: const Icon(Icons.search),
+        title: Text(t('browserEngine')),
+        subtitle: Text(s.browserSearchEngine.label),
+        onTap: () async {
+          final picked = await showDialog<SearchEngine>(
+            context: context,
+            builder: (ctx) => SimpleDialog(
+              title: Text(t('browserEngine')),
+              children: [
+                for (final e in SearchEngine.values)
+                  SimpleDialogOption(
+                    key: ValueKey('engine_${e.name}'),
+                    onPressed: () => Navigator.pop(ctx, e),
+                    child: Row(
+                      children: [
+                        Icon(
+                          e == s.browserSearchEngine
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_unchecked,
+                          color: GizliTheme.mint,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(e.label),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          );
+          if (picked == null) return;
+          await s.setBrowserSearchEngine(picked);
+          if (mounted) setState(() {});
+        },
+      ),
+      SwitchListTile(
+        key: const ValueKey('settings_browser_wipe'),
+        secondary: const Icon(Icons.cleaning_services_outlined),
+        title: Text(t('browserWipeOnLock')),
+        subtitle: Text(t('browserWipeOnLockHint')),
+        value: s.browserWipeOnLock,
+        onChanged: (v) async {
+          await s.setBrowserWipeOnLock(v);
+          if (mounted) setState(() {});
+        },
+      ),
+      ListTile(
+        key: const ValueKey('settings_browser_wipe_now'),
+        leading: const Icon(Icons.delete_sweep_outlined),
+        title: Text(t('browserWipeNow')),
+        onTap: () async {
+          final messenger = ScaffoldMessenger.of(context);
+          await app.wipeBrowserData();
+          messenger.showSnackBar(SnackBar(content: Text(t('browserWiped'))));
+        },
+      ),
+    ];
     final general = <Widget>[
       _header(t('general')),
       ListTile(
@@ -304,7 +366,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (_isDecoy) {
       return Scaffold(
         appBar: AppBar(title: Text(t('settings'))),
-        body: ListView(children: general),
+        body: ListView(children: [...browser, ...general]),
       );
     }
 
@@ -384,6 +446,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: WorkAppsHideSwitches(settings: s, keyPrefix: 'settings'),
             ),
           ],
+          ...browser,
           ...general,
           _header(t('dangerZone')),
           ListTile(
@@ -401,7 +464,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
           Center(
             child: Text(
-              'GizliAlan 0.3.2 · ${Flavor.hasSecondPhone ? 'Full' : 'Play'}',
+              'GizliAlan 0.4.0 · ${Flavor.hasSecondPhone ? 'Full' : 'Play'}',
               key: const ValueKey('settings_version'),
               style: const TextStyle(
                 color: GizliTheme.textSecondary,

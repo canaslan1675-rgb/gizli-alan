@@ -8,6 +8,7 @@ import '../app.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
 import '../theme.dart';
+import 'browser_screen.dart';
 import 'decoy_calculator_screen.dart';
 import 'files_screen.dart';
 import 'gallery_screen.dart';
@@ -138,6 +139,12 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         t('files'),
         const Color(0xFFB79CFF),
         () => _open(const FilesScreen()),
+      ),
+      _AppIcon(
+        Icons.travel_explore,
+        t('browser'),
+        const Color(0xFF7CFFB2),
+        () => _open(const BrowserScreen()),
       ),
       _AppIcon(
         Icons.calculate_outlined,

@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
+import 'browser_logic.dart';
 import 'second_phone_service.dart';
 
 /// Non-secret user preferences (stored in SharedPreferences, app sandbox).
@@ -18,6 +19,8 @@ class SettingsService {
   static const _kLockTimeout = 'lock_timeout_sec';
   static const _kLang = 'lang';
   static const _kWallpaper = 'wallpaper';
+  static const _kBrowserEngine = 'browser_engine';
+  static const _kBrowserWipe = 'browser_wipe_on_lock';
   static const _kSecondPhoneClose = 'second_phone_close';
   static const _kSecondPhoneClosedBy = 'second_phone_closed_by';
 
@@ -96,6 +99,19 @@ class SettingsService {
   Future<void> setSecondPhoneClosedBy(SecondPhoneCloseMode? m) => m == null
       ? _prefs.remove(_kSecondPhoneClosedBy)
       : _prefs.setString(_kSecondPhoneClosedBy, m.name);
+
+  /// Private browser (#32): search engine for address-bar queries.
+  SearchEngine get browserSearchEngine =>
+      SearchEngine.parse(_prefs.getString(_kBrowserEngine));
+
+  Future<void> setBrowserSearchEngine(SearchEngine e) =>
+      _prefs.setString(_kBrowserEngine, e.name);
+
+  /// "Kilitlenince temizle": wipe browser cookies/cache/storage when the
+  /// vault locks. Default on.
+  bool get browserWipeOnLock => _prefs.getBool(_kBrowserWipe) ?? true;
+
+  Future<void> setBrowserWipeOnLock(bool v) => _prefs.setBool(_kBrowserWipe, v);
 
   String get language => _prefs.getString(_kLang) ?? 'tr';
 
