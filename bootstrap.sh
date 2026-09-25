@@ -1,59 +1,26 @@
 #!/usr/bin/env bash
-# Bootstrap Android/iOS platform folders while preserving hand-written lib/ + pubspec.
+# Helper for fresh machines: fetch deps, and re-create android/ only if it is
+# missing (it is committed in the repo, including FLAG_SECURE MainActivity and
+# the minimal-permission manifest — don't overwrite it).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
 
 if ! command -v flutter >/dev/null 2>&1; then
-  echo "ERROR: flutter not found in PATH."
-  echo "Install Flutter: https://docs.flutter.dev/get-started/install"
-  exit 1
+  if [[ -x /workspace/tools/flutter/bin/flutter ]]; then
+    export PATH=/workspace/tools/flutter/bin:$PATH
+  else
+    echo "ERROR: flutter not found. Install: git clone -b stable https://github.com/flutter/flutter.git"
+    exit 1
+  fi
 fi
 
-TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
-
-echo "==> Creating temp Flutter project (org: com.offerforge, name: gizlialan)..."
-flutter create \
-  --org com.offerforge \
-  --project-name gizlialan \
-  --platforms=android \
-  "$TMP/gizlialan"
-
-# Preserve our sources
-echo "==> Merging platform folders into $ROOT ..."
-# Copy android/ if missing or incomplete
-if [[ ! -f "$ROOT/android/app/build.gradle" && ! -f "$ROOT/android/app/build.gradle.kts" ]]; then
-  rm -rf "$ROOT/android"
-  cp -a "$TMP/gizlialan/android" "$ROOT/android"
-else
-  echo "    android/ already present — keeping yours (check applicationId)."
+if [[ ! -f android/app/build.gradle.kts ]]; then
+  echo "==> android/ missing — generating (remember to re-apply FLAG_SECURE/manifest changes!)"
+  flutter create --org com.offerforge --project-name gizlialan --platforms=android .
 fi
 
-# Ensure applicationId
-MANIFEST="$ROOT/android/app/src/main/AndroidManifest.xml"
-if [[ -f "$MANIFEST" ]]; then
-  echo "    AndroidManifest present."
-fi
-
-# Copy analysis / test scaffolding if useful
-[[ -d "$ROOT/test" ]] || mkdir -p "$ROOT/test"
-if [[ ! -f "$ROOT/test/widget_test.dart" ]]; then
-  cat > "$ROOT/test/widget_test.dart" <<'TEST'
-import 'package:flutter_test/flutter_test.dart';
-
-void main() {
-  test('placeholder', () {
-    expect(1 + 1, 2);
-  });
-}
-TEST
-fi
-
-echo "==> flutter pub get"
 flutter pub get
-
-echo ""
-echo "DONE. Run: flutter run"
-echo "Package expected: com.offerforge.gizlialan"
-echo "If applicationId differs, edit android/app/build.gradle(.kts)"
+flutter analyze
+flutter test
+echo "DONE. Run: flutter run   |   Release: flutter build apk --release"
