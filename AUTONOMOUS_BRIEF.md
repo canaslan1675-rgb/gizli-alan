@@ -26,29 +26,29 @@
 ## 2. MVP kapsamı (3 hafta)
 
 ### Hafta 1: Güvenlik çekirdeği
-- [ ] Şifreli kasa altyapısı: anahtar üretimi, secure storage'da saklama, AES-GCM şifreleme/çözme servisi
-- [ ] PIN oluşturma, doğrulama, değiştirme (hash + salt, deneme sınırı ve bekleme süresi)
-- [ ] Parmak izi / biyometrik kilit açma (`local_auth`), PIN yedeği
-- [ ] Arka plana geçince otomatik kilit, FLAG_SECURE (ekran görüntüsü ve son uygulamalar önizlemesi engeli)
-- [ ] Galeri kasası: içe aktarma, şifreli kopya, ızgara görünüm, görüntüleyici, silme, dışa aktarma
-- [ ] Birim testleri: kripto servisi, auth servisi
-- [ ] Hafta sonu PR'ı
+- [x] Şifreli kasa altyapısı: anahtar üretimi, secure storage'da saklama, AES-GCM şifreleme/çözme servisi
+- [x] PIN oluşturma, doğrulama, değiştirme (hash + salt, deneme sınırı ve bekleme süresi)
+- [x] Parmak izi / biyometrik kilit açma (`local_auth`), PIN yedeği
+- [x] Arka plana geçince otomatik kilit, FLAG_SECURE (ekran görüntüsü ve son uygulamalar önizlemesi engeli)
+- [x] Galeri kasası: içe aktarma, şifreli kopya, ızgara görünüm, görüntüleyici, silme, dışa aktarma
+- [x] Birim testleri: kripto servisi, auth servisi
+- [x] Hafta sonu PR'ı — PR #1 (`mvp-v1` → `main`, birleştirildi)
 
 ### Hafta 2: Giriş katmanı ve içerik
-- [ ] Çalışan hesap makinesi girişi: PIN yazılıp `=` basılınca kasa açılır. Mağaza açıklamasında ve onboarding'de açıkça belirtilir.
-- [ ] Sahte PIN (isteğe bağlı): boş, sahte bir kasa açar
-- [ ] Notlar: şifreli oluşturma, düzenleme, silme, arama
-- [ ] Onboarding: "Bu uygulama yalnızca kendi cihazınız içindir"
-- [ ] TR ve EN metinler
-- [ ] Testler, hafta sonu PR'ı
+- [x] Çalışan hesap makinesi girişi: PIN yazılıp `=` basılınca kasa açılır. Mağaza açıklamasında ve onboarding'de açıkça belirtilir.
+- [x] Sahte PIN (isteğe bağlı): boş, sahte bir kasa açar
+- [x] Notlar: şifreli oluşturma, düzenleme, silme, arama
+- [x] Onboarding: "Bu uygulama yalnızca kendi cihazınız içindir"
+- [x] TR ve EN metinler
+- [x] Testler, hafta sonu PR'ı — PR #1/#2 (birleştirildi)
 
 ### Hafta 3: Sanal telefon arayüzü ve Play hazırlığı
-- [ ] Kasa içi "ana ekran": ikon ızgarası (Galeri, Notlar, Dosyalar, Ayarlar), duvar kağıdı seçimi
-- [ ] Uygulama içi bildirim izolasyonu: yalnızca kasa içinde görünen bildirim listesi, sistem bildiriminde içerik gösterilmez
-- [ ] Ayarlar: PIN değiştir, biyometri aç/kapa, sahte PIN, otomatik kilit süresi
-- [ ] Play hazırlığı: gizlilik politikası, Data safety notları, TR+EN mağaza metni taslağı, ekran görüntüsü planı, minimum izin listesi
-- [ ] Ödeme için yalnızca stub/arayüz (gerçek entegrasyon yok, bkz. §5)
-- [ ] Release derlemesi (mümkünse APK), hafta sonu PR'ı
+- [x] Kasa içi "ana ekran": ikon ızgarası (Galeri, Notlar, Dosyalar, Ayarlar), duvar kağıdı seçimi
+- [x] Uygulama içi bildirim izolasyonu: yalnızca kasa içinde görünen bildirim listesi, sistem bildiriminde içerik gösterilmez — #4, PR #19 (sahibinin birleştirmesini bekliyor)
+- [x] Ayarlar: PIN değiştir, biyometri aç/kapa, sahte PIN, otomatik kilit süresi
+- [x] Play hazırlığı: gizlilik politikası, Data safety notları, TR+EN mağaza metni taslağı, ekran görüntüsü planı, minimum izin listesi — `PRIVACY.md`, `docs/PLAY_COMPLIANCE.md` (ekran görüntüsü *planı* dahil). Açık: ekran görüntülerinin kendisi #6, HTTPS'te barındırma + destek e-postası #12 (sahibi)
+- [x] Ödeme için yalnızca stub/arayüz (gerçek entegrasyon yok, bkz. §5) — #5, PR #20 (sahibinin birleştirmesini bekliyor); gerçek ödeme #15 (sahibi, DUR)
+- [x] Release derlemesi (mümkünse APK), hafta sonu PR'ı — `v0.2.0-test` ön sürümü (arm64 APK, debug imzalı). İmzalama yapılandırması #8 / PR #21; yükleme anahtarı #13 (sahibi)
 
 ---
 
@@ -74,6 +74,8 @@
 
 ## 5. Çalışma kuralları
 
+> Bu maddeler sürekli geçerli kurallardır; işaretlenmez. Ajanlar arası iş paylaşımı: `COORDINATION.md`.
+
 - [ ] Her gün kod yazılır. Proje sahibi yokken de iş durmaz.
 - [ ] Her anlamlı adımda küçük, açıklayıcı commit atılır (`feat:`, `fix:`, `test:`, `docs:`).
 - [ ] Her hafta sonunda bir PR açılır. Her PR'da değişen dosyaların bir satırlık özetleri, test/analyze sonucu ve kalan iş listesi bulunur.
@@ -82,15 +84,17 @@
 - [ ] **Riskli veya geri alınamaz adımlarda DUR ve not düş** (`BLOCKERS.md`): Play Store'a yükleme veya yayın, gerçek ödeme / Play Billing entegrasyonu, herhangi bir harcama, hesap açma, dış servislere kişisel veri gönderme, force push veya geçmişi yeniden yazma.
 - [ ] Günlük ilerleme `PROGRESS.md` dosyasına tek paragraf olarak yazılır.
 
-## 6. Mevcut durum (25 Eylül 2026)
+## 6. Mevcut durum (25 Eylül 2026, güncellendi)
 
-- `/workspace/gizli-alan/` klasöründe iskelet var: onboarding, PIN kilidi, hesap makinesi girişi, notlar, dosyalar, kasa ana ekranı, TR/EN, PRIVACY.md.
-- Kod yazımı `mvp-v1` dalında sürüyor. PR açıklaması taslağı `PR_DESCRIPTION.md` dosyasında.
-- GitHub CLI girişi, proje sahibinin cihaz onayını bekliyor. Giriş tamamlanana kadar push/PR yok, commit'ler yerelde birikir. Giriş sonrası ilk iş: özel (private) repo oluştur, push et, PR aç.
+- Repo: GitHub'da özel repo `canaslan1675-rgb/gizli-alan`. **Entegrasyon dalı `main`**: MVP v1 (PR #1), v0.2 hesap makinesi markası + "İkinci telefon" (PR #2), Cursor kuralları + koordinasyon protokolü (PR #3) birleştirildi. `mvp-v1`, `v0.2-calculator-workprofile`, `cursor-rules` artık tarihsel.
+- Sürüm 0.2.0+2; test ön sürümü `v0.2.0-test` (arm64 APK, debug imzalı, mağaza için değil).
+- Açık PR'lar (sahibinin birleştirmesini bekliyor): #18 (main = entegrasyon dalı), #19 kasa içi bildirimler (#4), #20 Pro arayüz stub'ı (#5), #21 release imzalama (#8) ve bu doküman senkronu (#9).
+- İki ajan grubu (Joi ve Cursor ajanları) `COORDINATION.md` protokolüyle çalışır: işler `task` etiketli GitHub issue'ları, günlük `docs/AGENT_LOG.md`. Kalan işler ve sahibi kararları issue olarak açık (#6, #7, #10; sahibi: #11–#16).
+- GitHub girişi tamamlandı; önceki "giriş bekleniyor" notu geçersiz.
 
 ## 7. Bitti tanımı (3. hafta sonu)
 
-- [ ] Uygulama derleniyor, analyze ve testler temiz
-- [ ] Hafta 1–3 kontrol listelerinin tamamı işaretli ya da `BLOCKERS.md` dosyasında gerekçeli
-- [ ] 3 haftalık PR geçmişi ve güncel `PROGRESS.md`
-- [ ] Play hazırlık paketi (politika, Data safety, mağaza metni) repoda
+- [x] Uygulama derleniyor, analyze ve testler temiz
+- [x] Hafta 1–3 kontrol listelerinin tamamı işaretli ya da `BLOCKERS.md` dosyasında gerekçeli (açık kalanlar issue'lara bağlı; PR #19/#20 birleşince tamam)
+- [ ] 3 haftalık PR geçmişi ve güncel `PROGRESS.md` (PROGRESS güncel; 3 haftalık geçmiş henüz tamamlanmadı — 3. hafta sonunda yeniden kontrol edilecek)
+- [x] Play hazırlık paketi (politika, Data safety, mağaza metni) repoda (`PRIVACY.md`, `docs/PLAY_COMPLIANCE.md`; barındırma #12)

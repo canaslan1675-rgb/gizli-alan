@@ -50,3 +50,8 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
   a throwaway keystore (deleted afterwards, never committed), and the blank-value error.
 - For the owner: #13 (create the keystore + key.properties locally, steps in README).
 - Next (Joi): #9 docs sync.
+
+## 2026-09-26 00:10 +03:00 — joi
+- Finished: #9 docs sync on `joi/9-docs-sync` (stacked on #21). Brief §2 ticked/linked, §6 current, §7 partly ticked.
+- If #19/#20/#21 change before merge, re-check the brief ticks that cite them.
+- Next (Joi): #7 device test plan if still unclaimed; #6 is left for the Cursor agents.
