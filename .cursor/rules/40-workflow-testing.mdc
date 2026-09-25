@@ -54,7 +54,7 @@ aapt2 dump permissions build/app/outputs/flutter-apk/app-release.apk   # must li
   (map-based, `L10nScope`).
 - Android resource strings: `values` (EN default) + `values-tr`.
 
-## Device test matrix (open, see BLOCKERS.md)
+## Device test matrix (open, see BLOCKERS.md; checklist: docs/DEVICE_TEST_PLAN.md)
 There is no device on this box. The Second phone flow (provisioning, the signed cross-profile
 trampoline, freeze/unfreeze, clone fallback, removal) is untested on real hardware. Test on:
 - **Xiaomi** (MIUI/HyperOS, often blocks work profiles → check the Second space / Private space fallback)
