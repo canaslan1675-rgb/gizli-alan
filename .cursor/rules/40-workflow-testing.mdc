@@ -1,0 +1,61 @@
+---
+description: Daily workflow — analyze/test gates, build commands, commits and weekly PRs, docs to update (DECISIONS/PROGRESS/BLOCKERS), TR+EN l10n, device test matrix
+globs:
+alwaysApply: false
+---
+
+# Workflow and testing (from AUTONOMOUS_BRIEF.md §5, README.md, PROGRESS.md and BLOCKERS.md)
+
+## Gates (before every commit)
+- `flutter analyze` must be **clean** (no issues).
+- `flutter test` must **pass** (currently 50 tests: crypto, auth, calculator, storage,
+  second-phone, branding, app-flow / second-phone widget tests).
+- Add or extend tests for any change to crypto, auth, storage, the calculator, the second phone
+  or branding.
+
+## Build (this box)
+```bash
+export PATH=/workspace/tools/flutter/bin:$PATH   # Flutter 3.47 stable
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --release                                    # universal (~55 MB, debug-signed)
+flutter build apk --release --target-platform android-arm64    # arm64-only APK (v0.2 test build)
+aapt2 dump permissions build/app/outputs/flutter-apk/app-release.apk   # must list only USE_BIOMETRIC (+ AndroidX internal)
+```
+- The Android SDK is in `/workspace/tools/android-sdk`, and JDK 17 is in `/workspace/tools/jdk17`.
+- The `android/` project is committed. `bootstrap.sh` only re-creates it if missing.
+- The repo docs only say "arm64 release APK built". The `--target-platform android-arm64` flag
+  above is the standard Flutter way to build it.
+
+## Commits and PRs
+- Code every day. Work does not stop when the owner is away.
+  (TR: "Her gün kod yazılır. Proje sahibi yokken de iş durmaz.")
+- Make a small, descriptive commit at every meaningful step: `feat:`, `fix:`, `test:`, `docs:`
+  (scopes are OK, e.g. `feat(android):`).
+- Open **one PR at the end of each week**. Every PR must include:
+  - a one-line summary per changed file
+  - the test/analyze result
+  - the list of remaining work
+- Feature branches PR into the previous line (`v0.2-calculator-workprofile` → `mvp-v1` → `main`).
+- Never force-push or rewrite history (BLOCKER).
+
+## Docs to keep updated
+- `DECISIONS.md`: add a dated row (date, decision, why) for every non-trivial decision. No
+  approval needed for normal decisions.
+- `PROGRESS.md`: **one paragraph per day**.
+- `BLOCKERS.md`: every risky or irreversible step you stopped at, and every owner decision needed.
+- Keep `README.md`, `PRIVACY.md` and `docs/PLAY_COMPLIANCE.md` in sync when features or
+  permissions change.
+
+## Localization
+- Every user-facing string goes in **both** `lib/l10n/tr.dart` and `lib/l10n/en.dart`
+  (map-based, `L10nScope`).
+- Android resource strings: `values` (EN default) + `values-tr`.
+
+## Device test matrix (open, see BLOCKERS.md)
+There is no device on this box. The Second phone flow (provisioning, the signed cross-profile
+trampoline, freeze/unfreeze, clone fallback, removal) is untested on real hardware. Test on:
+- **Xiaomi** (MIUI/HyperOS, often blocks work profiles → check the Second space / Private space fallback)
+- **Samsung** (Secure Folder coexists)
+- **Pixel** (reference AOSP behaviour; a Pixel emulator also works for review)

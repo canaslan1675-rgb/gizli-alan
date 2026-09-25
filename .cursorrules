@@ -1,0 +1,31 @@
+# GizliAlan — legacy Cursor rules (see .cursor/rules/*.mdc for the full, current rules)
+
+Main brief: AUTONOMOUS_BRIEF.md. When unsure: brief > docs/research > your own judgement.
+Log decisions in DECISIONS.md, daily progress in PROGRESS.md, and stop-points in BLOCKERS.md.
+
+COORDINATION (other agents work here too): read COORDINATION.md and .cursor/rules/05-coordination.mdc.
+Every session: git fetch, read docs/AGENT_LOG.md, `gh issue list --label task`, CLAIM before working, heartbeat, log at end.
+
+Detailed rules:
+- .cursor/rules/05-coordination.mdc
+- .cursor/rules/00-project-overview.mdc
+- .cursor/rules/10-hard-bans-and-security.mdc
+- .cursor/rules/20-architecture.mdc
+- .cursor/rules/30-branding-play-policy.mdc
+- .cursor/rules/40-workflow-testing.mdc
+
+HARD BANS (non-negotiable):
+- No spyware/monitoring: no tracking other people, no location, no SMS/call interception, no keylogging.
+- No Accessibility Service. No Notification Listener.
+- Never device owner, never a main-profile device admin; self-deactivate if enabled that way.
+  Only exception: profile owner (empty <uses-policies>) of a work profile the owner creates for
+  "Second phone", used only for the owner's own isolation. Never read profile apps' data.
+- No INTERNET (release), no QUERY_ALL_PACKAGES, no REQUEST_INSTALL_PACKAGES, no storage/media/camera/mic
+  permissions. Only user-facing permission: USE_BIOMETRIC.
+- No server upload, no remote panel, no cloaking or reviewer detection, no icon hiding or alias switching,
+  no copied vendor branding. "Calculator"/"Hesap Makinesi" is OK only because the app is a real
+  calculator and the vault is disclosed (onboarding, ⓘ, listing, reviewer notes).
+- Never commit secrets (keystores, key.properties, tokens, login/device codes).
+- STOP and write to BLOCKERS.md before: Play upload/publishing, real payments/Play Billing, any
+  spending or account creation, sending personal data out, force-push/history rewrite.
+- Follow Play policy and KVKK. Before every commit: `flutter analyze` clean + `flutter test` passing.

@@ -1,71 +1,216 @@
 /// English strings.
 const Map<String, String> en = {
-  'appName': 'Hidden Space',
-  'appNameVault': 'Hidden Space Vault',
+  'appName': 'GizliAlan',
+  // Launcher / recents label (Android string resource says the same).
+  'launcherName': 'Calculator',
+  'appNameVault': 'GizliAlan Vault',
   'decoyTitle': 'Calculator',
-  'onboardingTitle': 'Welcome to Hidden Space',
+  // Onboarding
+  'onboardingTitle': 'Welcome to GizliAlan',
   'onboardingBody':
-      'A transparent personal vault for notes & files.\n'
-      'Not spyware. Data stays on your device only.\n'
-      'Two entries: optional calculator decoy, or "Hidden Space Vault".',
+      'GizliAlan is a personal vault for the owner of this phone: private '
+      'photos, notes and files, protected by a PIN (and optionally your '
+      'fingerprint/face), encrypted on this device.',
   'onboardingPrivacy':
-      'No SMS intercept, no accessibility spying, no notification listener, '
-      'no hidden overlays. Just your device and your PIN.',
+      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and uploads nothing — there is no server. (The optional "Second phone" only manages the separate work profile you create yourself.) Only use it for your own content on your own device.',
+  'ownDeviceConfirm':
+      'This is my own device and I will only store my own content.',
+  'entryTitle': 'Calculator entry',
+  'entryBody':
+      'GizliAlan can open as a normal, fully working calculator. To enter the '
+      'vault, type your PIN and press "=". Long-press "=" to use biometrics '
+      '(if enabled).',
+  'entryDisclosure':
+      'This is a disclosed feature, described in the store listing and in '
+      'the calculator\'s ⓘ button. In your app list this app appears as '
+      '"Calculator" with a simple calculator icon — that icon is GizliAlan. '
+      'You can switch the calculator entry off any time in Settings.',
+  'calculatorEntry': 'Open as calculator',
+  'calculatorEntryOn':
+      'App starts as a calculator — PIN then "=" opens the vault',
+  'calculatorEntryOff': 'App starts at the PIN screen',
   'setPin': 'Set PIN',
   'confirmPin': 'Confirm PIN',
+  'pinFormat': 'PIN must be 4–8 digits',
   'pinMismatch': 'PINs do not match',
-  'pinTooShort': 'PIN must be at least 4 digits',
+  'pinNoRecovery':
+      'Important: there is no PIN recovery. If you forget your PIN, the '
+      'vault content cannot be decrypted. Only a full reset is possible.',
+  'finishSetup': 'Create vault',
   'continue': 'Continue',
-  'unlock': 'Unlock',
+  'back': 'Back',
+  'dataSafetyShort':
+      'Data stays on this device, encrypted. No account, no cloud, no ads, no analytics.',
+  // Calculator
+  'calcInfoTitle': 'About this calculator',
+  'calcInfoBody':
+      'This is a real calculator and also the entrance to your GizliAlan '
+      'vault (it is listed as "Calculator" in your app list): type your '
+      'vault PIN and press "=" to open it. Long-press "=" for biometric '
+      'unlock if enabled. You can turn the calculator entry off in the vault '
+      'settings.',
+  // Lock
+  'unlock': 'Enter PIN',
   'wrongPin': 'Wrong PIN',
-  'vaultHome': 'Vault',
+  'lockedOut': 'Too many attempts. Try again in {s} s.',
+  'lockedOutShort': 'Too many attempts. Try again later.',
+  'useBiometric': 'Use biometrics',
+  'biometricReason': 'Unlock GizliAlan vault',
+  'biometricEnableReason': 'Confirm to enable biometric unlock',
+  // Home
+  'gallery': 'Gallery',
   'notes': 'Notes',
   'files': 'Files',
   'settings': 'Settings',
   'lock': 'Lock',
-  'leaveVault': 'Leave Vault',
-  'newNote': 'New Note',
-  'editNote': 'Edit Note',
-  'noteTitle': 'Title',
-  'noteBody': 'Body',
-  'save': 'Save',
+  // Gallery / files
+  'importPhotos': 'Add photos',
+  'importFile': 'Add file',
+  'importing': 'Encrypting…',
+  'importedN':
+      '{n} photo(s) encrypted into the vault. The originals are still in your '
+      'phone gallery — delete them there if you want.',
+  'importedFilesN':
+      '{n} file(s) encrypted into the vault. The originals were not changed.',
+  'tooBig': 'Some files were larger than 100 MB and were skipped.',
+  'emptyGallery':
+      'No photos yet.\nTap "Add photos" — they are encrypted on this device.',
+  'emptyFiles':
+      'No files yet.\nAdd PDFs or other documents — they stay encrypted on this device.',
+  'view': 'View',
+  'export': 'Export',
+  'exported': 'Exported (decrypted copy saved where you chose)',
+  'exportFailed': 'Export failed',
   'delete': 'Delete',
-  'emptyNotes': 'No notes yet',
-  'emptyFiles': 'No files yet',
-  'importFile': 'Import File',
-  'encryption': 'File encryption (AES)',
-  'encryptionHint':
-      'Default: hide-only in app storage. '
-      'When on, file payloads are AES-encrypted.',
-  'decoyEnabled': 'Decoy calculator (optional)',
-  'decoyHint':
-      'If off, app opens to PIN. A second launcher activity '
-      '"Hidden Space Vault" is always available.',
-  'lockTimeout': 'Auto-lock (seconds)',
-  'lockTimeoutHint': 'Vault locks when the app goes to background',
-  'privacyNote':
-      'Hidden Space is a personal vault, not a spy tool. '
-      'Do not confuse with Android Private Space (OS). '
-      'The app stays visible in the launcher.',
+  'deleteItemConfirm': 'Permanently delete this item from the vault?',
+  // Notes
+  'newNote': 'New note',
+  'editNote': 'Edit note',
+  'untitled': 'Untitled',
+  'noteTitle': 'Title',
+  'noteBody': 'Note',
+  'save': 'Save',
+  'search': 'Search',
+  'emptyNotes':
+      'No notes yet.\nYour first private note stays encrypted on this device.',
+  'deleteNoteConfirm': 'Delete this note?',
+  // Settings
+  'security': 'Security',
   'changePin': 'Change PIN',
-  'dangerZone': 'Danger Zone',
-  'wipeVault': 'Reset Vault',
-  'wipeConfirm': 'All notes and files will be deleted. Continue?',
+  'currentPin': 'Current PIN',
+  'newPin': 'New PIN',
+  'wrongCurrentPin': 'Current PIN is wrong',
+  'pinSaved': 'PIN saved',
+  'pinMustDiffer': 'Real PIN and decoy PIN must be different',
+  'biometric': 'Biometric unlock',
+  'biometricHint': 'Fingerprint/face opens the real vault (never the decoy)',
+  'biometricUnavailable': 'No biometrics enrolled on this device',
+  'decoyPin': 'Decoy PIN (optional)',
+  'decoyPinOn': 'On — the decoy PIN opens a separate, empty vault',
+  'decoyPinOff': 'Off',
+  'decoyPinExplain':
+      'A decoy PIN opens a second, separate vault that starts empty and has '
+      'its own encryption key. Your real vault is not shown there. It must '
+      'differ from your real PIN. This feature is described in the store '
+      'listing.',
+  'decoyRemove': 'Remove decoy PIN',
+  'decoyRemoveConfirm':
+      'Remove the decoy PIN and delete everything stored in the decoy vault?',
+  'screenSecurity': 'Screen protection',
+  'screenSecurityHint':
+      'Always on: screenshots, screen recording and the recent-apps preview are blocked (FLAG_SECURE)',
+  'entry': 'Entry',
+  'general': 'General',
+  'lockTimeout': 'Auto-lock',
+  'lockTimeoutHint': 'Locks when the app goes to the background',
+  'lockImmediately': 'Immediately',
+  'lockAfterSec': 'After {n} s',
+  'lockAfterMin': 'After {n} min',
+  'language': 'Language',
+  'wallpaper': 'Wallpaper',
+  'privacyTitle': 'Privacy & permissions',
+  'privacyBody':
+      '• All vault content (photos, files, notes) is encrypted with AES-256-GCM '
+      'using a key kept in Android Keystore-backed secure storage.\n'
+      '• Your PIN is stored only as a salted PBKDF2 hash.\n'
+      '• No internet permission in the release build, no account, no '
+      'analytics, no ads. Nothing leaves your device unless you export it.\n'
+      '• Permissions: biometric (optional unlock) only. Photos and files are '
+      'chosen by you through the system pickers — no storage/media '
+      'permission.\n'
+      '• No SMS, calls, contacts, location, microphone, camera, Accessibility '
+      'or main-device admin. The optional Second phone is only the profile '
+      'owner of the work profile you create.\n'
+      '• App backup is disabled, so vault data is not copied to the cloud. '
+      'Uninstalling or "Clear data" deletes the vault.',
+  'dangerZone': 'Danger zone',
+  'wipeVault': 'Reset everything',
+  'wipeHint': 'Deletes all vaults, PINs and keys',
+  'wipeConfirm':
+      'All photos, files and notes in all vaults, plus your PINs and keys, '
+      'will be permanently deleted. Continue?',
   'cancel': 'Cancel',
   'ok': 'OK',
-  'hintDecoy': 'Hint: long-press = or Settings → Vault',
-  'openVault': 'Open Vault',
-  'language': 'Language',
-  // Play Billing stubs (not wired yet)
-  'premiumTitle': 'Hidden Space Plus (coming soon)',
-  'premiumBody':
-      'Optional subscription placeholder. No purchase yet — '
-      'Google Play Billing will be added later. '
-      'Subscriptions auto-renew; cancel in Play subscriptions.',
-  'premiumDisclosure':
-      'Subscriptions are managed via Google Play. If a free trial is offered, '
-      'you are charged unless you cancel before it ends. Purchases are disabled in this build.',
-  'premiumCta': 'Coming soon',
-  'dataSafetyShort':
-      'Data stays on device. No cloud. File picker only when you choose a file.',
+  // Second phone (work profile)
+  'secondPhone': 'Second phone',
+  'secondPhoneApps': 'Second phone apps',
+  'spIntro':
+      'Second phone creates a separate space on this device using Android\'s own "work profile" feature (the same method Shelter/Island use). It has its own Play Store where you can add a separate Google account and install apps. Apps, accounts and files stay separate from your main phone.',
+  'spDisclosure':
+      'How it works: GizliAlan becomes the "profile owner" only of this work profile it creates. It is not an admin of your main profile or of the device; it monitors nothing, reads no other app\'s data and uploads nothing. Android shows its own notice during setup. Profile apps carry a briefcase badge and also appear in the "Work" tab of your app list. Setup and management are only possible while the vault is unlocked.',
+  'spSetUp': 'Set up second phone',
+  'spSetUpConfirm':
+      'Android will now start work profile setup. It can take a few minutes and shows system screens. Continue?',
+  'spCreated':
+      'Second phone is ready. Open Play Store to add your second Google account.',
+  'spCreatedPending':
+      'Setup finished; Android is still preparing the profile. Check again in a few seconds.',
+  'spCanceled': 'Setup was cancelled or could not be completed.',
+  'spXiaomiWarn':
+      'On Xiaomi / Redmi / POCO (MIUI/HyperOS) devices work profile setup is often blocked or left half-finished. You can still try; if it fails, use the phone\'s own "Second space" (Settings → Special features → Second space).',
+  'spXiaomiBlocked':
+      'This Xiaomi/Redmi/POCO device (MIUI/HyperOS) does not allow creating a work profile. Alternative: the built-in "Second space" (Settings → Special features → Second space), or on Android 15+ "Private space" (Settings → Security & privacy → Private space).',
+  'spNotAllowed':
+      'A work profile can\'t be created on this device right now, usually because one already exists (e.g. a company account) or the manufacturer disabled it. Alternative: Android 15+ "Private space" or the manufacturer\'s second space / secure folder.',
+  'spUnsupported':
+      'This device does not support Android work profiles. Alternative: Android 15+ "Private space" or the manufacturer\'s feature (Samsung Secure Folder, Xiaomi Second space).',
+  'spPrivateSpaceHint':
+      'This phone runs Android 15 or newer: "Private space" (Settings → Security & privacy → Private space) also gives you an OS-level separate space.',
+  'spUnlinked':
+      'A work profile with GizliAlan exists on this device but is not linked to this vault (app data may have been cleared). To remove it: Android Settings → Accounts (or Passwords & accounts) → Work → Remove work profile. Then set it up again.',
+  'spStatus': 'Status',
+  'spStatusOpen': 'Open',
+  'spStatusFrozen': 'Closed — apps hidden',
+  'spStatusQuiet': 'Closed — work profile off',
+  'spOpenStore': 'Open Play Store (second account)',
+  'spAddApp': 'Add an app from the main phone',
+  'spAddAppHint':
+      'System apps are copied directly; for other apps the second phone\'s Play Store page opens.',
+  'spCloseNow': 'Close second phone now',
+  'spOpenNow': 'Open second phone',
+  'spRemove': 'Remove second phone',
+  'spRemoveConfirm':
+      'The work profile and ALL apps, accounts and files in it will be permanently deleted. Continue?',
+  'spRemoved': 'Second phone removed.',
+  'spCloneOk': '"{app}" was added to the second phone.',
+  'spCloneStore':
+      'Android does not allow copying this app directly. The second phone\'s Play Store page was opened; install it there (add your second account first).',
+  'spCloneFailed':
+      'Could not add the app. You can install it from the second phone\'s Play Store.',
+  'spNoApps':
+      'No apps in the second phone yet. Install from Play Store or add from the main phone.',
+  'spNoCandidates': 'No apps available to add.',
+  'spFailed': 'Could not complete the action ({s}).',
+  'spClosed': 'Second phone closed.',
+  'spOpened': 'Second phone opened.',
+  'spQuietFallback':
+      'Android did not allow turning the work profile off; its apps were hidden instead.',
+  'spCloseMode': 'Second phone on lock',
+  'spCloseModeHint':
+      'Applied when you lock with the Lock button and undone when you unlock. Not applied on background auto-lock (you may be using a second-phone app).',
+  'spModeOff': 'Keep open',
+  'spModeFreeze': 'Hide its apps',
+  'spModeQuiet': 'Turn work profile off',
+  'spQuietNote':
+      'Android usually lets only the default home-screen app turn the work profile off. If not permitted, GizliAlan hides the apps instead. You can also use the "Work apps" quick-settings tile.',
 };

@@ -13,6 +13,21 @@ class GizliTheme {
   static const Color danger = Color(0xFFFF6B7A);
   static const Color warning = Color(0xFFFFC857);
 
+  /// Vault home wallpapers (gradients, no image assets needed).
+  static const List<List<Color>> wallpapers = [
+    [Color(0xFF0B1220), Color(0xFF12324A), Color(0xFF0E5A4A)],
+    [Color(0xFF1A0B2E), Color(0xFF3B1F5C), Color(0xFF7A2E6B)],
+    [Color(0xFF0B1220), Color(0xFF1E2A44), Color(0xFF3A4A6B)],
+    [Color(0xFF2B1305), Color(0xFF6B3410), Color(0xFFB8641B)],
+    [Color(0xFF03161A), Color(0xFF0B3B45), Color(0xFF1B7A8C)],
+  ];
+
+  static LinearGradient wallpaper(int i) => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: wallpapers[i.clamp(0, wallpapers.length - 1)],
+  );
+
   static ThemeData dark() {
     final base = ThemeData(
       useMaterial3: true,
@@ -35,7 +50,7 @@ class GizliTheme {
         elevation: 0,
         centerTitle: false,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: bgCard,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -59,7 +74,9 @@ class GizliTheme {
           backgroundColor: mint,
           foregroundColor: bg,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),

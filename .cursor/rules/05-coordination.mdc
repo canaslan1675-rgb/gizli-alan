@@ -1,0 +1,45 @@
+---
+description: Multi-agent coordination (Joi + Cursor agents) — session start checklist, claim/heartbeat/handoff/takeover via GitHub issues and docs/AGENT_LOG.md
+globs:
+alwaysApply: true
+---
+
+# Coordination with the other agents (full protocol: `COORDINATION.md`)
+
+Two agent sides work on this repo: **Joi** (`agent:joi`, daily 10:07 Istanbul, `joi/...` branches)
+and **Cursor agents** (`agent:cursor`, `cursor/...` branches). They cannot talk directly; the
+**repo is the channel**: GitHub issues labelled `task` + `docs/AGENT_LOG.md`.
+If you are a Cursor agent, you are `cursor`.
+
+## At the start of EVERY session
+```bash
+git fetch --all --prune
+tail -60 docs/AGENT_LOG.md
+gh issue list --label task --state open
+gh issue list --label status:in-progress
+gh issue list --label handoff
+gh pr list
+```
+
+## Rules
+- **Claim before working:** pick a free `task` issue (no `agent:*`, no `owner`, not
+  `status:blocked`) or a `handoff` one. Add `agent:cursor` (or `agent:joi`) + `status:in-progress`
+  and comment `CLAIM <agent> <ISO time>` with a plan and branch name. Earlier CLAIM wins a race.
+  Ideally 1 claimed issue per side, max 2.
+- **Branch:** `cursor/<issue#>-<slug>` or `joi/<issue#>-<slug>`, from the branch with the latest
+  work; push WIP often so the other side can continue.
+- **Heartbeat:** at least one `HEARTBEAT` comment per session (done / branch + sha / next / questions).
+- **Stopping unfinished:** `HANDOFF` comment with exact state, branch and remaining steps; swap
+  labels to `handoff`.
+- **Takeover:** if an in-progress issue has no commit on its branch **and** no comment for 24 h,
+  comment `TAKEOVER <agent> <time>`, swap the agent label, continue **from the existing branch**
+  (no restart, no history rewrite) and credit the previous work.
+- **Done:** PR with `Closes #N` (TR+EN description, per-file summary, analyze/test result,
+  remaining work); `DONE` comment on the issue; one line in `PROGRESS.md`.
+- **End of every session:** append a dated entry to `docs/AGENT_LOG.md` (agent, finished, in
+  progress, next, notes for the other side). Append-only.
+- **Never:** edit the other side's in-progress branch without TAKEOVER; force-push or rewrite
+  history; merge PRs (the owner merges); claim or label `owner` issues; put secrets in issues,
+  comments, logs or commits.
+- Hard bans (`10-hard-bans-and-security.mdc`) and stop points (`BLOCKERS.md`, brief §5) still apply.
+  Stop point reached → write BLOCKERS.md + open/update an `owner` issue.

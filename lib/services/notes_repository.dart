@@ -1,34 +1,25 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/note.dart';
+import 'vault_session.dart';
 
-/// Notes persisted as a single JSON file in app documents.
-/// Notes are NOT AES-encrypted in MVP (hide-only). Files may be encrypted
-/// separately via VaultStorage when the setting is on.
+/// Notes of one vault space, stored as a single AES-256-GCM encrypted JSON
+/// document (`notes.gae`). Nothing is written in plaintext.
 class NotesRepository {
-  static const _fileName = 'notes.json';
-  final _uuid = const Uuid();
-  File? _file;
+  NotesRepository(this._enc, this._file);
 
-  Future<File> get _notesFile async {
-    if (_file != null) return _file!;
-    final docs = await getApplicationDocumentsDirectory();
-    _file = File(p.join(docs.path, _fileName));
-    if (!await _file!.exists()) {
-      await _file!.writeAsString(jsonEncode([]));
-    }
-    return _file!;
-  }
+  final EncryptedFiles _enc;
+  final File _file;
+  final _uuid = const Uuid();
 
   Future<List<Note>> list() async {
-    final f = await _notesFile;
-    final raw = await f.readAsString();
-    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+    final raw = await _enc.read(_file);
+    if (raw == null) return [];
+    final list = (jsonDecode(utf8.decode(raw)) as List)
+        .cast<Map<String, dynamic>>();
     final notes = list.map(Note.fromJson).toList();
     notes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
     return notes;
@@ -64,12 +55,12 @@ class NotesRepository {
     await _save(notes);
   }
 
-  Future<void> wipe() async {
-    await _save([]);
-  }
+  Future<int> count() async => (await list()).length;
 
-  Future<void> _save(List<Note> notes) async {
-    final f = await _notesFile;
-    await f.writeAsString(jsonEncode(notes.map((n) => n.toJson()).toList()));
-  }
+  Future<void> wipe() => _save([]);
+
+  Future<void> _save(List<Note> notes) => _enc.write(
+    _file,
+    utf8.encode(jsonEncode(notes.map((n) => n.toJson()).toList())),
+  );
 }

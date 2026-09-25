@@ -1,0 +1,106 @@
+---
+description: GizliAlan architecture — encrypted vault (AES-256-GCM), PBKDF2 PIN + lockout, decoy PIN, calculator entry, Second phone work-profile components and HMAC-signed cross-profile intents
+globs: lib/**, android/**, test/**
+alwaysApply: false
+---
+
+# Architecture (from DECISIONS.md and README.md)
+
+## Layout
+```
+lib/
+  main.dart, app.dart          root, session ownership, auto-lock, navigation
+  theme.dart                   dark mint theme + gradient wallpapers
+  l10n/                        tr.dart, en.dart, l10n.dart (map-based l10n + L10nScope InheritedWidget, no gen-l10n)
+  services/
+    crypto_service.dart        AES-256-GCM seal/open, PBKDF2-HMAC-SHA256
+    secure_kv.dart             secure storage abstraction (Keystore / in-memory for tests)
+    auth_service.dart          PIN, decoy PIN, lockout, per-space data keys
+    biometric_service.dart     local_auth wrapper
+    vault_space.dart           real | decoy
+    vault_session.dart         unlocked space: encrypted files + repositories
+    vault_storage.dart         encrypted collections (gallery, files) + encrypted index
+    notes_repository.dart      encrypted notes document
+    calculator_engine.dart     pure calculator logic + PIN candidate
+    legacy_migration.dart      scaffold plaintext → encrypted vault
+    settings_service.dart      non-secret prefs
+    second_phone_service.dart  Second phone channel client + availability logic
+  screens/                     decoy_calculator, pin_lock, onboarding, vault_home, gallery, photo_viewer,
+                               files, notes_list, note_edit, settings, set_pin, second_phone
+android/app/src/main/kotlin/com/offerforge/gizlialan/secondphone/
+                               ProfileAdminReceiver, ProfileSetup, ProvisioningDoneActivity,
+                               ProfileActionActivity, SecondPhoneChannel, SecondPhoneContract
+tool/gen_launcher_icon.py      generates the original launcher icon
+```
+
+## Encrypted vault
+- Encryption is **always on**. There is no "hide-only" mode.
+- **AES-256-GCM** via `cryptography` (+ `cryptography_flutter` native on Android). Do not use
+  pointycastle/`encrypt` (too slow). GCM also gives integrity.
+- One random **256-bit data key per space** (`real`, `decoy`), kept in Keystore-backed
+  `flutter_secure_storage`. The key is **not** wrapped by the PIN. That is what lets biometrics
+  unlock without the PIN, and why a PIN change needs no re-encryption. This limitation is
+  documented. Possible future work: a biometric-bound Keystore key + PIN-wrapped DEK.
+- On-disk (app-private support dir):
+  - `spaces/<real|decoy>/notes.gae`
+  - `…/gallery/index.gae`, `…/gallery/<uuid>.gae`
+  - `…/files/…`
+- Sealed format: `"GAE1"` ‖ nonce(12) ‖ ciphertext ‖ tag(16).
+- Imports go through the system Photo Picker (`image_picker`) and SAF (`file_picker`). Exports
+  use SAF "save as". The image_picker cache copy is deleted after import. Originals are **not**
+  deleted from the phone gallery (the user is told).
+- FLAG_SECURE is **always on** (not a toggle). `allowBackup=false`, and the data-extraction
+  rules exclude everything.
+
+## PIN and lockout
+- 4–8 digits. **PBKDF2-HMAC-SHA256, 120,000 iterations**, random 16-byte salt, run on an isolate.
+- Lockout after **5 failures**: 30 s, doubling each time, capped at 15 min.
+- Calculator `=` checks **do not count as failures** (people type normal numbers).
+- No PIN recovery.
+
+## Decoy PIN
+- Opens a separate `decoy` space with its own key.
+- Biometrics always open the **real** space.
+- Decoy settings hide the security options.
+- Decoy must never reveal the Second phone: no tile, and locking it closes nothing.
+
+## Calculator entry
+- A real working calculator. Typing the PIN and then `=` opens the vault. Long-pressing `=`
+  starts biometric unlock.
+- It is on by default in onboarding, with an explicit disclosure screen and a toggle. The ⓘ
+  button in the calculator explains the entry. Turning it off = open straight at the PIN screen.
+- No hidden gestures (the "4× =" idea was removed). No second-launcher / `DIRECT_VAULT` stubs.
+- Onboarding: 3 steps with an "own device only" confirmation.
+
+## Second phone (v0.2, research option A)
+- Uses a managed work profile via `ACTION_PROVISION_MANAGED_PROFILE`.
+- **`ProfileAdminReceiver`**:
+  - `BIND_DEVICE_ADMIN`, **empty `<uses-policies/>`**
+  - profile owner of that profile only
+  - deactivates itself if enabled as a main-profile device admin
+- **`ProvisioningDoneActivity`** (`PROVISIONING_SUCCESSFUL`) finishes setup inside the new profile.
+- **Cross-profile calls:**
+  - Everything goes through one cross-profile intent filter to a headless
+    **`ProfileActionActivity`**. It is enabled only inside the profile, because only activities
+    can cross profiles without `INTERACT_ACROSS_*`.
+  - Every request is **HMAC-SHA256 signed** with a 256-bit secret handed over in
+    `EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE`. This avoids a trust-on-first-use race.
+  - Requests are valid for a **2-minute window**, and the caller package is checked when available.
+  - Never accept unsigned or expired requests. Never log or expose the secret.
+- **App cloning:**
+  1. Try `installExistingPackage` (AOSP only allows this for affiliated profiles).
+  2. Otherwise `enableSystemApp` for system apps.
+  3. Otherwise open the profile Play Store page.
+  - No `REQUEST_INSTALL_PACKAGES`, no APK copying.
+- **Close on lock** option: Off / **Hide apps (default)** / Turn work profile off.
+  - Applied only on the Lock button (and back-to-lock), and undone on the next real-vault unlock.
+  - Quiet mode falls back to hiding apps, because Android only lets the default launcher/system use it.
+  - Background auto-lock does **not** close the profile (it would kill the app the owner is using).
+- Reachable **only inside the unlocked real vault** (`secondPhoneIfUnlocked`).
+- Listing uses a `<queries>` MAIN/LAUNCHER intent + `LauncherApps`. No new permissions.
+- `uses-feature managed_users / device_admin` are `required=false`.
+- **Xiaomi/Redmi/POCO** (detected via `Build.MANUFACTURER/BRAND`): show a warning before setup,
+  then a blocked message with the **Second space** / Android 15+ **Private space** fallback.
+  Existing work profiles and OEM blocks get generic "not allowed" / "unsupported" messages.
+- Be honest about what this is: work-profile apps show a briefcase badge and a Work tab. It is
+  separation, not invisibility.

@@ -1,150 +1,180 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:encrypt/encrypt.dart' as enc;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
-/// Local vault file storage under app documents.
+import 'vault_session.dart';
+
+/// Metadata of one encrypted item (kept inside the encrypted index, so file
+/// names and types are not visible on disk either).
+class VaultItem {
+  VaultItem({
+    required this.id,
+    required this.name,
+    required this.mime,
+    required this.size,
+    required this.addedAt,
+  });
+
+  final String id;
+  final String name;
+  final String mime;
+  final int size;
+  final DateTime addedAt;
+
+  bool get isImage => mime.startsWith('image/');
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'mime': mime,
+    'size': size,
+    'addedAt': addedAt.toIso8601String(),
+  };
+
+  factory VaultItem.fromJson(Map<String, dynamic> j) => VaultItem(
+    id: j['id'] as String,
+    name: j['name'] as String? ?? 'file',
+    mime: j['mime'] as String? ?? 'application/octet-stream',
+    size: (j['size'] as num?)?.toInt() ?? 0,
+    addedAt:
+        DateTime.tryParse(j['addedAt'] as String? ?? '') ??
+        DateTime.fromMillisecondsSinceEpoch(0),
+  );
+}
+
+/// An encrypted collection (gallery or files) inside a vault space.
 ///
-/// DEFAULT BEHAVIOR: hide-only (files sit in the app sandbox, not encrypted).
-/// When [encryptionEnabled] is true, file bytes are AES-encrypted before write.
-///
-/// HONEST COMMENT: App-sandbox hiding is NOT Android Private Space. Other apps
-/// cannot read these files without root/backup access, but the app icon remains
-/// visible. Encryption adds confidentiality at rest for the file payloads.
+/// On disk: `index.gae` (encrypted JSON list of [VaultItem]) and one
+/// `<uuid>.gae` per item — random names, AES-256-GCM encrypted payloads.
 class VaultStorage {
-  VaultStorage({
-    FlutterSecureStorage? secure,
-  }) : _secure = secure ??
-            const FlutterSecureStorage(
-              aOptions: AndroidOptions(encryptedSharedPreferences: true),
-            );
+  VaultStorage(this._enc, this.dir);
 
-  final FlutterSecureStorage _secure;
-  static const _kAesKey = 'ga_aes_key_b64';
+  final EncryptedFiles _enc;
+  final Directory dir;
+  final _uuid = const Uuid();
 
-  Directory? _filesDir;
+  /// Largest single import we accept (whole file is held in memory).
+  static const int maxItemBytes = 100 * 1024 * 1024;
 
-  Future<Directory> get filesDir async {
-    if (_filesDir != null) return _filesDir!;
-    final docs = await getApplicationDocumentsDirectory();
-    final dir = Directory(p.join(docs.path, 'vault_files'));
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
-    }
-    _filesDir = dir;
-    return dir;
+  // Small LRU of decrypted payloads so the grid does not re-decrypt on scroll.
+  final _cache = <String, Uint8List>{}; // insertion-ordered (LinkedHashMap)
+  static const int _cacheBudget = 48 * 1024 * 1024;
+  int _cacheBytes = 0;
+
+  File get _index => File(p.join(dir.path, 'index.gae'));
+  File _blob(String id) => File(p.join(dir.path, '$id.gae'));
+
+  Future<List<VaultItem>> list() async {
+    final raw = await _enc.read(_index);
+    if (raw == null) return [];
+    final items = (jsonDecode(utf8.decode(raw)) as List)
+        .cast<Map<String, dynamic>>()
+        .map(VaultItem.fromJson)
+        .toList();
+    items.sort((a, b) => b.addedAt.compareTo(a.addedAt));
+    return items;
   }
 
-  Future<List<FileSystemEntity>> listFiles() async {
-    final dir = await filesDir;
-    final list = dir.listSync().whereType<File>().toList();
-    list.sort((a, b) => b.statSync().modified.compareTo(a.statSync().modified));
-    return list;
-  }
-
-  /// Import raw bytes. If [encrypt], wraps with AES; else plain write.
-  Future<File> importBytes({
-    required String fileName,
+  Future<VaultItem> add({
+    required String name,
     required Uint8List bytes,
-    required bool encrypt,
+    String? mime,
   }) async {
-    final dir = await filesDir;
-    final safe = _safeName(fileName);
-    final outPath = p.join(dir.path, safe);
-    final file = File(outPath);
-
-    if (encrypt) {
-      final sealed = await _encrypt(bytes);
-      // Store as .gaenc with metadata header
-      final payload = jsonEncode({
-        'v': 1,
-        'name': fileName,
-        'data': base64Encode(sealed),
-      });
-      final encPath = outPath.endsWith('.gaenc') ? outPath : '$outPath.gaenc';
-      return File(encPath).writeAsString(payload);
-    } else {
-      return file.writeAsBytes(bytes);
+    if (bytes.length > maxItemBytes) {
+      throw ArgumentError('File too large');
     }
+    final item = VaultItem(
+      id: _uuid.v4(),
+      name: p.basename(name).isEmpty ? 'file' : p.basename(name),
+      mime: mime ?? guessMime(name),
+      size: bytes.length,
+      addedAt: DateTime.now(),
+    );
+    await _enc.write(_blob(item.id), bytes);
+    final items = await list();
+    items.insert(0, item);
+    await _saveIndex(items);
+    return item;
   }
 
-  Future<Uint8List> readFile(File file, {required bool decryptIfNeeded}) async {
-    if (file.path.endsWith('.gaenc') && decryptIfNeeded) {
-      final raw = await file.readAsString();
-      final map = jsonDecode(raw) as Map<String, dynamic>;
-      final data = base64Decode(map['data'] as String);
-      return _decrypt(Uint8List.fromList(data));
+  Future<Uint8List> read(VaultItem item) async {
+    final hit = _cache.remove(item.id);
+    if (hit != null) {
+      _cache[item.id] = hit; // refresh LRU position
+      return hit;
     }
-    return file.readAsBytes();
+    final data = await _enc.read(_blob(item.id));
+    if (data == null) throw FileSystemException('missing item', item.id);
+    _remember(item.id, data);
+    return data;
   }
 
-  Future<String?> displayName(File file) async {
-    if (file.path.endsWith('.gaenc')) {
-      try {
-        final raw = await file.readAsString();
-        final map = jsonDecode(raw) as Map<String, dynamic>;
-        return map['name'] as String?;
-      } catch (_) {
-        return p.basename(file.path);
-      }
-    }
-    return p.basename(file.path);
+  Future<void> delete(VaultItem item) async {
+    _forget(item.id);
+    final f = _blob(item.id);
+    if (await f.exists()) await f.delete();
+    final items = await list();
+    items.removeWhere((i) => i.id == item.id);
+    await _saveIndex(items);
   }
 
-  Future<void> deleteFile(File file) async {
-    if (await file.exists()) await file.delete();
-  }
+  Future<int> count() async => (await list()).length;
 
   Future<void> wipeAll() async {
-    final dir = await filesDir;
-    if (await dir.exists()) {
-      await dir.delete(recursive: true);
-      await dir.create(recursive: true);
+    clearCache();
+    if (await dir.exists()) await dir.delete(recursive: true);
+  }
+
+  void clearCache() {
+    _cache.clear();
+    _cacheBytes = 0;
+  }
+
+  Future<void> _saveIndex(List<VaultItem> items) => _enc.write(
+    _index,
+    utf8.encode(jsonEncode(items.map((i) => i.toJson()).toList())),
+  );
+
+  void _remember(String id, Uint8List data) {
+    if (data.length > _cacheBudget ~/ 4) return;
+    _cache[id] = data;
+    _cacheBytes += data.length;
+    while (_cacheBytes > _cacheBudget && _cache.isNotEmpty) {
+      _forget(_cache.keys.first);
     }
   }
 
-  String _safeName(String name) {
-    final base = p.basename(name).replaceAll(RegExp(r'[^\w\.\-]+'), '_');
-    if (base.isEmpty) return 'file_${DateTime.now().millisecondsSinceEpoch}';
-    // Avoid overwrite
-    return '${DateTime.now().millisecondsSinceEpoch}_$base';
+  void _forget(String id) {
+    final d = _cache.remove(id);
+    if (d != null) _cacheBytes -= d.length;
   }
 
-  Future<enc.Key> _aesKey() async {
-    var b64 = await _secure.read(key: _kAesKey);
-    if (b64 == null) {
-      final r = Random.secure();
-      final bytes = List<int>.generate(32, (_) => r.nextInt(256));
-      b64 = base64Encode(bytes);
-      await _secure.write(key: _kAesKey, value: b64);
+  static String guessMime(String name) {
+    switch (p.extension(name).toLowerCase()) {
+      case '.jpg':
+      case '.jpeg':
+        return 'image/jpeg';
+      case '.png':
+        return 'image/png';
+      case '.gif':
+        return 'image/gif';
+      case '.webp':
+        return 'image/webp';
+      case '.heic':
+        return 'image/heic';
+      case '.bmp':
+        return 'image/bmp';
+      case '.pdf':
+        return 'application/pdf';
+      case '.txt':
+        return 'text/plain';
+      case '.mp4':
+        return 'video/mp4';
+      default:
+        return 'application/octet-stream';
     }
-    return enc.Key.fromBase64(b64);
-  }
-
-  Future<Uint8List> _encrypt(Uint8List plain) async {
-    final key = await _aesKey();
-    final iv = enc.IV.fromSecureRandom(16);
-    final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.cbc));
-    final encrypted = encrypter.encryptBytes(plain, iv: iv);
-    // IV || ciphertext
-    return Uint8List.fromList([...iv.bytes, ...encrypted.bytes]);
-  }
-
-  Future<Uint8List> _decrypt(Uint8List sealed) async {
-    final key = await _aesKey();
-    final iv = enc.IV(sealed.sublist(0, 16));
-    final cipher = sealed.sublist(16);
-    final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.cbc));
-    final decrypted = encrypter.decryptBytes(enc.Encrypted(cipher), iv: iv);
-    return Uint8List.fromList(decrypted);
-  }
-
-  Future<void> clearKey() async {
-    await _secure.delete(key: _kAesKey);
   }
 }

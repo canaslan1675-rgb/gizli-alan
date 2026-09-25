@@ -1,49 +1,86 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
+import 'second_phone_service.dart';
 
-/// User preferences: encryption toggle, decoy, lock timeout, language.
+/// Non-secret user preferences (stored in SharedPreferences, app sandbox).
 ///
-/// Default encryption = OFF (hide-only in app documents). Documented in README.
+/// Encryption is no longer optional: all vault content is always AES-256-GCM
+/// encrypted. Secrets (PIN hashes, keys) never live here — see AuthService.
 class SettingsService {
   SettingsService(this._prefs);
 
   final SharedPreferences _prefs;
 
-  static const _kEncryption = 'encryption_enabled';
-  static const _kDecoy = 'decoy_enabled';
+  // Key kept from the scaffold for compatibility ("decoy" = calculator entry).
+  static const _kCalculatorEntry = 'decoy_enabled';
+  static const _kBiometric = 'biometric_enabled';
   static const _kLockTimeout = 'lock_timeout_sec';
   static const _kLang = 'lang';
+  static const _kWallpaper = 'wallpaper';
+  static const _kSecondPhoneClose = 'second_phone_close';
+  static const _kSecondPhoneClosedBy = 'second_phone_closed_by';
+
+  static const lockTimeoutChoices = [0, 15, 60, 300];
 
   static Future<SettingsService> create() async {
     final prefs = await SharedPreferences.getInstance();
     final s = SettingsService(prefs);
-    // Apply saved language
     L10n.setLang(s.language);
     return s;
   }
 
-  /// Optional AES for files. Default false = hide-only.
-  bool get encryptionEnabled => _prefs.getBool(_kEncryption) ?? false;
+  /// App opens as a working calculator; typing the PIN then `=` opens the
+  /// vault. When false the app opens straight to the PIN / biometric screen.
+  bool get calculatorEntryEnabled => _prefs.getBool(_kCalculatorEntry) ?? true;
 
-  Future<void> setEncryptionEnabled(bool v) =>
-      _prefs.setBool(_kEncryption, v);
+  Future<void> setCalculatorEntryEnabled(bool v) =>
+      _prefs.setBool(_kCalculatorEntry, v);
 
-  /// Show calculator decoy as root when true (default true).
-  bool get decoyEnabled => _prefs.getBool(_kDecoy) ?? true;
+  /// Biometric unlock for the real vault (never opens the decoy vault).
+  bool get biometricEnabled => _prefs.getBool(_kBiometric) ?? false;
 
-  Future<void> setDecoyEnabled(bool v) => _prefs.setBool(_kDecoy, v);
+  Future<void> setBiometricEnabled(bool v) => _prefs.setBool(_kBiometric, v);
 
-  /// Seconds before auto-lock after app pause. Default 0 = immediate.
+  /// Seconds in background before auto-lock. 0 = lock immediately.
   int get lockTimeoutSec => _prefs.getInt(_kLockTimeout) ?? 0;
 
   Future<void> setLockTimeoutSec(int sec) =>
       _prefs.setInt(_kLockTimeout, sec.clamp(0, 300));
+
+  /// Index into GizliTheme.wallpapers for the vault home screen.
+  int get wallpaper => _prefs.getInt(_kWallpaper) ?? 0;
+
+  Future<void> setWallpaper(int i) => _prefs.setInt(_kWallpaper, i);
+
+  /// What the Lock button does to the second phone (work profile).
+  SecondPhoneCloseMode get secondPhoneCloseMode =>
+      SecondPhoneCloseMode.parse(_prefs.getString(_kSecondPhoneClose));
+
+  Future<void> setSecondPhoneCloseMode(SecondPhoneCloseMode m) =>
+      _prefs.setString(_kSecondPhoneClose, m.name);
+
+  /// How the second phone was closed at the last lock (null = not closed by
+  /// us), so the next unlock can re-open it the same way.
+  SecondPhoneCloseMode? get secondPhoneClosedBy {
+    final v = _prefs.getString(_kSecondPhoneClosedBy);
+    return v == null ? null : SecondPhoneCloseMode.parse(v);
+  }
+
+  Future<void> setSecondPhoneClosedBy(SecondPhoneCloseMode? m) => m == null
+      ? _prefs.remove(_kSecondPhoneClosedBy)
+      : _prefs.setString(_kSecondPhoneClosedBy, m.name);
 
   String get language => _prefs.getString(_kLang) ?? 'tr';
 
   Future<void> setLanguage(String code) async {
     await _prefs.setString(_kLang, code == 'en' ? 'en' : 'tr');
     L10n.setLang(language);
+  }
+
+  Future<void> resetAll() async {
+    final lang = language;
+    await _prefs.clear();
+    await setLanguage(lang);
   }
 }

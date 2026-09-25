@@ -1,100 +1,108 @@
-# GizliAlan / Hidden Space
+# GizliAlan
 
-Personal privacy vault for **Demirhan** — local notes & files behind a decoy calculator.
+Personal, offline **"hidden virtual phone" vault** for the device owner:
+encrypted photos, files and notes behind a PIN / biometrics, with an optional
+(disclosed) calculator entry and an optional decoy PIN.
 
-**Package:** `com.offerforge.gizlialan`  
-**No spyware. No cloud. No SMS. No accessibility abuse.**
+**Package:** `com.offerforge.gizlialan` · **Flutter** 3.47 (stable) · **Android** 9+ (minSdk 28)
+**No spyware. No cloud. No SMS/calls. No Accessibility. No main-device admin. No INTERNET in release.**
+
+Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculator icon (v0.2).
 
 ---
 
 ## 🇹🇷 Türkçe
 
-### Ne yapar?
-- Sahte hesap makinesi arayüzü (decoy)
-- PIN ile kişisel kasa (notlar + dosyalar)
-- İsteğe bağlı AES dosya şifreleme (varsayılan: **sadece gizleme**, şifreleme kapalı)
-- Uygulama arka plana gidince otomatik kilit
-- Kasadan çıkınca navigasyon stack temizlenir → decoy’a dönüş
+### Özellikler (MVP v1)
+- **Şifreli kasa:** tüm içerik AES-256-GCM ile şifreli; anahtar Android Keystore destekli `flutter_secure_storage`'da
+- **Hesap makinesi girişi (isteğe bağlı, açıkça belirtilir):** gerçek hesap makinesi; PIN + `=` kasayı açar, `=` uzun basış biyometrik
+- **PIN + biyometrik** (`local_auth`), yanlış denemede artan bekleme süresi, arka planda otomatik kilit
+- **FLAG_SECURE:** ekran görüntüsü / kayıt / son uygulamalar önizlemesi engelli
+- **Galeri kasası:** sistem Photo Picker ile içe aktarma, şifreli kopya, ızgara, görüntüleyici, dışa aktarma (SAF), silme
+- **Dosyalar** (PDF vb.) ve **Notlar** (arama ile), hepsi şifreli
+- **Sanal telefon ana ekranı:** saat, ikon ızgarası, dock, duvar kağıdı seçimi
+- **Sahte PIN (isteğe bağlı):** ayrı anahtarla ayrı, boş bir kasa
+- **TR / EN** arayüz
+- **v0.2 — Nötr başlatıcı adı/simgesi:** uygulama listesinde "Hesap Makinesi" / "Calculator" adı ve özgün hesap makinesi simgesi (adaptive + monochrome). Kasa; onboarding, ⓘ ve mağaza metninde açıkça belirtilir.
+- **v0.2 — İkinci telefon (iş profili):** Android iş profili (Shelter/Island yöntemi) kurulur; kendi Play Store'u ve ayrı Google hesabıyla izole uygulamalar. Kasa içinden: kur, durum, kilitleyince uygulamaları gizle / profili kapat (seçenek), ana telefondan uygulama ekle, Play Store'u aç, uygulamaları listele/başlat, profili kaldır. Xiaomi MIUI/HyperOS'ta engellenebilir → İkinci alan / Özel alan önerisi.
 
-### Ne yapmaz? (bilinçli sınırlar)
-- SMS okuma / dinleme yok
-- Accessibility servisi ile casusluk yok
-- Diğer uygulamaların üzerine gizli overlay yok
-- Bulut senkron yok — her şey cihazınızda
-
-### Çalıştırma
-
-```bash
-# 1) Flutter yüklü değilse: https://docs.flutter.dev/get-started/install
-# 2) Android iskeleti oluştur (bir kez)
-./bootstrap.sh
-
-# 3) Bağımlılıklar + çalıştır
-cd /workspace/gizli-alan   # veya proje yolu
-flutter pub get
-flutter run
-```
-
-`bootstrap.sh`, `flutter create` ile Android iskeletini üretir ve `lib/` + `pubspec.yaml` dosyalarınızı korur.
-
-### Google Play politikası (özet)
-Bu uygulama **kişisel gizlilik kasası**dır. Casus yazılım / stalkerware değildir.
-Play’de yayınlarken:
-- Privacy Policy URL zorunlu (bkz. `PRIVACY.md`)
-- “Sensitive permissions” istemeyin (SMS, Accessibility, Device Admin)
-- Açıklamada “gizle / kişisel kasa” dilini kullanın; “izle / dinle” dilini kullanmayın
-- Android **Private Space** (Android 15+) OS seviyesidir — bu uygulama onu taklit etmez, uygulama içi kasa sunar
-
-### OS limitleri vs Private Space
-| Özellik | GizliAlan (uygulama) | Android Private Space |
-|--------|----------------------|------------------------|
-| Uygulama listesinde gizleme | ❌ (launcher’da görünür) | ✅ OS destekli |
-| Bildirim izolasyonu | ❌ | ✅ |
-| Not / dosya kasası | ✅ | — |
-| Sahte UI (decoy) | ✅ | ❌ |
-| Root / OEM bağımsız | ✅ | Android 15+ |
+### Ne yapmaz
+SMS/arama okuma, konum, rehber, mikrofon/kamera, Erişilebilirlik Hizmeti,
+ana cihaz yöneticisi, bildirim dinleyici, sunucuya yükleme, ikon gizleme — **yok**.
+(İkinci telefon: yalnızca kullanıcının kendi oluşturduğu iş profilinin profil sahibi.)
 
 ---
 
 ## 🇬🇧 English
 
-### What it is
-A **personal** Hidden Space MVP: decoy calculator → PIN unlock → local notes & files vault.
-Optional AES encryption for stored files (default: hide-only, encryption off).
-
-### What it is NOT
-- Not spyware / stalkerware
-- No SMS intercept, no accessibility abuse, no hidden overlays on other apps
-- No cloud sync — data stays on-device in the app documents directory
-
-### Run
+### Build & run
 
 ```bash
-./bootstrap.sh          # once: flutter create + keep our lib/
+# Flutter SDK (this box: /workspace/tools/flutter, stable channel)
+export PATH=/workspace/tools/flutter/bin:$PATH
 flutter pub get
-flutter run
+flutter analyze
+flutter test
+flutter run                 # device/emulator
+flutter build apk --release # needs Android SDK + JDK 17
 ```
 
-### Privacy stance
-See `PRIVACY.md`. Designed for the device owner only. Leaving the vault clears the nav stack back to the decoy. `WidgetsBindingObserver` auto-locks on pause/inactive.
+On this box the Android toolchain lives in `/workspace/tools/android-sdk` and
+`/workspace/tools/jdk17` (see `flutter config`). The `android/` project is
+committed; `bootstrap.sh` only re-creates it if missing.
 
-### Play policy notes
-Declare as a personal privacy/vault utility. Do not request SMS, Accessibility, or Device Admin. Provide a privacy policy URL. Do not market as “spy on others.”
-
----
-
-## Project layout
+### Architecture
 
 ```
 lib/
-  main.dart
-  app.dart
-  theme.dart
-  l10n/tr.dart, en.dart
-  services/   auth, settings, vault_storage, notes_repository
-  screens/    decoy, onboarding, pin_lock, vault_home, notes, files, settings
-android/      minimal skeleton OR generated by bootstrap.sh
+  main.dart, app.dart          root, session ownership, auto-lock, navigation
+  theme.dart                   dark mint theme + wallpapers
+  l10n/                        tr.dart, en.dart, l10n.dart (L10nScope rebuilds on language change)
+  models/note.dart
+  services/
+    crypto_service.dart        AES-256-GCM seal/open, PBKDF2-HMAC-SHA256
+    secure_kv.dart             secure storage abstraction (Keystore / in-memory for tests)
+    auth_service.dart          PIN, decoy PIN, lockout, per-space data keys
+    biometric_service.dart     local_auth wrapper
+    vault_space.dart           real | decoy
+    vault_session.dart         unlocked space: encrypted files + repositories
+    vault_storage.dart         encrypted collections (gallery, files) + encrypted index
+    notes_repository.dart      encrypted notes document
+    calculator_engine.dart     pure calculator logic + PIN candidate
+    legacy_migration.dart      scaffold plaintext → encrypted vault
+    settings_service.dart      non-secret prefs
+    second_phone_service.dart  work-profile "second phone" channel client + availability logic
+  screens/                     decoy_calculator, pin_lock, onboarding, vault_home,
+                               gallery, photo_viewer, files, notes_list, note_edit,
+                               settings, set_pin, second_phone
+  widgets/vault_actions.dart   export/delete helpers, progress dialog
+android/app/src/main/kotlin/…/secondphone/
+                               ProfileAdminReceiver (profile owner only), ProfileSetup,
+                               ProvisioningDoneActivity, ProfileActionActivity (signed
+                               in-profile trampoline), SecondPhoneChannel (main profile)
+tool/gen_launcher_icon.py      generates the original launcher icon (vector + PNGs)
+test/                          crypto, auth, calculator, storage, second-phone, branding
+                               unit tests + app-flow / second-phone widget tests
+docs/PLAY_COMPLIANCE.md        permissions, Data safety answers, listing TR/EN, reviewer notes
 ```
 
+**On-disk layout** (app-private support dir):
+`spaces/<real|decoy>/notes.gae`, `…/gallery/index.gae`, `…/gallery/<uuid>.gae`,
+`…/files/…`. Sealed format: `"GAE1"` ‖ nonce(12) ‖ ciphertext ‖ tag(16).
+
+### Security model (honest)
+- Data keys are random 256-bit per space, stored in Keystore-backed secure
+  storage (not PIN-wrapped, so biometrics can unlock). Protects against other
+  apps, casual access and file copies; not against a rooted device with the
+  phone unlocked, or someone who knows the PIN.
+- The app stays visible in the launcher, labelled "Calculator" / "Hesap
+  Makinesi" (a real calculator; vault disclosed). It is not Android Private Space.
+- Second phone isolation is Android's work profile; GizliAlan is its profile
+  owner only. Work-profile apps show a briefcase badge and appear in the
+  launcher's Work tab — it is separation, not invisibility.
+- No PIN recovery.
+
+See `PRIVACY.md`, `docs/PLAY_COMPLIANCE.md`, `DECISIONS.md`.
+
 ## License
-Private / personal use for Demirhan. Not for redistribution as spyware tooling.
+Private / personal project. Not for use as monitoring or spyware tooling.
