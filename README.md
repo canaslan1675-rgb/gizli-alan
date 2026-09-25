@@ -53,6 +53,18 @@ On this box the Android toolchain lives in `/workspace/tools/android-sdk` and
 `/workspace/tools/jdk17` (see `flutter config`). The `android/` project is
 committed; `bootstrap.sh` only re-creates it if missing.
 
+### Store screenshots / Mağaza ekran görüntüleri
+
+`tool/gen_store_screenshots.sh` regenerates `docs/store/screenshots/{tr,en}/01…06_*.png`
+(1080×1920, RGB, no alpha). It runs `test/store_screenshots_test.dart` with
+`--dart-define=STORE_SCREENSHOTS=true`: the real screens are pumped in a widget test with
+fabricated demo content (generated pattern images, neutral fake notes) and captured through a
+`RepaintBoundary`. No emulator is needed and FLAG_SECURE is not touched. Plain `flutter test`
+skips the generator. Font fixtures: `test/fixtures/fonts/README.md`.
+
+TR: Mağaza görüntüleri gerçek ekranların sahte demo içerikle widget testinde çizilmesiyle
+üretilir (emülatör yok, FLAG_SECURE değişmez); yeniden üretmek için betiği çalıştır.
+
 ### Device testing / Cihaz testi
 
 Step-by-step checklist for real phones (Xiaomi / Samsung / Pixel) and emulators, with a
