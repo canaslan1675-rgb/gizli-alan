@@ -213,4 +213,20 @@ const Map<String, String> en = {
   'spModeQuiet': 'Turn work profile off',
   'spQuietNote':
       'Android usually lets only the default home-screen app turn the work profile off. If not permitted, GizliAlan hides the apps instead. You can also use the "Work apps" quick-settings tile.',
+  'notifications': 'Notifications',
+  'notifEmpty':
+      'No notifications yet. Imports, exports, deletions, Second phone changes and wrong PIN attempts are listed here.',
+  'notifFooter':
+      'This list is only visible inside the vault and is stored encrypted. GizliAlan posts no system notifications and never reads other apps\' notifications.',
+  'notifMarkAllRead': 'Mark all as read',
+  'notifClearAll': 'Clear all',
+  'notifClearConfirm': 'Delete all notifications of this vault?',
+  'evGalleryImported': '{n} photo(s) added to Gallery',
+  'evFilesImported': '{n} file(s) added to Files',
+  'evItemExported': '"{name}" exported',
+  'evItemDeleted': '"{name}" deleted',
+  'evFailedUnlocks': '{n} wrong PIN attempt(s) since your last unlock',
+  'evSecondPhoneCreated': 'Second phone created',
+  'evSecondPhoneAppAdded': '"{app}" added to the second phone',
+  'evSecondPhoneRemoved': 'Second phone removed',
 };

@@ -47,6 +47,9 @@ class AuthService {
   static const _kOnboarded = 'ga_onboarded';
   static const _kFailCount = 'ga_fail_count';
   static const _kLockUntil = 'ga_lock_until_ms';
+  // Wrong PIN-pad attempts since the last REAL unlock (survives decoy unlocks,
+  // so it is only ever reported inside the real vault).
+  static const _kFailSinceUnlock = 'ga_fail_since_unlock';
   // Legacy scaffold format (sha256(salt::pin)). Migrated on first success.
   static const _kLegacySalt = 'ga_pin_salt';
   static const _kLegacyHash = 'ga_pin_hash';
@@ -159,6 +162,7 @@ class AuthService {
       _kOnboarded,
       _kFailCount,
       _kLockUntil,
+      _kFailSinceUnlock,
       _kLegacySalt,
       _kLegacyHash,
       _dekKey(VaultSpace.real),
@@ -228,7 +232,17 @@ class AuthService {
     );
   }
 
+  /// Returns and resets the number of wrong PIN-pad attempts since the last
+  /// real-vault unlock. Call only when the REAL vault was opened.
+  Future<int> takeFailuresSinceUnlock() async {
+    final n = int.tryParse(await _kv.read(_kFailSinceUnlock) ?? '') ?? 0;
+    if (n > 0) await _kv.delete(_kFailSinceUnlock);
+    return n;
+  }
+
   Future<void> _registerFailure() async {
+    final since = int.tryParse(await _kv.read(_kFailSinceUnlock) ?? '') ?? 0;
+    await _kv.write(_kFailSinceUnlock, '${since + 1}');
     final n = (int.tryParse(await _kv.read(_kFailCount) ?? '') ?? 0) + 1;
     await _kv.write(_kFailCount, '$n');
     if (n >= freeAttempts) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../l10n/l10n.dart';
+import '../models/vault_event.dart';
 import '../services/vault_storage.dart';
 import '../theme.dart';
 import '../widgets/vault_actions.dart';
@@ -57,6 +58,9 @@ class _FilesScreenState extends State<FilesScreen> {
       }
       await FilePicker.clearTemporaryFiles();
     });
+    if (count > 0) {
+      await _store.events?.add(VaultEventType.filesImported, {'n': '$count'});
+    }
     if (!mounted) return;
     var msg = t('importedFilesN').replaceAll('{n}', '$count');
     if (tooBig > 0) msg += ' ${t('tooBig')}';
@@ -120,6 +124,9 @@ class _FilesScreenState extends State<FilesScreen> {
       case 'delete':
         if (await VaultActions.confirmDelete(context)) {
           await _store.delete(item);
+          await _store.events?.add(VaultEventType.itemDeleted, {
+            'name': item.name,
+          });
           _reload();
         }
         break;

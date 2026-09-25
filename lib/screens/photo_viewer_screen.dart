@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
+import '../models/vault_event.dart';
 import '../services/vault_storage.dart';
 import '../theme.dart';
 import '../widgets/vault_actions.dart';
@@ -42,6 +43,9 @@ class _PhotoViewerScreenState extends State<PhotoViewerScreen> {
     if (!await VaultActions.confirmDelete(context)) return;
     final item = _items[_index];
     await widget.store.delete(item);
+    await widget.store.events?.add(VaultEventType.itemDeleted, {
+      'name': item.name,
+    });
     if (!mounted) return;
     setState(() {
       _items.removeAt(_index);

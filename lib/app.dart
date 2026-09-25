@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'l10n/l10n.dart';
+import 'models/vault_event.dart';
 import 'screens/decoy_calculator_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/pin_lock_screen.dart';
@@ -163,6 +164,14 @@ class GizliAlanAppState extends State<GizliAlanApp>
         );
       } catch (e) {
         debugPrint('legacy migration skipped: $e');
+      }
+    }
+    if (space == VaultSpace.real) {
+      final failed = await auth.takeFailuresSinceUnlock();
+      if (failed > 0) {
+        await session.events.add(VaultEventType.failedUnlocks, {
+          'n': '$failed',
+        });
       }
     }
     setState(() => _session = session);
