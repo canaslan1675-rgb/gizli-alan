@@ -21,7 +21,10 @@ android/**/GeneratedPluginRegistrant.*
 *.apk
 *.aab
 *.keystore
+*.jks
 key.properties
+# the template is safe to commit
+!android/key.properties.example
 
 # iOS (scaffold leftover)
 ios/

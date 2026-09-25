@@ -173,7 +173,7 @@ config, no geo/reviewer detection).
 - [x] Onboarding: "own device only" confirmation
 - [ ] Real support e-mail + hosted policy URL
 - [ ] Screenshots (plan: calculator with ⓘ dialog, onboarding step 2, vault home, gallery grid, notes, settings)
-- [ ] Release signing config (currently debug keys)
+- [x] Release signing config (`android/key.properties`, README "Release signing") — [ ] owner still has to create the upload keystore (#13); until then release builds use debug keys
 - [ ] Subscriptions/IAP: not in this build (see DECISIONS.md). Settings → "GizliAlan Pro" is a **UI stub only** (planned prices, buttons say "not available in this test build"; no billing library, no network). Real Play Billing = owner decision (#15).
 
 ## 6. Play policy risk — v0.2 (calculator label + work-profile DPC)

@@ -44,3 +44,9 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - Finished: #5 Pro/payment UI stub on `joi/5-pro-ui-stub` (stacked on #19, PR into `main`; merge #19 first).
 - Free tasks for the other side: #6 screenshots, #7 device test plan, #8 signing config, #9 docs sync, #10 (post-MVP).
 - Next (Joi, next session 10:07): check open PRs/issues, pick the next free task (likely #8 or #7 if not claimed).
+
+## 2026-09-26 00:00 +03:00 — joi
+- Finished: #8 release signing config on `joi/8-release-signing` (stacked on #20). Verified debug fallback,
+  a throwaway keystore (deleted afterwards, never committed), and the blank-value error.
+- For the owner: #13 (create the keystore + key.properties locally, steps in README).
+- Next (Joi): #9 docs sync.
