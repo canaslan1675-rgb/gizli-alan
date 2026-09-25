@@ -1,6 +1,6 @@
 # Policy declarations, justification texts and reviewer demo video
 
-> **TR özet.** `play` flavor'u için **hiçbir hassas izin beyan formu gerekmiyor** (yalnızca `USE_BIOMETRIC`); doldurulacaklar standart App content formları (reklam yok, reklam kimliği yok,
+> **TR özet.** `play` flavor'u için **hiçbir hassas izin beyan formu gerekmiyor** (yalnızca `USE_BIOMETRIC` + normal izin `INTERNET`); doldurulacaklar standart App content formları (reklam yok, reklam kimliği yok,
 > hedef kitle 18+, içerik derecelendirmesi, veri güvenliği). Bu dosya: (1) standart formlar için hazır cevaplar, (2) `full` flavor'u için cihaz yöneticisi / iş profili gerekçe metni
 > (Play Console'da ayrı bir form çıkmazsa App access notlarına ve olası politika e-postası cevabına kullanılır), (3) inceleyiciler için demo video çekim listesi
 > (FLAG_SECURE nedeniyle ekran kaydı siyah çıkar; FLAG_SECURE'u kapatan özel bir derleme yapmak yerine **aynı release derlemesini** ikinci bir telefon/kamera ile çekin).
@@ -31,7 +31,7 @@ App access "Any other instructions", (b) if a declaration form appears, (c) in r
 ### 2.1 Short justification (≈ 500 chars)
 
 ```
-GizliAlan uses a DeviceAdminReceiver ONLY to become profile owner of an Android work profile that the user creates in-app ("Second phone", same model as Shelter/Island), via Android's own ACTION_PROVISION_MANAGED_PROFILE consent flow. The receiver declares no device-admin policies, is never device owner, and deactivates itself if enabled as a main-profile device admin. No data from the profile is read or sent; the app has no INTERNET permission.
+GizliAlan uses a DeviceAdminReceiver ONLY to become profile owner of an Android work profile that the user creates in-app ("Second phone", same model as Shelter/Island), via Android's own ACTION_PROVISION_MANAGED_PROFILE consent flow. The receiver declares no device-admin policies, is never device owner, and deactivates itself if enabled as a main-profile device admin. No data from the profile is read or sent. (The app's only network use is the optional in-vault browser loading pages the user opens; the app itself sends nothing.)
 ```
 
 ### 2.2 Full justification
@@ -81,7 +81,7 @@ YouTube video; put the link in App access. Use demo content only (pattern images
 | 11 | Decoy PIN | Set decoy `<DECOY_PIN>` → lock → enter decoy PIN → empty separate vault. |
 | 12 | Settings → Entry | Turn calculator entry off → relaunch → PIN screen directly. |
 | 13 | Privacy & permissions | Scroll the in-app privacy text. |
-| 14 | Android Settings → Apps → Calculator → Permissions | "No permissions requested" (biometric is an install-time permission, no runtime prompts); no internet. |
+| 14 | Android Settings → Apps → Calculator → Permissions | "No permissions requested" (biometric is an install-time permission, no runtime prompts); Android shows "Have full network access" (INTERNET, install-time, used only by the in-vault browser). |
 | 15 | Home button | App auto-locks; recents shows a blank preview (FLAG_SECURE). |
 
 ### 3.2 `full` additions (≈ +2 min)

@@ -30,12 +30,12 @@ TEXT = {
     'en': {
         'subtitle': 'Calculator Vault',
         'body': ['Encrypted photos, files and notes', 'behind a real, working calculator.'],
-        'foot': 'Offline  ·  No internet permission  ·  No ads',
+        'foot': 'No tracking  ·  No ads  ·  Encrypted on device',
     },
     'tr': {
         'subtitle': 'Hesap Makineli Kasa',
         'body': ['Şifreli fotoğraf, dosya ve notlar', 'gerçekten çalışan bir hesap makinesinin arkasında.'],
-        'foot': 'Çevrimdışı  ·  İnternet izni yok  ·  Reklam yok',
+        'foot': 'Takip yok  ·  Reklam yok  ·  Cihazda şifreli',
     },
 }
 

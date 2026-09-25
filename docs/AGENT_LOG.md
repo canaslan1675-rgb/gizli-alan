@@ -103,3 +103,9 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - Finished: #30 on `joi/30-hide-work-apps` (PR #31, owner-authorised self-merge). While the vault is locked, the Second phone's work apps are hidden (full only; see docs/SECOND_PHONE_HIDING.md). Also vault home background from a vault photo (Gallery long-press menu; both flavors). Version 0.3.2+5, prerelease `v0.3.2-test` with both APKs.
 - Note for all agents: profile-side hide rules live in `secondphone/HidePolicy.kt` (JVM tests: `cd android && ./gradlew :app:testFullDebugUnitTest`). Anything in `src/play`/`src/main` that mentions DevicePolicyManager now fails `test/flavor_sources_test.dart`. The home background id is stored encrypted in `spaces/<space>/home_background.gae`. `assets/wallpapers/` is an empty slot kept for a future bundled default; it is not in pubspec.
 - Next: owner device test #14 (DEVICE_TEST_PLAN §2.16, §3.15–3.20 on Xiaomi).
+
+
+## 2026-09-26 02:10 +03:00 — joi
+- Finished: #32 on `joi/32-private-browser` — private in-vault browser (see docs/PRIVATE_BROWSER.md), INTERNET permission (browser only), wipe on lock, docs/listing/feature graphic/screenshots updated. Version 0.4.0+6, prerelease `v0.4.0-test`.
+- Note for all agents: permissions are now exactly USE_BIOMETRIC + INTERNET (tests enforce it). Never add analytics/crash/ads SDKs or JS channels; all web-data wiping goes through `BrowserData.wipe()` (`gizlialan/system` `wipeWebData`). Don't claim "no internet permission" anywhere any more.
+- Next: owner device test #14 (DEVICE_TEST_PLAN §2.17–2.22 for the browser).

@@ -20,7 +20,7 @@ Items marked **[UNCERTAIN]** could not be confirmed from an official source.
 |------|------|
 | Play candidate | **`play` flavor**, `applicationId com.offerforge.gizlialan`, no Second phone, no `DeviceAdminReceiver`/`BIND_DEVICE_ADMIN`, no LAUNCHER `<queries>` |
 | Side-load flavor | `full`, `com.offerforge.gizlialan.full`, Second phone = managed work profile, app is profile owner only |
-| Permissions (both) | `USE_BIOMETRIC` only (+ AndroidX-internal signature permission); no `INTERNET` in release |
+| Permissions (both) | `USE_BIOMETRIC` + `INTERNET` since 0.4.0 (in-vault browser only) (+ AndroidX-internal signature permission) |
 | Launcher | label "Calculator" / "Hesap Makinesi", original navy/mint calculator icon; the app **is** a working calculator; PIN + `=` opens vault; long-press `=` biometrics |
 | Disclosure | onboarding step 2 (entry disclosure + toggle), ⓘ dialog, store listing, reviewer notes |
 | Data | AES-256-GCM on device, PBKDF2 PIN hash, no account, no server, no ads/analytics, backups disabled |
@@ -88,7 +88,7 @@ reviewer question for the **`play`** flavor. The `full` column is for the case t
 | [Calculator Photo Vault (Keepsafe)](https://play.google.com/store/apps/details?id=com.getkeepsafe.morpheus) | 500K+ | 17 Sep 2026 | "Hide your photos and videos behind a calculator", "Fake PIN" decoy vault |
 
   Pattern that is approved today: **the store title itself says "Calculator … Vault/Lock"**, the icon is a calculator, and the description explains PIN + `=`. GizliAlan's current draft title ("GizliAlan: Private Vault") does **not** mention the calculator, so a user (or reviewer) who installs it sees an icon/label ("Calculator") that the title does not announce. **Recommendation: put "Calculator Vault" / "Hesap Makineli Kasa" in the title** (see LISTING_*.md). This is both the most honest option and the one with the most precedent.
-- Differentiators that help GizliAlan (and are true): no internet permission, only one permission, no ads/accounts/analytics, no icon switching, no "hide from partner" marketing, calculator entry can be turned off, vault disclosed inside the app before first use. Competitors use words like "disguised", "secret", "no one will know" — **GizliAlan should avoid those** (they read as concealment towards third parties and invite stalkerware/deception scrutiny). Use "discreet", "private", "for your own content".
+- Differentiators that help GizliAlan (and are true): no tracking, no server, minimal permissions (biometric + internet for the in-vault browser only), no ads/accounts/analytics, no icon switching, no "hide from partner" marketing, calculator entry can be turned off, vault disclosed inside the app before first use. Competitors use words like "disguised", "secret", "no one will know" — **GizliAlan should avoid those** (they read as concealment towards third parties and invite stalkerware/deception scrutiny). Use "discreet", "private", "for your own content".
 - Keep: store icon = launcher icon (same original artwork), first screenshot = calculator **with the ⓘ disclosure open**, second = onboarding disclosure step. Never add icon-hiding, alias switching, "fake crash" screens or review-time behaviour changes.
 
 ### 3.2 Work profile (full flavor) — evidence
@@ -106,7 +106,7 @@ reviewer question for the **`play`** flavor. The `full` column is for the case t
 1. **Title announces the calculator vault** (e.g. "GizliAlan: Calculator Vault" / "GizliAlan: Hesap Makineli Kasa") — matches the on-device label/icon.
 2. **Full disclosure everywhere, identical behaviour for everyone**: listing, onboarding step 2, ⓘ, App access notes, screenshots 1–2. No remote config, no reviewer detection (there is no network anyway — say so).
 3. **App access instructions** even though no account exists: the PIN-then-`=` entry is non-obvious; reviewers who can't find the vault may flag "broken/limited functionality" or "hidden features".
-4. **Minimal footprint**: only `USE_BIOMETRIC`, no INTERNET, no Accessibility, no admin in `play`. Say it in the listing — it's a genuine differentiator.
+4. **Minimal footprint**: only `USE_BIOMETRIC` (+ `INTERNET` since 0.4.0 for the in-vault browser), no Accessibility, no admin in `play`. Say it in the listing — it's a genuine differentiator.
 5. **No non-functional UI in the Play build** — hide the Pro stub in `play` release builds (or ship real Play Billing first).
 6. **Clean Data safety** ("No data collected / shared") that matches `PRIVACY.md` and the binary (no SDKs that collect).
 7. **Serious closed test** with ≥ 12 (aim 20) real testers for ≥ 14 days, real feedback, fixes shipped during the test, and good answers to the production-access questionnaire.

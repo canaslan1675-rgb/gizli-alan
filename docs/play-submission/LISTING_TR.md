@@ -25,7 +25,7 @@ Alternatif: `Hesap Makineli Kasa: GizliAlan` (30).
 
 **Tam açıklama (1981/4000):**
 ```
-GizliAlan, telefonunun sahibi için çevrimdışı çalışan kişisel bir kasadır. Fotoğrafların, belgelerin ve notların PIN (isteğe bağlı parmak izi/yüz) ile korunur ve yalnızca cihazında AES-256-GCM ile şifrelenir.
+GizliAlan, telefonunun sahibi için cihazında çalışan kişisel bir kasadır. Fotoğrafların, belgelerin ve notların PIN (isteğe bağlı parmak izi/yüz) ile korunur ve yalnızca cihazında AES-256-GCM ile şifrelenir.
 
 HESAP MAKİNESİ GİRİŞİ – AÇIKÇA
 Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simgesiyle görünür. Bu simge GizliAlan'dır. Açıldığında gerçekten çalışan bir hesap makinesi karşılar. Kasa PIN'ini yazıp "=" tuşuna basınca kasa açılır; biyometriyi açtıysan "=" tuşuna uzun bas. Bu davranış ilk kurulumda, hesap makinesindeki ⓘ düğmesinde ve bu açıklamada anlatılır. İstersen Ayarlar'dan kapatıp uygulamanın doğrudan PIN ekranıyla açılmasını seçebilirsin.
@@ -42,8 +42,8 @@ Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simg
 
 GİZLİLİK
 • Hesap yok, sunucu yok, reklam yok, analitik yok
-• İnternet izni yok: uygulama verini hiçbir yere gönderemez
-• Tek izin: isteğe bağlı biyometrik kilit. Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
+• Takip yok, reklam yok: uygulama verini hiçbir yere göndermez. Dahili gizli tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
+• Az izin: isteğe bağlı biyometrik kilit ve yalnızca dahili tarayıcı için internet. Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
 • Bulut yedeklemesi kapalıdır; uygulamayı kaldırmak kasayı siler
 • PIN kurtarma yoktur. PIN'ini unutursan içerik çözülemez; bunu bilerek kullan
 
@@ -68,7 +68,7 @@ Gizlilik politikası ve destek e-postası bu sayfada yer alır.
 
 **Sürüm notları (ilk sürüm):**
 ```
-İlk sürüm: şifreli galeri, notlar ve dosyalar; hesap makinesi girişi (PIN + "="); biyometrik kilit; internet izni yok.
+İlk sürüm: şifreli galeri, notlar ve dosyalar; hesap makinesi girişi (PIN + "="); biyometrik kilit.
 ```
 
 ---
@@ -88,7 +88,7 @@ Hesap makinesi girişli şifreli kasa + iş profiliyle ayrı bir ikinci alan.
 
 **Tam açıklama (3174/4000):**
 ```
-GizliAlan, telefonunun sahibi için çevrimdışı çalışan kişisel bir kasadır. Fotoğrafların, belgelerin ve notların PIN (isteğe bağlı parmak izi/yüz) ile korunur ve yalnızca cihazında AES-256-GCM ile şifrelenir.
+GizliAlan, telefonunun sahibi için cihazında çalışan kişisel bir kasadır. Fotoğrafların, belgelerin ve notların PIN (isteğe bağlı parmak izi/yüz) ile korunur ve yalnızca cihazında AES-256-GCM ile şifrelenir.
 
 HESAP MAKİNESİ GİRİŞİ – AÇIKÇA
 Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simgesiyle görünür. Bu simge GizliAlan'dır. Açıldığında gerçekten çalışan bir hesap makinesi karşılar. Kasa PIN'ini yazıp "=" tuşuna basınca kasa açılır; biyometriyi açtıysan "=" tuşuna uzun bas. Bu davranış ilk kurulumda, hesap makinesindeki ⓘ düğmesinde ve bu açıklamada anlatılır. İstersen Ayarlar'dan kapatıp uygulamanın doğrudan PIN ekranıyla açılmasını seçebilirsin.
@@ -114,8 +114,8 @@ Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simg
 
 GİZLİLİK
 • Hesap yok, sunucu yok, reklam yok, analitik yok
-• İnternet izni yok: uygulama verini hiçbir yere gönderemez
-• Tek izin: isteğe bağlı biyometrik kilit (iş profili ek izin gerektirmez). Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
+• Takip yok, reklam yok: uygulama verini hiçbir yere göndermez. Dahili gizli tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
+• Az izin: isteğe bağlı biyometrik kilit ve yalnızca dahili tarayıcı için internet (iş profili ek izin gerektirmez). Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
 • Bulut yedeklemesi kapalıdır; uygulamayı kaldırmak kasayı siler
 • PIN kurtarma yoktur. PIN'ini unutursan içerik çözülemez; bunu bilerek kullan
 

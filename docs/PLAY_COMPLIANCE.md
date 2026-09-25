@@ -7,7 +7,7 @@
 | **`play`** | `com.offerforge.gizlialan` | **No.** Merged manifest has **no** `DeviceAdminReceiver`, no `BIND_DEVICE_ADMIN`, no provisioning/profile-action activities, no `profile_admin.xml`, no `managed_users`/`device_admin` uses-feature, no LAUNCHER `<queries>`. The Kotlin code (`secondphone/`) is not compiled in; the Dart UI hides every Second phone entry. | Google Play candidate |
 | `full` | `com.offerforge.gizlialan.full` | Yes (v0.2 behaviour, components in `android/app/src/full/`) | Side-load / GitHub test builds |
 
-Both: launcher label "Calculator"/"Hesap Makinesi", FLAG_SECURE, only `USE_BIOMETRIC`,
+Both: launcher label "Calculator"/"Hesap Makinesi", FLAG_SECURE, only `USE_BIOMETRIC` + `INTERNET` (in-vault browser, since 0.4.0),
 same `key.properties` release signing. They install side by side. Which flavor is
 submitted to Play is still the **owner's** choice after device testing (#11 keeps the
 `owner` label); this document assumes **`play`** for the listing, screenshots and
@@ -22,12 +22,17 @@ integration are out of scope for this branch (owner decision required).
 | Permission | Source | Needed for |
 |-----------|--------|-----------|
 | `android.permission.USE_BIOMETRIC` | app + `local_auth` | Optional biometric unlock |
+| `android.permission.INTERNET` | app (since 0.4.0, #32) | **Only** the in-vault private browser (`webview_flutter`, Android System WebView) loading pages the user opens. Normal (install-time) permission, no declaration form. No app code opens sockets; no analytics/telemetry/crash reporting/ads; no developer server. See `docs/PRIVATE_BROWSER.md`. |
 
 Explicitly removed with `tools:node="remove"`: `READ_EXTERNAL_STORAGE`,
 `WRITE_EXTERNAL_STORAGE`, `READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`,
 `READ_MEDIA_VISUAL_USER_SELECTED`, `MANAGE_EXTERNAL_STORAGE`, `CAMERA`,
-`RECORD_AUDIO`, `USE_FINGERPRINT`. No `INTERNET` in release (Flutter adds it to
-debug/profile manifests only). **Verify with**
+`RECORD_AUDIO`, `USE_FINGERPRINT`, `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`
+(could be pulled in via WebView plugins; geolocation is disabled in the WebView anyway).
+Since 0.4.0 `INTERNET` is declared in the main manifest for the browser; before that it
+existed only in debug/profile manifests. Meta-data `android.webkit.WebView.MetricsOptOut=true`
+opts out of WebView usage metrics. WebView **Safe Browsing** is left at the platform default
+(documented in the privacy policy); GizliAlan contains no Safe Browsing SDK calls. **Verify with**
 `aapt2 dump permissions build/app/outputs/flutter-apk/app-play-release.apk` (and `app-full-release.apk`)
 before every upload.
 
@@ -45,6 +50,11 @@ Re-verified 2026-09-26 on the v0.3 arm64 release APKs of **both** flavors: same 
 (`com.offerforge.gizlialan[.full].DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` + `USE_BIOMETRIC`).
 `aapt2 dump xmltree` of the `play` APK has no `DeviceAdminReceiver`, `BIND_DEVICE_ADMIN`,
 `device_admin` or `secondphone` entries; the `full` APK has them.
+
+**v0.4.0 (#32):** expected list for both flavors = `USE_BIOMETRIC`, `INTERNET` and the
+AndroidX-internal `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` — nothing else (asserted by
+`test/flavor_sources_test.dart`; re-verified with `aapt2 dump permissions` on the release APKs
+before the v0.4.0-test prerelease).
 
 Not used anywhere: Accessibility Service, Notification Listener, SMS/Call log,
 Contacts, Location, `QUERY_ALL_PACKAGES`, `REQUEST_INSTALL_PACKAGES`, overlays,
@@ -83,7 +93,7 @@ Re-check if any SDK (billing, crash reporting, backup) is added later.
 - **Kısa açıklama (≤80):** `Fotoğraf, dosya ve notların için şifreli kişisel kasa. Casusluk yok.`
 - **Tam açıklama:**
 ```
-GizliAlan, telefonunun sahibine özel, çevrimdışı bir kişisel kasadır.
+GizliAlan, telefonunun sahibine özel, cihazda çalışan kişisel bir kasadır.
 Fotoğrafların, belgelerin ve notların PIN veya biyometrik ile korunur ve
 cihazında AES-256 ile şifrelenir.
 
@@ -100,8 +110,8 @@ cihazında AES-256 ile şifrelenir.
 • İsteğe bağlı sahte PIN: ayrı, boş bir kasa açar
 
 GİZLİLİK
-• Hesap yok, sunucu yok, reklam yok, analitik yok; internet izni yok
-• Tek izin: isteğe bağlı biyometrik kilit
+• Hesap yok, sunucu yok, reklam yok, analitik yok, takip yok; internet yalnızca kasa içi gizli tarayıcı için
+• Az izin: isteğe bağlı biyometrik kilit; internet yalnızca dahili tarayıcı için
 • PIN kurtarma yoktur — PIN'ini unutma
 
 NE DEĞİLDİR
@@ -116,7 +126,7 @@ NE DEĞİLDİR
 - **Short (≤80):** `Encrypted personal vault for your photos, files and notes. No spyware.`
 - **Full:**
 ```
-GizliAlan is an offline personal vault for the owner of the phone. Your photos,
+GizliAlan is an on-device personal vault for the owner of the phone. Your photos,
 documents and notes are protected by a PIN or biometrics and encrypted on your
 device with AES-256.
 
@@ -133,8 +143,8 @@ FEATURES
 • Optional decoy PIN: opens a separate, empty vault
 
 PRIVACY
-• No account, no server, no ads, no analytics, no internet permission
-• Only permission: optional biometric unlock
+• No account, no server, no ads, no analytics, no tracking; internet only for the in-vault private browser
+• Minimal permissions: optional biometric unlock; internet only for the built-in browser
 • There is no PIN recovery — don't forget your PIN
 
 WHAT IT IS NOT

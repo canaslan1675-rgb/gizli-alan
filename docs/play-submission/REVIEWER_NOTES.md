@@ -21,13 +21,13 @@ Console form: **"All or some functionality in my app is restricted"** → *Add i
 ## 1. Short version (≤ 500 characters)
 
 ```
-No account. First launch: tick "own device", keep "Open as calculator" on, set PIN <DEMO_PIN>. The app then opens as a real working calculator (launcher label "Calculator"). Type <DEMO_PIN> and press "=" to open the vault. The ⓘ button explains this. Long-press "=" = biometrics (enable in vault Settings). Turn the calculator entry off in Settings > Entry. Offline app: no internet permission, no server, same behaviour for everyone.
+No account. First launch: tick "own device", keep "Open as calculator" on, set PIN <DEMO_PIN>. The app then opens as a real working calculator (launcher label "Calculator"). Type <DEMO_PIN> and press "=" to open the vault. The ⓘ button explains this. Long-press "=" = biometrics (enable in vault Settings). Turn the calculator entry off in Settings > Entry. No server, no analytics, same behaviour for everyone; INTERNET is used only by the in-vault browser (vault home → Tarayıcı/Browser) for pages the user opens.
 ```
 
 ## 2. Long version (feature by feature)
 
 ```
-GizliAlan is an offline personal vault. There is no account and no server; the release build has no INTERNET permission, so there is no remote configuration and no reviewer-specific behaviour. Everything described here is in the build you received.
+GizliAlan is an on-device personal vault. There is no account and no server; the app contacts no developer server, so there is no remote configuration and no reviewer-specific behaviour. The INTERNET permission exists only for the in-vault private browser (Android System WebView), which loads only pages the user opens; cookies/cache are wiped when the vault locks (setting "Kilitlenince temizle", on by default). Downloads are disabled. Everything described here is in the build you received.
 
 OPEN THE VAULT
 1. First launch – onboarding:
@@ -48,7 +48,7 @@ FEATURES INSIDE THE VAULT
 - Auto-lock when the app goes to background. FLAG_SECURE blocks screenshots/recents previews (pre-launch report screenshots will appear black – intended).
 
 WHAT THE APP DOES NOT DO
-No Accessibility service, no device admin, no SMS/call log/contacts/location/camera/microphone access, no monitoring of other apps or people, no data collection, no ads, no analytics. Only permission: USE_BIOMETRIC (optional).
+No Accessibility service, no device admin, no SMS/call log/contacts/location/camera/microphone access, no monitoring of other apps or people, no data collection, no ads, no analytics. Permissions: USE_BIOMETRIC (optional) and INTERNET, used only by the in-vault browser for pages the user opens (no analytics, no ads, no developer server).
 
 Demo video (optional): <DEMO_VIDEO_URL>
 ```

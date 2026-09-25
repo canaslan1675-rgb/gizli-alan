@@ -30,7 +30,7 @@ Account impact: rejections don't affect standing; removals can accumulate; **sus
 
 **Response (only if the listing already discloses everything):**
 ```
-Hello, thank you for the review. GizliAlan's primary function is an encrypted personal vault, and the listing states this in the title ("GizliAlan: Calculator Vault"), the short description and the first paragraphs of the full description. The app is also a fully working calculator; the launcher label "Calculator" and our original calculator icon (not copied from any vendor) reflect that real function. The vault entry (PIN then "=") is disclosed (1) in the store listing section "CALCULATOR ENTRY – DISCLOSED", (2) on onboarding step 2 before first use, with a toggle to turn it off, (3) in the ⓘ dialog on the calculator, (4) in screenshots 1–2 and (5) in the App access instructions. There is no reviewer- or region-specific behaviour (the app has no INTERNET permission). If a different wording or label would make this clearer for users, please tell us which element and we will change it promptly.
+Hello, thank you for the review. GizliAlan's primary function is an encrypted personal vault, and the listing states this in the title ("GizliAlan: Calculator Vault"), the short description and the first paragraphs of the full description. The app is also a fully working calculator; the launcher label "Calculator" and our original calculator icon (not copied from any vendor) reflect that real function. The vault entry (PIN then "=") is disclosed (1) in the store listing section "CALCULATOR ENTRY – DISCLOSED", (2) on onboarding step 2 before first use, with a toggle to turn it off, (3) in the ⓘ dialog on the calculator, (4) in screenshots 1–2 and (5) in the App access instructions. There is no reviewer- or region-specific behaviour (the app contacts no developer server and has no remote configuration). If a different wording or label would make this clearer for users, please tell us which element and we will change it promptly.
 ```
 
 ## 2. Broken functionality / minimum functionality
@@ -50,12 +50,12 @@ Thank you. The vault is protected by a PIN that the user creates on first launch
 
 **Response:** usually not needed — fix and resubmit. If already compliant:
 ```
-Our privacy policy is available at <PRIVACY_URL> (public HTTPS, no login) and is also shown in the app under Settings → Privacy & permissions. It states that the app collects and shares no user data; all content is encrypted and stays on the device, and the release build has no INTERNET permission.
+Our privacy policy is available at <PRIVACY_URL> (public HTTPS, no login) and is also shown in the app under Settings → Privacy & permissions. It states that the app collects and shares no user data; all content is encrypted and stays on the device, and the app has no server, analytics or ads; the INTERNET permission is used only by the in-vault browser to load pages the user opens.
 ```
 
 ## 4. Data safety mismatch
 
-**Cause:** Google's scan thinks an SDK collects data. **Fix plan:** check `aapt2 dump badging` + dependency list; if a plugin added a permission/SDK, remove it (`tools:node="remove"`) or declare truthfully. **Response** (if false positive): list permissions (only `USE_BIOMETRIC`), no INTERNET, dependency list, and quote the on-device processing definition from the [Data safety help page](https://support.google.com/googleplay/android-developer/answer/10787469).
+**Cause:** Google's scan thinks an SDK collects data. **Fix plan:** check `aapt2 dump badging` + dependency list; if a plugin added a permission/SDK, remove it (`tools:node="remove"`) or declare truthfully. **Response** (if false positive): list permissions (`USE_BIOMETRIC`, `INTERNET` for the user-driven in-vault browser only), dependency list, and quote the on-device processing definition from the [Data safety help page](https://support.google.com/googleplay/android-developer/answer/10787469).
 
 ## 5. Impersonation / intellectual property (icon)
 
@@ -65,7 +65,7 @@ Our privacy policy is available at <PRIVACY_URL> (public HTTPS, no login) and is
 
 **Response:**
 ```
-GizliAlan does not monitor anyone. It has no INTERNET permission, so it cannot transmit data; it requests no SMS, call log, contacts, location, microphone, camera, Accessibility or notification-listener access, and it is not a device administrator. It only stores content the device owner explicitly adds (via the system pickers) in an encrypted local vault. Onboarding requires confirming "This is my own device", and the listing states it must only be used on one's own device. The launcher icon is always visible; the app never hides its icon.
+GizliAlan does not monitor anyone. It contacts no server and transmits no data (INTERNET is used only by an in-vault browser for pages the user opens); it requests no SMS, call log, contacts, location, microphone, camera, Accessibility or notification-listener access, and it is not a device administrator. It only stores content the device owner explicitly adds (via the system pickers) in an encrypted local vault. Onboarding requires confirming "This is my own device", and the listing states it must only be used on one's own device. The launcher icon is always visible; the app never hides its icon.
 ```
 **Fix plan:** re-read listing for words like "secret", "hide from", "no one will know"; remove them.
 
