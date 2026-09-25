@@ -50,7 +50,9 @@ stores** fingerprint/face data; Android only tells it "success" or "failure".
 Photos and files are imported only when **you** pick them in the system Photo
 Picker / file picker (no storage or media permission). Export uses the system
 "save as" dialog. Debug builds additionally contain `INTERNET` for Flutter
-developer tooling; release builds do not.
+developer tooling; release builds do not. If a build shows a link to this
+policy (Settings → Privacy & permissions) and you tap "Open in browser", your
+browser app opens the page — GizliAlan itself sends nothing.
 
 ## Calculator entry and decoy PIN (disclosed features)
 

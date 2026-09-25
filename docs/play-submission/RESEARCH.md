@@ -24,7 +24,7 @@ Items marked **[UNCERTAIN]** could not be confirmed from an official source.
 | Launcher | label "Calculator" / "Hesap Makinesi", original navy/mint calculator icon; the app **is** a working calculator; PIN + `=` opens vault; long-press `=` biometrics |
 | Disclosure | onboarding step 2 (entry disclosure + toggle), ⓘ dialog, store listing, reviewer notes |
 | Data | AES-256-GCM on device, PBKDF2 PIN hash, no account, no server, no ads/analytics, backups disabled |
-| Version | 0.3.0+3, `minSdk 28`, `targetSdk = flutter.targetSdkVersion` = **36** (Flutter 3.47.5), `compileSdk 36` |
+| Version | 0.3.1+4 (Pro stub hidden in `play`, in-app policy link, feature graphic — #28), `minSdk 28`, `targetSdk = flutter.targetSdkVersion` = **36** (Flutter 3.47.5), `compileSdk 36` |
 | Developer | new **personal** Play developer account, Turkey |
 
 ---

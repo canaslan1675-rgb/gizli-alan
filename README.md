@@ -63,9 +63,20 @@ Both keep the launcher label "Calculator"/"Hesap Makinesi", FLAG_SECURE and only
 `android/app/build.gradle.kts`; the Second phone manifest entries, Kotlin code, strings and
 `profile_admin.xml` live only in `android/app/src/full/`. Dart: `lib/flavor.dart` reads
 Flutter's `appFlavor` (set by `--flavor`), then `--dart-define=FLAVOR=play|full`; unknown or
-missing → `play` (safe default). Settings → footer shows "GizliAlan 0.3.0 · Play/Full".
+missing → `play` (safe default). Settings → footer shows "GizliAlan 0.3.1 · Play/Full".
 On Android always pass a flavor, e.g.
 `flutter run --flavor full` (or `play`).
+
+Build-time options (#28):
+- `--dart-define=PRIVACY_URL=https://…` — Settings → Privacy & permissions then also shows the
+  hosted privacy policy with "Open in browser" (plain `ACTION_VIEW` intent via the
+  `gizlialan/system` channel, no url_launcher, still **no INTERNET permission**) and "Copy link".
+  Without it (or with a non-https value) only the built-in privacy text is shown.
+- The "GizliAlan Pro" UI stub is shown only in `full`; `--dart-define=PRO_STUB=true` shows it in
+  `play` too (review only). No billing either way; the 50-item free limit is displayed, not enforced.
+- Store feature graphic: `python3 tool/gen_feature_graphic.py` (Pillow) →
+  `docs/store/feature_graphic/feature_graphic_{tr,en}.png` (1024×500 RGB).
+- Play upload example: `flutter build appbundle --release --flavor play --dart-define=PRIVACY_URL=https://…`.
 
 TR: `play` = Google Play adayı, İkinci telefon yok (APK'da cihaz yöneticisi bileşeni bile yok);
 `full` = İkinci telefonlu test/yan yükleme sürümü. İkisi aynı telefona birlikte kurulabilir.

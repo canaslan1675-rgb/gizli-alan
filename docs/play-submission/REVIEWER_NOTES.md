@@ -46,7 +46,6 @@ FEATURES INSIDE THE VAULT
 - Settings: change PIN, biometric unlock (Android BiometricPrompt; then long-press "=" on the calculator), auto-lock delay, decoy PIN, wallpaper, language, "Reset everything", privacy & permissions text.
 - Decoy PIN (optional): Settings -> Decoy PIN. It opens a separate vault that starts empty. Biometrics always open the real vault.
 - Auto-lock when the app goes to background. FLAG_SECURE blocks screenshots/recents previews (pre-launch report screenshots will appear black – intended).
-- "GizliAlan Pro" screen: [OWNER: delete this line if the Pro stub is hidden in the play release] shows planned prices only; no purchase is possible in this version and no payment is taken.
 
 WHAT THE APP DOES NOT DO
 No Accessibility service, no device admin, no SMS/call log/contacts/location/camera/microphone access, no monitoring of other apps or people, no data collection, no ads, no analytics. Only permission: USE_BIOMETRIC (optional).

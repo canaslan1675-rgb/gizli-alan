@@ -32,7 +32,7 @@ Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not 
 | B8 | No Advertising ID (`AD_ID`) permission | ✅ | declare "No" in Console |
 | B9 | Release signing with **upload key** (RSA ≥ 2048), `android/key.properties` local only | 👤 #13 | [Play App Signing](https://support.google.com/googleplay/android-developer/answer/9842756). Config ready (PR #21). Back up the keystore + passwords offline |
 | B10 | Enrol in **Play App Signing** (accept ToS when creating the app) | 👤 | mandatory for new apps with AAB |
-| B11 | versionCode increments for every upload | ✅ | pubspec `0.3.0+3`; bump `+N` per upload |
+| B11 | versionCode increments for every upload | ✅ | pubspec `0.3.1+4`; bump `+N` per upload |
 | B12 | Crash-free on Android 16 device (targetSdk 36 behaviour: edge-to-edge, predictive back) + Android 9 (minSdk) | ⚠️ 👤 #14 | `docs/DEVICE_TEST_PLAN.md`; pre-launch report will also run |
 | B13 | FLAG_SECURE unconditional | ✅ | pre-launch report screenshots will be black — expected, mention in reviewer notes |
 | B14 | No code that changes behaviour by locale/date/reviewer | ✅ | no network, no remote config |
@@ -48,8 +48,8 @@ Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not 
 | C5 | Calculator entry can be switched off | ✅ | Settings → Entry |
 | C6 | Original launcher + store icon, no vendor look-alike | ✅ | `tool/gen_launcher_icon.py`, `docs/store_icon_512.png` |
 | C7 | No icon hiding / alias switching | ✅ | |
-| C8 | **Pro UI stub** (Buy/Subscribe → "not available in this test build") | ⚠️ **recommend hiding in `play` release** (or ship real Play Billing, #15) | Risk: "Broken functionality / placeholder UI" rejection; also Payments policy once prices are shown. Follow-up issue suggested (code change, not in this PR) |
-| C9 | Privacy policy reachable **inside the app** | ⚠️ | In-app privacy text exists (Settings → Privacy). Add the hosted policy URL as selectable text once #12 is done (no INTERNET needed; user can copy/open) |
+| C8 | **Pro UI stub** hidden in `play` | ✅ #28 (v0.3.1) | `Flavor.hasProStub` = `full` only (`--dart-define=PRO_STUB=true` to review); tests in `test/pro_screen_test.dart` |
+| C9 | Privacy policy reachable **inside the app** | ✅ #28 (needs URL) | In-app privacy text + link when built with `--dart-define=PRIVACY_URL=https://…` (ACTION_VIEW intent, no INTERNET). 👤 set the URL after #12 |
 | C10 | Decoy PIN described honestly | ✅ | "separate, empty vault" |
 | C11 | "Delete everything" / uninstall removes all data | ✅ | backups disabled |
 
@@ -62,7 +62,7 @@ Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not 
 | D3 | Short description ≤ 80 | ✅ draft | |
 | D4 | Full description ≤ 4000, no keyword lists, no emoji in title | ✅ draft | |
 | D5 | App icon 512×512 PNG ≤ 1 MB | ✅ | `docs/store_icon_512.png` |
-| D6 | **Feature graphic 1024×500** | ❌ | agent can generate from icon geometry (no text claims like "#1"/"free") |
+| D6 | **Feature graphic 1024×500** | ✅ #28 | `docs/store/feature_graphic/feature_graphic_{tr,en}.png`, RGB, `tool/gen_feature_graphic.py` |
 | D7 | Phone screenshots (2–8, 9:16) | ✅ | `docs/store/screenshots/play/{tr,en}/01…06` (1080×1920). 01 = calculator + ⓘ, 02 = onboarding disclosure |
 | D8 | Category **Tools** | 👤 | competitors (HideU, Island, Calculator Vault) are Tools |
 | D9 | Contact e-mail (public), website optional | 👤 #12 | |

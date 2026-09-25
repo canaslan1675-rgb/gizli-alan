@@ -271,4 +271,10 @@ const Map<String, String> tr = {
       'Kaldırma veya "Verileri temizle" kasayı siler.',
   'notifEmpty_play':
       'Henüz bildirim yok. İçe/dışa aktarma, silme ve hatalı PIN denemeleri burada listelenir.',
+  // Privacy policy link (#28), shown only when PRIVACY_URL is set.
+  'privacyPolicyOnline': 'Gizlilik politikasının tamamı (çevrimiçi):',
+  'openInBrowser': 'Tarayıcıda aç',
+  'copyLink': 'Bağlantıyı kopyala',
+  'linkCopied': 'Bağlantı kopyalandı',
+  'noBrowser': 'Tarayıcı bulunamadı. Bunun yerine bağlantı kopyalandı.',
 };

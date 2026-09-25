@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../app.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
+import '../services/privacy_link.dart';
 import '../services/second_phone_service.dart';
 import '../services/settings_service.dart';
 import '../services/vault_session.dart';
@@ -104,12 +106,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _privacyInfo() {
     final t = L10n.current;
+    final url = PrivacyLink.url;
+    final messenger = ScaffoldMessenger.of(context);
+    Future<void> copy(String msgKey) async {
+      await Clipboard.setData(ClipboardData(text: url!));
+      messenger.showSnackBar(SnackBar(content: Text(t(msgKey))));
+    }
+
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(t('privacyTitle')),
-        content: SingleChildScrollView(child: Text(t('privacyBody'))),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(t('privacyBody')),
+              if (url != null) ...[
+                const SizedBox(height: 16),
+                Text(
+                  t('privacyPolicyOnline'),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
+                SelectableText(
+                  url,
+                  key: const ValueKey('privacy_url'),
+                  style: const TextStyle(color: GizliTheme.mint),
+                ),
+              ],
+            ],
+          ),
+        ),
         actions: [
+          if (url != null) ...[
+            TextButton(
+              key: const ValueKey('privacy_copy'),
+              onPressed: () => copy('linkCopied'),
+              child: Text(t('copyLink')),
+            ),
+            TextButton(
+              key: const ValueKey('privacy_open'),
+              onPressed: () async {
+                final ok = await PrivacyLink.open(url);
+                if (!ok) await copy('noBrowser');
+              },
+              child: Text(t('openInBrowser')),
+            ),
+          ],
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t('ok'))),
         ],
       ),
@@ -213,15 +258,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
-      ListTile(
-        key: const ValueKey('settings_pro'),
-        leading: const Icon(Icons.workspace_premium_outlined),
-        title: Text(t('proTitle')),
-        subtitle: Text(t('proSettingsHint')),
-        onTap: () => Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => const ProScreen())),
-      ),
+      if (Flavor.hasProStub)
+        ListTile(
+          key: const ValueKey('settings_pro'),
+          leading: const Icon(Icons.workspace_premium_outlined),
+          title: Text(t('proTitle')),
+          subtitle: Text(t('proSettingsHint')),
+          onTap: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const ProScreen())),
+        ),
       ListTile(
         leading: const Icon(Icons.privacy_tip_outlined),
         title: Text(t('privacyTitle')),
@@ -362,7 +408,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
           Center(
             child: Text(
-              'GizliAlan 0.3.0 · ${Flavor.hasSecondPhone ? 'Full' : 'Play'}',
+              'GizliAlan 0.3.1 · ${Flavor.hasSecondPhone ? 'Full' : 'Play'}',
               key: const ValueKey('settings_version'),
               style: const TextStyle(
                 color: GizliTheme.textSecondary,
