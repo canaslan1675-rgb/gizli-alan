@@ -31,7 +31,12 @@ The app really is a working calculator. The listing and in-app behaviour must te
 - Drafts live in `docs/PLAY_COMPLIANCE.md` §2–4. Keep them in sync with the features.
 - Data safety: no data collected or shared. On-device only. No ads. 18+. Re-check if any SDK is
   added (billing, crash reporting, backup).
-- Privacy policy: `PRIVACY.md`. It must be **hosted on HTTPS before submission**.
+- Privacy policy: `PRIVACY.md`. It must be **hosted on HTTPS before submission**. Build the Play
+  AAB with `--dart-define=PRIVACY_URL=<hosted URL>` so Settings → Privacy shows the link (#28;
+  ACTION_VIEW intent via `gizlialan/system`, never add url_launcher/INTERNET).
+- Never show non-working purchase UI in `play` (`Flavor.hasProStub` is `full` only).
+- Feature graphic: `tool/gen_feature_graphic.py` → `docs/store/feature_graphic/` (same artwork as the icon).
+- Full submission pack: `docs/play-submission/`.
 - Still open: real support e-mail, hosted policy URL, screenshots (first screenshot = calculator
   with the ⓘ dialog open), release signing, IAP (not in this build).
 

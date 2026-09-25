@@ -21,3 +21,5 @@
 **2026-09-26 (Sat, #6):** Store screenshots TR+EN (6 frames each, 1080×1920 RGB) rendered from the real screens in a skipped-by-default widget test with demo content; generator script + README note; FLAG_SECURE unchanged. Taken over from the Cursor agent (owner-approved).
 
 **2026-09-26 (Sat, #11):** Two flavors: `play` (com.offerforge.gizlialan, no Second phone, no device-admin component in the APK) and `full` (com.offerforge.gizlialan.full, Second phone); Dart gating + play-specific texts, flavor tests, screenshots per flavor (play/ for the listing), docs; v0.3.0+3, both arm64 APKs in prerelease `v0.3.0-test`. Play submission flavor still the owner's call.
+
+**2026-09-26 (Sat, #28):** Play follow-ups: Pro stub hidden in `play` (kept in `full`, `PRO_STUB` flag), in-app privacy-policy link via `--dart-define=PRIVACY_URL` (ACTION_VIEW intent, still no INTERNET), feature graphic 1024×500 TR/EN + generator, gating/privacy tests; v0.3.1+4, prerelease `v0.3.1-test` with play + full arm64 APKs.

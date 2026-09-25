@@ -15,7 +15,7 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 
 | | |
 |---|---|
-| Build | Latest test APK from GitHub Releases (e.g. `v0.3.0-test`: `GizliAlan-v0.3-play.apk` = no Second phone, `GizliAlan-v0.3-full.apk` = with Second phone; arm64, debug-signed; they install side by side) or a newer one built from `main` (`flutter build apk --release --flavor play|full --target-platform android-arm64`). §3 applies to the **full** APK only; on the play APK check that no Second phone tile/setting exists and GizliAlan never appears under Device admin apps. |
+| Build | Latest test APK from GitHub Releases (e.g. `v0.3.1-test`: `GizliAlan-v0.3.1-play.apk` = no Second phone, `GizliAlan-v0.3.1-full.apk` = with Second phone; arm64, debug-signed; they install side by side) or a newer one built from `main` (`flutter build apk --release --flavor play|full --target-platform android-arm64`). §3 applies to the **full** APK only; on the play APK check that no Second phone tile/setting exists and GizliAlan never appears under Device admin apps. |
 | Install | `adb install -r GizliAlan-test-*.apk` or open the APK on the phone (allow "install unknown apps" for the file manager/browser — that is a phone setting, not an app permission). |
 | Reset between runs | Settings → Apps → Calculator (GizliAlan) → Storage → Clear data. If a work profile was created: remove it in-app (§3.9) or Settings → Accounts/Passwords → Work → Remove work profile. |
 | Record | Device model, Android version, OEM skin + version (MIUI/HyperOS/One UI), build/tag, date. |

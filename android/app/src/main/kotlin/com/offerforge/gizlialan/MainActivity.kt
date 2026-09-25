@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
 
 /**
  * FlutterFragmentActivity is required by local_auth (BiometricPrompt).
@@ -15,10 +16,12 @@ import io.flutter.embedding.engine.FlutterEngine
  *
  * Also hosts the flavor-specific native feature ([FlavorFeatures]): the
  * "second phone" (own work profile) channel in the `full` flavor, nothing in
- * the `play` flavor.
+ * the `play` flavor — and [SystemChannel] (open the privacy-policy URL in
+ * the browser via ACTION_VIEW; no INTERNET permission).
  */
 class MainActivity : FlutterFragmentActivity() {
     private var flavorFeature: FlavorFeature? = null
+    private var systemChannel: MethodChannel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(
@@ -30,10 +33,13 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        systemChannel = SystemChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         flavorFeature = FlavorFeatures.attach(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        systemChannel?.setMethodCallHandler(null)
+        systemChannel = null
         flavorFeature?.dispose()
         flavorFeature = null
         super.cleanUpFlutterEngine(flutterEngine)

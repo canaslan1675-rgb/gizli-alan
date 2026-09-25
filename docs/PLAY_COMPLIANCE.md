@@ -205,7 +205,9 @@ config, no geo/reviewer detection).
 - [ ] Real support e-mail + hosted policy URL
 - [x] Screenshots: **Play listing uses `docs/store/screenshots/play/{tr,en}/`** `01_calculator_info.png … 06_settings.png` (no Second phone anywhere); `full/{tr,en}/` is the same set for the side-load build (vault home shows the Second phone tile) (1080×1920 RGB PNG; calculator with ⓘ dialog, onboarding step 2, vault home, gallery grid, notes, settings). Widget-rendered with demo content by `tool/gen_store_screenshots.sh`
 - [x] Release signing config (`android/key.properties`, README "Release signing") — [ ] owner still has to create the upload keystore (#13); until then release builds use debug keys
-- [ ] Subscriptions/IAP: not in this build (see DECISIONS.md). Settings → "GizliAlan Pro" is a **UI stub only** (planned prices, buttons say "not available in this test build"; no billing library, no network). Real Play Billing = owner decision (#15).
+- [ ] Subscriptions/IAP: not in this build (see DECISIONS.md). Settings → "GizliAlan Pro" is a **UI stub only** (planned prices, buttons say "not available in this test build"; no billing library, no network). **Since v0.3.1 (#28) the stub is hidden in the `play` flavor** (no non-working purchase buttons for reviewers); it remains in `full`. Real Play Billing = owner decision (#15).
+- [x] Feature graphic 1024×500 TR/EN: `docs/store/feature_graphic/` (generator `tool/gen_feature_graphic.py`), #28.
+- [x] In-app privacy policy link: build with `--dart-define=PRIVACY_URL=<hosted URL>` (#28); set it once #12 is hosted.
 
 ## 6. Play policy risk — calculator label (+ work-profile DPC in `full`)
 

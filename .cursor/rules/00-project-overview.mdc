@@ -72,7 +72,7 @@ The checkboxes in the brief are not ticked. Actual status:
   - Release APK built (debug-signed, `v0.2.0-test`)
 - In open PRs (waiting for the owner to merge):
   - In-app notification isolation: vault-only, encrypted notification list (#4 → PR #19)
-  - Pro/payment **UI stub** (#5 → PR #20)
+  - Pro/payment **UI stub** (#5 → PR #20; hidden in the `play` flavor since #28, `Flavor.hasProStub`)
   - Release signing config via `android/key.properties` (#8 → PR #21)
 - Not done yet (see the `task` issues):
   - Screenshots (#6), device test plan (#7)

@@ -88,3 +88,13 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - #11 keeps the `owner` label: which flavor is submitted to Play is the owner's call after device testing (#14).
 - Note for all agents: Android builds now need `--flavor play|full`. Never put Second phone code or manifest
   entries in `src/main`; they go in `src/full`. New Second phone UI must check `Flavor.hasSecondPhone`.
+
+## 2026-09-26 01:40 +03:00 — joi
+- Merged earlier: #27 Play submission pack (owner request).
+- Finished: #28 on `joi/28-play-followups` — Pro stub hidden in `play` (`Flavor.hasProStub`), `PRIVACY_URL`
+  dart-define + Settings link (Kotlin `SystemChannel`, no url_launcher, no INTERNET), feature graphic
+  `docs/store/feature_graphic/` + `tool/gen_feature_graphic.py`, tests, docs, v0.3.1+4, prerelease `v0.3.1-test`.
+- Note for all agents: new Pro/purchase UI must check `Flavor.hasProStub`; never add url_launcher — use
+  `PrivacyLink.open` / the `gizlialan/system` channel. Play AAB: add `--dart-define=PRIVACY_URL=…` once #12 is hosted.
+- Next: owner items #11–#16; #10 (post-MVP) is free.
+

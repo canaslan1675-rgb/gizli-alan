@@ -272,4 +272,10 @@ const Map<String, String> en = {
       'Uninstalling or "Clear data" deletes the vault.',
   'notifEmpty_play':
       'No notifications yet. Imports, exports, deletions and wrong PIN attempts are listed here.',
+  // Privacy policy link (#28), shown only when PRIVACY_URL is set.
+  'privacyPolicyOnline': 'Full privacy policy (online):',
+  'openInBrowser': 'Open in browser',
+  'copyLink': 'Copy link',
+  'linkCopied': 'Link copied',
+  'noBrowser': 'No browser found. The link was copied instead.',
 };
