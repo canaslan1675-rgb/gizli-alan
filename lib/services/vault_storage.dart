@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
+import 'vault_events.dart';
 import 'vault_session.dart';
 
 /// Metadata of one encrypted item (kept inside the encrypted index, so file
@@ -50,10 +51,14 @@ class VaultItem {
 /// On disk: `index.gae` (encrypted JSON list of [VaultItem]) and one
 /// `<uuid>.gae` per item — random names, AES-256-GCM encrypted payloads.
 class VaultStorage {
-  VaultStorage(this._enc, this.dir);
+  VaultStorage(this._enc, this.dir, {this.events});
 
   final EncryptedFiles _enc;
   final Directory dir;
+
+  /// The space's notification list; UI actions (import/export/delete) log to
+  /// it. The storage itself does not log.
+  final VaultEventLog? events;
   final _uuid = const Uuid();
 
   /// Largest single import we accept (whole file is held in memory).

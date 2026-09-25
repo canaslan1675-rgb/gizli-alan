@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 
 import 'crypto_service.dart';
 import 'notes_repository.dart';
+import 'vault_events.dart';
 import 'vault_space.dart';
 import 'vault_storage.dart';
 
@@ -34,7 +35,8 @@ class EncryptedFiles {
 
 /// Everything available while a vault space is unlocked. Dropped on lock.
 ///
-/// Layout: `<base>/spaces/<space>/notes.gae`, `.../gallery/`, `.../files/`.
+/// Layout: `<base>/spaces/<space>/notes.gae`, `events.gae`, `.../gallery/`,
+/// `.../files/`.
 class VaultSession {
   VaultSession({
     required this.space,
@@ -47,8 +49,17 @@ class VaultSession {
          crypto ?? CryptoService(),
        ) {
     notes = NotesRepository(_files, File(p.join(dir.path, 'notes.gae')));
-    gallery = VaultStorage(_files, Directory(p.join(dir.path, 'gallery')));
-    files = VaultStorage(_files, Directory(p.join(dir.path, 'files')));
+    events = VaultEventLog(_files, File(p.join(dir.path, 'events.gae')));
+    gallery = VaultStorage(
+      _files,
+      Directory(p.join(dir.path, 'gallery')),
+      events: events,
+    );
+    files = VaultStorage(
+      _files,
+      Directory(p.join(dir.path, 'files')),
+      events: events,
+    );
   }
 
   final VaultSpace space;
@@ -56,6 +67,9 @@ class VaultSession {
   final EncryptedFiles _files;
 
   late final NotesRepository notes;
+
+  /// Vault-only notification list of this space.
+  late final VaultEventLog events;
   late final VaultStorage gallery;
   late final VaultStorage files;
 

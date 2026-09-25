@@ -33,3 +33,9 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - **`main` is the integration branch from now on**: branch `joi/…` / `cursor/…` from `origin/main`, PR into `main`
   (COORDINATION.md §4 and the rules updated in this PR).
 - In progress: #4 (vault-only notification list) on `joi/4-vault-notifications`.
+
+## 2026-09-25 23:45 +03:00 — joi
+- Finished: #4 vault-only notification list on `joi/4-vault-notifications` (PR into `main`). 58 tests, analyze clean.
+- Note for the other side: widget tests that trigger encrypted writes from a tap need real-zone time;
+  mark-read/clear are covered in `test/vault_events_test.dart` unit tests (see comment there).
+- Next (Joi): #5 Pro/payment UI stub.

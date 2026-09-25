@@ -12,6 +12,7 @@ import 'gallery_screen.dart';
 import '../services/second_phone_service.dart';
 import '../widgets/profile_app_tile.dart';
 import 'notes_list_screen.dart';
+import 'notifications_screen.dart';
 import 'second_phone_screen.dart';
 import 'settings_screen.dart';
 
@@ -32,6 +33,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
   DateTime _now = DateTime.now();
   List<ProfileApp> _profileApps = const [];
   ValueNotifier<int>? _spChanged;
+  int _unread = 0;
 
   @override
   void initState() {
@@ -48,7 +50,15 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       _spChanged = GizliAlanApp.of(context).secondPhoneChanged
         ..addListener(_loadProfileApps);
       _loadProfileApps();
+      _loadUnread();
     }
+  }
+
+  Future<void> _loadUnread() async {
+    final events = GizliAlanApp.of(context).session?.events;
+    if (events == null) return;
+    final n = await events.unreadCount();
+    if (mounted && n != _unread) setState(() => _unread = n);
   }
 
   @override
@@ -74,6 +84,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
     ) {
       if (mounted) setState(() {}); // e.g. wallpaper changed in settings
       _loadProfileApps();
+      _loadUnread();
     });
   }
 
@@ -120,6 +131,14 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         t('decoyTitle'),
         const Color(0xFF9AA8BC),
         () => _open(const DecoyCalculatorScreen()),
+      ),
+      _AppIcon(
+        Icons.notifications_none,
+        t('notifications'),
+        GizliTheme.warning,
+        () => _open(const NotificationsScreen()),
+        badge: _unread,
+        key: const ValueKey('tile_notifications'),
       ),
       if (!(app.session?.isDecoy ?? true))
         _AppIcon(
@@ -178,7 +197,9 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                 Expanded(
                   child: CustomScrollView(
                     slivers: [
-                      _grid(apps.map((a) => _AppTile(icon: a)).toList()),
+                      _grid(
+                        apps.map((a) => _AppTile(key: a.key, icon: a)).toList(),
+                      ),
                       if (_profileApps.isNotEmpty) ...[
                         SliverToBoxAdapter(
                           child: Padding(
@@ -272,7 +293,16 @@ Widget _grid(List<Widget> children) => SliverPadding(
 );
 
 class _AppIcon {
-  const _AppIcon(this.icon, this.label, this.color, this.onTap);
+  const _AppIcon(
+    this.icon,
+    this.label,
+    this.color,
+    this.onTap, {
+    this.badge = 0,
+    this.key,
+  });
+  final int badge;
+  final Key? key;
   final IconData icon;
   final String label;
   final Color color;
@@ -280,7 +310,7 @@ class _AppIcon {
 }
 
 class _AppTile extends StatelessWidget {
-  const _AppTile({required this.icon});
+  const _AppTile({super.key, required this.icon});
   final _AppIcon icon;
 
   @override
@@ -299,7 +329,12 @@ class _AppTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: icon.color.withValues(alpha: 0.45)),
             ),
-            child: Icon(icon.icon, color: icon.color, size: 30),
+            child: Badge(
+              isLabelVisible: icon.badge > 0,
+              label: Text(icon.badge > 99 ? '99+' : '${icon.badge}'),
+              backgroundColor: GizliTheme.danger,
+              child: Icon(icon.icon, color: icon.color, size: 30),
+            ),
           ),
           const SizedBox(height: 6),
           Text(

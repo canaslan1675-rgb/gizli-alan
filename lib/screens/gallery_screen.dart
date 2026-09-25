@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../app.dart';
 import '../l10n/l10n.dart';
+import '../models/vault_event.dart';
 import '../services/vault_storage.dart';
 import '../theme.dart';
 import '../widgets/vault_actions.dart';
@@ -65,6 +66,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
         }
       }
     });
+    if (count > 0) {
+      await _store.events?.add(VaultEventType.galleryImported, {'n': '$count'});
+    }
     if (!mounted) return;
     messenger.showSnackBar(
       SnackBar(

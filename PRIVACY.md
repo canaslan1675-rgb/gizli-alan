@@ -21,7 +21,8 @@ anywhere.
 | Vault photos, files, notes | App-private storage (`files/spaces/…`) | AES-256-GCM, random nonce per item; file names/types are inside an encrypted index | Your vault |
 | Vault data keys (one per vault) | `flutter_secure_storage` (Android Keystore-backed) | Hardware/OS-protected key storage | Decrypt your vault |
 | PIN and optional decoy PIN | `flutter_secure_storage` | Only a salted PBKDF2-HMAC-SHA256 hash is kept, never the PIN | Unlock |
-| Failed-attempt counter | `flutter_secure_storage` | — | Brute-force throttling |
+| In-vault notification list (the app's own events: imports, exports, deletions, Second phone changes, number of wrong PIN attempts) | App-private storage (`files/spaces/<vault>/events.gae`) | AES-256-GCM, separate per vault; shown only inside the unlocked vault, never as a system notification | Tell you what happened in your vault |
+| Failed-attempt counters | `flutter_secure_storage` | — | Brute-force throttling; count of wrong PIN attempts since your last unlock (shown in the real vault's notification list) |
 | Preferences (language, auto-lock, calculator entry, biometrics on/off, wallpaper) | SharedPreferences (app-private) | Not secret | App settings |
 
 Biometric unlock uses Android's BiometricPrompt. The app **never receives or
@@ -120,7 +121,9 @@ bile istemez. PIN yalnızca tuzlanmış PBKDF2 özeti olarak, anahtarlar Android
 Keystore destekli güvenli depoda tutulur. Tek izin: isteğe bağlı biyometrik
 kilit (`USE_BIOMETRIC`). Fotoğraf/dosyaları sistem seçicileriyle sen seçersin.
 SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik Hizmeti veya Cihaz
-Yöneticisi kullanılmaz; başkalarını izleme aracı değildir. Uygulama yedeği
+Yöneticisi kullanılmaz; başkalarını izleme aracı değildir. Kasa içi bildirim listesi (içe/dışa aktarma, silme, İkinci telefon
+değişiklikleri, hatalı PIN sayısı) de şifreli saklanır ve yalnızca kasa içinde görünür;
+sistem bildirimi gönderilmez. Uygulama yedeği
 kapalıdır. PIN kurtarma yoktur. Hesap makinesi girişi ve sahte PIN özellikleri
 kurulumda, uygulama içinde ve mağaza açıklamasında açıkça belirtilir.
 

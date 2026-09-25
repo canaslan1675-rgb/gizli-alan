@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../l10n/l10n.dart';
+import '../models/vault_event.dart';
 import '../services/second_phone_service.dart';
 import '../theme.dart';
 import '../widgets/profile_app_tile.dart';
@@ -33,6 +34,9 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
   }
 
   SecondPhoneService? get _sp => _app.secondPhoneIfUnlocked;
+
+  Future<void> _log(VaultEventType type, [Map<String, String>? params]) async =>
+      _app.session?.events.add(type, params ?? const {});
 
   Future<void> _refresh() async {
     final sp = _sp;
@@ -110,6 +114,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
     final r = await _run((sp) => sp.provision());
     if (r == null) return;
     if (r == 'ok') {
+      await _log(VaultEventType.secondPhoneCreated);
       // The profile finishes initialising asynchronously.
       await Future<void>.delayed(const Duration(seconds: 2));
       await _refresh();
@@ -148,6 +153,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
       case null:
         return;
       case 'cloned':
+        await _log(VaultEventType.secondPhoneAppAdded, {'app': picked.label});
         _toast(t('spCloneOk').replaceAll('{app}', picked.label));
       case 'store_opened':
         _toast(t('spCloneStore'));
@@ -207,6 +213,9 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
     await _app.settings.setSecondPhoneClosedBy(null);
     await Future<void>.delayed(const Duration(seconds: 2));
     await _refresh();
+    if (_st?.exists == false || r == 'removed') {
+      await _log(VaultEventType.secondPhoneRemoved);
+    }
     _toast(
       _st?.exists == false || r == 'removed' ? t('spRemoved') : _failed(r),
     );

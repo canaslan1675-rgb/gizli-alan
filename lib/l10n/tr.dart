@@ -212,4 +212,20 @@ const Map<String, String> tr = {
   'spModeQuiet': 'İş profilini kapat',
   'spQuietNote':
       'Android iş profilini kapatmaya çoğu zaman yalnızca varsayılan ana ekran uygulamasına izin verir. İzin yoksa GizliAlan uygulamaları gizlemeye geçer. Hızlı ayarlardaki "İş uygulamaları" düğmesini de kullanabilirsin.',
+  'notifications': 'Bildirimler',
+  'notifEmpty':
+      'Henüz bildirim yok. İçe/dışa aktarma, silme, İkinci telefon değişiklikleri ve hatalı PIN denemeleri burada listelenir.',
+  'notifFooter':
+      'Bu liste yalnızca kasanın içinde görünür ve şifreli saklanır. GizliAlan sistem bildirimi göndermez, başka uygulamaların bildirimlerini okumaz.',
+  'notifMarkAllRead': 'Tümünü okundu say',
+  'notifClearAll': 'Tümünü temizle',
+  'notifClearConfirm': 'Bu kasadaki tüm bildirimler silinsin mi?',
+  'evGalleryImported': 'Galeriye {n} fotoğraf eklendi',
+  'evFilesImported': 'Dosyalara {n} dosya eklendi',
+  'evItemExported': '"{name}" dışa aktarıldı',
+  'evItemDeleted': '"{name}" silindi',
+  'evFailedUnlocks': 'Son girişinden beri {n} hatalı PIN denemesi',
+  'evSecondPhoneCreated': 'İkinci telefon oluşturuldu',
+  'evSecondPhoneAppAdded': 'İkinci telefona "{app}" eklendi',
+  'evSecondPhoneRemoved': 'İkinci telefon kaldırıldı',
 };

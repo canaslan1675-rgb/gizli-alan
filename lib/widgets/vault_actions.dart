@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../l10n/l10n.dart';
+import '../models/vault_event.dart';
 import '../services/vault_storage.dart';
 import '../theme.dart';
 
@@ -30,6 +31,9 @@ class VaultActions {
         ),
       );
       if (uri != null) {
+        await storage.events?.add(VaultEventType.itemExported, {
+          'name': item.name,
+        });
         messenger.showSnackBar(SnackBar(content: Text(t('exported'))));
       }
     } catch (e) {
