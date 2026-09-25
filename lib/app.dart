@@ -302,6 +302,11 @@ class GizliAlanAppState extends State<GizliAlanApp>
     final s = _session;
     if (s == null) return;
     s.close();
+    // Drop decoded vault photos (gallery thumbnails, home background) from
+    // Flutter's in-memory image cache.
+    PaintingBinding.instance.imageCache
+      ..clear()
+      ..clearLiveImages();
     _backgroundedAt = null;
     setState(() => _session = null);
     navKey.currentState?.popUntil((r) => r.isFirst);

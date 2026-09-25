@@ -127,6 +127,16 @@ const Map<String, String> tr = {
   'lockAfterMin': '{n} dk sonra',
   'language': 'Dil',
   'wallpaper': 'Duvar kağıdı',
+  'homeBackground': 'Ana ekran arka planı',
+  'homeBackgroundDefault':
+      'Varsayılan (aşağıdaki renk). Fotoğraf kullanmak için: Galeri → fotoğrafa uzun bas → "Ana ekran arka planı yap".',
+  'homeBackgroundPhoto':
+      'Kasadaki bir fotoğraf. Kaldırınca aşağıdaki renge dönülür.',
+  'homeBackgroundRemove': 'Arka planı kaldır',
+  'homeBackgroundSet':
+      'Kasa ana ekranı arka planı yapıldı. Fotoğraf kasada şifreli kalır.',
+  'setAsHomeBackground': 'Ana ekran arka planı yap',
+  'open': 'Aç',
   'privacyTitle': 'Gizlilik ve izinler',
   'privacyBody':
       '• Tüm kasa içeriği (fotoğraf, dosya, not) Android Keystore destekli '

@@ -23,6 +23,7 @@ Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculato
 - **Sanal telefon ana ekranı:** saat, ikon ızgarası, dock, duvar kağıdı seçimi
 - **Bildirimler (yalnızca kasa içinde):** içe/dışa aktarma, silme, İkinci telefon değişiklikleri ve son girişten beri hatalı PIN sayısı; şifreli, kasa başına ayrı; sistem bildirimi yok (izin de yok)
 - **GizliAlan Pro ekranı (yalnızca arayüz):** Ayarlar → planlar ve planlanan fiyatlar (Ücretsiz 50 öğe, Pro 249 TL tek seferlik / 449 TL yıllık); satın alma yok, ödeme kodu yok
+- **v0.3.2 — Ana ekran arka planı:** Galeri → fotoğrafa uzun bas → "Ana ekran arka planı yap" (menüde ayrıca Aç / Dışa aktar / Sil). Yalnızca kasa ana ekranında, okunabilirlik için karartma katmanıyla; fotoğraf kasada şifreli kalır, yalnızca bellekte çözülür. Ayarlar → "Ana ekran arka planı" durumu gösterir ve "Arka planı kaldır" sunar. Varsayılan: düz renk geçişi (paketli görsel yok; `assets/wallpapers/` ileride varsayılan görsel için ayrılmış). Her kasanın (gerçek/sahte) kendi arka planı.
 - **Sahte PIN (isteğe bağlı):** ayrı anahtarla ayrı, boş bir kasa
 - **TR / EN** arayüz
 - **v0.2 — Nötr başlatıcı adı/simgesi:** uygulama listesinde "Hesap Makinesi" / "Calculator" adı ve özgün hesap makinesi simgesi (adaptive + monochrome). Kasa; onboarding, ⓘ ve mağaza metninde açıkça belirtilir.

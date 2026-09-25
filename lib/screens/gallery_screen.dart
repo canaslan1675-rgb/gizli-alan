@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../app.dart';
 import '../l10n/l10n.dart';
 import '../models/vault_event.dart';
+import '../services/vault_session.dart';
 import '../services/vault_storage.dart';
 import '../theme.dart';
 import '../widgets/vault_actions.dart';
@@ -24,6 +25,8 @@ class GalleryScreen extends StatefulWidget {
 class _GalleryScreenState extends State<GalleryScreen> {
   late Future<List<VaultItem>> _future;
 
+  VaultSession? _sessionRef;
+
   // Captured once: the session may be closed (auto-lock) while this route is
   // animating away, so never look it up again during build.
   VaultStorage? _storeRef;
@@ -33,7 +36,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_storeRef == null) {
-      _storeRef = GizliAlanApp.of(context).session!.gallery;
+      _sessionRef = GizliAlanApp.of(context).session!;
+      _storeRef = _sessionRef!.gallery;
       _future = _store.list();
     }
   }
@@ -79,6 +83,91 @@ class _GalleryScreenState extends State<GalleryScreen> {
     _reload();
   }
 
+  Future<void> _openViewer(List<VaultItem> items, int i) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            PhotoViewerScreen(store: _store, items: items, initialIndex: i),
+      ),
+    );
+    _reload();
+  }
+
+  /// Long-press options: open, export, set as vault home background, delete.
+  Future<void> _showOptions(List<VaultItem> items, int i) async {
+    final t = L10n.current;
+    final item = items[i];
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                item.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            ListTile(
+              key: const ValueKey('photo_opt_open'),
+              leading: const Icon(Icons.open_in_full),
+              title: Text(t('open')),
+              onTap: () => Navigator.pop(ctx, 'open'),
+            ),
+            if (item.isImage)
+              ListTile(
+                key: const ValueKey('photo_opt_background'),
+                leading: const Icon(Icons.wallpaper_outlined),
+                title: Text(t('setAsHomeBackground')),
+                onTap: () => Navigator.pop(ctx, 'background'),
+              ),
+            ListTile(
+              key: const ValueKey('photo_opt_export'),
+              leading: const Icon(Icons.ios_share),
+              title: Text(t('export')),
+              onTap: () => Navigator.pop(ctx, 'export'),
+            ),
+            ListTile(
+              key: const ValueKey('photo_opt_delete'),
+              leading: const Icon(
+                Icons.delete_outline,
+                color: GizliTheme.danger,
+              ),
+              title: Text(
+                t('delete'),
+                style: const TextStyle(color: GizliTheme.danger),
+              ),
+              onTap: () => Navigator.pop(ctx, 'delete'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || choice == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    switch (choice) {
+      case 'open':
+        await _openViewer(items, i);
+      case 'background':
+        // Stays inside the vault: only this photo's id is stored (encrypted);
+        // the vault home decrypts it into memory.
+        await _sessionRef!.setHomeBackgroundId(item.id);
+        messenger.showSnackBar(SnackBar(content: Text(t('homeBackgroundSet'))));
+      case 'export':
+        await VaultActions.export(context, _store, item);
+      case 'delete':
+        if (!await VaultActions.confirmDelete(context)) return;
+        await _store.delete(item);
+        await _store.events?.add(VaultEventType.itemDeleted, {
+          'name': item.name,
+        });
+        _reload();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = L10n.of(context);
@@ -111,20 +200,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
             ),
             itemCount: items.length,
             itemBuilder: (context, i) => _Thumb(
+              key: ValueKey('gallery_thumb_$i'),
               store: _store,
               item: items[i],
-              onTap: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => PhotoViewerScreen(
-                      store: _store,
-                      items: items,
-                      initialIndex: i,
-                    ),
-                  ),
-                );
-                _reload();
-              },
+              onTap: () => _openViewer(items, i),
+              onLongPress: () => _showOptions(items, i),
             ),
           );
         },
@@ -134,10 +214,17 @@ class _GalleryScreenState extends State<GalleryScreen> {
 }
 
 class _Thumb extends StatefulWidget {
-  const _Thumb({required this.store, required this.item, required this.onTap});
+  const _Thumb({
+    super.key,
+    required this.store,
+    required this.item,
+    required this.onTap,
+    required this.onLongPress,
+  });
   final VaultStorage store;
   final VaultItem item;
   final VoidCallback onTap;
+  final VoidCallback onLongPress;
 
   @override
   State<_Thumb> createState() => _ThumbState();
@@ -150,6 +237,7 @@ class _ThumbState extends State<_Thumb> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.onTap,
+      onLongPress: widget.onLongPress,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(6),
         child: Container(

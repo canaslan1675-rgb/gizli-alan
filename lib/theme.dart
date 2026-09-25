@@ -22,6 +22,12 @@ class GizliTheme {
     [Color(0xFF03161A), Color(0xFF0B3B45), Color(0xFF1B7A8C)],
   ];
 
+  /// Readability scrim over a photo background on the vault home.
+  static const double homePhotoScrim = 0.45;
+
+  // Slot for a bundled default background (assets/wallpapers/, see the
+  // README there). Empty for now: default = the gradient below.
+
   static LinearGradient wallpaper(int i) => LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,

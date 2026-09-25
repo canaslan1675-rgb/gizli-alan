@@ -49,6 +49,7 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 | 2.13 | Unlock the real vault after 2.12. | **Notifications** tile shows a badge; list says "N wrong PIN attempt(s) since your last unlock". Imports/exports/deletes from 2.7–2.8 are listed. Mark all read / Clear all work. No system notification was ever shown. (Needs PR #19.) |
 | 2.14 | Settings → GizliAlan Pro → Buy / Subscribe. | Plans + prices shown; dialog "Not available yet"; no Play purchase sheet, no network. (Needs PR #20.) |
 | 2.15 | Settings → Language TR/EN. | All screens switch language. |
+| 2.16 | Gallery → long-press a photo. | Sheet: Open / Set as home background / Export / Delete. "Set as home background" → vault home shows the photo (darkened, clock/labels readable); calculator, gallery and other screens unchanged. Settings → Home screen background → "Remove background" → plain gradient again. Decoy vault has its own (none by default). Deleting that photo → plain gradient. |
 
 ## 3. Second phone (work profile) — main focus
 

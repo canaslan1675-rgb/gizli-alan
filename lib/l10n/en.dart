@@ -128,6 +128,16 @@ const Map<String, String> en = {
   'lockAfterMin': 'After {n} min',
   'language': 'Language',
   'wallpaper': 'Wallpaper',
+  'homeBackground': 'Home screen background',
+  'homeBackgroundDefault':
+      'Default (colour below). To use a photo: Gallery → long-press a photo → "Set as home background".',
+  'homeBackgroundPhoto':
+      'A photo from this vault. Remove it to go back to the colour below.',
+  'homeBackgroundRemove': 'Remove background',
+  'homeBackgroundSet':
+      'Set as the vault home background. The photo stays encrypted in the vault.',
+  'setAsHomeBackground': 'Set as home background',
+  'open': 'Open',
   'privacyTitle': 'Privacy & permissions',
   'privacyBody':
       '• All vault content (photos, files, notes) is encrypted with AES-256-GCM '

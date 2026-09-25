@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -74,6 +75,52 @@ class VaultSession {
   late final VaultStorage files;
 
   bool get isDecoy => space == VaultSpace.decoy;
+
+  // ------------------------------------------------ vault home background
+
+  /// Which gallery photo is this space's vault-home background. Stored
+  /// encrypted inside the space (`home_background.gae`), so neither the
+  /// choice nor the photo ever leaves the vault; the photo is only decrypted
+  /// into memory while unlocked. Each space (real / decoy) has its own.
+  File get _homeBackground => File(p.join(dir.path, 'home_background.gae'));
+
+  Future<String?> homeBackgroundId() async {
+    try {
+      final raw = await _files.read(_homeBackground);
+      if (raw == null) return null;
+      final id = utf8.decode(raw).trim();
+      return id.isEmpty ? null : id;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Sets (or with null removes) the background photo.
+  Future<void> setHomeBackgroundId(String? id) async {
+    if (id == null) {
+      if (await _homeBackground.exists()) await _homeBackground.delete();
+      return;
+    }
+    await _files.write(_homeBackground, utf8.encode(id));
+  }
+
+  /// Decrypted bytes of the background photo, or null (none set, or the
+  /// photo was deleted from the gallery — then the choice is cleared).
+  Future<Uint8List?> homeBackgroundBytes() async {
+    final id = await homeBackgroundId();
+    if (id == null) return null;
+    final items = await gallery.list();
+    final matches = items.where((i) => i.id == id && i.isImage);
+    if (matches.isEmpty) {
+      await setHomeBackgroundId(null);
+      return null;
+    }
+    try {
+      return await gallery.read(matches.first);
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Best-effort: zero our copy of the key and drop caches.
   void close() {

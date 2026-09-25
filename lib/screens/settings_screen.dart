@@ -26,6 +26,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool? _hasDecoy;
   bool _bioAvailable = false;
+  bool _hasHomeBackground = false;
   late final bool _isDecoy;
   bool _init = false;
 
@@ -43,11 +44,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final app = GizliAlanApp.of(context);
     final hasDecoy = await app.auth.hasDecoyPin();
     final bio = await app.biometrics.isAvailable();
+    final bg = await app.session?.homeBackgroundId();
     if (!mounted) return;
     setState(() {
       _hasDecoy = hasDecoy;
       _bioAvailable = bio;
+      _hasHomeBackground = bg != null;
     });
+  }
+
+  Future<void> _removeHomeBackground() async {
+    await GizliAlanApp.of(context).session?.setHomeBackgroundId(null);
+    if (mounted) setState(() => _hasHomeBackground = false);
   }
 
   Future<void> _toggleBiometric(bool v) async {
@@ -226,6 +234,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
             app.refresh();
           },
         ),
+      ),
+      ListTile(
+        key: const ValueKey('settings_home_background'),
+        leading: const Icon(Icons.image_outlined),
+        title: Text(t('homeBackground')),
+        subtitle: Text(
+          _hasHomeBackground
+              ? t('homeBackgroundPhoto')
+              : t('homeBackgroundDefault'),
+        ),
+        trailing: _hasHomeBackground
+            ? TextButton(
+                key: const ValueKey('settings_home_background_remove'),
+                onPressed: _removeHomeBackground,
+                child: Text(t('homeBackgroundRemove')),
+              )
+            : null,
       ),
       ListTile(
         leading: const Icon(Icons.wallpaper_outlined),
