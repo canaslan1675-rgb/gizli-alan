@@ -11,3 +11,5 @@
 **2026-09-25 (Fri, #5):** Pro/payment UI stub: Settings → GizliAlan Pro with planned plans and prices, usage vs. 50-item free limit (display only), buttons explain there are no purchases in this test build; no billing code. Tests pass, analyze clean.
 
 **2026-09-25 (Fri, #8):** Release signing config: optional android/key.properties (template committed, secrets git-ignored), debug-key fallback with warning, owner steps in README; verified with/without a throwaway keystore.
+
+**2026-09-25 (Fri, #9):** Docs sync: brief week 1–3 checkboxes ticked or linked to issues/PRs, §6 current state rewritten, project-overview rule updated.
