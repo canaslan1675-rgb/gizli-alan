@@ -6,6 +6,7 @@ import '../models/vault_event.dart';
 import '../services/second_phone_service.dart';
 import '../theme.dart';
 import '../widgets/profile_app_tile.dart';
+import '../widgets/work_apps_hide_switches.dart';
 
 /// "Second phone": set up and manage the owner's own Android work profile
 /// (managed profile, Shelter/Island model). Only reachable from the unlocked
@@ -272,11 +273,17 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
         ),
         title: Text(t('spStatus')),
         subtitle: Text(status),
-        trailing: TextButton(
+      ),
+      Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextButton.icon(
+          key: const ValueKey('sp_open_close'),
           onPressed: _busy ? null : (closed ? _openNow : _closeNow),
-          child: Text(closed ? t('spOpenNow') : t('spCloseNow')),
+          icon: Icon(closed ? Icons.lock_open_outlined : Icons.lock_outline),
+          label: Text(closed ? t('spOpenNow') : t('spCloseNow')),
         ),
       ),
+      WorkAppsHideSwitches(settings: _app.settings),
       const SizedBox(height: 8),
       ElevatedButton.icon(
         onPressed: _busy || closed ? null : _openStore,

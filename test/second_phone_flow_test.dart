@@ -30,6 +30,9 @@ class FakeSecondPhone extends SecondPhoneService {
   final closes = <SecondPhoneCloseMode>[];
   final opens = <SecondPhoneCloseMode>[];
 
+  /// What close() reports (null = the profile refused / failed).
+  SecondPhoneCloseMode? closeResult = SecondPhoneCloseMode.freeze;
+
   @override
   Future<SecondPhoneStatus> status() async => st;
 
@@ -41,11 +44,15 @@ class FakeSecondPhone extends SecondPhoneService {
   @override
   Future<SecondPhoneCloseMode?> close(SecondPhoneCloseMode mode) async {
     closes.add(mode);
-    return SecondPhoneCloseMode.freeze;
+    return closeResult;
   }
 
   @override
-  Future<bool> open(SecondPhoneCloseMode applied) async {
+  Future<bool> open(
+    SecondPhoneCloseMode applied, {
+    int quietPolls = 10,
+    Duration pollDelay = const Duration(milliseconds: 500),
+  }) async {
     opens.add(applied);
     return true;
   }
@@ -113,9 +120,16 @@ void main() {
     await settle(tester);
     final state = tester.state<GizliAlanAppState>(find.byType(GizliAlanApp));
     expect(state.secondPhoneIfUnlocked, isNull); // gated behind unlock
+    // App start while locked hides the work apps (#30).
+    expect(sp.closes, [SecondPhoneCloseMode.freeze]);
+    expect(settings.secondPhoneClosedBy, SecondPhoneCloseMode.freeze);
+    sp.closes.clear();
 
-    // Real vault: tile + profile app grid.
+    // Real vault: tile + profile app grid; unlock unhides.
     await typePin(tester, '2580');
+    expect(sp.opens, [SecondPhoneCloseMode.freeze]);
+    expect(settings.secondPhoneClosedBy, isNull);
+    sp.opens.clear();
     expect(find.byType(VaultHomeScreen), findsOneWidget);
     expect(find.text('Second phone'), findsOneWidget);
     expect(find.text('Chat'), findsOneWidget);
@@ -229,14 +243,17 @@ void main() {
       expect(state.secondPhoneIfUnlocked, isNull);
 
       await openSettings(tester);
-      expect(find.byKey(const ValueKey('sp_close_mode')), findsNothing);
+      expect(
+        find.byKey(const ValueKey('settings_hide_when_locked')),
+        findsNothing,
+      );
       expect(find.textContaining('Second phone'), findsNothing);
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey('settings_version')),
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.3.1 · Play'), findsOneWidget);
+      expect(find.text('GizliAlan 0.3.2 · Play'), findsOneWidget);
       await tester.pageBack();
       await settle(tester);
 
@@ -270,17 +287,133 @@ void main() {
 
       await openSettings(tester);
       await tester.scrollUntilVisible(
-        find.byKey(const ValueKey('sp_close_mode')),
+        find.byKey(const ValueKey('settings_hide_when_locked')),
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.byKey(const ValueKey('sp_close_mode')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('settings_hide_when_locked')),
+        findsOneWidget,
+      );
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey('settings_version')),
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.3.1 · Full'), findsOneWidget);
+      expect(find.text('GizliAlan 0.3.2 · Full'), findsOneWidget);
+    });
+  });
+
+  group('hide work apps while locked (#30)', () {
+    Future<GizliAlanAppState> start(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2340);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await tester.runAsync(() => auth.setPin('2580'));
+      await tester.pumpWidget(
+        GizliAlanApp(
+          settings: settings,
+          auth: auth,
+          biometrics: FakeBiometrics(),
+          baseDirProvider: () async => tmp,
+          secondPhone: sp,
+        ),
+      );
+      await settle(tester);
+      return tester.state<GizliAlanAppState>(find.byType(GizliAlanApp));
+    }
+
+    testWidgets('toggle off: nothing hidden on start or Lock; unlock still '
+        'unhides what was hidden before', (tester) async {
+      await settings.setHideWorkAppsWhenLocked(false);
+      await settings.setSecondPhoneClosedBy(SecondPhoneCloseMode.freeze);
+      await start(tester);
+      expect(sp.closes, isEmpty);
+      await typePin(tester, '2580');
+      expect(sp.opens, [SecondPhoneCloseMode.freeze]);
+      expect(settings.secondPhoneClosedBy, isNull);
+      await tester.tap(find.byKey(const ValueKey('lock_button')));
+      await settle(tester);
+      expect(sp.closes, isEmpty);
+    });
+
+    testWidgets('resume while locked hides; failures are not retried in a '
+        'loop', (tester) async {
+      sp.closeResult = null; // profile refuses
+      final state = await start(tester);
+      expect(sp.closes.length, 1); // app start
+      // The translucent profile activity pauses/resumes us: no new attempt.
+      state.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      await settle(tester);
+      expect(sp.closes.length, 1);
+      // Leaving and coming back within the cooldown: still no attempt.
+      state.didChangeAppLifecycleState(AppLifecycleState.paused);
+      state.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      await settle(tester);
+      expect(sp.closes.length, 1);
+      expect(settings.secondPhoneClosedBy, isNull);
+    });
+
+    testWidgets('already hidden: start/resume do not hide again', (
+      tester,
+    ) async {
+      await settings.setSecondPhoneClosedBy(SecondPhoneCloseMode.freeze);
+      final state = await start(tester);
+      state.didChangeAppLifecycleState(AppLifecycleState.paused);
+      state.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      await settle(tester);
+      expect(sp.closes, isEmpty);
+    });
+
+    testWidgets('pause option: Lock asks for quiet mode (hide + pause)', (
+      tester,
+    ) async {
+      await settings.setPauseWorkProfileWhenLocked(true);
+      sp.closeResult = SecondPhoneCloseMode.quiet;
+      await start(tester);
+      expect(sp.closes, [SecondPhoneCloseMode.quiet]);
+      await typePin(tester, '2580');
+      expect(sp.opens, [SecondPhoneCloseMode.quiet]);
+    });
+
+    testWidgets('Second phone screen has the toggle, default on, TR label', (
+      tester,
+    ) async {
+      L10n.setLang('tr');
+      await settings.setLanguage('tr');
+      await start(tester);
+      await typePin(tester, '2580');
+      await tester.tap(find.text('İkinci telefon').first);
+      await settle(tester);
+      final toggle = find.byKey(const ValueKey('sp_hide_when_locked'));
+      await tester.scrollUntilVisible(
+        toggle,
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.text('Kilitliyken iş uygulamalarını gizle'), findsOneWidget);
+      expect(tester.widget<SwitchListTile>(toggle).value, isTrue);
+      await tester.ensureVisible(toggle);
+      await settle(tester);
+      await tester.tap(toggle);
+      await settle(tester);
+      expect(settings.hideWorkAppsWhenLocked, isFalse);
+      expect(tester.widget<SwitchListTile>(toggle).value, isFalse);
+      final pause = find.byKey(const ValueKey('sp_pause_too'));
+      expect(tester.widget<SwitchListTile>(pause).onChanged, isNull);
+    });
+
+    testWidgets('play flavor: never hides or unhides anything', (tester) async {
+      Flavor.debugOverride = AppFlavor.play;
+      final state = await start(tester);
+      await state.ensureWorkAppsHiddenWhileLocked();
+      await typePin(tester, '2580');
+      await tester.tap(find.byKey(const ValueKey('lock_button')));
+      await settle(tester);
+      state.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      await settle(tester);
+      expect(sp.closes, isEmpty);
+      expect(sp.opens, isEmpty);
     });
   });
 }

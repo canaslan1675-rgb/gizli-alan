@@ -5,11 +5,11 @@ import '../app.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
 import '../services/privacy_link.dart';
-import '../services/second_phone_service.dart';
 import '../services/settings_service.dart';
 import '../services/vault_session.dart';
 import '../services/vault_space.dart';
 import '../theme.dart';
+import '../widgets/work_apps_hide_switches.dart';
 import 'pro_screen.dart';
 import 'set_pin_screen.dart';
 
@@ -354,41 +354,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           if (Flavor.hasSecondPhone) ...[
             _header(t('secondPhone')),
-            ListTile(
-              leading: const Icon(Icons.phone_android_outlined),
-              title: Text(t('spCloseMode')),
-              subtitle: Text(
-                s.secondPhoneCloseMode == SecondPhoneCloseMode.quiet
-                    ? '${t('spCloseModeHint')}\n${t('spQuietNote')}'
-                    : t('spCloseModeHint'),
-              ),
-              isThreeLine: true,
-            ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: SegmentedButton<SecondPhoneCloseMode>(
-                key: const ValueKey('sp_close_mode'),
-                segments: [
-                  ButtonSegment(
-                    value: SecondPhoneCloseMode.off,
-                    label: Text(t('spModeOff')),
-                  ),
-                  ButtonSegment(
-                    value: SecondPhoneCloseMode.freeze,
-                    label: Text(t('spModeFreeze')),
-                  ),
-                  ButtonSegment(
-                    value: SecondPhoneCloseMode.quiet,
-                    label: Text(t('spModeQuiet')),
-                  ),
-                ],
-                selected: {s.secondPhoneCloseMode},
-                showSelectedIcon: false,
-                onSelectionChanged: (v) async {
-                  await s.setSecondPhoneCloseMode(v.first);
-                  setState(() {});
-                },
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: WorkAppsHideSwitches(settings: s, keyPrefix: 'settings'),
             ),
           ],
           ...general,
@@ -408,7 +376,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
           Center(
             child: Text(
-              'GizliAlan 0.3.1 · ${Flavor.hasSecondPhone ? 'Full' : 'Play'}',
+              'GizliAlan 0.3.2 · ${Flavor.hasSecondPhone ? 'Full' : 'Play'}',
               key: const ValueKey('settings_version'),
               style: const TextStyle(
                 color: GizliTheme.textSecondary,

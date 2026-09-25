@@ -14,8 +14,10 @@ import com.offerforge.gizlialan.secondphone.SecondPhoneContract as C
  * returns a result. All operations only affect the work profile:
  *
  *  - freeze / unfreeze: hide or unhide the profile's launchable apps
- *    (DevicePolicyManager.setApplicationHidden) so the second phone is
- *    "closed" while the vault is locked;
+ *    (DevicePolicyManager.setApplicationHidden, rules in [HidePolicy]) so
+ *    they are not visible in the phone launcher while the vault is locked;
+ *    the set of packages we hid is persisted here and only those are
+ *    unhidden;
  *  - clone: make a main-profile app available in the profile
  *    (installExistingPackage, or enableSystemApp for system apps). If Android
  *    does not allow that, optionally open the profile's Play Store page;
@@ -74,31 +76,62 @@ class ProfileActionActivity : Activity() {
         val i = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
         return packageManager.queryIntentActivities(i, 0)
             .map { it.activityInfo.packageName }
-            .filter { it != packageName }
             .toSet()
     }
 
+    /**
+     * Hides the profile's launchable apps (see [HidePolicy] for exactly
+     * which) so they disappear from the phone launcher's Work/"İş" folder.
+     * Records every package WE hid, so [unfreeze] only unhides those.
+     */
     private fun freeze() {
-        val done = frozen().toMutableSet()
-        for (pkg in launchablePackages()) {
-            if (dpm.setApplicationHidden(admin, pkg, true)) done.add(pkg)
+        val before = frozen()
+        val succeeded = mutableListOf<String>()
+        for (pkg in HidePolicy.toHide(launchablePackages(), packageName, before)) {
+            try {
+                if (dpm.setApplicationHidden(admin, pkg, true)) succeeded.add(pkg)
+            } catch (_: Exception) {
+                // protected / vanished package: leave it alone
+            }
         }
+        val done = HidePolicy.afterHide(before, succeeded)
         setFrozen(done)
         reply(RESULT_OK, "frozen", done.size)
     }
 
+    private fun isHidden(pkg: String): Boolean = try {
+        dpm.isApplicationHidden(admin, pkg)
+    } catch (_: Exception) {
+        false
+    }
+
+    private fun installedEvenIfHidden(pkg: String): Boolean = try {
+        packageManager.getApplicationInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES)
+        true
+    } catch (_: PackageManager.NameNotFoundException) {
+        false
+    }
+
+    /** Unhides only what [freeze] recorded (+ Play Store as a safety net). */
     private fun unfreeze() {
+        val recorded = frozen()
+        val failed = mutableListOf<String>()
         var n = 0
-        for (pkg in frozen()) {
+        for (pkg in HidePolicy.unhideCandidates(recorded)) {
+            val wasOurs = pkg in recorded
             try {
                 dpm.setApplicationHidden(admin, pkg, false)
-                n++
             } catch (_: Exception) {
                 // package may have been uninstalled meanwhile
             }
+            if (isHidden(pkg)) {
+                if (wasOurs) failed.add(pkg)
+            } else if (wasOurs) {
+                n++
+            }
         }
-        setFrozen(emptySet())
-        reply(RESULT_OK, "unfrozen", n)
+        setFrozen(HidePolicy.afterUnhide(failed, ::installedEvenIfHidden))
+        reply(RESULT_OK, if (failed.isEmpty()) "unfrozen" else "partial", n)
     }
 
     private fun isInstalledHere(pkg: String): Boolean = try {

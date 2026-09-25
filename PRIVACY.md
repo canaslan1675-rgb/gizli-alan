@@ -71,8 +71,10 @@ browser app opens the page — GizliAlan itself sends nothing.
 - Inside it you can add a separate Google account in its Play Store and install
   apps. Those apps, accounts and files are kept apart from your main profile by
   Android; GizliAlan does **not** read their data, messages or notifications.
-- GizliAlan only uses the profile-owner role to: hide/unhide the profile's apps
-  when you lock/unlock the vault (if you enable that), make an app from your
+- GizliAlan only uses the profile-owner role to: hide the profile's apps while
+  the vault is locked and unhide them when you unlock it ("Hide work apps while
+  locked", on by default, can be turned off; it only remembers which of the
+  profile's apps it hid, on the device), make an app from your
   main profile available in the profile, open the profile's Play Store, list and
   launch the profile's apps from the vault home, and delete the profile.
 - To show the app grid and the "add app" picker, GizliAlan reads the names and

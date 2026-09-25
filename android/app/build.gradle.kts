@@ -105,3 +105,9 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // JVM unit tests only (android/app/src/testFull: Second phone HidePolicy,
+    // issue #30). Not packaged into any APK.
+    testImplementation("junit:junit:4.13.2")
+}

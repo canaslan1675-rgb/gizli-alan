@@ -1,17 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-/// What to do with the "second phone" (work profile) when the owner locks
-/// the vault with the Lock button.
+/// What to do with the "second phone" (work profile) while the real vault is
+/// locked (issue #30: "Kilitliyken iş uygulamalarını gizle", default on).
 enum SecondPhoneCloseMode {
-  /// Leave the work profile as it is.
+  /// Leave the work profile as it is (toggle off).
   off,
 
-  /// Hide (freeze) the profile's apps; unhidden again on the next unlock.
+  /// Hide (freeze) the profile's launchable apps so they disappear from the
+  /// phone launcher's Work/"İş" folder; unhidden again on the next real
+  /// unlock. Default.
   freeze,
 
-  /// Turn the work profile off (quiet mode). Android only allows this for the
-  /// default launcher / system apps, so it falls back to [freeze].
+  /// [freeze] AND additionally try to pause the work profile (quiet mode).
+  /// Android only lets the default launcher / system apps pause a profile,
+  /// so on most phones only the hiding part takes effect.
   quiet;
 
   static SecondPhoneCloseMode parse(String? v) =>
@@ -163,7 +166,7 @@ class CloneCandidate {
 /// Every call returns a status string instead of throwing, so the UI can
 /// show a clear message. Common statuses: `ok`, `canceled`, `unavailable`,
 /// `blocked`, `no_profile`, `unreachable`, `denied`, `not_permitted`,
-/// `frozen`, `unfrozen`, `cloned`, `store_opened`, `needs_store`,
+/// `frozen`, `unfrozen`, `partial`, `cloned`, `store_opened`, `needs_store`,
 /// `no_store`, `removed`, `error`.
 ///
 /// Only the vault (after PIN/biometric unlock) uses this; see
@@ -236,26 +239,45 @@ class SecondPhoneService {
 
   Future<String> remove() => _status('remove');
 
-  /// Closes the second phone. Returns the mode that was actually applied
-  /// (quiet mode falls back to freezing when Android does not permit it), or
-  /// null when nothing was done.
+  /// Closes the second phone. Always hides the apps first (quiet mode alone
+  /// would leave greyed-out icons in the launcher, e.g. on Xiaomi); with
+  /// [SecondPhoneCloseMode.quiet] it then also tries to pause the profile.
+  /// Returns the mode that was actually applied, or null when nothing was
+  /// done.
   Future<SecondPhoneCloseMode?> close(SecondPhoneCloseMode mode) async {
     if (mode == SecondPhoneCloseMode.off) return null;
+    final frozen = await freeze() == 'frozen';
     if (mode == SecondPhoneCloseMode.quiet) {
       if (await setQuietMode(true) == 'ok') return SecondPhoneCloseMode.quiet;
     }
-    return await freeze() == 'frozen' ? SecondPhoneCloseMode.freeze : null;
+    return frozen ? SecondPhoneCloseMode.freeze : null;
   }
 
-  /// Re-opens what [close] did.
-  Future<bool> open(SecondPhoneCloseMode applied) async {
+  /// `unfrozen`, or `partial` (some unhides failed; the profile keeps those
+  /// recorded and retries them on the next unfreeze).
+  static bool isUnfrozen(String status) =>
+      status == 'unfrozen' || status == 'partial';
+
+  /// Re-opens what [close] did. For quiet mode the profile must be running
+  /// again before its apps can be unhidden, so this waits (up to
+  /// [quietPolls] × [pollDelay]) for Android to report it unpaused.
+  Future<bool> open(
+    SecondPhoneCloseMode applied, {
+    int quietPolls = 10,
+    Duration pollDelay = const Duration(milliseconds: 500),
+  }) async {
     switch (applied) {
       case SecondPhoneCloseMode.off:
         return true;
       case SecondPhoneCloseMode.quiet:
-        return await setQuietMode(false) == 'ok';
+        if (await setQuietMode(false) != 'ok') return false;
+        for (var i = 0; i < quietPolls; i++) {
+          if (!(await status()).quietMode) break;
+          await Future<void>.delayed(pollDelay);
+        }
+        return isUnfrozen(await unfreeze());
       case SecondPhoneCloseMode.freeze:
-        return await unfreeze() == 'unfrozen';
+        return isUnfrozen(await unfreeze());
     }
   }
 }

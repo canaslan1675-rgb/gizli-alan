@@ -213,12 +213,15 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                                   color: GizliTheme.textSecondary,
                                 ),
                                 const SizedBox(width: 6),
-                                Text(
-                                  t('secondPhoneApps'),
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    letterSpacing: 1.1,
-                                    color: GizliTheme.textSecondary,
+                                Flexible(
+                                  child: Text(
+                                    t('secondPhoneApps'),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      letterSpacing: 1.1,
+                                      color: GizliTheme.textSecondary,
+                                    ),
                                   ),
                                 ),
                               ],

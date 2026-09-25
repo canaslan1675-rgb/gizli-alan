@@ -102,7 +102,7 @@ void main() {
     expect(await sp.close(SecondPhoneCloseMode.freeze), isNull);
   });
 
-  test('close(quiet) falls back to freezing when Android refuses', () async {
+  test('close(quiet) hides first, then pause is refused -> freeze', () async {
     mock((c) {
       switch (c.method) {
         case 'setQuietMode':
@@ -116,23 +116,70 @@ void main() {
       SecondPhoneCloseMode.quiet,
     );
     expect(applied, SecondPhoneCloseMode.freeze);
-    expect(calls.map((c) => c.method), ['setQuietMode', 'freeze']);
-    expect(calls.first.arguments, {'enabled': true});
+    // Hiding always comes first: quiet mode alone leaves greyed icons.
+    expect(calls.map((c) => c.method), ['freeze', 'setQuietMode']);
+    expect(calls.last.arguments, {'enabled': true});
   });
 
-  test(
-    'close(quiet) uses quiet mode when permitted; open reverses it',
-    () async {
-      mock((c) => {'status': 'ok'});
-      final sp = SecondPhoneService();
-      expect(
-        await sp.close(SecondPhoneCloseMode.quiet),
-        SecondPhoneCloseMode.quiet,
-      );
-      expect(await sp.open(SecondPhoneCloseMode.quiet), isTrue);
-      expect(calls.last.arguments, {'enabled': false});
-    },
-  );
+  test('close(freeze) hides only; failure -> null', () async {
+    mock((c) => {'status': 'frozen'});
+    expect(
+      await SecondPhoneService().close(SecondPhoneCloseMode.freeze),
+      SecondPhoneCloseMode.freeze,
+    );
+    expect(calls.map((c) => c.method), ['freeze']);
+    mock((c) => {'status': 'denied'});
+    expect(
+      await SecondPhoneService().close(SecondPhoneCloseMode.freeze),
+      isNull,
+    );
+  });
+
+  test('close(quiet) when permitted; open unpauses, waits, unhides', () async {
+    var quiet = true;
+    var statusCalls = 0;
+    mock((c) {
+      switch (c.method) {
+        case 'freeze':
+          return {'status': 'frozen'};
+        case 'setQuietMode':
+          return {'status': 'ok'};
+        case 'status':
+          // Android reports the profile running again on the 2nd poll.
+          if (++statusCalls >= 2) quiet = false;
+          return {'exists': true, 'linked': true, 'quietMode': quiet};
+        case 'unfreeze':
+          return {'status': 'unfrozen', 'count': 2};
+      }
+      return null;
+    });
+    final sp = SecondPhoneService();
+    expect(
+      await sp.close(SecondPhoneCloseMode.quiet),
+      SecondPhoneCloseMode.quiet,
+    );
+    calls.clear();
+    expect(
+      await sp.open(SecondPhoneCloseMode.quiet, pollDelay: Duration.zero),
+      isTrue,
+    );
+    expect(calls.map((c) => c.method), [
+      'setQuietMode',
+      'status',
+      'status',
+      'unfreeze',
+    ]);
+    expect(calls.first.arguments, {'enabled': false});
+  });
+
+  test('open: partial unhide counts as opened, errors do not', () async {
+    mock((c) => {'status': 'partial', 'count': 1});
+    expect(await SecondPhoneService().open(SecondPhoneCloseMode.freeze), true);
+    mock((c) => {'status': 'denied'});
+    expect(await SecondPhoneService().open(SecondPhoneCloseMode.freeze), false);
+    expect(SecondPhoneService.isUnfrozen('unfrozen'), isTrue);
+    expect(SecondPhoneService.isUnfrozen('no_profile'), isFalse);
+  });
 
   test('close(off) does nothing', () async {
     mock((c) => {'status': 'frozen'});
@@ -175,5 +222,41 @@ void main() {
     await s.setSecondPhoneClosedBy(null);
     expect(s.secondPhoneClosedBy, isNull);
     expect(SecondPhoneCloseMode.parse('bogus'), SecondPhoneCloseMode.freeze);
+  });
+
+  test('settings: "hide work apps while locked" defaults on (#30)', () async {
+    SharedPreferences.setMockInitialValues({});
+    final s = await SettingsService.create();
+    expect(s.hideWorkAppsWhenLocked, isTrue);
+    expect(s.pauseWorkProfileWhenLocked, isFalse);
+
+    await s.setPauseWorkProfileWhenLocked(true);
+    expect(s.secondPhoneCloseMode, SecondPhoneCloseMode.quiet);
+    expect(s.hideWorkAppsWhenLocked, isTrue); // pause implies hide
+
+    await s.setHideWorkAppsWhenLocked(false);
+    expect(s.secondPhoneCloseMode, SecondPhoneCloseMode.off);
+    expect(s.pauseWorkProfileWhenLocked, isFalse);
+    await s.setPauseWorkProfileWhenLocked(true); // ignored while off
+    expect(s.secondPhoneCloseMode, SecondPhoneCloseMode.off);
+
+    await s.setHideWorkAppsWhenLocked(true);
+    expect(s.secondPhoneCloseMode, SecondPhoneCloseMode.freeze);
+  });
+
+  test('settings: legacy "off" choice is respected as toggle off', () async {
+    SharedPreferences.setMockInitialValues({'second_phone_close': 'off'});
+    final s = await SettingsService.create();
+    expect(s.hideWorkAppsWhenLocked, isFalse);
+  });
+
+  test('settings: reset keeps the "apps hidden by us" marker', () async {
+    SharedPreferences.setMockInitialValues({});
+    final s = await SettingsService.create();
+    await s.setHideWorkAppsWhenLocked(false);
+    await s.setSecondPhoneClosedBy(SecondPhoneCloseMode.freeze);
+    await s.resetAll();
+    expect(s.secondPhoneClosedBy, SecondPhoneCloseMode.freeze);
+    expect(s.hideWorkAppsWhenLocked, isTrue); // settings back to defaults
   });
 }

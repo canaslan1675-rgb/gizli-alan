@@ -180,7 +180,7 @@ const Map<String, String> tr = {
   'spStatus': 'Durum',
   'spStatusOpen': 'Açık',
   'spStatusFrozen': 'Kapalı — uygulamalar gizli',
-  'spStatusQuiet': 'Kapalı — iş profili kapalı',
+  'spStatusQuiet': 'Kapalı — uygulamalar gizli, iş profili duraklatıldı',
   'spOpenStore': 'Play Store\'u aç (ikinci hesap)',
   'spAddApp': 'Ana telefondan uygulama ekle',
   'spAddAppHint':
@@ -203,15 +203,15 @@ const Map<String, String> tr = {
   'spClosed': 'İkinci telefon kapatıldı.',
   'spOpened': 'İkinci telefon açıldı.',
   'spQuietFallback':
-      'Android iş profilini kapatmaya izin vermedi; bunun yerine uygulamalar gizlendi.',
-  'spCloseMode': 'Kilitleyince ikinci telefon',
-  'spCloseModeHint':
-      'Kilitle düğmesiyle kilitlerken uygulanır, kasa açılınca geri açılır. Arka planda otomatik kilitte uygulanmaz (ikinci telefondaki uygulamayı kullanıyor olabilirsin).',
-  'spModeOff': 'Açık kalsın',
-  'spModeFreeze': 'Uygulamaları gizle',
-  'spModeQuiet': 'İş profilini kapat',
-  'spQuietNote':
-      'Android iş profilini kapatmaya çoğu zaman yalnızca varsayılan ana ekran uygulamasına izin verir. İzin yoksa GizliAlan uygulamaları gizlemeye geçer. Hızlı ayarlardaki "İş uygulamaları" düğmesini de kullanabilirsin.',
+      'Uygulamalar gizlendi. Android iş profilini duraklatmaya izin vermedi.',
+  'spHideWhenLocked': 'Kilitliyken iş uygulamalarını gizle',
+  'spHideWhenLockedHint':
+      'Kasa kilitliyken ikinci telefondaki uygulamalar telefonun ana ekranından, "İş" klasöründen ve uygulama listesinden kaldırılır. Hiçbir şey silinmez, verileri durur. Gerçek PIN veya parmak izinle açınca geri gelir. Gizliyken bu uygulamalar çalışmaz ve bildirim almaz.',
+  'spHideWhenLockedWhen':
+      'Kilitle düğmesine basınca hemen gizlenir. Arka planda otomatik kilitlenirse Android GizliAlan\'ın işlem yapmasına izin vermez; uygulamalar GizliAlan kilitliyken bir sonraki açılışta (başlatma veya geri dönüş) gizlenir. Görünür kalanlar: GizliAlan ve profili yönetmek için gereken Google Play hizmetleri / yükleyici / ayar bileşenleri.',
+  'spPauseToo': 'Ayrıca iş profilini duraklatmayı dene',
+  'spPauseTooHint':
+      'Android iş profilini duraklatmaya çoğu telefonda yalnızca varsayılan ana ekran uygulamasına izin verir; bu yüzden çoğu zaman yalnızca gizleme uygulanır. Duraklatılmış profilin simgeleri bazı ana ekranlarda (ör. Xiaomi) gri olarak görünmeye devam eder — simgeleri kaldıran gizlemedir. Hızlı ayarlardaki "İş uygulamaları" düğmesini de kullanabilirsin.',
   'notifications': 'Bildirimler',
   'notifEmpty':
       'Henüz bildirim yok. İçe/dışa aktarma, silme, İkinci telefon değişiklikleri ve hatalı PIN denemeleri burada listelenir.',

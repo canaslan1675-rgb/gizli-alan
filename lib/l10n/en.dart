@@ -181,7 +181,7 @@ const Map<String, String> en = {
   'spStatus': 'Status',
   'spStatusOpen': 'Open',
   'spStatusFrozen': 'Closed — apps hidden',
-  'spStatusQuiet': 'Closed — work profile off',
+  'spStatusQuiet': 'Closed — apps hidden, work profile paused',
   'spOpenStore': 'Open Play Store (second account)',
   'spAddApp': 'Add an app from the main phone',
   'spAddAppHint':
@@ -204,15 +204,15 @@ const Map<String, String> en = {
   'spClosed': 'Second phone closed.',
   'spOpened': 'Second phone opened.',
   'spQuietFallback':
-      'Android did not allow turning the work profile off; its apps were hidden instead.',
-  'spCloseMode': 'Second phone on lock',
-  'spCloseModeHint':
-      'Applied when you lock with the Lock button and undone when you unlock. Not applied on background auto-lock (you may be using a second-phone app).',
-  'spModeOff': 'Keep open',
-  'spModeFreeze': 'Hide its apps',
-  'spModeQuiet': 'Turn work profile off',
-  'spQuietNote':
-      'Android usually lets only the default home-screen app turn the work profile off. If not permitted, GizliAlan hides the apps instead. You can also use the "Work apps" quick-settings tile.',
+      'Apps hidden. Android did not allow pausing the work profile.',
+  'spHideWhenLocked': 'Hide work apps while locked',
+  'spHideWhenLockedHint':
+      'While the vault is locked, second-phone apps are removed from the phone\'s home screen, its "Work" folder and the app list. Nothing is uninstalled and their data stays. They come back when you unlock with your real PIN or fingerprint. While hidden they do not run and receive no notifications.',
+  'spHideWhenLockedWhen':
+      'Hidden immediately when you press Lock. After a background auto-lock Android does not let GizliAlan act, so the apps are hidden the next time GizliAlan is open while locked (app start or return). Kept visible: GizliAlan itself and Google Play services / installer / settings components needed to manage the profile.',
+  'spPauseToo': 'Also try to pause the work profile',
+  'spPauseTooHint':
+      'Android lets only the default home-screen app pause a work profile, so on most phones only hiding takes effect. A paused profile\'s icons stay visible (greyed out) in some launchers, e.g. Xiaomi — hiding is what removes them. You can also use the "Work apps" quick-settings tile.',
   'notifications': 'Notifications',
   'notifEmpty':
       'No notifications yet. Imports, exports, deletions, Second phone changes and wrong PIN attempts are listed here.',
