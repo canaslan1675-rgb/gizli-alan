@@ -240,3 +240,13 @@ no new permissions; no reading of other apps' data; no network.
   "GizliAlan: Calculator Vault".
 - Store icon: use `docs/store_icon_512.png` (same original icon as the launcher)
   and make the first screenshot show the calculator with the ⓘ dialog open.
+
+## 7. Play submission pack (2026-09-26)
+
+Current, source-cited submission material lives in [`docs/play-submission/`](play-submission/):
+[RESEARCH](play-submission/RESEARCH.md) (policy research, risk ranking, current requirements) ·
+[CHECKLIST](play-submission/CHECKLIST.md) · [LISTING_TR](play-submission/LISTING_TR.md) ·
+[LISTING_EN](play-submission/LISTING_EN.md) · [REVIEWER_NOTES](play-submission/REVIEWER_NOTES.md) ·
+[DATA_SAFETY](play-submission/DATA_SAFETY.md) · [DECLARATIONS](play-submission/DECLARATIONS.md) ·
+[APPEAL_PLAYBOOK](play-submission/APPEAL_PLAYBOOK.md). Where they differ from §2–§4 above (e.g. the
+recommended title now includes "Calculator Vault" / "Hesap Makineli Kasa"), the pack supersedes them.
