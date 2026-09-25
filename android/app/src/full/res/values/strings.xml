@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- full flavor only: Second phone (work profile) strings. -->
+<resources>
+    <!-- Shown by Android in provisioning / device-admin settings. Honest name. -->
+    <string name="profile_admin_label">GizliAlan – second phone (work profile)</string>
+    <string name="profile_admin_description">Creates and manages only your own separate work profile ("second phone") on this device. It has no control over your main profile and does not monitor anything.</string>
+    <string name="profile_name">Second phone</string>
+</resources>

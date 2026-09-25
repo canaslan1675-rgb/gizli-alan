@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Hesap Makinesi</string>
-    <string name="profile_admin_label">GizliAlan – ikinci telefon (iş profili)</string>
-    <string name="profile_admin_description">Bu cihazda yalnızca size ait ayrı iş profilini ("ikinci telefon") oluşturur ve yönetir. Ana profiliniz üzerinde yetkisi yoktur ve hiçbir şeyi izlemez.</string>
-    <string name="profile_name">İkinci telefon</string>
 </resources>

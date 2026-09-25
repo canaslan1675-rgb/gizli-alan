@@ -253,4 +253,22 @@ const Map<String, String> tr = {
       'Bu test sürümünde satın alma yoktur ve hiçbir ödeme alınmaz. Pro, ileride Google Play üzerinden sunulabilir.',
   'proFooter':
       'GizliAlan hesap istemez ve hiçbir veriyi sunucuya göndermez. Uygulama Gumroad vb. yerlerde satılmaz.',
+  // `play` flavor variants (no Second phone in that build), see L10n.t.
+  'onboardingPrivacy_play':
+      'İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve hiçbir şey yüklemez — sunucu yoktur. Yalnızca kendi cihazında, kendi içeriğin için kullan.',
+  'privacyBody_play':
+      '• Tüm kasa içeriği (fotoğraf, dosya, not) Android Keystore destekli '
+      'güvenli depoda tutulan bir anahtarla AES-256-GCM ile şifrelenir.\n'
+      '• PIN\'in yalnızca tuzlanmış PBKDF2 özeti olarak saklanır.\n'
+      '• Yayın sürümünde internet izni yok; hesap, analitik, reklam yok. Sen '
+      'dışa aktarmadıkça hiçbir şey cihazdan çıkmaz.\n'
+      '• İzinler: yalnızca biyometrik (isteğe bağlı kilit açma). Fotoğraf ve '
+      'dosyaları sistem seçicileriyle sen seçersin — depolama/medya izni '
+      'yok.\n'
+      '• SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik veya '
+      'cihaz yöneticisi yok.\n'
+      '• Uygulama yedeği kapalıdır; kasa verisi buluta kopyalanmaz. '
+      'Kaldırma veya "Verileri temizle" kasayı siler.',
+  'notifEmpty_play':
+      'Henüz bildirim yok. İçe/dışa aktarma, silme ve hatalı PIN denemeleri burada listelenir.',
 };

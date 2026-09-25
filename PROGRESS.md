@@ -19,3 +19,5 @@
 **2026-09-26 (Sat, #7 close):** Re-checked emulator path on the agent box (`/dev/kvm` exists but root:103 only — `box` cannot use it; no emulator/system image) → documented in DEVICE_TEST_PLAN §5/§6 and closed the agent-side of #7. Brief §6 refreshed (PRs #18–#23 merged). #6 left with Cursor (push blocked locally).
 
 **2026-09-26 (Sat, #6):** Store screenshots TR+EN (6 frames each, 1080×1920 RGB) rendered from the real screens in a skipped-by-default widget test with demo content; generator script + README note; FLAG_SECURE unchanged. Taken over from the Cursor agent (owner-approved).
+
+**2026-09-26 (Sat, #11):** Two flavors: `play` (com.offerforge.gizlialan, no Second phone, no device-admin component in the APK) and `full` (com.offerforge.gizlialan.full, Second phone); Dart gating + play-specific texts, flavor tests, screenshots per flavor (play/ for the listing), docs; v0.3.0+3, both arm64 APKs in prerelease `v0.3.0-test`. Play submission flavor still the owner's call.

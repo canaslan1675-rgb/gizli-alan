@@ -35,7 +35,7 @@ import com.offerforge.gizlialan.secondphone.SecondPhoneContract as C
  * profile for the "add app" picker. It never reads other apps' data.
  */
 class SecondPhoneChannel(private val activity: Activity, messenger: BinaryMessenger) :
-    MethodChannel.MethodCallHandler {
+    MethodChannel.MethodCallHandler, com.offerforge.gizlialan.FlavorFeature {
 
     private val channel = MethodChannel(messenger, "gizlialan/second_phone")
     private val pending = HashMap<Int, MethodChannel.Result>()
@@ -52,7 +52,7 @@ class SecondPhoneChannel(private val activity: Activity, messenger: BinaryMessen
         channel.setMethodCallHandler(this)
     }
 
-    fun dispose() {
+    override fun dispose() {
         channel.setMethodCallHandler(null)
         io.shutdown()
     }
@@ -179,7 +179,7 @@ class SecondPhoneChannel(private val activity: Activity, messenger: BinaryMessen
     }
 
     /** Returns true if [requestCode] belonged to this channel. */
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         val result = pending.remove(requestCode) ?: return false
         if (data?.hasExtra(C.RESULT_STATUS) == true) {
             result.success(

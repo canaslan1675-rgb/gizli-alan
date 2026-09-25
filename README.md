@@ -46,8 +46,30 @@ flutter pub get
 flutter analyze
 flutter test
 flutter run                 # device/emulator
-flutter build apk --release # needs Android SDK + JDK 17
+# release builds need a flavor (Android SDK + JDK 17):
+flutter build apk --release --flavor play --target-platform android-arm64
+flutter build apk --release --flavor full --target-platform android-arm64
 ```
+
+### Build flavors / Yapı çeşitleri (#11)
+
+| Flavor | applicationId | Second phone | APK output |
+|--------|---------------|--------------|-----------|
+| `play` | `com.offerforge.gizlialan` | **no** — no device-admin receiver / work-profile code in the APK, UI hidden | `build/app/outputs/flutter-apk/app-play-release.apk` |
+| `full` | `com.offerforge.gizlialan.full` | yes (side-load / test) | `build/app/outputs/flutter-apk/app-full-release.apk` |
+
+Both keep the launcher label "Calculator"/"Hesap Makinesi", FLAG_SECURE and only the
+`USE_BIOMETRIC` permission, and install side by side. Android: `productFlavors` in
+`android/app/build.gradle.kts`; the Second phone manifest entries, Kotlin code, strings and
+`profile_admin.xml` live only in `android/app/src/full/`. Dart: `lib/flavor.dart` reads
+Flutter's `appFlavor` (set by `--flavor`), then `--dart-define=FLAVOR=play|full`; unknown or
+missing → `play` (safe default). Settings → footer shows "GizliAlan 0.3.0 · Play/Full".
+On Android always pass a flavor, e.g.
+`flutter run --flavor full` (or `play`).
+
+TR: `play` = Google Play adayı, İkinci telefon yok (APK'da cihaz yöneticisi bileşeni bile yok);
+`full` = İkinci telefonlu test/yan yükleme sürümü. İkisi aynı telefona birlikte kurulabilir.
+Play'e hangisinin gönderileceği sahibin kararı (#11).
 
 On this box the Android toolchain lives in `/workspace/tools/android-sdk` and
 `/workspace/tools/jdk17` (see `flutter config`). The `android/` project is
@@ -55,8 +77,9 @@ committed; `bootstrap.sh` only re-creates it if missing.
 
 ### Store screenshots / Mağaza ekran görüntüleri
 
-`tool/gen_store_screenshots.sh` regenerates `docs/store/screenshots/{tr,en}/01…06_*.png`
-(1080×1920, RGB, no alpha). It runs `test/store_screenshots_test.dart` with
+`tool/gen_store_screenshots.sh` regenerates `docs/store/screenshots/{play,full}/{tr,en}/01…06_*.png`
+(1080×1920, RGB, no alpha; 24 files). **The Play listing uses `play/`** (no Second phone
+anywhere); `full/` is the side-load build (vault home shows the Second phone tile). It runs `test/store_screenshots_test.dart` with
 `--dart-define=STORE_SCREENSHOTS=true`: the real screens are pumped in a widget test with
 fabricated demo content (generated pattern images, neutral fake notes) and captured through a
 `RepaintBoundary`. No emulator is needed and FLAG_SECURE is not touched. Plain `flutter test`
@@ -86,8 +109,9 @@ key** — fine for test APKs (GitHub pre-releases), **not** for Google Play.
 2. `cp android/key.properties.example android/key.properties` and fill in
    `storeFile` (absolute path, or relative to `android/`), `storePassword`,
    `keyAlias`, `keyPassword`. Missing values fail the build with a clear message.
-3. `flutter build appbundle --release` (Play) or `flutter build apk --release`.
-   Check the signer: `apksigner verify --print-certs build/app/outputs/flutter-apk/app-release.apk`
+3. `flutter build appbundle --release --flavor play` (Play) or `flutter build apk --release --flavor play|full`.
+   The same `key.properties` signs both flavors.
+   Check the signer: `apksigner verify --print-certs build/app/outputs/flutter-apk/app-play-release.apk`
    (must **not** say `CN=Android Debug`).
 4. Recommended: enable **Play App Signing** when creating the app in Play Console
    (Google keeps the app signing key, your keystore is only the upload key).
@@ -123,7 +147,8 @@ lib/
     calculator_engine.dart     pure calculator logic + PIN candidate
     legacy_migration.dart      scaffold plaintext → encrypted vault
     settings_service.dart      non-secret prefs
-    second_phone_service.dart  work-profile "second phone" channel client + availability logic
+    second_phone_service.dart  work-profile "second phone" channel client + availability logic (full flavor)
+  flavor.dart                  AppFlavor play|full (#11), Flavor.hasSecondPhone
   screens/                     decoy_calculator, pin_lock, onboarding, vault_home,
                                gallery, photo_viewer, files, notes_list, note_edit,
                                settings, set_pin, second_phone

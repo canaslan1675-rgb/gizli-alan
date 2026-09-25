@@ -88,7 +88,12 @@ void main() {
         await tester.scrollUntilVisible(
           find.byKey(const ValueKey('settings_pro')),
           200,
-          scrollable: find.byType(Scrollable).last,
+          scrollable: find
+              .descendant(
+                of: find.byType(SettingsScreen),
+                matching: find.byType(Scrollable),
+              )
+              .first,
         );
         await tester.tap(find.byKey(const ValueKey('settings_pro')));
         await settle(tester);

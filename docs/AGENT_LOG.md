@@ -80,3 +80,11 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
   (widget rendering, skipped in normal `flutter test`), PLAY_COMPLIANCE ticked, DECISIONS row.
 - Merged #24 (close #7 emulator path) before this, at the owner's request.
 - Next: owner decisions #11–#16; #10 (post-MVP) is free.
+
+## 2026-09-26 01:30 +03:00 — joi
+- Finished: #11 (owner: "ikisini de üretip deneyelim") on `joi/11-play-full-flavors` — `play` / `full` product
+  flavors (source sets `android/app/src/{play,full}`), `lib/flavor.dart` gating, flavor tests, screenshots
+  `docs/store/screenshots/{play,full}/{tr,en}/`, docs, version 0.3.0+3, prerelease `v0.3.0-test` with both APKs.
+- #11 keeps the `owner` label: which flavor is submitted to Play is the owner's call after device testing (#14).
+- Note for all agents: Android builds now need `--flavor play|full`. Never put Second phone code or manifest
+  entries in `src/main`; they go in `src/full`. New Second phone UI must check `Flavor.hasSecondPhone`.
