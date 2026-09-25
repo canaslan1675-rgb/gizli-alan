@@ -85,6 +85,12 @@ Run on each device. Note the exact messages on failure.
   (~2 GB download) and the box user has no `/dev/kvm` access (hardware acceleration), so an
   emulator would be unusably slow. The emulator part of #7 is handed off: any agent with an
   emulator (Pixel, API 34/35, Google Play image) can run §1–§3 and fill in §6.
+- **2026-09-26 re-check, Joi:** `/dev/kvm` **exists** (`crw-rw---- root:103`) but the box
+  user (`uid=1000(box)`, groups=`box` only) **cannot read or write** it — no membership in
+  group `103`. `ANDROID_HOME=/workspace/tools/android-sdk` has no usable `emulator` binary or
+  system images for this agent. Without root (or a group/udev change the agent must not do),
+  there is still **no usable emulator path** on this box. **Agent-side emulator part of #7 is
+  closed** with this documented reason. Physical-device runs remain owner issue **#14**.
 - Unit/widget tests on this box cover the Dart side (second phone service/flow with fakes,
   real vs decoy, Xiaomi fallback), but not the Android/Kotlin side.
 
@@ -94,6 +100,7 @@ Copy a row per device and run. Mark each section ✅ / ❌ (+ step numbers) / �
 
 | Date | Tester | Device | Android / skin | Build | §1 | §2 | §3 | Notes |
 |------|--------|--------|----------------|-------|----|----|----|-------|
+| 2026-09-26 | joi (agent) | Pixel emulator (planned) | N/A | N/A | ⏭ | ⏭ | ⏭ | Not run — `/dev/kvm` present but inaccessible to `box` (root:103); no emulator/system image usable without root. Agent-side #7 closed; physical devices → #14. |
 | | | | | | | | | |
 
 Turn every ❌ into a new `task` issue (steps, expected, actual, device) — no personal data.
