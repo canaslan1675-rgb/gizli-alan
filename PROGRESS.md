@@ -13,3 +13,5 @@
 **2026-09-25 (Fri, #8):** Release signing config: optional android/key.properties (template committed, secrets git-ignored), debug-key fallback with warning, owner steps in README; verified with/without a throwaway keystore.
 
 **2026-09-25 (Fri, #9):** Docs sync: brief week 1–3 checkboxes ticked or linked to issues/PRs, §6 current state rewritten, project-overview rule updated.
+
+**2026-09-25 (Fri, #7):** Device test plan docs/DEVICE_TEST_PLAN.md (TR+EN) for Xiaomi/Samsung/Pixel with a results table; emulator run handed off (no emulator/KVM on the box).

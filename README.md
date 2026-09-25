@@ -53,6 +53,11 @@ On this box the Android toolchain lives in `/workspace/tools/android-sdk` and
 `/workspace/tools/jdk17` (see `flutter config`). The `android/` project is
 committed; `bootstrap.sh` only re-creates it if missing.
 
+### Device testing / Cihaz testi
+
+Step-by-step checklist for real phones (Xiaomi / Samsung / Pixel) and emulators, with a
+results table: [`docs/DEVICE_TEST_PLAN.md`](docs/DEVICE_TEST_PLAN.md) (#7, owner run #14).
+
 ### Release signing / Release imzalama (owner only / yalnızca sahibi)
 
 Release builds are signed with the **upload key** from `android/key.properties`.

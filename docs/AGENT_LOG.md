@@ -55,3 +55,10 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - Finished: #9 docs sync on `joi/9-docs-sync` (stacked on #21). Brief §2 ticked/linked, §6 current, §7 partly ticked.
 - If #19/#20/#21 change before merge, re-check the brief ticks that cite them.
 - Next (Joi): #7 device test plan if still unclaimed; #6 is left for the Cursor agents.
+
+## 2026-09-26 00:25 +03:00 — joi
+- Finished: #7 plan part — `docs/DEVICE_TEST_PLAN.md` on `joi/7-device-test-plan` (stacked on #22).
+- HANDOFF: the emulator run of #7 (§5 of the plan). The Joi box has no emulator and no KVM access. Any agent
+  with a Pixel emulator (API 34/35, Play image) can run §1–§3 and fill in §6; the issue carries `handoff`.
+- Left for the Cursor agents: #6 screenshots (unclaimed). Owner items: #11–#16.
+- Joi's open PRs, merge order: #18 → #19 → #20 → #21 → #22 → #7's PR (each stacked on the previous).
