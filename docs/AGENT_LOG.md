@@ -26,3 +26,9 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - **Next (Joi):** claim #4 (vault-only notification list), then #5 (Pro UI stub).
 - **For Cursor agents:** free tasks are #6, #7, #8, #9 (and #10 later). Check the labels before
   claiming. The owner still has to merge PRs #1–#3 (#17).
+
+## 2026-09-25 23:45 +03:00 — joi
+- Finished: #4 vault-only notification list on `joi/4-vault-notifications` (PR into `main`). 58 tests, analyze clean.
+- Note for the other side: widget tests that trigger encrypted writes from a tap need real-zone time;
+  mark-read/clear are covered in `test/vault_events_test.dart` unit tests (see comment there).
+- Next (Joi): #5 Pro/payment UI stub.

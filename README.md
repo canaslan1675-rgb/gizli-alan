@@ -21,6 +21,7 @@ Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculato
 - **Galeri kasası:** sistem Photo Picker ile içe aktarma, şifreli kopya, ızgara, görüntüleyici, dışa aktarma (SAF), silme
 - **Dosyalar** (PDF vb.) ve **Notlar** (arama ile), hepsi şifreli
 - **Sanal telefon ana ekranı:** saat, ikon ızgarası, dock, duvar kağıdı seçimi
+- **Bildirimler (yalnızca kasa içinde):** içe/dışa aktarma, silme, İkinci telefon değişiklikleri ve son girişten beri hatalı PIN sayısı; şifreli, kasa başına ayrı; sistem bildirimi yok (izin de yok)
 - **Sahte PIN (isteğe bağlı):** ayrı anahtarla ayrı, boş bir kasa
 - **TR / EN** arayüz
 - **v0.2 — Nötr başlatıcı adı/simgesi:** uygulama listesinde "Hesap Makinesi" / "Calculator" adı ve özgün hesap makinesi simgesi (adaptive + monochrome). Kasa; onboarding, ⓘ ve mağaza metninde açıkça belirtilir.
@@ -68,6 +69,7 @@ lib/
     vault_session.dart         unlocked space: encrypted files + repositories
     vault_storage.dart         encrypted collections (gallery, files) + encrypted index
     notes_repository.dart      encrypted notes document
+    vault_events.dart          encrypted vault-only notification list (events.gae)
     calculator_engine.dart     pure calculator logic + PIN candidate
     legacy_migration.dart      scaffold plaintext → encrypted vault
     settings_service.dart      non-secret prefs
@@ -87,7 +89,7 @@ docs/PLAY_COMPLIANCE.md        permissions, Data safety answers, listing TR/EN, 
 ```
 
 **On-disk layout** (app-private support dir):
-`spaces/<real|decoy>/notes.gae`, `…/gallery/index.gae`, `…/gallery/<uuid>.gae`,
+`spaces/<real|decoy>/notes.gae`, `…/events.gae`, `…/gallery/index.gae`, `…/gallery/<uuid>.gae`,
 `…/files/…`. Sealed format: `"GAE1"` ‖ nonce(12) ‖ ciphertext ‖ tag(16).
 
 ### Security model (honest)
