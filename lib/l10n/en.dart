@@ -126,6 +126,7 @@ const Map<String, String> en = {
   'lockAfterSec': 'After {n} s',
   'lockAfterMin': 'After {n} min',
   'language': 'Language',
+  'wallpaper': 'Wallpaper',
   'privacyTitle': 'Privacy & permissions',
   'privacyBody':
       '• All vault content (photos, files, notes) is encrypted with AES-256-GCM '

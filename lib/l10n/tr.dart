@@ -124,6 +124,7 @@ const Map<String, String> tr = {
   'lockAfterSec': '{n} sn sonra',
   'lockAfterMin': '{n} dk sonra',
   'language': 'Dil',
+  'wallpaper': 'Duvar kağıdı',
   'privacyTitle': 'Gizlilik ve izinler',
   'privacyBody':
       '• Tüm kasa içeriği (fotoğraf, dosya, not) Android Keystore destekli '

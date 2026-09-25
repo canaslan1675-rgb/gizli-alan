@@ -41,7 +41,11 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
   }
 
   void _open(Widget screen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen)).then((
+      _,
+    ) {
+      if (mounted) setState(() {}); // e.g. wallpaper changed in settings
+    });
   }
 
   @override
@@ -90,12 +94,8 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       },
       child: Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF0B1220), Color(0xFF12324A), Color(0xFF0E5A4A)],
-            ),
+          decoration: BoxDecoration(
+            gradient: GizliTheme.wallpaper(app.settings.wallpaper),
           ),
           child: SafeArea(
             child: Column(

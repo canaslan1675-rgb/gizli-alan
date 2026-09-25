@@ -180,6 +180,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       ListTile(
+        leading: const Icon(Icons.wallpaper_outlined),
+        title: Text(t('wallpaper')),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Wrap(
+            spacing: 10,
+            children: List.generate(GizliTheme.wallpapers.length, (i) {
+              final selected = s.wallpaper == i;
+              return GestureDetector(
+                onTap: () async {
+                  await s.setWallpaper(i);
+                  setState(() {});
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: GizliTheme.wallpaper(i),
+                    border: Border.all(
+                      color: selected ? GizliTheme.mint : Colors.white24,
+                      width: selected ? 3 : 1,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
+      ListTile(
         leading: const Icon(Icons.privacy_tip_outlined),
         title: Text(t('privacyTitle')),
         subtitle: Text(t('dataSafetyShort')),

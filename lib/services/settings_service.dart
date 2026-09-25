@@ -16,6 +16,7 @@ class SettingsService {
   static const _kBiometric = 'biometric_enabled';
   static const _kLockTimeout = 'lock_timeout_sec';
   static const _kLang = 'lang';
+  static const _kWallpaper = 'wallpaper';
 
   static const lockTimeoutChoices = [0, 15, 60, 300];
 
@@ -43,6 +44,11 @@ class SettingsService {
 
   Future<void> setLockTimeoutSec(int sec) =>
       _prefs.setInt(_kLockTimeout, sec.clamp(0, 300));
+
+  /// Index into GizliTheme.wallpapers for the vault home screen.
+  int get wallpaper => _prefs.getInt(_kWallpaper) ?? 0;
+
+  Future<void> setWallpaper(int i) => _prefs.setInt(_kWallpaper, i);
 
   String get language => _prefs.getString(_kLang) ?? 'tr';
 
