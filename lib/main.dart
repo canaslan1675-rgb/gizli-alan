@@ -11,10 +11,13 @@ import 'services/settings_service.dart';
 ///
 /// PLAY COMPLIANCE:
 /// - Not spyware / stalkerware; nothing about other people is collected.
-/// - No SMS/call access, no Accessibility Service, no Device Admin, no
+/// - No SMS/call access, no Accessibility Service, no main-device admin, no
 ///   Notification Listener, no network upload (release build has no INTERNET).
 /// - The calculator entry is disclosed in onboarding, in-app and in the
-///   store listing; reviewers see exactly what users see.
+///   store listing; reviewers see exactly what users see. The launcher
+///   label is "Calculator"/"Hesap Makinesi" (a real calculator).
+/// - Optional "second phone": profile owner of the user's own work profile
+///   only (no device-owner / main-profile admin powers).
 /// - AES-GCM uses Android's native implementation via cryptography_flutter
 ///   (registered automatically as a Dart plugin).
 /// - Screens are protected with FLAG_SECURE (set in MainActivity).

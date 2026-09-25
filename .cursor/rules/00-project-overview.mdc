@@ -1,0 +1,94 @@
+---
+description: GizliAlan project overview — what the app is, current version, goals, source-of-truth order and 3-week MVP plan status
+globs:
+alwaysApply: true
+---
+
+# GizliAlan — project overview
+
+Source files: `AUTONOMOUS_BRIEF.md` (main brief, Turkish), `DECISIONS.md`, `BLOCKERS.md`,
+`PROGRESS.md`, `README.md`, `docs/PLAY_COMPLIANCE.md`, `PRIVACY.md`. If these rules and those
+files disagree, the files win. Update these rules when the brief changes.
+
+## Priority when something is unclear
+**`AUTONOMOUS_BRIEF.md` > `docs/` / research files > your own engineering judgement.**
+Decide, write it down in `DECISIONS.md`, and keep going.
+(TR: "Belirsizlikte: bu brief > docs / araştırma dosyaları > kendi mühendislik kararın. Karar ver, not düş, devam et.")
+
+## What the app is
+- **GizliAlan ("Gizli Sanal Telefon")**: a separate "phone space" inside the user's *own* phone,
+  with its own app grid, notes, media and notifications, kept apart from the main phone.
+  Metaphor: "a new phone inside your phone" (TR: "telefonun içinde yeni telefon").
+- **For:** the device owner only. It is a personal privacy vault.
+- **Package:** `com.offerforge.gizlialan` · Flutter 3.47 stable · Android first, minSdk 28 (Android 9+).
+- **Stack:** Flutter, `flutter_secure_storage` (Keystore-backed), AES-256-GCM via `cryptography`
+  (+ `cryptography_flutter`), `local_auth`, `image_picker` (system Photo Picker), `file_picker` (SAF), FLAG_SECURE.
+- **Offline:** no account, no server, no ads, no analytics, no INTERNET permission in release.
+
+## Architecture decision
+- MVP = research option **C + E**: in-app encrypted vault + dual-mode (calculator) UI.
+  Launcher role and cloud sync are out of scope.
+- **v0.2 (2026-09-25, owner request):** adds research option **A**, an optional "Second phone"
+  (TR: "İkinci telefon"). It is an Android managed work profile (Shelter/Island model) where
+  the app is **profile owner of that profile only**. The launcher label/icon is a neutral
+  calculator ("Hesap Makinesi" / "Calculator"), and the vault is always disclosed.
+
+## Current version and branches
+- Version **0.2.0+2** (v0.2 test build, tag `v0.2.0-test`).
+- Branches: `main` (initial scaffold) ← `mvp-v1` (MVP v1) ← `v0.2-calculator-workprofile` (latest).
+- Note: brief §6 says GitHub login and push are still pending. That is **out of date**: the repo
+  is now `canaslan1675-rgb/gizli-alan` on GitHub.
+
+## Pricing (UI only, no real integration)
+- Free: basic vault, 30–50 item limit, no ads.
+- Pro one-time: about **249 TL / 7.99 USD**. Pro yearly: **449 TL**.
+- The app is not sold on Gumroad. Gumroad would only carry a helper setup/privacy guide.
+- No billing/IAP code yet (see `DECISIONS.md`). Real payment integration is a BLOCKER-level step.
+
+## 3-week MVP plan (brief §2) and status (from PROGRESS.md / code, 2026-09-25)
+The checkboxes in the brief are not ticked. Actual status:
+
+**Week 1: security core (done)**
+- Encrypted vault (key generation, secure storage, AES-GCM service)
+- PIN create/verify/change (hash + salt, attempt limit + lockout)
+- Biometric unlock with PIN fallback
+- Auto-lock in background, FLAG_SECURE
+- Gallery vault (import, encrypted copy, grid, viewer, delete, export)
+- Unit tests for crypto and auth
+
+**Week 2: entry layer and content (done)**
+- Working calculator entry (type PIN, then `=`), disclosed in onboarding and the listing
+- Optional decoy PIN that opens a separate empty vault
+- Encrypted notes with search
+- Onboarding with "own device only" confirmation
+- TR + EN strings
+
+**Week 3: virtual phone UI and Play prep (partly done)**
+- Done:
+  - Vault home icon grid with wallpapers
+  - Settings: change PIN, biometrics, decoy PIN
+  - Play prep docs: privacy policy, Data safety, TR/EN listing, minimal permission list
+  - Release APK built (debug-signed)
+- Not done yet:
+  - In-app notification isolation (a notification list visible only inside the vault; no
+    content in system notifications)
+  - Pro/payment **UI stub**
+  - Screenshots
+  - Real release signing
+
+**v0.2 additions:** calculator launcher label + original icon, and Second phone.
+50 tests pass, `flutter analyze` is clean, and the arm64 release APK is built.
+Second phone is **not yet tested on a real device**.
+
+## Definition of done (end of week 3)
+- App builds, and analyze and tests are clean.
+- Every week 1–3 item is ticked, or explained in `BLOCKERS.md`.
+- 3 weeks of PR history and an up-to-date `PROGRESS.md`.
+- Play readiness pack (policy, Data safety, store listing) is in the repo.
+
+## Research sources (box paths, may not exist on other machines)
+- `/workspace/gizli-arastirma/gizli-sanal-telefon-app-20260920.md`: concept, competitors
+  (Keepsafe, Calculator Vault, Shelter/Island, Private Space), technical options A–F,
+  architecture matrix, MVP plan, revenue model.
+- `/workspace/gizli-arastirma/gizlialan/01–05`: technical hiding, Play Billing, UI wireframes,
+  competition, Play compliance, `PRIVACY_POLICY.md`.

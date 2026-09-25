@@ -17,7 +17,9 @@
 - `/workspace/gizli-arastirma/gizli-sanal-telefon-app-20260920.md`: konsept, rakipler (Keepsafe, Calculator Vault, Shelter/Island, Private Space), teknik seçenekler A–F, mimari matris, MVP planı, gelir modeli
 - `/workspace/gizli-arastirma/gizlialan/01–05`: teknik gizleme, Play Billing, UI wireframe, rekabet, Play uyumluluk, `PRIVACY_POLICY.md`
 
-**Mimari karar:** MVP = seçenek C + E (Flutter uygulama içi kasa + çift mod arayüz). Work Profile, launcher rolü, app klonlama ve bulut senkron MVP dışında.
+**Mimari karar:** MVP = seçenek C + E (Flutter uygulama içi kasa + çift mod arayüz). Launcher rolü ve bulut senkron kapsam dışı.
+
+**v0.2 güncellemesi (25 Eylül 2026, proje sahibinin talebi):** seçenek A eklendi — isteğe bağlı "İkinci telefon" = Android yönetilen iş profili (Shelter/Island modeli), uygulama yalnızca bu profilin *profil sahibi*. Başlatıcı adı/simgesi nötr hesap makinesi ("Hesap Makinesi" / "Calculator"), kasa açıkça belirtilerek. Ayrıntı: `DECISIONS.md`.
 
 ---
 
@@ -53,10 +55,12 @@
 ## 3. Kesin yasaklar
 
 - Casus veya izleme yazılımı yok. Başkasını izleme, konum takibi, SMS/arama dinleme yok.
-- Keylogging yok. Accessibility Service ve Device Admin kullanılmaz.
+- Keylogging yok. Accessibility Service kullanılmaz.
+- **Device Admin yasağı = ana cihaz / ana profil yöneticiliği yasağı.** Uygulama cihaz sahibi (device owner) olmaz, ana profilde cihaz yöneticisi (şifre, kilit, silme, kaldırma engeli vb. politikalar) olarak etkinleştirilmez; böyle etkinleştirilirse kendini hemen devre dışı bırakır.
+- **İzin verilen istisna:** yalnızca "İkinci telefon" özelliği için, kullanıcının kendi açık onayıyla oluşturduğu iş profilinin *profil sahibi* (profile owner) olmak (`ACTION_PROVISION_MANAGED_PROFILE`, politika listesi boş `DeviceAdminReceiver`). Bu yetki yalnızca sahibinin kendi izolasyonu için kullanılır: profil uygulamalarını gizle/göster, uygulama ekle, profil Play Store'unu aç, profil uygulamalarını listele/başlat, profili sil. Profil içindeki uygulamaların verisi, bildirimleri veya kullanımı okunmaz/izlenmez.
 - Gizli izleme, sunucuya veri yükleme, uzaktan panel yok.
 - Cloaking yok: mağaza incelemesinde gösterilen davranış ile gerçek davranış aynı olmalı. Hesap makinesi girişi açıkça belgelenir.
-- Uygulama ikonunu sistemden gizleme veya başka bir uygulama gibi davranma yok.
+- Uygulama ikonunu sistemden gizleme veya başka bir uygulama gibi davranma yok. Nötr "Hesap Makinesi" adı/simgesi serbesttir çünkü uygulama gerçekten çalışan bir hesap makinesidir ve kasa onboarding, ⓘ ve mağaza metninde açıklanır; Google/Samsung/Xiaomi vb. marka simgeleri veya adları kopyalanmaz.
 - Yalnızca gerekli izinler istenir. Play politikalarına ve Türk hukukuna (KVKK) uyulur.
 
 ## 4. Fiyat ve gelir (uygulama içinde yalnızca arayüz olarak)

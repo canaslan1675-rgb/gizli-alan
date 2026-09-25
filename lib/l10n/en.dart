@@ -1,6 +1,8 @@
 /// English strings.
 const Map<String, String> en = {
   'appName': 'GizliAlan',
+  // Launcher / recents label (Android string resource says the same).
+  'launcherName': 'Calculator',
   'appNameVault': 'GizliAlan Vault',
   'decoyTitle': 'Calculator',
   // Onboarding
@@ -10,10 +12,7 @@ const Map<String, String> en = {
       'photos, notes and files, protected by a PIN (and optionally your '
       'fingerprint/face), encrypted on this device.',
   'onboardingPrivacy':
-      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or '
-      'location, uses no Accessibility Service or Device Admin, and uploads '
-      'nothing — there is no server. Only use it for your own content on '
-      'your own device.',
+      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and uploads nothing — there is no server. (The optional "Second phone" only manages the separate work profile you create yourself.) Only use it for your own content on your own device.',
   'ownDeviceConfirm':
       'This is my own device and I will only store my own content.',
   'entryTitle': 'Calculator entry',
@@ -23,8 +22,9 @@ const Map<String, String> en = {
       '(if enabled).',
   'entryDisclosure':
       'This is a disclosed feature, described in the store listing and in '
-      'the calculator\'s ⓘ button. The app icon and name in your launcher '
-      'stay "GizliAlan". You can switch it off any time in Settings.',
+      'the calculator\'s ⓘ button. In your app list this app appears as '
+      '"Calculator" with a simple calculator icon — that icon is GizliAlan. '
+      'You can switch the calculator entry off any time in Settings.',
   'calculatorEntry': 'Open as calculator',
   'calculatorEntryOn':
       'App starts as a calculator — PIN then "=" opens the vault',
@@ -45,9 +45,10 @@ const Map<String, String> en = {
   'calcInfoTitle': 'About this calculator',
   'calcInfoBody':
       'This is a real calculator and also the entrance to your GizliAlan '
-      'vault: type your vault PIN and press "=" to open it. Long-press "=" '
-      'for biometric unlock if enabled. You can turn the calculator entry off '
-      'in the vault settings.',
+      'vault (it is listed as "Calculator" in your app list): type your '
+      'vault PIN and press "=" to open it. Long-press "=" for biometric '
+      'unlock if enabled. You can turn the calculator entry off in the vault '
+      'settings.',
   // Lock
   'unlock': 'Enter PIN',
   'wrongPin': 'Wrong PIN',
@@ -138,7 +139,8 @@ const Map<String, String> en = {
       'chosen by you through the system pickers — no storage/media '
       'permission.\n'
       '• No SMS, calls, contacts, location, microphone, camera, Accessibility '
-      'or Device Admin.\n'
+      'or main-device admin. The optional Second phone is only the profile '
+      'owner of the work profile you create.\n'
       '• App backup is disabled, so vault data is not copied to the cloud. '
       'Uninstalling or "Clear data" deletes the vault.',
   'dangerZone': 'Danger zone',
@@ -149,4 +151,66 @@ const Map<String, String> en = {
       'will be permanently deleted. Continue?',
   'cancel': 'Cancel',
   'ok': 'OK',
+  // Second phone (work profile)
+  'secondPhone': 'Second phone',
+  'secondPhoneApps': 'Second phone apps',
+  'spIntro':
+      'Second phone creates a separate space on this device using Android\'s own "work profile" feature (the same method Shelter/Island use). It has its own Play Store where you can add a separate Google account and install apps. Apps, accounts and files stay separate from your main phone.',
+  'spDisclosure':
+      'How it works: GizliAlan becomes the "profile owner" only of this work profile it creates. It is not an admin of your main profile or of the device; it monitors nothing, reads no other app\'s data and uploads nothing. Android shows its own notice during setup. Profile apps carry a briefcase badge and also appear in the "Work" tab of your app list. Setup and management are only possible while the vault is unlocked.',
+  'spSetUp': 'Set up second phone',
+  'spSetUpConfirm':
+      'Android will now start work profile setup. It can take a few minutes and shows system screens. Continue?',
+  'spCreated':
+      'Second phone is ready. Open Play Store to add your second Google account.',
+  'spCreatedPending':
+      'Setup finished; Android is still preparing the profile. Check again in a few seconds.',
+  'spCanceled': 'Setup was cancelled or could not be completed.',
+  'spXiaomiWarn':
+      'On Xiaomi / Redmi / POCO (MIUI/HyperOS) devices work profile setup is often blocked or left half-finished. You can still try; if it fails, use the phone\'s own "Second space" (Settings → Special features → Second space).',
+  'spXiaomiBlocked':
+      'This Xiaomi/Redmi/POCO device (MIUI/HyperOS) does not allow creating a work profile. Alternative: the built-in "Second space" (Settings → Special features → Second space), or on Android 15+ "Private space" (Settings → Security & privacy → Private space).',
+  'spNotAllowed':
+      'A work profile can\'t be created on this device right now, usually because one already exists (e.g. a company account) or the manufacturer disabled it. Alternative: Android 15+ "Private space" or the manufacturer\'s second space / secure folder.',
+  'spUnsupported':
+      'This device does not support Android work profiles. Alternative: Android 15+ "Private space" or the manufacturer\'s feature (Samsung Secure Folder, Xiaomi Second space).',
+  'spPrivateSpaceHint':
+      'This phone runs Android 15 or newer: "Private space" (Settings → Security & privacy → Private space) also gives you an OS-level separate space.',
+  'spUnlinked':
+      'A work profile with GizliAlan exists on this device but is not linked to this vault (app data may have been cleared). To remove it: Android Settings → Accounts (or Passwords & accounts) → Work → Remove work profile. Then set it up again.',
+  'spStatus': 'Status',
+  'spStatusOpen': 'Open',
+  'spStatusFrozen': 'Closed — apps hidden',
+  'spStatusQuiet': 'Closed — work profile off',
+  'spOpenStore': 'Open Play Store (second account)',
+  'spAddApp': 'Add an app from the main phone',
+  'spAddAppHint':
+      'System apps are copied directly; for other apps the second phone\'s Play Store page opens.',
+  'spCloseNow': 'Close second phone now',
+  'spOpenNow': 'Open second phone',
+  'spRemove': 'Remove second phone',
+  'spRemoveConfirm':
+      'The work profile and ALL apps, accounts and files in it will be permanently deleted. Continue?',
+  'spRemoved': 'Second phone removed.',
+  'spCloneOk': '"{app}" was added to the second phone.',
+  'spCloneStore':
+      'Android does not allow copying this app directly. The second phone\'s Play Store page was opened; install it there (add your second account first).',
+  'spCloneFailed':
+      'Could not add the app. You can install it from the second phone\'s Play Store.',
+  'spNoApps':
+      'No apps in the second phone yet. Install from Play Store or add from the main phone.',
+  'spNoCandidates': 'No apps available to add.',
+  'spFailed': 'Could not complete the action ({s}).',
+  'spClosed': 'Second phone closed.',
+  'spOpened': 'Second phone opened.',
+  'spQuietFallback':
+      'Android did not allow turning the work profile off; its apps were hidden instead.',
+  'spCloseMode': 'Second phone on lock',
+  'spCloseModeHint':
+      'Applied when you lock with the Lock button and undone when you unlock. Not applied on background auto-lock (you may be using a second-phone app).',
+  'spModeOff': 'Keep open',
+  'spModeFreeze': 'Hide its apps',
+  'spModeQuiet': 'Turn work profile off',
+  'spQuietNote':
+      'Android usually lets only the default home-screen app turn the work profile off. If not permitted, GizliAlan hides the apps instead. You can also use the "Work apps" quick-settings tile.',
 };

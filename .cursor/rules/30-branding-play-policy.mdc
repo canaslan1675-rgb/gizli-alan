@@ -1,0 +1,58 @@
+---
+description: Branding (neutral Calculator/Hesap Makinesi label + original icon), vault disclosure requirements, Play policy risk and split-build fallback, store listing/Data safety
+globs: android/app/src/main/res/**, android/app/src/main/AndroidManifest.xml, tool/gen_launcher_icon.py, docs/**, PRIVACY.md, lib/screens/onboarding*, lib/screens/decoy_calculator*, lib/l10n/**
+alwaysApply: false
+---
+
+# Branding and Play policy (from DECISIONS.md, BLOCKERS.md and docs/PLAY_COMPLIANCE.md)
+
+## Launcher label and icon
+- The label comes from `@string/app_name`: **"Calculator"** (`values`, default) and
+  **"Hesap Makinesi"** (`values-tr`). The recents title matches.
+- The icon is **original**: navy background, light body, dark display, 3×3 keys, mint "=" key.
+  - It is generated from one geometry by `tool/gen_launcher_icon.py`: adaptive fg/bg,
+    monochrome (themed icons), round/legacy PNGs, and the 512 px store icon
+    `docs/store_icon_512.png`.
+  - Change the icon only through the script, so the vector and PNGs stay identical.
+- Never copy Google/Samsung/Xiaomi calculator icons or branding. No icon hiding, no alias
+  switching, no reviewer-specific behaviour.
+
+## The vault must always be disclosed
+This is required, because it is what makes a calculator-looking vault allowed under Play
+Deceptive Behavior / Behavior Transparency:
+- Onboarding step 2 (the calculator-entry disclosure screen + toggle)
+- The ⓘ dialog in the calculator
+- The store listing (TR + EN)
+- Reviewer notes (App access)
+
+The app really is a working calculator. The listing and in-app behaviour must tell the same story.
+
+## Store listing, Data safety and reviewer notes
+- Drafts live in `docs/PLAY_COMPLIANCE.md` §2–4. Keep them in sync with the features.
+- Data safety: no data collected or shared. On-device only. No ads. 18+. Re-check if any SDK is
+  added (billing, crash reporting, backup).
+- Privacy policy: `PRIVACY.md`. It must be **hosted on HTTPS before submission**.
+- Still open: real support e-mail, hosted policy URL, screenshots (first screenshot = calculator
+  with the ⓘ dialog open), release signing, IAP (not in this build).
+
+## Play policy risk (v0.2): medium–high review friction
+- A `DeviceAdminReceiver` / managed-profile DPC gets stricter review (Device & Network Abuse,
+  Unwanted Software, sensitive-API policies).
+- "Calculator label + admin component" can look like concealment.
+- Mitigations already in place:
+  - real calculator and full disclosure
+  - empty admin policies, self-deactivation as a main-profile admin
+  - Second phone gated behind the vault and fully described
+  - no new permissions, no network, no reading of other apps' data
+- **Fallback (split build):** a Play flavor **without** the `secondphone` components (vault +
+  calculator only), with the Second phone build distributed as a signed side-loaded APK
+  (GitHub releases / F-Droid style, like Shelter). The Play title can optionally be made more
+  explicit, e.g. "GizliAlan: Calculator Vault".
+- **Owner decision is required before any Play submission:**
+  (a) submit with full disclosure and accept review friction, or (b) use the split build.
+  Nothing has been submitted anywhere. Do not submit, publish or set up Play Console.
+
+## Closed testing (context from Google Play rules, NOT from the repo docs)
+- New personal Play developer accounts must run a **closed test with at least 12 testers for
+  14 consecutive days** before production access. Confirm the current numbers on Google's pages.
+- Setting this up means Play Console work, so it is an owner/BLOCKER step. Do not start it yourself.

@@ -1,6 +1,8 @@
 /// Turkish strings (default locale).
 const Map<String, String> tr = {
   'appName': 'GizliAlan',
+  // Launcher / recents label (Android string resource says the same).
+  'launcherName': 'Hesap Makinesi',
   'appNameVault': 'GizliAlan Kasa',
   'decoyTitle': 'Hesap Makinesi',
   // Onboarding
@@ -10,10 +12,7 @@ const Map<String, String> tr = {
       'fotoğraflar, notlar ve dosyalar PIN (ve isteğe bağlı parmak izi/yüz) '
       'ile korunur ve bu cihazda şifrelenir.',
   'onboardingPrivacy':
-      'İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; '
-      'Erişilebilirlik Hizmeti veya Cihaz Yöneticisi kullanmaz ve hiçbir şey '
-      'yüklemez — sunucu yoktur. Yalnızca kendi cihazında, kendi içeriğin '
-      'için kullan.',
+      'İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve hiçbir şey yüklemez — sunucu yoktur. (İsteğe bağlı "İkinci telefon" yalnızca senin oluşturduğun ayrı iş profilini yönetir.) Yalnızca kendi cihazında, kendi içeriğin için kullan.',
   'ownDeviceConfirm':
       'Bu benim kendi cihazım ve yalnızca kendi içeriğimi saklayacağım.',
   'entryTitle': 'Hesap makinesi girişi',
@@ -23,8 +22,10 @@ const Map<String, String> tr = {
       'tuşuna uzun bas (açıksa).',
   'entryDisclosure':
       'Bu gizlenmiş bir özellik değildir; mağaza açıklamasında ve hesap '
-      'makinesindeki ⓘ düğmesinde anlatılır. Uygulama simgesi ve adı '
-      '"GizliAlan" olarak kalır. Ayarlar\'dan istediğin zaman kapatabilirsin.',
+      'makinesindeki ⓘ düğmesinde anlatılır. Telefonunun uygulama listesinde '
+      'bu uygulama sade bir hesap makinesi simgesiyle "Hesap Makinesi" adıyla '
+      'görünür — o simge GizliAlan\'dır. Hesap makinesi girişini Ayarlar\'dan '
+      'istediğin zaman kapatabilirsin.',
   'calculatorEntry': 'Hesap makinesi olarak aç',
   'calculatorEntryOn':
       'Uygulama hesap makinesiyle açılır — PIN ve "=" kasayı açar',
@@ -45,9 +46,10 @@ const Map<String, String> tr = {
   'calcInfoTitle': 'Bu hesap makinesi hakkında',
   'calcInfoBody':
       'Bu gerçek bir hesap makinesidir ve aynı zamanda GizliAlan kasanın '
-      'girişidir: kasa PIN\'ini yazıp "=" tuşuna basarak kasayı açarsın. '
-      'Biyometrik açıksa "=" tuşuna uzun bas. Hesap makinesi girişini kasa '
-      'ayarlarından kapatabilirsin.',
+      'girişidir (uygulama listesinde "Hesap Makinesi" adıyla görünür): kasa '
+      'PIN\'ini yazıp "=" tuşuna basarak kasayı açarsın. Biyometrik açıksa '
+      '"=" tuşuna uzun bas. Hesap makinesi girişini kasa ayarlarından '
+      'kapatabilirsin.',
   // Lock
   'unlock': 'PIN gir',
   'wrongPin': 'Yanlış PIN',
@@ -136,7 +138,8 @@ const Map<String, String> tr = {
       'dosyaları sistem seçicileriyle sen seçersin — depolama/medya izni '
       'yok.\n'
       '• SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik veya '
-      'Cihaz Yöneticisi yok.\n'
+      'ana cihaz yöneticisi yok. İsteğe bağlı İkinci telefon yalnızca senin '
+      'oluşturduğun iş profilinin profil sahibidir.\n'
       '• Uygulama yedeği kapalıdır; kasa verisi buluta kopyalanmaz. '
       'Kaldırma veya "Verileri temizle" kasayı siler.',
   'dangerZone': 'Tehlikeli alan',
@@ -147,4 +150,66 @@ const Map<String, String> tr = {
       'kalıcı olarak silinecek. Devam edilsin mi?',
   'cancel': 'İptal',
   'ok': 'Tamam',
+  // Second phone (work profile)
+  'secondPhone': 'İkinci telefon',
+  'secondPhoneApps': 'İkinci telefon uygulamaları',
+  'spIntro':
+      'İkinci telefon, Android\'in kendi "iş profili" özelliğiyle bu cihazda ayrı bir alan oluşturur (Shelter/Island ile aynı yöntem). İçinde kendi Play Store\'u vardır; oraya ayrı bir Google hesabı ekleyip uygulama kurabilirsin. Uygulamalar, hesaplar ve dosyalar ana telefonundan ayrı tutulur.',
+  'spDisclosure':
+      'Nasıl çalışır: GizliAlan yalnızca kendi oluşturduğu bu iş profilinin "profil sahibi" olur. Ana profilin veya cihazın yöneticisi olmaz; hiçbir şeyi izlemez, başka uygulamaların verisini okumaz, hiçbir şey yüklemez. Android kurulumda kendi bilgilendirmesini gösterir. Profildeki uygulamalar çanta rozetiyle, telefonun uygulama listesindeki "İş" sekmesinde de görünür. Kurulum ve yönetim yalnızca kasa açıkken yapılabilir.',
+  'spSetUp': 'İkinci telefonu kur',
+  'spSetUpConfirm':
+      'Android şimdi iş profili kurulumunu başlatacak. Birkaç dakika sürebilir ve sistem ekranları gösterilir. Devam edilsin mi?',
+  'spCreated':
+      'İkinci telefon hazır. Play Store\'u açıp ikinci Google hesabını ekleyebilirsin.',
+  'spCreatedPending':
+      'Kurulum tamamlandı; Android profili hazırlıyor. Birkaç saniye sonra tekrar kontrol et.',
+  'spCanceled': 'Kurulum iptal edildi veya tamamlanamadı.',
+  'spXiaomiWarn':
+      'Xiaomi / Redmi / POCO (MIUI/HyperOS) cihazlarda iş profili kurulumu sıklıkla engellenir veya yarım kalır. Yine de deneyebilirsin; olmazsa telefonun kendi "İkinci alan" özelliğini kullan (Ayarlar → Özel özellikler → İkinci alan).',
+  'spXiaomiBlocked':
+      'Bu Xiaomi/Redmi/POCO cihaz (MIUI/HyperOS) iş profili oluşturmaya izin vermiyor. Alternatif: telefonun yerleşik "İkinci alan" özelliği (Ayarlar → Özel özellikler → İkinci alan) ya da Android 15+ ise "Özel alan" (Ayarlar → Güvenlik ve gizlilik → Özel alan).',
+  'spNotAllowed':
+      'Bu cihazda şu anda iş profili oluşturulamıyor. Genelde zaten bir iş profili (ör. şirket hesabı) olduğu ya da üretici bu özelliği kapattığı için olur. Alternatif: Android 15+ "Özel alan" veya üreticinin ikinci alan / güvenli klasör özelliği.',
+  'spUnsupported':
+      'Bu cihaz Android iş profillerini desteklemiyor. Alternatif: Android 15+ "Özel alan" veya üreticinin özelliği (Samsung Güvenli Klasör, Xiaomi İkinci Alan).',
+  'spPrivateSpaceHint':
+      'Bu telefon Android 15 veya üstü: "Özel alan" (Ayarlar → Güvenlik ve gizlilik → Özel alan) da işletim sistemi düzeyinde ayrı bir alan sunar.',
+  'spUnlinked':
+      'Bu cihazda GizliAlan içeren bir iş profili var ama bu kasaya bağlı değil (uygulama verisi silinmiş olabilir). Kaldırmak için: Android Ayarlar → Hesaplar (veya Parolalar ve hesaplar) → İş → İş profilini kaldır. Sonra yeniden kurabilirsin.',
+  'spStatus': 'Durum',
+  'spStatusOpen': 'Açık',
+  'spStatusFrozen': 'Kapalı — uygulamalar gizli',
+  'spStatusQuiet': 'Kapalı — iş profili kapalı',
+  'spOpenStore': 'Play Store\'u aç (ikinci hesap)',
+  'spAddApp': 'Ana telefondan uygulama ekle',
+  'spAddAppHint':
+      'Sistem uygulamaları doğrudan kopyalanır; diğerleri için ikinci telefonun Play Store sayfası açılır.',
+  'spCloseNow': 'İkinci telefonu şimdi kapat',
+  'spOpenNow': 'İkinci telefonu aç',
+  'spRemove': 'İkinci telefonu kaldır',
+  'spRemoveConfirm':
+      'İş profili ve içindeki TÜM uygulamalar, hesaplar ve dosyalar kalıcı olarak silinecek. Devam edilsin mi?',
+  'spRemoved': 'İkinci telefon kaldırıldı.',
+  'spCloneOk': '"{app}" ikinci telefona eklendi.',
+  'spCloneStore':
+      'Android bu uygulamanın doğrudan kopyalanmasına izin vermiyor. İkinci telefonun Play Store sayfası açıldı; oradan kur (önce ikinci hesabı ekle).',
+  'spCloneFailed':
+      'Uygulama eklenemedi. İkinci telefonun Play Store\'undan kurabilirsin.',
+  'spNoApps':
+      'İkinci telefonda henüz uygulama yok. Play Store\'dan kur veya ana telefondan ekle.',
+  'spNoCandidates': 'Eklenebilecek uygulama bulunamadı.',
+  'spFailed': 'İşlem tamamlanamadı ({s}).',
+  'spClosed': 'İkinci telefon kapatıldı.',
+  'spOpened': 'İkinci telefon açıldı.',
+  'spQuietFallback':
+      'Android iş profilini kapatmaya izin vermedi; bunun yerine uygulamalar gizlendi.',
+  'spCloseMode': 'Kilitleyince ikinci telefon',
+  'spCloseModeHint':
+      'Kilitle düğmesiyle kilitlerken uygulanır, kasa açılınca geri açılır. Arka planda otomatik kilitte uygulanmaz (ikinci telefondaki uygulamayı kullanıyor olabilirsin).',
+  'spModeOff': 'Açık kalsın',
+  'spModeFreeze': 'Uygulamaları gizle',
+  'spModeQuiet': 'İş profilini kapat',
+  'spQuietNote':
+      'Android iş profilini kapatmaya çoğu zaman yalnızca varsayılan ana ekran uygulamasına izin verir. İzin yoksa GizliAlan uygulamaları gizlemeye geçer. Hızlı ayarlardaki "İş uygulamaları" düğmesini de kullanabilirsin.',
 };

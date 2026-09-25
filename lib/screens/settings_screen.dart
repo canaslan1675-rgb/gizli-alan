@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../l10n/l10n.dart';
+import '../services/second_phone_service.dart';
 import '../services/settings_service.dart';
 import '../services/vault_session.dart';
 import '../services/vault_space.dart';
@@ -294,6 +295,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
               setState(() {});
             },
           ),
+          _header(t('secondPhone')),
+          ListTile(
+            leading: const Icon(Icons.phone_android_outlined),
+            title: Text(t('spCloseMode')),
+            subtitle: Text(
+              s.secondPhoneCloseMode == SecondPhoneCloseMode.quiet
+                  ? '${t('spCloseModeHint')}\n${t('spQuietNote')}'
+                  : t('spCloseModeHint'),
+            ),
+            isThreeLine: true,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: SegmentedButton<SecondPhoneCloseMode>(
+              key: const ValueKey('sp_close_mode'),
+              segments: [
+                ButtonSegment(
+                  value: SecondPhoneCloseMode.off,
+                  label: Text(t('spModeOff')),
+                ),
+                ButtonSegment(
+                  value: SecondPhoneCloseMode.freeze,
+                  label: Text(t('spModeFreeze')),
+                ),
+                ButtonSegment(
+                  value: SecondPhoneCloseMode.quiet,
+                  label: Text(t('spModeQuiet')),
+                ),
+              ],
+              selected: {s.secondPhoneCloseMode},
+              showSelectedIcon: false,
+              onSelectionChanged: (v) async {
+                await s.setSecondPhoneCloseMode(v.first);
+                setState(() {});
+              },
+            ),
+          ),
           ...general,
           _header(t('dangerZone')),
           ListTile(
@@ -311,7 +349,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
           const Center(
             child: Text(
-              'GizliAlan 1.0.0 (MVP)',
+              'GizliAlan 0.2.0',
               style: TextStyle(color: GizliTheme.textSecondary, fontSize: 12),
             ),
           ),
