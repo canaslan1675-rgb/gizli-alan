@@ -86,6 +86,19 @@ void main() {
       _fontBytes('test/fixtures/fonts/Roboto-Regular-circled-i.ttf'),
     );
     await roboto.load();
+    // Android's "monospace" (vault home signature); DejaVu Sans Mono has the
+    // "●" glyph, Roboto Mono (Flutter cache) is the fallback.
+    final monoPath = [
+      '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',
+      '${Platform.environment['FLUTTER_ROOT'] ?? '/workspace/tools/flutter'}'
+          '/bin/cache/dart-sdk/bin/resources/devtools/assets/fonts/'
+          'Roboto_Mono/RobotoMono-Regular.ttf',
+    ].where((p) => File(p).existsSync());
+    if (monoPath.isNotEmpty) {
+      await (FontLoader(
+        'monospace',
+      )..addFont(_fontBytes(monoPath.first))).load();
+    }
     final icons = FontLoader('MaterialIcons')
       ..addFont(_fontBytes('$fontDir/MaterialIcons-Regular.otf'));
     await icons.load();

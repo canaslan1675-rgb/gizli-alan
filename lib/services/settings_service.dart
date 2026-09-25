@@ -19,6 +19,7 @@ class SettingsService {
   static const _kLockTimeout = 'lock_timeout_sec';
   static const _kLang = 'lang';
   static const _kWallpaper = 'wallpaper';
+  static const _kWallpaperImage = 'wallpaper_image';
   static const _kBrowserEngine = 'browser_engine';
   static const _kBrowserWipe = 'browser_wipe_on_lock';
   static const _kSecondPhoneClose = 'second_phone_close';
@@ -54,7 +55,17 @@ class SettingsService {
   /// Index into GizliTheme.wallpapers for the vault home screen.
   int get wallpaper => _prefs.getInt(_kWallpaper) ?? 0;
 
-  Future<void> setWallpaper(int i) => _prefs.setInt(_kWallpaper, i);
+  /// Choosing a plain colour also turns the bundled default image off.
+  Future<void> setWallpaper(int i) async {
+    await _prefs.setInt(_kWallpaper, i);
+    await _prefs.setBool(_kWallpaperImage, false);
+  }
+
+  /// Vault home uses the bundled default image (assets/wallpapers/default.jpg,
+  /// provided by the owner) when no vault photo is chosen. Default true.
+  bool get wallpaperImage => _prefs.getBool(_kWallpaperImage) ?? true;
+
+  Future<void> setWallpaperImage(bool v) => _prefs.setBool(_kWallpaperImage, v);
 
   /// What happens to the second phone (work profile) while the real vault
   /// is locked. Default [SecondPhoneCloseMode.freeze] (hide work apps).

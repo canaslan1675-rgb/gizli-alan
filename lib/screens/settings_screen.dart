@@ -1,3 +1,4 @@
+import '../app_version.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -317,31 +318,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ListTile(
         leading: const Icon(Icons.wallpaper_outlined),
         title: Text(t('wallpaper')),
+        // First swatch: default picture; the others: plain colour (Düz renk).
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 8),
           child: Wrap(
             spacing: 10,
-            children: List.generate(GizliTheme.wallpapers.length, (i) {
-              final selected = s.wallpaper == i;
-              return GestureDetector(
+            runSpacing: 8,
+            children: [
+              // Bundled default picture (owner-provided).
+              GestureDetector(
+                key: const ValueKey('settings_wallpaper_image'),
                 onTap: () async {
-                  await s.setWallpaper(i);
+                  await s.setWallpaperImage(true);
                   setState(() {});
                 },
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: GizliTheme.wallpaper(i),
-                    border: Border.all(
-                      color: selected ? GizliTheme.mint : Colors.white24,
-                      width: selected ? 3 : 1,
+                child: Tooltip(
+                  message: t('wallpaperDefaultImage'),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: const DecorationImage(
+                        image: AssetImage(GizliTheme.defaultWallpaperAsset),
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(
+                        color: s.wallpaperImage
+                            ? GizliTheme.mint
+                            : Colors.white24,
+                        width: s.wallpaperImage ? 3 : 1,
+                      ),
                     ),
                   ),
                 ),
-              );
-            }),
+              ),
+              ...List.generate(GizliTheme.wallpapers.length, (i) {
+                final selected = !s.wallpaperImage && s.wallpaper == i;
+                return GestureDetector(
+                  key: ValueKey('settings_wallpaper_$i'),
+                  onTap: () async {
+                    await s.setWallpaper(i);
+                    setState(() {});
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: GizliTheme.wallpaper(i),
+                      border: Border.all(
+                        color: selected ? GizliTheme.mint : Colors.white24,
+                        width: selected ? 3 : 1,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ],
           ),
         ),
       ),
@@ -464,11 +498,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
           Center(
             child: Text(
-              'GizliAlan 0.4.0 · ${Flavor.hasSecondPhone ? 'Full' : 'Play'}',
+              'GizliAlan $appVersion · ${Flavor.hasSecondPhone ? 'Full' : 'Play'}',
               key: const ValueKey('settings_version'),
               style: const TextStyle(
                 color: GizliTheme.textSecondary,
                 fontSize: 12,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          // Attribution for the bundled default wallpaper (xAI terms).
+          Center(
+            child: Text(
+              t('wallpaperAttribution'),
+              key: const ValueKey('settings_wallpaper_attribution'),
+              style: const TextStyle(
+                color: GizliTheme.textSecondary,
+                fontSize: 11,
               ),
             ),
           ),

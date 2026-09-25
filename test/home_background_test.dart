@@ -4,6 +4,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gizlialan/app_version.dart';
+import 'package:gizlialan/theme.dart';
 import 'package:gizlialan/app.dart';
 import 'package:gizlialan/flavor.dart';
 import 'package:gizlialan/l10n/l10n.dart';
@@ -147,6 +149,7 @@ void main() {
       // Calculator disguise has no background mechanism at all.
       expect(find.byType(DecoyCalculatorScreen), findsOneWidget);
       expect(find.byKey(const ValueKey('vault_home_background')), findsNothing);
+      expect(find.byKey(const ValueKey('home_watermark')), findsNothing);
 
       for (final k in [...'2580'.split(''), '=']) {
         await tester.tap(find.byKey(ValueKey('calc_$k')));
@@ -154,9 +157,25 @@ void main() {
       }
       await settle();
       expect(find.byType(VaultHomeScreen), findsOneWidget);
-      // Default: plain gradient, no image.
-      expect(homeDecoration().image, isNull);
-      expect(homeDecoration().gradient, isNotNull);
+      // Default: the bundled owner picture (AssetImage), no colour filter.
+      expect(homeDecoration().image!.image, isA<AssetImage>());
+      expect(
+        (homeDecoration().image!.image as AssetImage).assetName,
+        GizliTheme.defaultWallpaperAsset,
+      );
+      // Desktop-style watermark above the dock, not interactive.
+      expect(find.byKey(const ValueKey('home_watermark')), findsOneWidget);
+      expect(
+        find.textContaining('v$appVersion (build $appBuild)  ·  play'),
+        findsOneWidget,
+      );
+      expect(
+        find.ancestor(
+          of: find.byKey(const ValueKey('home_watermark')),
+          matching: find.byType(IgnorePointer),
+        ),
+        findsWidgets,
+      );
 
       final state = tester.state<GizliAlanAppState>(find.byType(GizliAlanApp));
       await tester.runAsync(
@@ -189,6 +208,7 @@ void main() {
       expect(withPhoto.image, isNotNull);
       expect(withPhoto.image!.image, isA<MemoryImage>());
       expect(withPhoto.image!.colorFilter, isNotNull); // readability scrim
+      expect(find.byKey(const ValueKey('home_watermark')), findsOneWidget);
 
       // Settings shows the state and only offers removal.
       // Through the home icon, like the owner (home reloads on return).
@@ -210,13 +230,38 @@ void main() {
       await tester.pageBack();
       await settle();
       await settle();
+      // Removing the vault photo goes back to the default picture.
+      expect(homeDecoration().image!.image, isA<AssetImage>());
+
+      // "Düz renk": picking a colour swatch switches to the plain gradient.
+      await tester.tap(find.byIcon(Icons.settings_outlined));
+      await settle();
+      final swatch = find.byKey(const ValueKey('settings_wallpaper_1'));
+      await tester.scrollUntilVisible(
+        swatch,
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.ensureVisible(swatch);
+      await settle();
+      await tester.tap(swatch);
+      await settle();
+      expect(settings.wallpaperImage, isFalse);
+      await tester.pageBack();
+      await settle();
       expect(homeDecoration().image, isNull);
+      expect(homeDecoration().gradient, isNotNull);
     },
   );
 
-  test('no bundled wallpaper is shipped and no new permissions', () {
+  test('only the owner default wallpaper is bundled; no new permissions', () {
     final pubspec = File('pubspec.yaml').readAsStringSync();
-    expect(pubspec.contains('assets/wallpapers'), isFalse);
+    expect(pubspec.contains('- assets/wallpapers/default.jpg'), isTrue);
+    expect(RegExp('assets/').allMatches(pubspec).length, 1);
+    expect(
+      File('assets/wallpapers/default.jpg').lengthSync(),
+      lessThan(400000),
+    );
     expect(
       File('android/app/src/main/AndroidManifest.xml').readAsStringSync(),
       isNot(contains('READ_MEDIA_IMAGES"/>')),

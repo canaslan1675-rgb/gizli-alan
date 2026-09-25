@@ -129,9 +129,12 @@ const Map<String, String> tr = {
   'wallpaper': 'Duvar kağıdı',
   'homeBackground': 'Ana ekran arka planı',
   'homeBackgroundDefault':
-      'Varsayılan (aşağıdaki renk). Fotoğraf kullanmak için: Galeri → fotoğrafa uzun bas → "Ana ekran arka planı yap".',
+      'Varsayılan (aşağıdaki görsel veya renk). Fotoğraf kullanmak için: Galeri → fotoğrafa uzun bas → "Ana ekran arka planı yap".',
   'homeBackgroundPhoto':
-      'Kasadaki bir fotoğraf. Kaldırınca aşağıdaki renge dönülür.',
+      'Kasadaki bir fotoğraf. Kaldırınca aşağıdaki varsayılana dönülür.',
+  'wallpaperDefaultImage': 'Varsayılan görsel',
+  'wallpaperAttribution': 'Varsayılan arka plan: Created with Grok',
+  'wallpaperPlain': 'Düz renk',
   'homeBackgroundRemove': 'Arka planı kaldır',
   'homeBackgroundSet':
       'Kasa ana ekranı arka planı yapıldı. Fotoğraf kasada şifreli kalır.',

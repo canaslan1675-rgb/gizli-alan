@@ -49,10 +49,19 @@ object SystemChannel {
                     }
                 }
                 "wipeWebData" -> result.success(wipeWebData(activity))
+                "appInfo" -> result.success(appInfo(activity))
                 else -> result.notImplemented()
             }
         }
         return channel
+    }
+
+    /** versionName / versionCode of the installed APK (vault home watermark). */
+    private fun appInfo(activity: Activity): Map<String, Any?>? = try {
+        val info = activity.packageManager.getPackageInfo(activity.packageName, 0)
+        mapOf("versionName" to info.versionName, "versionCode" to info.longVersionCode)
+    } catch (e: Exception) {
+        null
     }
 
     private fun wipeWebData(activity: Activity): Boolean = try {

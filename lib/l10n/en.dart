@@ -130,9 +130,12 @@ const Map<String, String> en = {
   'wallpaper': 'Wallpaper',
   'homeBackground': 'Home screen background',
   'homeBackgroundDefault':
-      'Default (colour below). To use a photo: Gallery → long-press a photo → "Set as home background".',
+      'Default (picture or colour below). To use a photo: Gallery → long-press a photo → "Set as home background".',
   'homeBackgroundPhoto':
-      'A photo from this vault. Remove it to go back to the colour below.',
+      'A photo from this vault. Remove it to go back to the default below.',
+  'wallpaperDefaultImage': 'Default picture',
+  'wallpaperAttribution': 'Default background: Created with Grok',
+  'wallpaperPlain': 'Plain colour',
   'homeBackgroundRemove': 'Remove background',
   'homeBackgroundSet':
       'Set as the vault home background. The photo stays encrypted in the vault.',

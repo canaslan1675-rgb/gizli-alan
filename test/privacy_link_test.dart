@@ -157,7 +157,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('privacy_open')));
     await tester.pumpAndSettle();
     // The same channel also carries the browser wipe (#32) — ignore it.
-    final opens = calls.where((c) => c.method != 'wipeWebData').toList();
+    final opens = calls.where((c) => c.method == 'openUrl').toList();
     expect(opens, hasLength(1));
     expect(opens.single.method, 'openUrl');
     expect(opens.single.arguments, {'url': url});

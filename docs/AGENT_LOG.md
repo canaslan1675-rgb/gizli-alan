@@ -108,4 +108,5 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 ## 2026-09-26 02:10 +03:00 — joi
 - Finished: #32 on `joi/32-private-browser` — private in-vault browser (see docs/PRIVATE_BROWSER.md), INTERNET permission (browser only), wipe on lock, docs/listing/feature graphic/screenshots updated. Version 0.4.0+6, prerelease `v0.4.0-test`.
 - Note for all agents: permissions are now exactly USE_BIOMETRIC + INTERNET (tests enforce it). Never add analytics/crash/ads SDKs or JS channels; all web-data wiping goes through `BrowserData.wipe()` (`gizlialan/system` `wipeWebData`). Don't claim "no internet permission" anywhere any more.
-- Next: owner device test #14 (DEVICE_TEST_PLAN §2.17–2.22 for the browser).
+- Also: default wallpaper `assets/wallpapers/default.jpg` (owner, Grok; attribution required, keep the Settings line) and the vault home signature (`_HomeWatermark`; its crypto terms are interpolated from `CryptoService` — if crypto changes, the text follows; `test/home_watermark_test.dart` checks).
+- Next: owner device test #14 (DEVICE_TEST_PLAN §2.17–2.23).
