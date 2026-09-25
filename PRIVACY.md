@@ -31,7 +31,9 @@ stores** fingerprint/face data; Android only tells it "success" or "failure".
 
 - No collection, sale or sharing of personal data. Nothing is uploaded.
 - No SMS, call log, contacts, location, microphone or camera access.
-- No Accessibility Service, Device Admin, Notification Listener or overlays.
+- No Accessibility Service, Notification Listener or overlays. GizliAlan is
+  never a device administrator of your phone or main profile (see "Second
+  phone" below for the optional work profile).
 - No monitoring of other apps or other people. GizliAlan is not a tracking or
   "spy" tool and must not be installed on someone else's device.
 - No advertising ID, no analytics, no third-party SDKs that collect data.
@@ -53,8 +55,30 @@ developer tooling; release builds do not.
 
 - The app can open as a working calculator; entering your PIN followed by `=`
   opens the vault. This is explained during setup, in the calculator's ⓘ
-  button and in the store listing. The launcher name/icon remain "GizliAlan".
+  button and in the store listing. In the launcher the app is labelled
+  "Calculator" / "Hesap Makinesi" with a simple calculator icon, and it really
+  is a working calculator; the vault behind it is disclosed as above.
 - An optional decoy PIN opens a separate, initially empty vault with its own key.
+
+## Second phone (optional Android work profile)
+
+- If you choose **Second phone → Set up**, Android creates a *work profile* on
+  your device and GizliAlan becomes the **profile owner of that profile only**
+  (the same mechanism as Shelter / Island). Android shows its own notice first.
+- Inside it you can add a separate Google account in its Play Store and install
+  apps. Those apps, accounts and files are kept apart from your main profile by
+  Android; GizliAlan does **not** read their data, messages or notifications.
+- GizliAlan only uses the profile-owner role to: hide/unhide the profile's apps
+  when you lock/unlock the vault (if you enable that), make an app from your
+  main profile available in the profile, open the profile's Play Store, list and
+  launch the profile's apps from the vault home, and delete the profile.
+- To show the app grid and the "add app" picker, GizliAlan reads the names and
+  icons of **launchable apps** on the device (a launcher-intent query, not
+  `QUERY_ALL_PACKAGES`). This stays on the device.
+- No extra permissions are requested and nothing is uploaded. Remove the
+  profile any time in the app or in Android Settings → Accounts → Work.
+  "Reset everything" in GizliAlan does not delete the work profile; remove it
+  separately.
 
 ## Your control / deletion
 
@@ -68,8 +92,8 @@ developer tooling; release builds do not.
 
 Encryption protects your vault against other apps, casual access and copies of
 the app's files. It cannot fully protect against a rooted/compromised device or
-someone who knows your PIN. GizliAlan does not hide itself from the launcher and
-is not a replacement for Android Private Space.
+someone who knows your PIN. GizliAlan does not hide itself from the launcher (it is
+listed as "Calculator") and is not a replacement for Android Private Space.
 
 ## Children
 

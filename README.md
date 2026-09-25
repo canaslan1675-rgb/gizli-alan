@@ -5,7 +5,9 @@ encrypted photos, files and notes behind a PIN / biometrics, with an optional
 (disclosed) calculator entry and an optional decoy PIN.
 
 **Package:** `com.offerforge.gizlialan` · **Flutter** 3.47 (stable) · **Android** 9+ (minSdk 28)
-**No spyware. No cloud. No SMS/calls. No Accessibility. No Device Admin. No INTERNET in release.**
+**No spyware. No cloud. No SMS/calls. No Accessibility. No main-device admin. No INTERNET in release.**
+
+Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculator icon (v0.2).
 
 ---
 
@@ -21,10 +23,13 @@ encrypted photos, files and notes behind a PIN / biometrics, with an optional
 - **Sanal telefon ana ekranı:** saat, ikon ızgarası, dock, duvar kağıdı seçimi
 - **Sahte PIN (isteğe bağlı):** ayrı anahtarla ayrı, boş bir kasa
 - **TR / EN** arayüz
+- **v0.2 — Nötr başlatıcı adı/simgesi:** uygulama listesinde "Hesap Makinesi" / "Calculator" adı ve özgün hesap makinesi simgesi (adaptive + monochrome). Kasa; onboarding, ⓘ ve mağaza metninde açıkça belirtilir.
+- **v0.2 — İkinci telefon (iş profili):** Android iş profili (Shelter/Island yöntemi) kurulur; kendi Play Store'u ve ayrı Google hesabıyla izole uygulamalar. Kasa içinden: kur, durum, kilitleyince uygulamaları gizle / profili kapat (seçenek), ana telefondan uygulama ekle, Play Store'u aç, uygulamaları listele/başlat, profili kaldır. Xiaomi MIUI/HyperOS'ta engellenebilir → İkinci alan / Özel alan önerisi.
 
 ### Ne yapmaz
 SMS/arama okuma, konum, rehber, mikrofon/kamera, Erişilebilirlik Hizmeti,
-Cihaz Yöneticisi, bildirim dinleyici, sunucuya yükleme, ikon gizleme — **yok**.
+ana cihaz yöneticisi, bildirim dinleyici, sunucuya yükleme, ikon gizleme — **yok**.
+(İkinci telefon: yalnızca kullanıcının kendi oluşturduğu iş profilinin profil sahibi.)
 
 ---
 
@@ -66,11 +71,18 @@ lib/
     calculator_engine.dart     pure calculator logic + PIN candidate
     legacy_migration.dart      scaffold plaintext → encrypted vault
     settings_service.dart      non-secret prefs
+    second_phone_service.dart  work-profile "second phone" channel client + availability logic
   screens/                     decoy_calculator, pin_lock, onboarding, vault_home,
                                gallery, photo_viewer, files, notes_list, note_edit,
-                               settings, set_pin
+                               settings, set_pin, second_phone
   widgets/vault_actions.dart   export/delete helpers, progress dialog
-test/                          crypto, auth, calculator, storage unit tests + app flow widget test
+android/app/src/main/kotlin/…/secondphone/
+                               ProfileAdminReceiver (profile owner only), ProfileSetup,
+                               ProvisioningDoneActivity, ProfileActionActivity (signed
+                               in-profile trampoline), SecondPhoneChannel (main profile)
+tool/gen_launcher_icon.py      generates the original launcher icon (vector + PNGs)
+test/                          crypto, auth, calculator, storage, second-phone, branding
+                               unit tests + app-flow / second-phone widget tests
 docs/PLAY_COMPLIANCE.md        permissions, Data safety answers, listing TR/EN, reviewer notes
 ```
 
@@ -83,8 +95,11 @@ docs/PLAY_COMPLIANCE.md        permissions, Data safety answers, listing TR/EN, 
   storage (not PIN-wrapped, so biometrics can unlock). Protects against other
   apps, casual access and file copies; not against a rooted device with the
   phone unlocked, or someone who knows the PIN.
-- The app stays visible in the launcher as "GizliAlan". It is not Android
-  Private Space.
+- The app stays visible in the launcher, labelled "Calculator" / "Hesap
+  Makinesi" (a real calculator; vault disclosed). It is not Android Private Space.
+- Second phone isolation is Android's work profile; GizliAlan is its profile
+  owner only. Work-profile apps show a briefcase badge and appear in the
+  launcher's Work tab — it is separation, not invisibility.
 - No PIN recovery.
 
 See `PRIVACY.md`, `docs/PLAY_COMPLIANCE.md`, `DECISIONS.md`.
