@@ -116,28 +116,24 @@ void main() {
           findsOneWidget,
         );
         await tester.scrollUntilVisible(
-          find.text('399 TL'),
+          find.text('1,500 TL / year'),
           200,
           scrollable: find.byType(Scrollable).last,
         );
-        expect(find.text('149 TL / year'), findsOneWidget);
-        expect(find.text('Best value'), findsOneWidget);
-        // Yearly is listed before lifetime.
+        expect(find.text('290 TL / month'), findsOneWidget);
+        expect(find.text('Save 57% · Best value'), findsOneWidget);
+        expect(find.textContaining('one-time'), findsNothing);
+        // Monthly is listed before yearly.
         expect(
-          tester.getTopLeft(find.byKey(const ValueKey('plan_yearly'))).dy,
+          tester.getTopLeft(find.byKey(const ValueKey('plan_monthly'))).dy,
           lessThan(
-            tester.getTopLeft(find.byKey(const ValueKey('plan_lifetime'))).dy,
+            tester.getTopLeft(find.byKey(const ValueKey('plan_yearly'))).dy,
           ),
         );
-
-        await tester.scrollUntilVisible(
-          find.text('Buy'),
-          200,
-          scrollable: find.byType(Scrollable).last,
-        );
-        await tester.ensureVisible(find.text('Buy'));
+        final subscribe = find.text('Subscribe').last;
+        await tester.ensureVisible(subscribe);
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Buy'));
+        await tester.tap(subscribe);
         await tester.pumpAndSettle();
         expect(find.text('Not available yet'), findsOneWidget);
         await tester.tap(find.byKey(const ValueKey('pro_dialog_ok')));
