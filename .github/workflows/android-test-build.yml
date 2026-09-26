@@ -52,7 +52,7 @@ jobs:
           cp build/app/outputs/flutter-apk/app-full-release.apk /tmp/full.apk
 
       - name: Kotlin unit tests (full flavor)
-        run: cd android && ./gradlew --no-daemon -q :app:testFullReleaseUnitTest
+        run: cd android && ./gradlew --no-daemon -q :app:testFullDebugUnitTest
 
       - name: Verify signer (must match earlier *-test releases)
         run: |
