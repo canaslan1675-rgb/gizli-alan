@@ -54,6 +54,13 @@ const Map<String, String> tr = {
   'proStubToggle': "Pro'yu simüle et (test sürümü)",
   'proStubToggleHint':
       'Satın alma yok; yalnızca Pro özelliklerini denemek için yerel bir anahtar.',
+  'deleteOriginal': 'Kasaya aktarınca orijinali sil',
+  'deleteOriginalHint':
+      "Özel fotoğraf ve dosyalarını kasaya aktardığında, orijinalleri telefonun galerisinde, İndirilenler klasöründe ve Dosyalar uygulamasında kalmaya devam eder. Telefonunu eline alan biri bunları oradan görebilir. Bu seçenek açıkken, dosya kasaya şifrelenerek güvenle kaydedildikten sonra telefondaki orijinali silinir. Böylece dosya yalnızca kasada, şifreli olarak kalır ve PIN'in olmadan kimse göremez. Kasadaki kopya ve ikinci telefon (iş profili) içindeki dosyalar etkilenmez. Android silme için onay isteyebilir.",
+  'originalsDeletedN': '{n} orijinal silindi.',
+  'originalsKeptN': '{n} orijinal silinemedi; kasadaki kopya güvende.',
+  'originalsDeclined':
+      'Orijinaller silinmedi (onay verilmedi); kasadaki kopya güvende.',
   'calcInfoTitle': 'Bu hesap makinesi hakkında',
   'calcInfoBody':
       'Bu gerçek bir hesap makinesidir ve aynı zamanda GizliAlan kasanın '

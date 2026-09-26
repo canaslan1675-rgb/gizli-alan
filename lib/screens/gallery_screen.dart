@@ -8,8 +8,10 @@ import '../app.dart';
 import '../l10n/l10n.dart';
 import '../models/vault_event.dart';
 import '../services/vault_session.dart';
+import '../services/pro_entitlement.dart';
 import '../services/vault_storage.dart';
 import '../theme.dart';
+import '../widgets/import_delete_originals.dart';
 import '../widgets/vault_actions.dart';
 import 'photo_viewer_screen.dart';
 
@@ -46,6 +48,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   Future<void> _import() async {
     final app = GizliAlanApp.of(context);
+    if (ProEntitlement.deleteOriginalAfterImport(app.settings)) {
+      await importDeletingOriginals(
+        context,
+        _store,
+        images: true,
+        event: VaultEventType.galleryImported,
+      );
+      if (mounted) _reload();
+      return;
+    }
     final t = L10n.current;
     final messenger = ScaffoldMessenger.of(context);
     final picked = await app.withExternalUi(

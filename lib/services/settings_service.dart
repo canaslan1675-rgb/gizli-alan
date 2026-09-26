@@ -22,6 +22,7 @@ class SettingsService {
   static const _kWallpaperImage = 'wallpaper_image';
   static const _kProStub = 'pro_stub_active';
   static const _kHideCalcInfo = 'hide_calc_info_icon';
+  static const _kDeleteOriginal = 'delete_original_after_import';
   static const _kBrowserEngine = 'browser_engine';
   static const _kBrowserWipe = 'browser_wipe_on_lock';
   static const _kSecondPhoneClose = 'second_phone_close';
@@ -55,6 +56,14 @@ class SettingsService {
   bool get hideCalcInfoIcon => _prefs.getBool(_kHideCalcInfo) ?? false;
 
   Future<void> setHideCalcInfoIcon(bool v) => _prefs.setBool(_kHideCalcInfo, v);
+
+  /// User opt-in (Pro only, #37): delete the phone's original after a
+  /// verified import. Effective value: ProEntitlement.
+  bool get deleteOriginalAfterImport =>
+      _prefs.getBool(_kDeleteOriginal) ?? false;
+
+  Future<void> setDeleteOriginalAfterImport(bool v) =>
+      _prefs.setBool(_kDeleteOriginal, v);
 
   /// Biometric unlock for the real vault (never opens the decoy vault).
   bool get biometricEnabled => _prefs.getBool(_kBiometric) ?? false;

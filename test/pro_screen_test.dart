@@ -132,18 +132,6 @@ void main() {
     );
   }
 
-  Finder settingsList() => find
-      .descendant(
-        of: find.byType(SettingsScreen),
-        matching: find.byType(Scrollable),
-      )
-      .first;
-
-  Future<void> scrollToEnd(WidgetTester tester) async {
-    await tester.drag(settingsList(), const Offset(0, -5000));
-    await settle(tester, 2);
-  }
-
   group('Pro stub gating (#28)', () {
     test('hasProStub: play off, full on, override wins', () {
       Flavor.debugOverride = AppFlavor.play;
@@ -165,7 +153,11 @@ void main() {
           MaterialPageRoute(builder: (_) => const SettingsScreen()),
         );
         await settle(tester);
-        await scrollToEnd(tester);
+        await tester.scrollUntilVisible(
+          find.text('Privacy & permissions'),
+          150,
+          scrollable: find.byType(Scrollable).last,
+        );
         expect(find.byKey(const ValueKey('settings_pro')), findsNothing);
         expect(find.text('GizliAlan Pro'), findsNothing);
         expect(find.byType(ProScreen), findsNothing);
@@ -182,7 +174,11 @@ void main() {
         MaterialPageRoute(builder: (_) => const SettingsScreen()),
       );
       await settle(tester);
-      await scrollToEnd(tester);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('settings_pro')),
+        150,
+        scrollable: find.byType(Scrollable).last,
+      );
       expect(find.byKey(const ValueKey('settings_pro')), findsOneWidget);
     });
   });

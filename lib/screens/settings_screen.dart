@@ -245,6 +245,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  /// "Delete original after import" (Pro, #37): visible to everyone with
+  /// its explanation; non-Pro taps open the Pro screen (full) or say
+  /// "Pro yakında" (play).
+  Widget _deleteOriginalTile() {
+    final t = L10n.of(context);
+    final app = GizliAlanApp.of(context);
+    final s = app.settings;
+    const icon = Icon(Icons.auto_delete_outlined);
+    final pro = ProEntitlement.isActive(s);
+    return SwitchListTile(
+      key: const ValueKey('settings_delete_original'),
+      secondary: icon,
+      title: Row(
+        children: [
+          Flexible(child: Text(t('deleteOriginal'))),
+          const SizedBox(width: 6),
+          const _ProBadge(),
+        ],
+      ),
+      subtitle: Text(
+        pro
+            ? t('deleteOriginalHint')
+            : '${t('deleteOriginalHint')}\n'
+                  '${ProEntitlement.available ? t('hideCalcInfoLocked') : t('proSoon')}',
+      ),
+      isThreeLine: true,
+      value: ProEntitlement.deleteOriginalAfterImport(s),
+      onChanged: (v) async {
+        if (!pro) {
+          if (ProEntitlement.available) {
+            await Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const ProScreen()));
+          } else {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(t('proSoon'))));
+          }
+          if (mounted) setState(() {});
+          return;
+        }
+        await s.setDeleteOriginalAfterImport(v);
+        setState(() {});
+      },
+    );
+  }
+
   Widget _header(String text) => Padding(
     padding: const EdgeInsets.fromLTRB(16, 20, 16, 6),
     child: Text(
@@ -542,6 +589,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
           _hideCalcInfoTile(),
+          _deleteOriginalTile(),
           // Help stays reachable even when the ⓘ button is hidden.
           ListTile(
             key: const ValueKey('settings_calc_help'),
@@ -612,4 +660,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+}
+
+class _ProBadge extends StatelessWidget {
+  const _ProBadge();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+    decoration: BoxDecoration(
+      color: GizliTheme.warning.withValues(alpha: 0.15),
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: GizliTheme.warning.withValues(alpha: 0.6)),
+    ),
+    child: const Text(
+      'PRO',
+      style: TextStyle(
+        fontSize: 10,
+        fontWeight: FontWeight.w700,
+        color: GizliTheme.warning,
+      ),
+    ),
+  );
 }
