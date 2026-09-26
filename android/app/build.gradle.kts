@@ -73,6 +73,16 @@ android {
     }
 
     signingConfigs {
+        // CI (android-test-build.yml) points this at the restored shared debug
+        // keystore so test APKs keep the same signer as earlier *-test builds.
+        System.getenv("GIZLI_DEBUG_KEYSTORE")?.takeIf { it.isNotBlank() }?.let { path ->
+            getByName("debug") {
+                storeFile = file(path)
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
         if (hasReleaseKeystore) {
             create("release") {
                 // storeFile is resolved relative to the android/ directory.
