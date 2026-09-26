@@ -82,7 +82,7 @@ Build-time options (#28):
   `play` too (review only). No billing either way; the 50-item free limit is displayed, not enforced.
 - Store feature graphic: `python3 tool/gen_feature_graphic.py` (Pillow) →
   `docs/store/feature_graphic/feature_graphic_{tr,en}.png` (1024×500 RGB).
-- Play upload example: `flutter build appbundle --release --flavor play --dart-define=PRIVACY_URL=https://…`.
+- Play upload example: `flutter build appbundle --release --flavor play --dart-define=PRIVACY_URL=https://canaslan1675-rgb.github.io/gizli-alan/privacy/`.
 
 TR: `play` = Google Play adayı, İkinci telefon yok (APK'da cihaz yöneticisi bileşeni bile yok);
 `full` = İkinci telefonlu test/yan yükleme sürümü. İkisi aynı telefona birlikte kurulabilir.

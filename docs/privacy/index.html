@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>GizliAlan — Privacy Policy / Gizlilik Politikası</title>
+<style>
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:820px;margin:0 auto;padding:24px 16px;line-height:1.55;color:#1b2430;background:#fff}
+h1,h2{line-height:1.25} h2{margin-top:2em;border-bottom:1px solid #dde3ea;padding-bottom:.2em}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.95em}
+th,td{border:1px solid #cfd7e0;padding:6px 8px;text-align:left;vertical-align:top}
+code{background:#f1f4f7;padding:1px 4px;border-radius:4px}
+blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid #2ecc8f;background:#f4fbf8}
+</style>
+</head>
+<body>
+<h1>Privacy Policy — GizliAlan</h1>
+<p><strong>Last updated:</strong> 2026-09-26
+<strong>App:</strong> GizliAlan (package <code>com.offerforge.gizlialan</code>)
+<strong>Audience:</strong> The owner of the device, for their own content only.</p>
+<blockquote>
+<p>TR özet aşağıda. / Turkish summary below.</p>
+</blockquote>
+<h2>Summary</h2>
+<p>GizliAlan is an <strong>on-device</strong> personal vault. Photos, files and notes you add are
+<strong>encrypted and stored only on your device</strong>. There is no account, no server,
+no analytics, no telemetry, no advertising and no crash-reporting SDK. The app
+never sends your vault content or any usage data anywhere. Since version 0.4.0
+the app requests the Internet permission <strong>only</strong> for the optional in-vault
+private browser: the only network traffic is to web pages that <strong>you</strong> open
+there (see "Private browser" below).</p>
+<h2>What the app stores (on your device only)</h2>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Where</th>
+<th>Protection</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vault photos, files, notes</td>
+<td>App-private storage (<code>files/spaces/…</code>)</td>
+<td>AES-256-GCM, random nonce per item; file names/types are inside an encrypted index</td>
+<td>Your vault</td>
+</tr>
+<tr>
+<td>Vault data keys (one per vault)</td>
+<td><code>flutter_secure_storage</code> (Android Keystore-backed)</td>
+<td>Hardware/OS-protected key storage</td>
+<td>Decrypt your vault</td>
+</tr>
+<tr>
+<td>PIN and optional decoy PIN</td>
+<td><code>flutter_secure_storage</code></td>
+<td>Only a salted PBKDF2-HMAC-SHA256 hash is kept, never the PIN</td>
+<td>Unlock</td>
+</tr>
+<tr>
+<td>In-vault notification list (the app's own events: imports, exports, deletions, Second phone changes, number of wrong PIN attempts)</td>
+<td>App-private storage (<code>files/spaces/&lt;vault&gt;/events.gae</code>)</td>
+<td>AES-256-GCM, separate per vault; shown only inside the unlocked vault, never as a system notification</td>
+<td>Tell you what happened in your vault</td>
+</tr>
+<tr>
+<td>Failed-attempt counters</td>
+<td><code>flutter_secure_storage</code></td>
+<td>—</td>
+<td>Brute-force throttling; count of wrong PIN attempts since your last unlock (shown in the real vault's notification list)</td>
+</tr>
+<tr>
+<td>Preferences (language, auto-lock, calculator entry, biometrics on/off, wallpaper)</td>
+<td>SharedPreferences (app-private)</td>
+<td>Not secret</td>
+<td>App settings</td>
+</tr>
+</tbody>
+</table>
+<p>Biometric unlock uses Android's BiometricPrompt. The app <strong>never receives or
+stores</strong> fingerprint/face data; Android only tells it "success" or "failure".</p>
+<h2>What the app does NOT do</h2>
+<ul>
+<li>No collection, sale or sharing of personal data. The app uploads nothing and
+  has no server. (Pages you open in the private browser receive what any
+  website receives from a browser — see below.)</li>
+<li>No SMS, call log, contacts, location, microphone or camera access.</li>
+<li>No Accessibility Service, Notification Listener or overlays. GizliAlan is
+  never a device administrator of your phone or main profile (see "Second
+  phone" below for the optional work profile).</li>
+<li>No monitoring of other apps or other people. GizliAlan is not a tracking or
+  "spy" tool and must not be installed on someone else's device.</li>
+<li>No advertising ID, no analytics, no telemetry, no crash reporting, no ads,
+  no third-party SDKs that collect data.</li>
+<li>No cloud backup: Android auto-backup and device-transfer are disabled for
+  this app.</li>
+</ul>
+<h2>Permissions</h2>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>USE_BIOMETRIC</code></td>
+<td>Optional fingerprint/face unlock of your vault</td>
+</tr>
+<tr>
+<td><code>INTERNET</code></td>
+<td>Only for the in-vault private browser, to load pages <strong>you</strong> open (since 0.4.0)</td>
+</tr>
+</tbody>
+</table>
+<p>Photos and files are imported only when <strong>you</strong> pick them in the system Photo
+Picker / file picker (no storage or media permission). Export uses the system
+"save as" dialog. Location permissions that the WebView plugin would add are
+removed from the manifest. If a build shows a link to this
+policy (Settings → Privacy &amp; permissions) and you tap "Open in browser", your
+browser app opens the page — GizliAlan itself sends nothing.</p>
+<h2>Private browser (since 0.4.0)</h2>
+<p>The vault home screen has an optional <strong>Browser</strong> ("Tarayıcı"). It uses
+Android System WebView. GizliAlan adds no tracking to it and sends nothing to
+the developer. What happens when you use it:</p>
+<ul>
+<li>Only the pages <strong>you</strong> type or open are loaded. Searches go to the search
+  engine you choose (default DuckDuckGo; Startpage, Brave, Google or Bing
+  selectable). No search-suggestion requests are made while you type.</li>
+<li>Those websites see your IP address and whatever you send them, as with any
+  browser. Their own privacy policies apply.</li>
+<li>Android System WebView's <strong>Safe Browsing</strong> is left at the platform default:
+  Android/Google Play services may check visited URLs against Google's list of
+  dangerous sites. This is a system component, not an SDK in GizliAlan. WebView
+  usage-metrics upload is opted out.</li>
+<li>Cookies, cache and site storage live in the app's private storage and are
+  <strong>deleted when the vault locks</strong> (setting "Kilitlenince temizle / Clear on
+  lock", on by default; also "Clear now"). History exists only in memory.</li>
+<li>Third-party cookies are blocked. File access, JavaScript bridges to the app,
+  location, camera, microphone, downloads and file uploads are disabled.</li>
+<li>Screenshots and recent-apps previews stay blocked (FLAG_SECURE).</li>
+</ul>
+<h2>Calculator entry and decoy PIN (disclosed features)</h2>
+<ul>
+<li>The app can open as a working calculator; entering your PIN followed by <code>=</code>
+  opens the vault. This is explained during setup, in the calculator's ⓘ
+  button and in the store listing. In the launcher the app is labelled
+  "Calculator" / "Hesap Makinesi" with a simple calculator icon, and it really
+  is a working calculator; the vault behind it is disclosed as above.</li>
+<li>An optional decoy PIN opens a separate, initially empty vault with its own key.</li>
+</ul>
+<h2>Second phone (optional Android work profile)</h2>
+<ul>
+<li>If you choose <strong>Second phone → Set up</strong>, Android creates a <em>work profile</em> on
+  your device and GizliAlan becomes the <strong>profile owner of that profile only</strong>
+  (the same mechanism as Shelter / Island). Android shows its own notice first.</li>
+<li>Inside it you can add a separate Google account in its Play Store and install
+  apps. Those apps, accounts and files are kept apart from your main profile by
+  Android; GizliAlan does <strong>not</strong> read their data, messages or notifications.</li>
+<li>(Both flavors) A vault photo you choose as the vault home background stays encrypted in the vault; only its id is stored (also encrypted), and it is decrypted into memory only while the vault is open.</li>
+<li>GizliAlan only uses the profile-owner role to: hide the profile's apps while
+  the vault is locked and unhide them when you unlock it ("Hide work apps while
+  locked", on by default, can be turned off; it only remembers which of the
+  profile's apps it hid, on the device), make an app from your
+  main profile available in the profile, open the profile's Play Store, list and
+  launch the profile's apps from the vault home, and delete the profile.</li>
+<li>To show the app grid and the "add app" picker, GizliAlan reads the names and
+  icons of <strong>launchable apps</strong> on the device (a launcher-intent query, not
+  <code>QUERY_ALL_PACKAGES</code>). This stays on the device.</li>
+<li>No extra permissions are requested and nothing is uploaded. Remove the
+  profile any time in the app or in Android Settings → Accounts → Work.
+  "Reset everything" in GizliAlan does not delete the work profile; remove it
+  separately.</li>
+</ul>
+<h2>Your control / deletion</h2>
+<ul>
+<li>Delete individual items inside the app, or use <strong>Settings → Reset everything</strong>.</li>
+<li>"Clear data" in Android settings or uninstalling removes all vault data and
+  keys permanently.</li>
+<li><strong>There is no PIN recovery.</strong> We cannot recover your data because we never
+  have it.</li>
+</ul>
+<h2>Security limits (honest)</h2>
+<p>Encryption protects your vault against other apps, casual access and copies of
+the app's files. It cannot fully protect against a rooted/compromised device or
+someone who knows your PIN. GizliAlan does not hide itself from the launcher (it is
+listed as "Calculator") and is not a replacement for Android Private Space.</p>
+<h2>Children</h2>
+<p>Not directed at children under 13.</p>
+<h2>Changes</h2>
+<p>If features that touch data (e.g. optional backup, purchases) are added, this
+policy and the Play Data safety form will be updated <strong>before</strong> release.</p>
+<h2>Contact</h2>
+<p>Developer: OfferForge (Demirhan, personal project).
+Support e-mail: <strong>delibaltabaris5@gmail.com</strong>
+This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
+<hr />
+<h2>TR — Özet</h2>
+<p>GizliAlan <strong>cihazda çalışan</strong> kişisel bir kasadır. Eklediğin fotoğraf, dosya ve
+notlar <strong>yalnızca cihazında, AES-256-GCM ile şifreli</strong> saklanır. Hesap, sunucu,
+analitik, telemetri, reklam veya hata raporlama SDK'sı yoktur; uygulama kasa
+içeriğini veya kullanım verisini hiçbir yere göndermez. 0.4.0'dan itibaren
+internet izni <strong>yalnızca</strong> isteğe bağlı kasa içi gizli tarayıcı içindir: tek ağ
+trafiği, tarayıcıda <strong>senin</strong> açtığın sayfalaradır (Android System WebView;
+çerez/önbellek kasa kilitlenince silinir, üçüncü taraf çerezler engelli,
+indirme kapalı). PIN yalnızca tuzlanmış PBKDF2 özeti olarak, anahtarlar Android
+Keystore destekli güvenli depoda tutulur. İzinler: isteğe bağlı biyometrik
+kilit (<code>USE_BIOMETRIC</code>) ve yalnızca kasa içi tarayıcı için <code>INTERNET</code>. Fotoğraf/dosyaları sistem seçicileriyle sen seçersin.
+SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik Hizmeti veya Cihaz
+Yöneticisi kullanılmaz; başkalarını izleme aracı değildir. Kasa içi bildirim listesi (içe/dışa aktarma, silme, İkinci telefon
+değişiklikleri, hatalı PIN sayısı) de şifreli saklanır ve yalnızca kasa içinde görünür;
+sistem bildirimi gönderilmez. Uygulama yedeği
+kapalıdır. PIN kurtarma yoktur. Hesap makinesi girişi ve sahte PIN özellikleri
+kurulumda, uygulama içinde ve mağaza açıklamasında açıkça belirtilir.</p>
+<p><strong>İletişim / destek:</strong> delibaltabaris5@gmail.com — Politika: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
+<p><em>This document is provided for transparency and Play policy readiness. It is not legal advice.</em></p>
+</body>
+</html>

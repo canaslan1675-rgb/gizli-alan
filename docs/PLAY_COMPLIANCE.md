@@ -212,7 +212,7 @@ config, no geo/reviewer detection).
 - [x] Privacy policy (PRIVACY.md) — **host on HTTPS before submission**
 - [x] Data safety answers drafted
 - [x] Onboarding: "own device only" confirmation
-- [ ] Real support e-mail + hosted policy URL
+- [x] Support e-mail delibaltabaris5@gmail.com + hosted policy URL https://canaslan1675-rgb.github.io/gizli-alan/privacy/
 - [x] Screenshots: **Play listing uses `docs/store/screenshots/play/{tr,en}/`** `01_calculator_info.png … 06_settings.png` (no Second phone anywhere); `full/{tr,en}/` is the same set for the side-load build (vault home shows the Second phone tile) (1080×1920 RGB PNG; calculator with ⓘ dialog, onboarding step 2, vault home, gallery grid, notes, settings). Widget-rendered with demo content by `tool/gen_store_screenshots.sh`
 - [x] Release signing config (`android/key.properties`, README "Release signing") — [ ] owner still has to create the upload keystore (#13); until then release builds use debug keys
 - [ ] Subscriptions/IAP: not in this build (see DECISIONS.md). Settings → "GizliAlan Pro" is a **UI stub only** (planned prices, buttons say "not available in this test build"; no billing library, no network). **Since v0.3.1 (#28) the stub is hidden in the `play` flavor** (no non-working purchase buttons for reviewers); it remains in `full`. Real Play Billing = owner decision (#15).
