@@ -92,7 +92,7 @@ class SettingsService {
   Future<void> setWallpaperImage(bool v) => _prefs.setBool(_kWallpaperImage, v);
 
   /// What happens to the second phone (work profile) while the real vault
-  /// is locked. Default [SecondPhoneCloseMode.freeze] (hide work apps).
+  /// is locked. Default [SecondPhoneCloseMode.quiet] (hide apps + try to pause).
   SecondPhoneCloseMode get secondPhoneCloseMode =>
       SecondPhoneCloseMode.parse(_prefs.getString(_kSecondPhoneClose));
 

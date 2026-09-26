@@ -164,12 +164,20 @@ const Map<String, String> en = {
   'browserSearchWith':
       'Searches use {engine}. No search suggestions are sent while you type.',
   'browserPrivacyNote':
-      'Private browser inside the vault. GizliAlan adds no tracking, analytics or ads — only the sites you open are contacted. Third-party cookies are blocked, history is kept only while this screen is open, and cookies, cache and site data are erased when the vault locks (Settings → Browser). Sites can still see your IP address, like any browser. Downloads, file uploads, location, camera and microphone are off. Android System WebView may check pages with Google Safe Browsing (Android default).',
+      'Private browser inside the vault. GizliAlan adds no tracking, analytics or ads — only the sites you open are contacted. Third-party cookies are blocked, history is kept only while this screen is open, and cookies, cache and site data are erased when the vault locks (Settings → Browser). Sites can still see your IP address, like any browser. Downloads go straight into the encrypted vault (images to Photos, other files to Files), never to phone storage; long-press an image to save it. File uploads, location, camera and microphone are off. Android System WebView may check pages with Google Safe Browsing (Android default).',
   'browserBack': 'Back',
   'browserForward': 'Forward',
   'browserReload': 'Reload',
   'browserBlockedLink':
       'This kind of link (app, phone, e-mail, file…) is not opened from the vault browser.',
+  'browserSaveImage': 'Save image to vault',
+  'browserDownloading': 'Downloading into the vault…',
+  'browserSavedPhotos': 'Saved to vault Photos: {name}',
+  'browserSavedFiles': 'Saved to vault Files: {name}',
+  'browserDlTooLarge': 'Too large to save (max {mb} MB).',
+  'browserDlNotImage': 'This is not an image.',
+  'browserDlUnsupported': 'This download cannot be saved (unsupported link).',
+  'browserDlFailed': 'Download failed.',
   'browserEngine': 'Search engine',
   'browserWipeOnLock': 'Clear on lock',
   'browserWipeOnLockHint':

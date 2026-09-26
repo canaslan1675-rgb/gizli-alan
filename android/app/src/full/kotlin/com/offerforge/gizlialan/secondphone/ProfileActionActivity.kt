@@ -66,72 +66,19 @@ class ProfileActionActivity : Activity() {
         finish()
     }
 
-    private val prefs by lazy { getSharedPreferences("second_phone_profile", MODE_PRIVATE) }
+    private val hider by lazy { ProfileHider(this) }
 
-    private fun frozen(): Set<String> = prefs.getStringSet("frozen", emptySet()) ?: emptySet()
+    private fun frozen(): Set<String> = hider.frozen()
 
-    private fun setFrozen(s: Set<String>) = prefs.edit().putStringSet("frozen", s).apply()
+    private fun setFrozen(s: Set<String>) = hider.setFrozen(s)
 
-    private fun launchablePackages(): Set<String> {
-        val i = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-        return packageManager.queryIntentActivities(i, 0)
-            .map { it.activityInfo.packageName }
-            .toSet()
-    }
+    /** Hides every hideable launchable app (see [ProfileHider], [HidePolicy]). */
+    private fun freeze() = reply(RESULT_OK, "frozen", hider.hideAll())
 
-    /**
-     * Hides the profile's launchable apps (see [HidePolicy] for exactly
-     * which) so they disappear from the phone launcher's Work/"İş" folder.
-     * Records every package WE hid, so [unfreeze] only unhides those.
-     */
-    private fun freeze() {
-        val before = frozen()
-        val succeeded = mutableListOf<String>()
-        for (pkg in HidePolicy.toHide(launchablePackages(), packageName, before)) {
-            try {
-                if (dpm.setApplicationHidden(admin, pkg, true)) succeeded.add(pkg)
-            } catch (_: Exception) {
-                // protected / vanished package: leave it alone
-            }
-        }
-        val done = HidePolicy.afterHide(before, succeeded)
-        setFrozen(done)
-        reply(RESULT_OK, "frozen", done.size)
-    }
-
-    private fun isHidden(pkg: String): Boolean = try {
-        dpm.isApplicationHidden(admin, pkg)
-    } catch (_: Exception) {
-        false
-    }
-
-    private fun installedEvenIfHidden(pkg: String): Boolean = try {
-        packageManager.getApplicationInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES)
-        true
-    } catch (_: PackageManager.NameNotFoundException) {
-        false
-    }
-
-    /** Unhides only what [freeze] recorded (+ Play Store as a safety net). */
+    /** Unhides only what we recorded (+ Play Store as a safety net). */
     private fun unfreeze() {
-        val recorded = frozen()
-        val failed = mutableListOf<String>()
-        var n = 0
-        for (pkg in HidePolicy.unhideCandidates(recorded)) {
-            val wasOurs = pkg in recorded
-            try {
-                dpm.setApplicationHidden(admin, pkg, false)
-            } catch (_: Exception) {
-                // package may have been uninstalled meanwhile
-            }
-            if (isHidden(pkg)) {
-                if (wasOurs) failed.add(pkg)
-            } else if (wasOurs) {
-                n++
-            }
-        }
-        setFrozen(HidePolicy.afterUnhide(failed, ::installedEvenIfHidden))
-        reply(RESULT_OK, if (failed.isEmpty()) "unfrozen" else "partial", n)
+        val (n, allOk) = hider.unhideAll()
+        reply(RESULT_OK, if (allOk) "unfrozen" else "partial", n)
     }
 
     private fun isInstalledHere(pkg: String): Boolean = try {

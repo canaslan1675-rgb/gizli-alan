@@ -140,7 +140,10 @@ the developer. What happens when you use it:</p>
   <strong>deleted when the vault locks</strong> (setting "Kilitlenince temizle / Clear on
   lock", on by default; also "Clear now"). History exists only in memory.</li>
 <li>Third-party cookies are blocked. File access, JavaScript bridges to the app,
-  location, camera, microphone, downloads and file uploads are disabled.</li>
+  location, camera, microphone and file uploads are disabled. Downloads (and
+  long-press "Save image to vault") go <strong>only into the encrypted vault</strong>
+  (images to Photos, other files to Files); nothing is written to shared
+  storage or the Downloads folder.</li>
 <li>Screenshots and recent-apps previews stay blocked (FLAG_SECURE).</li>
 </ul>
 <h2>Calculator entry and decoy PIN (disclosed features)</h2>
@@ -206,7 +209,7 @@ içeriğini veya kullanım verisini hiçbir yere göndermez. 0.4.0'dan itibaren
 internet izni <strong>yalnızca</strong> isteğe bağlı kasa içi gizli tarayıcı içindir: tek ağ
 trafiği, tarayıcıda <strong>senin</strong> açtığın sayfalaradır (Android System WebView;
 çerez/önbellek kasa kilitlenince silinir, üçüncü taraf çerezler engelli,
-indirme kapalı). PIN yalnızca tuzlanmış PBKDF2 özeti olarak, anahtarlar Android
+indirilenler yalnızca şifreli kasaya kaydedilir, telefon depolamasına yazılmaz). PIN yalnızca tuzlanmış PBKDF2 özeti olarak, anahtarlar Android
 Keystore destekli güvenli depoda tutulur. İzinler: isteğe bağlı biyometrik
 kilit (<code>USE_BIOMETRIC</code>) ve yalnızca kasa içi tarayıcı için <code>INTERNET</code>. Fotoğraf/dosyaları sistem seçicileriyle sen seçersin.
 SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik Hizmeti veya Cihaz

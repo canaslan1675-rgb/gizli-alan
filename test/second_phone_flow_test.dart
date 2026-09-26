@@ -121,7 +121,10 @@ void main() {
     final state = tester.state<GizliAlanAppState>(find.byType(GizliAlanApp));
     expect(state.secondPhoneIfUnlocked, isNull); // gated behind unlock
     // App start while locked hides the work apps (#30).
-    expect(sp.closes, [SecondPhoneCloseMode.freeze]);
+    expect(
+      sp.closes,
+      [SecondPhoneCloseMode.quiet],
+    ); // default: hide + try pause; Android refused the pause, so closedBy = freeze
     expect(settings.secondPhoneClosedBy, SecondPhoneCloseMode.freeze);
     sp.closes.clear();
 
@@ -138,7 +141,7 @@ void main() {
     // Lock button closes the second phone (default: hide apps).
     await tester.tap(find.byKey(const ValueKey('lock_button')));
     await settle(tester);
-    expect(sp.closes, [SecondPhoneCloseMode.freeze]);
+    expect(sp.closes, [SecondPhoneCloseMode.quiet]);
     expect(settings.secondPhoneClosedBy, SecondPhoneCloseMode.freeze);
     expect(state.secondPhoneIfUnlocked, isNull);
 
@@ -253,7 +256,7 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.4.3 · Play'), findsOneWidget);
+      expect(find.text('GizliAlan 0.4.4 · Play'), findsOneWidget);
       await tester.pageBack();
       await settle(tester);
 
@@ -300,7 +303,7 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.4.3 · Full'), findsOneWidget);
+      expect(find.text('GizliAlan 0.4.4 · Full'), findsOneWidget);
     });
   });
 
@@ -354,14 +357,25 @@ void main() {
       expect(settings.secondPhoneClosedBy, isNull);
     });
 
-    testWidgets('already hidden: start/resume do not hide again', (
+    testWidgets('already hidden: start sweeps again (catches apps installed '
+        'since the last lock, #45), resume within cooldown does not', (
       tester,
     ) async {
       await settings.setSecondPhoneClosedBy(SecondPhoneCloseMode.freeze);
       final state = await start(tester);
+      expect(sp.closes, [SecondPhoneCloseMode.quiet]);
       state.didChangeAppLifecycleState(AppLifecycleState.paused);
       state.didChangeAppLifecycleState(AppLifecycleState.resumed);
       await settle(tester);
+      expect(sp.closes.length, 1);
+      expect(settings.secondPhoneClosedBy, SecondPhoneCloseMode.freeze);
+    });
+
+    testWidgets('paused (quiet) profile: no sweep while locked', (
+      tester,
+    ) async {
+      await settings.setSecondPhoneClosedBy(SecondPhoneCloseMode.quiet);
+      await start(tester);
       expect(sp.closes, isEmpty);
     });
 

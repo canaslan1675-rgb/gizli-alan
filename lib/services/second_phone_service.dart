@@ -9,19 +9,17 @@ enum SecondPhoneCloseMode {
 
   /// Hide (freeze) the profile's launchable apps so they disappear from the
   /// phone launcher's Work/"İş" folder; unhidden again on the next real
-  /// unlock. Default.
+  /// unlock.
   freeze,
 
   /// [freeze] AND additionally try to pause the work profile (quiet mode).
   /// Android only lets the default launcher / system apps pause a profile,
-  /// so on most phones only the hiding part takes effect.
+  /// so on most phones only the hiding part takes effect. Default since
+  /// v0.4.4 (#45: owner wants the strictest possible lock).
   quiet;
 
-  static SecondPhoneCloseMode parse(String? v) =>
-      SecondPhoneCloseMode.values.firstWhere(
-        (m) => m.name == v,
-        orElse: () => SecondPhoneCloseMode.freeze,
-      );
+  static SecondPhoneCloseMode parse(String? v) => SecondPhoneCloseMode.values
+      .firstWhere((m) => m.name == v, orElse: () => SecondPhoneCloseMode.quiet);
 }
 
 /// How the second-phone screen should present itself on this device.

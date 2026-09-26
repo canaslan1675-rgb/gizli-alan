@@ -50,18 +50,58 @@ object HidePolicy {
         "com.mi.android.globallauncher",
     )
 
+    /**
+     * Hidden on lock even if they have no launcher entry: the profile's
+     * system file browser (DocumentsUI). Its cross-profile "Work" tab is how
+     * the personal side browses work-profile files (Play downloads, app
+     * files); with it hidden that tab has nothing to open (#45).
+     */
+    val ALSO_HIDE: Set<String> = setOf(
+        "com.android.documentsui",
+        "com.google.android.documentsui",
+    )
+
+    /**
+     * User restrictions set on the work profile while the vault is locked and
+     * cleared on unlock (#45): no clipboard between profiles, no sharing from
+     * the personal side into the profile.
+     */
+    val LOCK_RESTRICTIONS: List<String> = listOf(
+        "no_cross_profile_copy_paste", // UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE
+        "no_sharing_into_profile", // UserManager.DISALLOW_SHARE_INTO_MANAGED_PROFILE
+    )
+
+    /** What to hide on lock: launchable apps + [ALSO_HIDE] that are installed. */
+    fun lockTargets(launchable: Collection<String>, installed: (String) -> Boolean): Set<String> =
+        launchable.toSet() + ALSO_HIDE.filter(installed)
+
     /** May [pkg] be hidden? Never ourselves, never an essential package. */
     fun canHide(pkg: String, self: String): Boolean =
         pkg.isNotBlank() && pkg != self && pkg !in NEVER_HIDE
 
     /**
-     * Packages to hide now: launchable ones that are allowed and not already
-     * recorded as hidden by us. (Packages hidden by someone else are not
-     * launchable, so they are never recorded and never unhidden by us.)
+     * Packages to hide now: every launchable package that may be hidden.
+     * A package that is launchable is by definition visible, so it is hidden
+     * again even if it is already in our recorded set (e.g. Play re-installed
+     * or updated it, or it was unhidden outside GizliAlan) — issue #45: the
+     * old version skipped recorded packages, so such apps stayed visible in
+     * the launcher's Work tab while the vault was locked.
      */
-    fun toHide(launchable: Collection<String>, self: String, alreadyHidden: Set<String>): List<String> =
+    fun toHide(launchable: Collection<String>, self: String): List<String> =
         launchable.asSequence()
-            .filter { canHide(it, self) && it !in alreadyHidden }
+            .filter { canHide(it, self) }
+            .distinct()
+            .sorted()
+            .toList()
+
+    /**
+     * Fallback for packages whose hide failed: suspend them instead (icon
+     * greyed out and not openable) so they are at least unusable; only
+     * hideable packages, never already-suspended-by-us ones.
+     */
+    fun toSuspend(failedHide: Collection<String>, self: String, alreadySuspended: Set<String>): List<String> =
+        failedHide.asSequence()
+            .filter { canHide(it, self) && it !in alreadySuspended }
             .distinct()
             .sorted()
             .toList()

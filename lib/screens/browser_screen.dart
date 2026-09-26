@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../l10n/l10n.dart';
+import '../services/browser_download.dart';
 import '../services/browser_engine.dart';
 import '../services/browser_logic.dart';
 import '../theme.dart';
@@ -12,6 +13,9 @@ import '../theme.dart';
 /// cookies/cache/storage are wiped on vault lock ("Kilitlenince temizle").
 class BrowserScreen extends StatefulWidget {
   const BrowserScreen({super.key});
+
+  /// Fetches downloads into memory; replaceable in tests.
+  static BrowserDownloader downloader = BrowserDownloader();
 
   @override
   State<BrowserScreen> createState() => _BrowserScreenState();
@@ -30,9 +34,14 @@ class _BrowserScreenState extends State<BrowserScreen> {
     super.didChangeDependencies();
     if (_engine != null) return;
     final factory = GizliAlanApp.of(context).browserEngineFactory;
-    _engine = factory(onBlocked: _blocked)
-      ..url.addListener(_onUrl)
-      ..progress.addListener(_onProgress);
+    _engine =
+        factory(
+            onBlocked: _blocked,
+            onDownload: _saveToVault,
+            onImageLongPress: _imageMenu,
+          )
+          ..url.addListener(_onUrl)
+          ..progress.addListener(_onProgress);
   }
 
   BrowserEngine get _e => _engine!;
@@ -42,6 +51,63 @@ class _BrowserScreenState extends State<BrowserScreen> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(L10n.current('browserBlockedLink'))));
+  }
+
+  /// Long-press on an image: "Save image to vault".
+  Future<void> _imageMenu(DownloadRequest r) async {
+    if (!mounted) return;
+    final t = L10n.current;
+    final save = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (c) => SafeArea(
+        child: ListTile(
+          key: const ValueKey('browser_save_image'),
+          leading: const Icon(Icons.download_for_offline_outlined),
+          title: Text(t('browserSaveImage')),
+          onTap: () => Navigator.of(c).pop(true),
+        ),
+      ),
+    );
+    if (save == true) await _saveToVault(r);
+  }
+
+  /// Any download (and saved images) -> encrypted vault, never public storage.
+  Future<void> _saveToVault(DownloadRequest r) async {
+    if (!mounted) return;
+    final session = GizliAlanApp.of(context).session;
+    if (session == null) return;
+    final t = L10n.current;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(t('browserDownloading'))));
+    String msg;
+    try {
+      final f = await BrowserScreen.downloader.fetch(r);
+      final photos = f.target == DownloadTarget.photos;
+      final store = photos ? session.gallery : session.files;
+      await store.add(name: f.name, bytes: f.bytes, mime: f.mime);
+      msg = t(
+        photos ? 'browserSavedPhotos' : 'browserSavedFiles',
+      ).replaceAll('{name}', f.name);
+    } on DownloadException catch (e) {
+      final mb =
+          BrowserDownloadLogic.limitFor(imageOnly: r.imageOnly) ~/
+          (1024 * 1024);
+      msg = switch (e.failure) {
+        DownloadFailure.tooLarge => t(
+          'browserDlTooLarge',
+        ).replaceAll('{mb}', '$mb'),
+        DownloadFailure.notImage => t('browserDlNotImage'),
+        DownloadFailure.unsupported => t('browserDlUnsupported'),
+        _ => t('browserDlFailed'),
+      };
+    } catch (_) {
+      msg = t('browserDlFailed');
+    }
+    messenger
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(msg)));
   }
 
   void _onUrl() {

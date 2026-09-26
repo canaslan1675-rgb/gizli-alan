@@ -210,10 +210,10 @@ void main() {
     });
   });
 
-  test('settings: close mode defaults to freeze and persists', () async {
+  test('settings: close mode defaults to quiet (#45) and persists', () async {
     SharedPreferences.setMockInitialValues({});
     final s = await SettingsService.create();
-    expect(s.secondPhoneCloseMode, SecondPhoneCloseMode.freeze);
+    expect(s.secondPhoneCloseMode, SecondPhoneCloseMode.quiet);
     expect(s.secondPhoneClosedBy, isNull);
     await s.setSecondPhoneCloseMode(SecondPhoneCloseMode.quiet);
     await s.setSecondPhoneClosedBy(SecondPhoneCloseMode.freeze);
@@ -221,14 +221,16 @@ void main() {
     expect(s.secondPhoneClosedBy, SecondPhoneCloseMode.freeze);
     await s.setSecondPhoneClosedBy(null);
     expect(s.secondPhoneClosedBy, isNull);
-    expect(SecondPhoneCloseMode.parse('bogus'), SecondPhoneCloseMode.freeze);
+    expect(SecondPhoneCloseMode.parse('bogus'), SecondPhoneCloseMode.quiet);
   });
 
   test('settings: "hide work apps while locked" defaults on (#30)', () async {
     SharedPreferences.setMockInitialValues({});
     final s = await SettingsService.create();
     expect(s.hideWorkAppsWhenLocked, isTrue);
-    expect(s.pauseWorkProfileWhenLocked, isFalse);
+    expect(s.pauseWorkProfileWhenLocked, isTrue); // default since #45
+    await s.setPauseWorkProfileWhenLocked(false);
+    expect(s.secondPhoneCloseMode, SecondPhoneCloseMode.freeze);
 
     await s.setPauseWorkProfileWhenLocked(true);
     expect(s.secondPhoneCloseMode, SecondPhoneCloseMode.quiet);

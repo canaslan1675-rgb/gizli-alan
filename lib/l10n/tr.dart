@@ -163,12 +163,20 @@ const Map<String, String> tr = {
   'browserSearchWith':
       'Aramalar {engine} ile yapılır. Yazarken arama önerisi gönderilmez.',
   'browserPrivacyNote':
-      'Kasa içinde gizli tarayıcı. GizliAlan izleme, analitik veya reklam eklemez; yalnızca açtığın sitelerle bağlantı kurulur. Üçüncü taraf çerezler engellenir, geçmiş yalnızca bu ekran açıkken tutulur; çerezler, önbellek ve site verileri kasa kilitlenince silinir (Ayarlar → Tarayıcı). Her tarayıcıda olduğu gibi siteler IP adresini görebilir. İndirme, dosya yükleme, konum, kamera ve mikrofon kapalıdır. Android System WebView sayfaları Google Güvenli Tarama ile denetleyebilir (Android varsayılanı).',
+      'Kasa içinde gizli tarayıcı. GizliAlan izleme, analitik veya reklam eklemez; yalnızca açtığın sitelerle bağlantı kurulur. Üçüncü taraf çerezler engellenir, geçmiş yalnızca bu ekran açıkken tutulur; çerezler, önbellek ve site verileri kasa kilitlenince silinir (Ayarlar → Tarayıcı). Her tarayıcıda olduğu gibi siteler IP adresini görebilir. İndirilenler doğrudan şifreli kasaya gider (resimler Fotoğraflar\'a, diğer dosyalar Dosyalar\'a), telefon depolamasına asla yazılmaz; bir resmi kaydetmek için üzerine uzun bas. Dosya yükleme, konum, kamera ve mikrofon kapalıdır. Android System WebView sayfaları Google Güvenli Tarama ile denetleyebilir (Android varsayılanı).',
   'browserBack': 'Geri',
   'browserForward': 'İleri',
   'browserReload': 'Yenile',
   'browserBlockedLink':
       'Bu tür bağlantılar (uygulama, telefon, e-posta, dosya…) kasa tarayıcısından açılmaz.',
+  'browserSaveImage': 'Resmi kasaya kaydet',
+  'browserDownloading': 'Kasaya indiriliyor…',
+  'browserSavedPhotos': 'Kasadaki Fotoğraflar\'a kaydedildi: {name}',
+  'browserSavedFiles': 'Kasadaki Dosyalar\'a kaydedildi: {name}',
+  'browserDlTooLarge': 'Kaydetmek için çok büyük (en fazla {mb} MB).',
+  'browserDlNotImage': 'Bu bir resim değil.',
+  'browserDlUnsupported': 'Bu indirme kaydedilemez (desteklenmeyen bağlantı).',
+  'browserDlFailed': 'İndirme başarısız.',
   'browserEngine': 'Arama motoru',
   'browserWipeOnLock': 'Kilitlenince temizle',
   'browserWipeOnLockHint':

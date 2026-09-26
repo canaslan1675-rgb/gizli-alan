@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
+import 'browser_download.dart';
 import 'browser_logic.dart';
 
 /// Minimal browser surface used by BrowserScreen, so the screen can be
@@ -26,7 +27,11 @@ abstract class BrowserEngine {
 }
 
 typedef BrowserEngineFactory =
-    BrowserEngine Function({required void Function(String url) onBlocked});
+    BrowserEngine Function({
+      required void Function(String url) onBlocked,
+      required void Function(DownloadRequest r) onDownload,
+      required void Function(DownloadRequest r) onImageLongPress,
+    });
 
 /// Android System WebView, locked down for private browsing inside the vault:
 /// - JavaScript on (needed by most sites) but **no JavaScript channels**: the
@@ -34,11 +39,17 @@ typedef BrowserEngineFactory =
 /// - no file / content:// access, no geolocation, every web permission
 ///   request (camera, microphone, MIDI…) denied, no file chooser;
 /// - third-party cookies blocked; only http(s) navigations allowed;
-/// - downloads are not handled (no DownloadListener) — nothing is saved.
+/// - downloads never touch public storage: the native DownloadListener and
+///   image long-press (Kotlin `gizlialan/browser`, #45) hand the URL to
+///   [onDownload] / [onImageLongPress], which save into the encrypted vault.
 /// Cookies/cache/storage live in the app-private WebView directory and are
 /// wiped on lock by [BrowserData.wipe] (setting "Kilitlenince temizle").
 class WebViewBrowserEngine implements BrowserEngine {
-  WebViewBrowserEngine({required void Function(String url) onBlocked}) {
+  WebViewBrowserEngine({
+    required void Function(String url) onBlocked,
+    required void Function(DownloadRequest r) onDownload,
+    required void Function(DownloadRequest r) onImageLongPress,
+  }) {
     _controller = WebViewController(onPermissionRequest: (r) => r.deny())
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFF0B1220))
@@ -67,7 +78,31 @@ class WebViewBrowserEngine implements BrowserEngine {
       AndroidWebViewCookieManager(
         const PlatformWebViewCookieManagerCreationParams(),
       ).setAcceptThirdPartyCookies(platform, false);
+      _channel.setMethodCallHandler((call) async {
+        final args = call.arguments;
+        if (args is! Map) return;
+        if (call.method == 'download') {
+          onDownload(DownloadRequest.fromMap(args));
+        } else if (call.method == 'imageLongPress') {
+          onImageLongPress(DownloadRequest.fromMap(args, imageOnly: true));
+        }
+      });
+      _webViewId = platform.webViewIdentifier;
     }
+  }
+
+  static const MethodChannel _channel = MethodChannel('gizlialan/browser');
+  int? _webViewId;
+
+  /// (Re)installs the native download / long-press hooks. Done before each
+  /// load: webview_flutter installs its own DownloadListener when the
+  /// navigation delegate is set, and ours must be the one that stays.
+  Future<void> _attachHooks() async {
+    final id = _webViewId;
+    if (id == null) return;
+    try {
+      await _channel.invokeMethod<bool>('attach', {'id': id});
+    } catch (_) {}
   }
 
   late final WebViewController _controller;
@@ -84,7 +119,10 @@ class WebViewBrowserEngine implements BrowserEngine {
   Widget view() => WebViewWidget(controller: _controller);
 
   @override
-  Future<void> load(Uri uri) => _controller.loadRequest(uri);
+  Future<void> load(Uri uri) async {
+    await _attachHooks();
+    await _controller.loadRequest(uri);
+  }
 
   @override
   Future<bool> canGoBack() => _controller.canGoBack();
@@ -103,6 +141,7 @@ class WebViewBrowserEngine implements BrowserEngine {
 
   @override
   void dispose() {
+    _channel.setMethodCallHandler(null);
     _url.dispose();
     _progress.dispose();
   }
