@@ -116,12 +116,12 @@ void main() {
           findsOneWidget,
         );
         await tester.scrollUntilVisible(
-          find.text('1,500 TL / year'),
+          find.text('999 TL / year'),
           200,
           scrollable: find.byType(Scrollable).last,
         );
-        expect(find.text('290 TL / month'), findsOneWidget);
-        expect(find.text('Save 57% · Best value'), findsOneWidget);
+        expect(find.text('150 TL / month'), findsOneWidget);
+        expect(find.text('Save 45% · Best value'), findsOneWidget);
         expect(find.textContaining('one-time'), findsNothing);
         // Monthly is listed before yearly.
         expect(
