@@ -49,8 +49,8 @@ unlock still unhides.
 | Event | Result |
 |---|---|
 | **Lock** button (or Back on vault home) in the real vault | Hidden immediately. |
-| App start while locked (calculator / PIN screen) | Hidden if not already hidden. |
-| GizliAlan returns to the foreground while locked (incl. auto-lock on resume) | Hidden if not already hidden (at most one attempt per visit, 10 s cooldown — the cross-profile request briefly shows a translucent activity which pauses/resumes us). |
+| App start while locked (calculator / PIN screen) | Hidden — every time (since #45 also when already hidden, so apps installed since the last lock are caught). |
+| GizliAlan returns to the foreground while locked (incl. auto-lock on resume) | Re-swept (at most one attempt per visit, 10 s cooldown — the cross-profile request briefly shows a translucent activity which pauses/resumes us). |
 | Background auto-lock (Home button, launching a work app from the vault) | **Not immediately** — Android blocks activity starts from a backgrounded app, and the cross-profile request is an activity. Happens the next time GizliAlan is in the foreground while locked. |
 | Real unlock (PIN or biometric) | Unhidden (only what we hid). If the marker was lost but the toggle is on, the profile is asked anyway (it only unhides its own list). |
 | Decoy vault | Nothing is hidden or unhidden. |
@@ -105,3 +105,20 @@ where the ROM offers it.
   `pauseWorkProfileWhenLocked`, `GizliAlanAppState.ensureWorkAppsHiddenWhileLocked`,
   `WorkAppsHideSwitches` (Second phone screen + Settings).
 - #30 added no permissions (INTERNET arrived later in 0.4.0, only for the in-vault browser), FLAG_SECURE unchanged, nothing is read from other apps.
+
+## v0.4.4 (#45): strictest possible lock — what is and isn't achievable
+
+Owner bug (Xiaomi, v0.4.3): apps installed from Play inside the profile stayed in the Work tab while locked.
+Cause: the policy already covered *all* launchable apps, but (1) packages already in our "hidden" record were skipped, so a recorded app that became visible again (Play re-install/update, unhidden elsewhere) was never re-hidden; (2) once "closed", the vault never swept again until the next unlock.
+
+Now, on every lock / every foreground visit while locked / every 15 min inside the profile (JobScheduler, while locked):
+- **Hidden:** every package with a launcher entry (incl. Play Store, Files, Chrome, apps installed at any time) + the system file browser DocumentsUI (no launcher entry, but it is what serves the personal side's "Work" tab in the file picker). Never: GizliAlan itself (its launcher entry is disabled in the profile anyway), Play services, installer/permission UIs, Settings/SystemUI, MIUI security/launcher. Unlock unhides exactly the recorded set (+ Play Store safety net). If a hide fails, the app is **suspended** instead (greyed out, not openable) and unsuspended on unlock.
+- **Profile policies while locked** (cleared on unlock): no cross-profile copy/paste (`DISALLOW_CROSS_PROFILE_COPY_PASTE`), no sharing into the profile (`DISALLOW_SHARE_INTO_MANAGED_PROFILE`), work caller-ID / contacts search / Bluetooth contact sharing disabled. Profile name is now neutral ("Work" / "İş").
+- **Quiet mode (pause profile)** is now the default and always requested — but Android only lets the *default launcher* or system apps pause a profile (`UserManager.requestQuietModeEnabled` → SecurityException for normal apps; there is no profile-owner/DPM equivalent on a personal device). On a normal phone it is refused and hiding is what applies; if the owner ever makes a launcher that allows it, it takes effect automatically.
+
+**Not achievable with public APIs (no root):**
+- **Removing the Work tab/folder itself.** Stock Launcher3, MIUI/HyperOS and Pixel launchers show the Work tab whenever a managed profile exists; with every app hidden it is *empty* (Launcher3 shows its "no work apps"/paused card), but the tab stays. Only deleting the profile removes it. A third-party launcher that can hide the Work tab (user-installed) is the only workaround.
+- **Immediate hide when auto-locking in the background** (Home button): Android blocks the cross-profile request from a backgrounded app; the profile-side job / next foreground visit catch up (≤15 min, usually at the next GizliAlan open).
+- **Instant reaction to an install while locked:** `ACTION_PACKAGE_ADDED` is not delivered to manifest receivers (API 26+) and the profile has no running process; covered by the 15-min job and the foreground sweep. Installing is practically impossible while locked anyway (Play Store is hidden).
+- **Blocking the personal side from all work files without quiet mode:** Android's own default cross-profile filters (set by the system, not by us) can't be removed by a profile owner; hiding DocumentsUI in the profile removes the file picker's Work tab target, but full isolation needs quiet mode.
+- MIUI/HyperOS launcher sometimes refreshes the Work tab only after it is reopened (icon cache); hidden apps disappear on the next drawer open.

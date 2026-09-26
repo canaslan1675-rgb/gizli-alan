@@ -9,6 +9,7 @@ import 'package:gizlialan/l10n/l10n.dart';
 import 'package:gizlialan/screens/browser_screen.dart';
 import 'package:gizlialan/screens/vault_home_screen.dart';
 import 'package:gizlialan/services/auth_service.dart';
+import 'package:gizlialan/services/browser_download.dart';
 import 'package:gizlialan/services/browser_engine.dart';
 import 'package:gizlialan/services/browser_logic.dart';
 import 'package:gizlialan/services/secure_kv.dart';
@@ -19,9 +20,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app_flow_test.dart' show FakeBiometrics;
 
 class FakeEngine implements BrowserEngine {
-  FakeEngine(this.onBlocked);
+  FakeEngine(this.onBlocked, [this.onDownload, this.onImageLongPress]);
 
   final void Function(String url) onBlocked;
+  final void Function(DownloadRequest r)? onDownload;
+  final void Function(DownloadRequest r)? onImageLongPress;
   final loads = <Uri>[];
   final _url = ValueNotifier<String>('');
   final _progress = ValueNotifier<int>(100);
@@ -202,6 +205,18 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    /// Waits (real time; encryption runs off the UI isolate) until [text]
+    /// is no longer shown.
+    Future<void> untilGone(WidgetTester tester, String text) async {
+      for (var i = 0; i < 50 && find.text(text).evaluate().isNotEmpty; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 100)),
+        );
+        await tester.pump();
+      }
+      await tester.pumpAndSettle();
+    }
+
     Future<GizliAlanAppState> openVault(WidgetTester tester) async {
       tester.view.physicalSize = const Size(1080, 2340);
       tester.view.devicePixelRatio = 3;
@@ -213,11 +228,16 @@ void main() {
           auth: auth,
           biometrics: FakeBiometrics(),
           baseDirProvider: () async => tmp,
-          browserEngineFactory: ({required onBlocked}) {
-            final e = FakeEngine(onBlocked);
-            engines.add(e);
-            return e;
-          },
+          browserEngineFactory:
+              ({
+                required onBlocked,
+                required onDownload,
+                required onImageLongPress,
+              }) {
+                final e = FakeEngine(onBlocked, onDownload, onImageLongPress);
+                engines.add(e);
+                return e;
+              },
           wipeBrowserData: () async {
             wipes++;
             return true;
@@ -274,6 +294,55 @@ void main() {
       expect(find.byType(BrowserScreen), findsNothing);
       expect(engines.single.disposed, isTrue);
       expect(wipes, wipesAtStart + 1);
+    });
+
+    testWidgets('long-press image -> Save to vault -> encrypted Photos; '
+        'other downloads -> vault Files (#45)', (tester) async {
+      final state = await openVault(tester);
+      await tester.tap(find.text('Tarayıcı'));
+      await settle(tester);
+      const pngB64 =
+          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+      engines.single.onImageLongPress!(
+        const DownloadRequest(
+          url: 'data:image/png;base64,$pngB64',
+          imageOnly: true,
+        ),
+      );
+      await settle(tester);
+      expect(find.text('Resmi kasaya kaydet'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('browser_save_image')));
+      await settle(tester);
+      await untilGone(tester, 'Kasaya indiriliyor…');
+      expect(find.textContaining("Fotoğraflar'a kaydedildi"), findsOneWidget);
+      final photos = await tester.runAsync(() => state.session!.gallery.list());
+      expect(photos!.single.mime, 'image/png');
+
+      engines.single.onDownload!(
+        const DownloadRequest(
+          url: 'data:text/plain;base64,aGVsbG8=',
+          contentDisposition: 'attachment; filename="not.txt"',
+        ),
+      );
+      await settle(tester);
+      await untilGone(tester, 'Kasaya indiriliyor…');
+      expect(
+        find.textContaining("Dosyalar'a kaydedildi: not.txt"),
+        findsOneWidget,
+      );
+      final files = await tester.runAsync(() => state.session!.files.list());
+      expect(files!.single.name, 'not.txt');
+
+      // Unsupported download: message, nothing stored.
+      engines.single.onDownload!(
+        const DownloadRequest(url: 'blob:https://x/1'),
+      );
+      await settle(tester);
+      expect(find.textContaining('kaydedilemez'), findsOneWidget);
+      expect(
+        (await tester.runAsync(() => state.session!.files.list()))!.length,
+        1,
+      );
     });
 
     testWidgets('clear on lock OFF: no wipe; engine choice is used', (

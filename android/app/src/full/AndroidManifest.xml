@@ -51,6 +51,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <!-- Work profile only: periodic re-hide while the vault is locked (#45). -->
+        <service
+            android:name=".secondphone.HideSweepJob"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false" />
     </application>
     <queries>
         <!-- Second phone: list launchable apps (main + own work profile) for

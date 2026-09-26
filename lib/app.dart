@@ -271,12 +271,16 @@ class GizliAlanAppState extends State<GizliAlanApp>
   /// Android does not let a backgrounded app start the cross-profile
   /// request, so a background auto-lock cannot hide immediately; it happens
   /// the next time GizliAlan is in the foreground while locked. Does nothing
-  /// while unlocked, when the toggle is off, when already hidden by us, or
-  /// in the `play` flavor.
+  /// while unlocked, when the toggle is off, when the profile is paused by
+  /// us (quiet mode), or in the `play` flavor.
   Future<void> ensureWorkAppsHiddenWhileLocked() async {
     if (!Flavor.hasSecondPhone || isUnlocked) return;
     if (!settings.hideWorkAppsWhenLocked) return;
-    if (settings.secondPhoneClosedBy != null) return;
+    // Already hidden by freeze: sweep again anyway, so apps installed or
+    // re-shown since the last lock are hidden too (#45). A paused (quiet)
+    // profile cannot be reached without the system "turn on work apps"
+    // prompt, so skip it.
+    if (settings.secondPhoneClosedBy == SecondPhoneCloseMode.quiet) return;
     if (_closing || _hideTriedThisVisit) return;
     final last = _lastHideAttempt;
     if (last != null && DateTime.now().difference(last) < hideCooldown) return;

@@ -65,7 +65,7 @@ void main() {
       expect(p, contains('"$pkg"'));
     }
     final action = File(
-      '$src/full/kotlin/com/offerforge/gizlialan/secondphone/ProfileActionActivity.kt',
+      '$src/full/kotlin/com/offerforge/gizlialan/secondphone/ProfileHider.kt',
     ).readAsStringSync();
     expect(action, contains('HidePolicy.toHide'));
     expect(action, contains('HidePolicy.unhideCandidates'));

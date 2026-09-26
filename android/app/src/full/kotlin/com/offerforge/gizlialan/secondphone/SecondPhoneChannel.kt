@@ -201,7 +201,10 @@ class SecondPhoneChannel(private val activity: Activity, messenger: BinaryMessen
         val p = profile() ?: return mapOf("status" to "no_profile")
         return try {
             um.requestQuietModeEnabled(enabled, p)
-            mapOf("status" to "ok")
+            // Android may silently refuse (returns false) instead of throwing.
+            val now = try { um.isQuietModeEnabled(p) } catch (_: Exception) { !enabled }
+            // (Turning it off may first show the system prompt; the vault polls.)
+            mapOf("status" to if (!enabled || now) "ok" else "not_permitted")
         } catch (e: SecurityException) {
             // Android lets only the default launcher (or system apps) do this.
             mapOf("status" to "not_permitted")

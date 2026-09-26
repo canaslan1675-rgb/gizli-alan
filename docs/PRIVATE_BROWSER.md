@@ -19,7 +19,7 @@
 | History | In memory only (WebView back stack); gone when the screen closes |
 | Cookies / cache / DOM storage | App-private WebView storage; **wiped on vault lock** when "Kilitlenince temizle" is on (default), and on app start while locked; "Şimdi temizle" wipes immediately |
 | Third-party cookies | Blocked (`AndroidWebViewCookieManager.setAcceptThirdPartyCookies(false)`) |
-| Downloads | **Disabled** — no `DownloadListener` is registered, so download links do nothing. Saving into the vault encrypted was not "simple" (needs a streamed fetch outside WebView, cookie/auth forwarding and MIME handling); left for a later issue |
+| Downloads | **Into the vault only** (#45) — native `DownloadListener` + image long-press (`HitTestResult` IMAGE/SRC_IMAGE_ANCHOR) in `BrowserChannel.kt` hand the URL (with the WebView's cookies, UA, referer) to Dart (`lib/services/browser_download.dart`), which fetches into memory (http/https/data:, max 100 MB files / 25 MB long-press images, image MIME validated/sniffed) and stores it encrypted: images → Photos, other → Files. Never public storage; blob: URLs unsupported |
 | File upload (`<input type=file>`) | Disabled (no file chooser handler) |
 | Geolocation / camera / mic / MIDI | Denied (`onPermissionRequest → deny`, `setGeolocationEnabled(false)`, location permissions removed from manifest) |
 | `file://`, `content://`, `intent:`, `tel:` … | Blocked by the navigation delegate (only `http`, `https`, `about:blank`); snackbar "blocked" |

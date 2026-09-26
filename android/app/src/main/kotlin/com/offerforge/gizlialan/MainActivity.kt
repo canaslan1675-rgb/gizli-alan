@@ -23,6 +23,7 @@ class MainActivity : FlutterFragmentActivity() {
     private var flavorFeature: FlavorFeature? = null
     private var systemChannel: MethodChannel? = null
     private var importChannel: MethodChannel? = null
+    private var browserChannel: MethodChannel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(
@@ -36,6 +37,7 @@ class MainActivity : FlutterFragmentActivity() {
         super.configureFlutterEngine(flutterEngine)
         systemChannel = SystemChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         importChannel = ImportChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
+        browserChannel = BrowserChannel.attach(flutterEngine)
         flavorFeature = FlavorFeatures.attach(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
@@ -44,6 +46,8 @@ class MainActivity : FlutterFragmentActivity() {
         systemChannel = null
         importChannel?.setMethodCallHandler(null)
         importChannel = null
+        browserChannel?.setMethodCallHandler(null)
+        browserChannel = null
         flavorFeature?.dispose()
         flavorFeature = null
         super.cleanUpFlutterEngine(flutterEngine)

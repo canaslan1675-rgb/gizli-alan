@@ -35,3 +35,5 @@
 **2026-09-26 (Sat, #37):** Pro opt-in "delete original after import" (verified import first, system delete dialog on Android 11+). v0.4.2+8.
 
 **2026-09-26 (Sat, #43):** Calculator audit: full-precision chaining, a±b% = a±a·b/100, ± key, repeated =, e-notation results reusable, 15-significant-digit display, "=" on lone operator no longer shows Error, "5." display fix; 21 new engine+keypad tests (27 calculator tests total, suite 139). v0.4.3+9.
+
+**2026-09-26 (Sat, #45):** v0.4.4: work-profile lock hides every launchable app each sweep (recorded-but-visible bug fixed), profile-side 15-min re-hide job, DocumentsUI hidden, suspend fallback, cross-profile lock policies, quiet mode default (only effective if Android permits); browser downloads + long-press images saved straight into the encrypted vault.
