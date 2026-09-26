@@ -38,6 +38,8 @@ jobs:
           mkdir -p ~/.android
           echo "$DEBUG_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore
           test ! -e android/key.properties  # must fall back to debug signing
+          echo "GIZLI_DEBUG_KEYSTORE=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+          keytool -list -v -keystore ~/.android/debug.keystore -storepass android | grep 'SHA256:'
 
       - run: flutter pub get
       - run: flutter test
@@ -48,6 +50,16 @@ jobs:
           cp build/app/outputs/flutter-apk/app-play-release.apk /tmp/play.apk
           flutter build apk --release --flavor full --target-platform android-arm64
           cp build/app/outputs/flutter-apk/app-full-release.apk /tmp/full.apk
+
+      - name: Verify signer (must match earlier *-test releases)
+        run: |
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          for f in /tmp/play.apk /tmp/full.apk; do
+            "$APKSIGNER" verify --print-certs "$f" | tee /tmp/cert.txt
+            grep -q "SHA-256 digest: $EXPECTED_CERT_SHA256" /tmp/cert.txt
+          done
+        env:
+          EXPECTED_CERT_SHA256: 090ace425849fcf2a7dae20af382784fe0e721719eec3230fb5a36fb92f5c321
 
       - name: Publish prerelease
         env:
