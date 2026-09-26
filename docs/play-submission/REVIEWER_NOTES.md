@@ -82,4 +82,4 @@ The decoy vault has no Second phone tile and cannot reveal the profile.
 
 Send testers §1 plus: "Please use the app at least a few times a week for 14 days: add a few non-sensitive
 test photos, a note, lock/unlock, try the calculator. Report anything confusing via Play's private feedback or
-<SUPPORT_EMAIL>. Don't store real sensitive content during the test (no PIN recovery)."
+delibaltabaris5@gmail.com. Don't store real sensitive content during the test (no PIN recovery)."

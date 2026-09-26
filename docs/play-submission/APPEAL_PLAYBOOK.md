@@ -50,7 +50,7 @@ Thank you. The vault is protected by a PIN that the user creates on first launch
 
 **Response:** usually not needed — fix and resubmit. If already compliant:
 ```
-Our privacy policy is available at <PRIVACY_URL> (public HTTPS, no login) and is also shown in the app under Settings → Privacy & permissions. It states that the app collects and shares no user data; all content is encrypted and stays on the device, and the app has no server, analytics or ads; the INTERNET permission is used only by the in-vault browser to load pages the user opens.
+Our privacy policy is available at https://canaslan1675-rgb.github.io/gizli-alan/privacy/ (public HTTPS, no login) and is also shown in the app under Settings → Privacy & permissions. It states that the app collects and shares no user data; all content is encrypted and stays on the device, and the app has no server, analytics or ads; the INTERNET permission is used only by the in-vault browser to load pages the user opens.
 ```
 
 ## 4. Data safety mismatch

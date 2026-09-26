@@ -1,6 +1,6 @@
 # Privacy Policy — GizliAlan
 
-**Last updated:** 2026-09-25
+**Last updated:** 2026-09-26
 **App:** GizliAlan (package `com.offerforge.gizlialan`)
 **Audience:** The owner of the device, for their own content only.
 
@@ -140,8 +140,9 @@ policy and the Play Data safety form will be updated **before** release.
 
 ## Contact
 
-Developer: Demirhan (personal project). Replace with a real support e-mail and
-host this page on HTTPS before publishing on Google Play.
+Developer: OfferForge (Demirhan, personal project).
+Support e-mail: **delibaltabaris5@gmail.com**
+This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/
 
 ---
 
@@ -163,5 +164,7 @@ değişiklikleri, hatalı PIN sayısı) de şifreli saklanır ve yalnızca kasa 
 sistem bildirimi gönderilmez. Uygulama yedeği
 kapalıdır. PIN kurtarma yoktur. Hesap makinesi girişi ve sahte PIN özellikleri
 kurulumda, uygulama içinde ve mağaza açıklamasında açıkça belirtilir.
+
+**İletişim / destek:** delibaltabaris5@gmail.com — Politika: https://canaslan1675-rgb.github.io/gizli-alan/privacy/
 
 *This document is provided for transparency and Play policy readiness. It is not legal advice.*

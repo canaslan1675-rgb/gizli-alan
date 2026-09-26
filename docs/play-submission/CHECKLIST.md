@@ -49,7 +49,7 @@ Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not 
 | C6 | Original launcher + store icon, no vendor look-alike | ✅ | `tool/gen_launcher_icon.py`, `docs/store_icon_512.png` |
 | C7 | No icon hiding / alias switching | ✅ | |
 | C8 | **Pro UI stub** hidden in `play` | ✅ #28 (v0.3.1) | `Flavor.hasProStub` = `full` only (`--dart-define=PRO_STUB=true` to review); tests in `test/pro_screen_test.dart` |
-| C9 | Privacy policy reachable **inside the app** | ✅ #28 (needs URL) | In-app privacy text + link when built with `--dart-define=PRIVACY_URL=https://…` (ACTION_VIEW intent to the user's browser app). 👤 set the URL after #12 |
+| C9 | Privacy policy reachable **inside the app** | ✅ #28 + #12 | In-app privacy text + link when built with `--dart-define=PRIVACY_URL=https://…` (ACTION_VIEW intent to the user's browser app). Play AAB built with `PRIVACY_URL=https://canaslan1675-rgb.github.io/gizli-alan/privacy/` |
 | C10 | Decoy PIN described honestly | ✅ | "separate, empty vault" |
 | C11 | "Delete everything" / uninstall removes all data | ✅ | backups disabled |
 
@@ -65,7 +65,7 @@ Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not 
 | D6 | **Feature graphic 1024×500** | ✅ #28 | `docs/store/feature_graphic/feature_graphic_{tr,en}.png`, RGB, `tool/gen_feature_graphic.py` |
 | D7 | Phone screenshots (2–8, 9:16) | ✅ | `docs/store/screenshots/play/{tr,en}/01…06` (1080×1920). 01 = calculator + ⓘ, 02 = onboarding disclosure |
 | D8 | Category **Tools** | 👤 | competitors (HideU, Island, Calculator Vault) are Tools |
-| D9 | Contact e-mail (public), website optional | 👤 #12 | |
+| D9 | Contact e-mail (public), website optional | ✅ #12 | delibaltabaris5@gmail.com; privacy policy https://canaslan1675-rgb.github.io/gizli-alan/privacy/ |
 | D10 | Privacy policy URL (HTTPS, public, not PDF, no login) | 👤 #12 | GitHub Pages works |
 | D11 | "External marketing" opt-out optional | 👤 | Store settings |
 
