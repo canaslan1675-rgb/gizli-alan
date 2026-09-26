@@ -216,7 +216,8 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
                   ),
                   Row(
                     children: [
-                      _key('0', flex: 2),
+                      _key('±', bg: opBg, fg: opFg),
+                      _key('0'),
                       _key('.'),
                       _key('=', bg: GizliTheme.mint, fg: GizliTheme.bg),
                     ],
