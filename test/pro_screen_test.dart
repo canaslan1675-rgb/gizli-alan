@@ -110,18 +110,33 @@ void main() {
           find.byKey(const ValueKey('pro_test_build_note')),
           findsOneWidget,
         );
-        expect(find.text('Basic vault, up to 50 items'), findsOneWidget);
+        expect(find.text('7 days · 50 items'), findsOneWidget);
         expect(
           find.text('Usage: 1 / 50 items (limit not enforced in this build)'),
           findsOneWidget,
         );
         await tester.scrollUntilVisible(
-          find.text('449 TL / year'),
+          find.text('399 TL'),
           200,
           scrollable: find.byType(Scrollable).last,
         );
-        expect(find.text('249 TL (about 7.99 USD)'), findsOneWidget);
+        expect(find.text('149 TL / year'), findsOneWidget);
+        expect(find.text('Best value'), findsOneWidget);
+        // Yearly is listed before lifetime.
+        expect(
+          tester.getTopLeft(find.byKey(const ValueKey('plan_yearly'))).dy,
+          lessThan(
+            tester.getTopLeft(find.byKey(const ValueKey('plan_lifetime'))).dy,
+          ),
+        );
 
+        await tester.scrollUntilVisible(
+          find.text('Buy'),
+          200,
+          scrollable: find.byType(Scrollable).last,
+        );
+        await tester.ensureVisible(find.text('Buy'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Buy'));
         await tester.pumpAndSettle();
         expect(find.text('Not available yet'), findsOneWidget);
