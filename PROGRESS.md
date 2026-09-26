@@ -33,3 +33,5 @@
 **2026-09-26 (Sat, #12/#13):** Support e-mail delibaltabaris5@gmail.com in PRIVACY + Play docs; privacy policy published on GitHub Pages (https://canaslan1675-rgb.github.io/gizli-alan/privacy/, `tool/gen_privacy_html.py`, /docs on main, no trackers). Upload key generated on the box (outside the repo), Play AAB 0.4.1+7 built with PRIVACY_URL (not published).
 
 **2026-09-26 (Sat, #37):** Pro opt-in "delete original after import" (verified import first, system delete dialog on Android 11+). v0.4.2+8.
+
+**2026-09-26 (Sat, #43):** Calculator audit: full-precision chaining, a±b% = a±a·b/100, ± key, repeated =, e-notation results reusable, 15-significant-digit display, "=" on lone operator no longer shows Error, "5." display fix; 21 new engine+keypad tests (27 calculator tests total, suite 139). v0.4.3+9.
