@@ -197,8 +197,14 @@ void main() {
 
     // Help remains reachable in vault Settings.
     final help = find.byKey(const ValueKey('settings_calc_help'));
+    await tester.scrollUntilVisible(
+      help,
+      100,
+      scrollable: find.byType(Scrollable).last,
+    );
     await tester.ensureVisible(help);
-    await tester.tap(help);
+    await settle(tester);
+    await tester.tap(help, warnIfMissed: false);
     await settle(tester);
     expect(find.text('Bu hesap makinesi hakkında'), findsOneWidget);
     await tester.tap(find.text('Tamam').last);

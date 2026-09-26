@@ -23,4 +23,8 @@ class ProEntitlement {
   /// Pro is active. If Pro lapses the icon reappears; the opt-in is kept.
   static bool hideCalculatorInfo(SettingsService s) =>
       s.hideCalcInfoIcon && isActive(s);
+
+  /// Delete originals after import only while opted in AND Pro is active.
+  static bool deleteOriginalAfterImport(SettingsService s) =>
+      s.deleteOriginalAfterImport && isActive(s);
 }

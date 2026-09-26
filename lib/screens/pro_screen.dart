@@ -121,17 +121,18 @@ class _ProScreenState extends State<ProScreen> {
             current: true,
           ),
           _PlanCard(
-            key: const ValueKey('plan_lifetime'),
-            title: t('proLifetime'),
-            price: t('proLifetimePrice'),
+            key: const ValueKey('plan_monthly'),
+            title: t('proMonthly'),
+            price: t('proMonthlyPrice'),
             features: [t('proF1'), t('proF2'), t('proF3')],
-            action: t('proBuy'),
+            action: t('proSubscribe'),
             onAction: _notAvailable,
           ),
           _PlanCard(
             key: const ValueKey('plan_yearly'),
             title: t('proYearly'),
             price: t('proYearlyPrice'),
+            badge: t('proYearlyHint'),
             features: [t('proF1'), t('proF2'), t('proF3')],
             action: t('proSubscribe'),
             onAction: _notAvailable,
@@ -160,7 +161,11 @@ class _PlanCard extends StatelessWidget {
     this.action,
     this.onAction,
     this.current = false,
+    this.badge,
   });
+
+  /// Highlight chip, e.g. "En avantajlı / Best value".
+  final String? badge;
 
   final String title;
   final String price;
@@ -203,6 +208,15 @@ class _PlanCard extends StatelessWidget {
               price,
               style: const TextStyle(fontSize: 16, color: GizliTheme.mint),
             ),
+            if (badge != null) ...[
+              const SizedBox(height: 6),
+              Chip(
+                key: const ValueKey('plan_best_value'),
+                label: Text(badge!),
+                visualDensity: VisualDensity.compact,
+                backgroundColor: GizliTheme.mint.withValues(alpha: 0.18),
+              ),
+            ],
             const SizedBox(height: 8),
             for (final f in features)
               Padding(

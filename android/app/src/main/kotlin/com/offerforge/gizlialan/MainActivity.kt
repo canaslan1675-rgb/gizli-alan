@@ -22,6 +22,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterFragmentActivity() {
     private var flavorFeature: FlavorFeature? = null
     private var systemChannel: MethodChannel? = null
+    private var importChannel: MethodChannel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(
@@ -34,12 +35,15 @@ class MainActivity : FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         systemChannel = SystemChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
+        importChannel = ImportChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         flavorFeature = FlavorFeatures.attach(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
         systemChannel?.setMethodCallHandler(null)
         systemChannel = null
+        importChannel?.setMethodCallHandler(null)
+        importChannel = null
         flavorFeature?.dispose()
         flavorFeature = null
         super.cleanUpFlutterEngine(flutterEngine)
@@ -47,6 +51,7 @@ class MainActivity : FlutterFragmentActivity() {
 
     @Deprecated("Needed to receive provisioning / cross-profile results")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (ImportChannel.onActivityResult(this, requestCode, resultCode, data)) return
         if (flavorFeature?.onActivityResult(requestCode, resultCode, data) == true) return
         @Suppress("DEPRECATION")
         super.onActivityResult(requestCode, resultCode, data)

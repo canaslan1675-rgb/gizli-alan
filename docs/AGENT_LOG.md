@@ -115,3 +115,7 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - Closed the loop on #32: PR #33 → `main`, prerelease `v0.4.0-test` (play + full arm64), vault-home
   screenshots recompressed (~1.2 MB). Heartbeat on #32.
 - Next: owner merge #33 + device test #14. Free for agents: #10 (post-MVP). Owner #12–#16 stop points.
+
+
+## 2026-09-26 19:52 +03:00 — joi
+- Finished: #37 — Pro "Kasaya aktarınca orijinali sil" (default off, ProEntitlement-gated). Import via system document picker, encrypt + read-back verify, then delete only verified originals (`ImportChannel.kt`: MediaStore.createDeleteRequest on Android 11+, RecoverableSecurityException flow on 10, DocumentsContract.deleteDocument for SAF). No new permissions. v0.4.2+8, prerelease `v0.4.2-test`, signed AAB in /workspace/release.

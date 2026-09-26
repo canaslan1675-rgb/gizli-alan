@@ -52,6 +52,14 @@ const Map<String, String> en = {
   'calcHelpHint': 'How the vault opens (same text as ⓘ)',
   'proStubToggle': 'Simulate Pro (test build)',
   'proStubToggleHint': 'No purchase; a local switch to try Pro features only.',
+  'deleteOriginal': 'Delete original after import',
+  'deleteOriginalHint':
+      "When you import private photos and files into the vault, the originals stay in your phone's gallery, Downloads folder and Files app. Anyone who picks up your phone could see them there. With this option on, the original on your phone is deleted after the file has been encrypted and safely saved in the vault. The file then exists only in the vault, encrypted, and no one can see it without your PIN. The vault copy and files inside the second phone (work profile) are not affected. Android may ask you to confirm the deletion.",
+  'originalsDeletedN': '{n} original(s) deleted.',
+  'originalsKeptN':
+      '{n} original(s) could not be deleted; the vault copy is safe.',
+  'originalsDeclined':
+      'Originals were not deleted (not confirmed); the vault copy is safe.',
   'calcInfoTitle': 'About this calculator',
   'calcInfoBody':
       'This is a real calculator and also the entrance to your GizliAlan '
@@ -278,19 +286,19 @@ const Map<String, String> en = {
       'This is a test build: there are no purchases and no payment is taken. Prices are planned prices.',
   'proFree': 'Free',
   'proFreePrice': '0 TL',
-  'proFreeF1': 'Basic vault, up to {max} items',
+  'proFreeF1': '7 days · {max} items',
   'proFreeF2': 'No ads',
   'proFreeF3': 'All data encrypted on your device',
   'proUsage': 'Usage: {n} / {max} items (limit not enforced in this build)',
   'proCurrent': 'Current',
-  'proLifetime': 'Pro — one-time',
-  'proLifetimePrice': '249 TL (about 7.99 USD)',
+  'proMonthly': 'Pro — monthly',
+  'proMonthlyPrice': '150 TL / month',
   'proYearly': 'Pro — yearly',
-  'proYearlyPrice': '449 TL / year',
+  'proYearlyPrice': '999 TL / year',
+  'proYearlyHint': 'Save 45% · Best value',
   'proF1': 'Unlimited items',
   'proF2': 'No ads',
   'proF3': 'All data encrypted on your device',
-  'proBuy': 'Buy',
   'proSubscribe': 'Subscribe',
   'proNotAvailableTitle': 'Not available yet',
   'proNotAvailableBody':

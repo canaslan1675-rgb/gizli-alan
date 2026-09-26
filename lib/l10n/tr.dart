@@ -54,6 +54,13 @@ const Map<String, String> tr = {
   'proStubToggle': "Pro'yu simüle et (test sürümü)",
   'proStubToggleHint':
       'Satın alma yok; yalnızca Pro özelliklerini denemek için yerel bir anahtar.',
+  'deleteOriginal': 'Kasaya aktarınca orijinali sil',
+  'deleteOriginalHint':
+      "Özel fotoğraf ve dosyalarını kasaya aktardığında, orijinalleri telefonun galerisinde, İndirilenler klasöründe ve Dosyalar uygulamasında kalmaya devam eder. Telefonunu eline alan biri bunları oradan görebilir. Bu seçenek açıkken, dosya kasaya şifrelenerek güvenle kaydedildikten sonra telefondaki orijinali silinir. Böylece dosya yalnızca kasada, şifreli olarak kalır ve PIN'in olmadan kimse göremez. Kasadaki kopya ve ikinci telefon (iş profili) içindeki dosyalar etkilenmez. Android silme için onay isteyebilir.",
+  'originalsDeletedN': '{n} orijinal silindi.',
+  'originalsKeptN': '{n} orijinal silinemedi; kasadaki kopya güvende.',
+  'originalsDeclined':
+      'Orijinaller silinmedi (onay verilmedi); kasadaki kopya güvende.',
   'calcInfoTitle': 'Bu hesap makinesi hakkında',
   'calcInfoBody':
       'Bu gerçek bir hesap makinesidir ve aynı zamanda GizliAlan kasanın '
@@ -278,19 +285,19 @@ const Map<String, String> tr = {
       'Bu bir test sürümüdür: satın alma yoktur, ödeme alınmaz. Fiyatlar planlanan fiyatlardır.',
   'proFree': 'Ücretsiz',
   'proFreePrice': '0 TL',
-  'proFreeF1': 'Temel kasa, {max} öğeye kadar',
+  'proFreeF1': '7 gün · {max} öğe',
   'proFreeF2': 'Reklam yok',
   'proFreeF3': 'Tüm veriler cihazda şifreli',
   'proUsage': 'Kullanım: {n} / {max} öğe (bu sürümde sınır uygulanmaz)',
   'proCurrent': 'Mevcut',
-  'proLifetime': 'Pro — tek seferlik',
-  'proLifetimePrice': '249 TL (yaklaşık 7,99 USD)',
+  'proMonthly': 'Pro — aylık',
+  'proMonthlyPrice': '150 TL / ay',
   'proYearly': 'Pro — yıllık',
-  'proYearlyPrice': '449 TL / yıl',
+  'proYearlyPrice': '999 TL / yıl',
+  'proYearlyHint': '%45 tasarruf · En avantajlı',
   'proF1': 'Sınırsız öğe',
   'proF2': 'Reklam yok',
   'proF3': 'Tüm veriler cihazda şifreli',
-  'proBuy': 'Satın al',
   'proSubscribe': 'Abone ol',
   'proNotAvailableTitle': 'Henüz mevcut değil',
   'proNotAvailableBody':

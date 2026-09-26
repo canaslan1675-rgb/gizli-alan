@@ -110,19 +110,30 @@ void main() {
           find.byKey(const ValueKey('pro_test_build_note')),
           findsOneWidget,
         );
-        expect(find.text('Basic vault, up to 50 items'), findsOneWidget);
+        expect(find.text('7 days · 50 items'), findsOneWidget);
         expect(
           find.text('Usage: 1 / 50 items (limit not enforced in this build)'),
           findsOneWidget,
         );
         await tester.scrollUntilVisible(
-          find.text('449 TL / year'),
+          find.text('999 TL / year'),
           200,
           scrollable: find.byType(Scrollable).last,
         );
-        expect(find.text('249 TL (about 7.99 USD)'), findsOneWidget);
-
-        await tester.tap(find.text('Buy'));
+        expect(find.text('150 TL / month'), findsOneWidget);
+        expect(find.text('Save 45% · Best value'), findsOneWidget);
+        expect(find.textContaining('one-time'), findsNothing);
+        // Monthly is listed before yearly.
+        expect(
+          tester.getTopLeft(find.byKey(const ValueKey('plan_monthly'))).dy,
+          lessThan(
+            tester.getTopLeft(find.byKey(const ValueKey('plan_yearly'))).dy,
+          ),
+        );
+        final subscribe = find.text('Subscribe').last;
+        await tester.ensureVisible(subscribe);
+        await tester.pumpAndSettle();
+        await tester.tap(subscribe);
         await tester.pumpAndSettle();
         expect(find.text('Not available yet'), findsOneWidget);
         await tester.tap(find.byKey(const ValueKey('pro_dialog_ok')));
@@ -130,18 +141,6 @@ void main() {
         expect(find.text('Not available yet'), findsNothing);
       },
     );
-  }
-
-  Finder settingsList() => find
-      .descendant(
-        of: find.byType(SettingsScreen),
-        matching: find.byType(Scrollable),
-      )
-      .first;
-
-  Future<void> scrollToEnd(WidgetTester tester) async {
-    await tester.drag(settingsList(), const Offset(0, -5000));
-    await settle(tester, 2);
   }
 
   group('Pro stub gating (#28)', () {
@@ -165,7 +164,11 @@ void main() {
           MaterialPageRoute(builder: (_) => const SettingsScreen()),
         );
         await settle(tester);
-        await scrollToEnd(tester);
+        await tester.scrollUntilVisible(
+          find.text('Privacy & permissions'),
+          150,
+          scrollable: find.byType(Scrollable).last,
+        );
         expect(find.byKey(const ValueKey('settings_pro')), findsNothing);
         expect(find.text('GizliAlan Pro'), findsNothing);
         expect(find.byType(ProScreen), findsNothing);
@@ -182,7 +185,11 @@ void main() {
         MaterialPageRoute(builder: (_) => const SettingsScreen()),
       );
       await settle(tester);
-      await scrollToEnd(tester);
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('settings_pro')),
+        150,
+        scrollable: find.byType(Scrollable).last,
+      );
       expect(find.byKey(const ValueKey('settings_pro')), findsOneWidget);
     });
   });
