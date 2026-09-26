@@ -1,0 +1,68 @@
+# Debug-signed test APKs (play + full, arm64) → GitHub prerelease v<version>-test.
+# Signed with the same Android debug key as earlier *-test releases (secret
+# DEBUG_KEYSTORE_B64) so they install over them. The Play upload key is NEVER
+# used in CI; the Play AAB is built locally on the owner's box.
+name: android-test-build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*-test']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.5
+          cache: true
+
+      - name: Restore debug keystore
+        env:
+          DEBUG_KEYSTORE_B64: ${{ secrets.DEBUG_KEYSTORE_B64 }}
+        run: |
+          test -n "$DEBUG_KEYSTORE_B64"
+          mkdir -p ~/.android
+          echo "$DEBUG_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore
+          test ! -e android/key.properties  # must fall back to debug signing
+
+      - run: flutter pub get
+      - run: flutter test
+
+      - name: Build APKs
+        run: |
+          flutter build apk --release --flavor play --target-platform android-arm64
+          cp build/app/outputs/flutter-apk/app-play-release.apk /tmp/play.apk
+          flutter build apk --release --flavor full --target-platform android-arm64
+          cp build/app/outputs/flutter-apk/app-full-release.apk /tmp/full.apk
+
+      - name: Publish prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VER=$(sed -n 's/^version: *\([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          TAG="v${VER}-test"
+          mkdir -p dist
+          cp /tmp/play.apk "dist/GizliAlan-v${VER}-play.apk"
+          cp /tmp/full.apk "dist/GizliAlan-v${VER}-full.apk"
+          (cd dist && sha256sum *.apk > SHA256SUMS.txt && cat SHA256SUMS.txt)
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* --prerelease --target "$GITHUB_SHA" \
+              --title "GizliAlan ${TAG}" \
+              --notes "Debug-signed arm64 test builds (not for Play), built by GitHub Actions from ${GITHUB_SHA}. play = no Second phone; full = with Second phone. SHA256SUMS.txt attached."
+          fi
