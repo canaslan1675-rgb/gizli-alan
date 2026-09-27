@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../app.dart';
 import '../l10n/l10n.dart';
 import '../services/settings_service.dart';
 import '../theme.dart';
@@ -12,7 +13,12 @@ class WorkAppsHideSwitches extends StatefulWidget {
     super.key,
     required this.settings,
     this.keyPrefix = 'sp',
+    this.openWorkSettings,
   });
+
+  /// Opens the system screen for pausing the Work tab; returns the id of
+  /// the screen opened or `none`. Defaults to the app's second phone.
+  final Future<String> Function()? openWorkSettings;
 
   final SettingsService settings;
   final String keyPrefix;
@@ -22,6 +28,52 @@ class WorkAppsHideSwitches extends StatefulWidget {
 }
 
 class _WorkAppsHideSwitchesState extends State<WorkAppsHideSwitches> {
+  Future<void> _openSettings() async {
+    final open =
+        widget.openWorkSettings ??
+        () async =>
+            await GizliAlanApp.of(
+              context,
+            ).secondPhoneIfUnlocked?.openWorkSettings() ??
+            'none';
+    String r;
+    try {
+      r = await open();
+    } catch (_) {
+      r = 'none';
+    }
+    if (r == 'none' && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(L10n.current('spWorkGuideFailed'))),
+      );
+    }
+  }
+
+  /// Turned on: short guide, then the system screen (#47).
+  Future<void> _guide() async {
+    final t = L10n.current;
+    final go = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        key: const ValueKey('work_guide_dialog'),
+        title: Text(t('spWorkGuideTitle')),
+        content: SingleChildScrollView(child: Text(t('spWorkGuideBody'))),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(c).pop(false),
+            child: Text(t('spWorkGuideLater')),
+          ),
+          FilledButton(
+            key: const ValueKey('work_guide_open'),
+            onPressed: () => Navigator.of(c).pop(true),
+            child: Text(t('spWorkGuideOpen')),
+          ),
+        ],
+      ),
+    );
+    if (go == true) await _openSettings();
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = L10n.of(context);
@@ -42,12 +94,23 @@ class _WorkAppsHideSwitchesState extends State<WorkAppsHideSwitches> {
           onChanged: (v) async {
             await s.setHideWorkAppsWhenLocked(v);
             if (mounted) setState(() {});
+            if (v && mounted) await _guide();
           },
         ),
         if (hide)
           Padding(
             padding: const EdgeInsets.only(left: 56, bottom: 8),
             child: Text(t('spHideWhenLockedWhen'), style: hint),
+          ),
+        if (hide)
+          Padding(
+            padding: const EdgeInsets.only(left: 48),
+            child: TextButton.icon(
+              key: ValueKey('${widget.keyPrefix}_work_settings_again'),
+              icon: const Icon(Icons.settings_outlined),
+              label: Text(t('spWorkGuideReopen')),
+              onPressed: _openSettings,
+            ),
           ),
         SwitchListTile(
           key: ValueKey('${widget.keyPrefix}_pause_too'),

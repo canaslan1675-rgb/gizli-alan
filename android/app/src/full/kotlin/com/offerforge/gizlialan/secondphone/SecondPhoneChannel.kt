@@ -80,6 +80,9 @@ class SecondPhoneChannel(private val activity: Activity, messenger: BinaryMessen
                 "unfreeze" -> sendToProfile(Intent(C.ACTION).putExtra(C.EXTRA_OP, C.OP_UNFREEZE), result)
                 "ping" -> sendToProfile(Intent(C.ACTION).putExtra(C.EXTRA_OP, C.OP_PING), result)
                 "setQuietMode" -> result.success(setQuietMode(call.argument<Boolean>("enabled") ?: true))
+                "openSystemScreen" -> result.success(
+                    mapOf("opened" to openSystemScreen(call.argument<List<Map<String, Any?>>>("candidates") ?: emptyList())),
+                )
                 "remove" -> sendToProfile(Intent(C.ACTION).putExtra(C.EXTRA_OP, C.OP_REMOVE), result)
                 else -> result.notImplemented()
             }
@@ -195,16 +198,52 @@ class SecondPhoneChannel(private val activity: Activity, messenger: BinaryMessen
         return true
     }
 
+    // ---------------------------------------------- work-tab settings guide
+
+    /**
+     * Tries the system screens chosen by Dart (WorkSettingsIntents) in order;
+     * every startActivity is guarded (missing activity, not exported, OEM
+     * permission). Returns the id of the first that opened, else "none".
+     */
+    private fun openSystemScreen(candidates: List<Map<String, Any?>>): String {
+        for (c in candidates) {
+            val id = c["id"] as? String ?: continue
+            try {
+                val i = Intent()
+                (c["action"] as? String)?.let { i.action = it }
+                (c["component"] as? String)?.let { ComponentName.unflattenFromString(it)?.let(i::setComponent) }
+                when (val pkg = c["package"] as? String) {
+                    null -> {}
+                    "@home" -> {
+                        val home = ctx.packageManager.resolveActivity(
+                            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME),
+                            PackageManager.MATCH_DEFAULT_ONLY,
+                        )?.activityInfo?.packageName
+                        if (home.isNullOrEmpty() || home == "android") continue
+                        i.setPackage(home)
+                    }
+                    else -> i.setPackage(pkg)
+                }
+                if (i.action == null && i.component == null) continue
+                activity.startActivity(i)
+                return id
+            } catch (_: Exception) {
+            }
+        }
+        return "none"
+    }
+
     // ----------------------------------------------------------- quiet mode
 
     private fun setQuietMode(enabled: Boolean): Map<String, Any?> {
         val p = profile() ?: return mapOf("status" to "no_profile")
         return try {
-            um.requestQuietModeEnabled(enabled, p)
             // Android may silently refuse (returns false) instead of throwing.
+            // Trust the return value; the state flip itself can lag behind.
+            val accepted = um.requestQuietModeEnabled(enabled, p)
             val now = try { um.isQuietModeEnabled(p) } catch (_: Exception) { !enabled }
             // (Turning it off may first show the system prompt; the vault polls.)
-            mapOf("status" to if (!enabled || now) "ok" else "not_permitted")
+            mapOf("status" to if (!enabled || accepted || now) "ok" else "not_permitted")
         } catch (e: SecurityException) {
             // Android lets only the default launcher (or system apps) do this.
             mapOf("status" to "not_permitted")

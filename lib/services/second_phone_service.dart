@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'work_settings_intents.dart';
+
 /// What to do with the "second phone" (work profile) while the real vault is
 /// locked (issue #30: "Kilitliyken iş uygulamalarını gizle", default on).
 enum SecondPhoneCloseMode {
@@ -236,6 +238,17 @@ class SecondPhoneService {
       _status('setQuietMode', {'enabled': enabled});
 
   Future<String> remove() => _status('remove');
+
+  /// Opens the first system screen (see [WorkSettingsIntents]) where the
+  /// user can pause / hide the Work tab. Returns its id, or `none`.
+  Future<String> openWorkSettings() async {
+    final st = await status();
+    final list = WorkSettingsIntents.candidates(xiaomi: st.isXiaomi);
+    final r = await _call('openSystemScreen', {
+      'candidates': [for (final c in list) c.toMap()],
+    });
+    return r is Map ? (r['opened'] as String?) ?? 'none' : 'none';
+  }
 
   /// Closes the second phone. Always hides the apps first (quiet mode alone
   /// would leave greyed-out icons in the launcher, e.g. on Xiaomi); with

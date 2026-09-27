@@ -36,6 +36,14 @@ class FakeSecondPhone extends SecondPhoneService {
   @override
   Future<SecondPhoneStatus> status() async => st;
 
+  final workSettingsOpened = <String>[];
+
+  @override
+  Future<String> openWorkSettings() async {
+    workSettingsOpened.add('managed_profile');
+    return 'managed_profile';
+  }
+
   @override
   Future<List<ProfileApp>> listApps() async => const [
     ProfileApp(label: 'Chat', packageName: 'com.example.chat', activity: 'A'),
@@ -256,7 +264,7 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.4.4 · Play'), findsOneWidget);
+      expect(find.text('GizliAlan 0.4.5 · Play'), findsOneWidget);
       await tester.pageBack();
       await settle(tester);
 
@@ -303,7 +311,7 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.4.4 · Full'), findsOneWidget);
+      expect(find.text('GizliAlan 0.4.5 · Full'), findsOneWidget);
     });
   });
 
@@ -415,6 +423,29 @@ void main() {
       expect(tester.widget<SwitchListTile>(toggle).value, isFalse);
       final pause = find.byKey(const ValueKey('sp_pause_too'));
       expect(tester.widget<SwitchListTile>(pause).onChanged, isNull);
+      expect(
+        find.byKey(const ValueKey('sp_work_settings_again')),
+        findsNothing,
+      );
+
+      // Turning it back on: guide dialog (TR), then the system screen.
+      await tester.tap(toggle);
+      await settle(tester);
+      expect(find.byKey(const ValueKey('work_guide_dialog')), findsOneWidget);
+      expect(find.textContaining('İş uygulamaları'), findsWidgets);
+      await tester.tap(find.byKey(const ValueKey('work_guide_open')));
+      await settle(tester);
+      expect(sp.workSettingsOpened, ['managed_profile']);
+      expect(settings.hideWorkAppsWhenLocked, isTrue);
+
+      // "Ayarları tekrar aç" in the row opens it again.
+      final again = find.byKey(const ValueKey('sp_work_settings_again'));
+      await tester.ensureVisible(again);
+      await settle(tester);
+      expect(find.text('Ayarları tekrar aç'), findsOneWidget);
+      await tester.tap(again);
+      await settle(tester);
+      expect(sp.workSettingsOpened, hasLength(2));
     });
 
     testWidgets('play flavor: never hides or unhides anything', (tester) async {

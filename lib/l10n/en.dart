@@ -269,6 +269,14 @@ const Map<String, String> en = {
       'While the vault is locked, second-phone apps are removed from the phone\'s home screen, its "Work" folder and the app list. Nothing is uninstalled and their data stays. They come back when you unlock with your real PIN or fingerprint. While hidden they do not run and receive no notifications.',
   'spHideWhenLockedWhen':
       'Hidden immediately when you press Lock. After a background auto-lock Android does not let GizliAlan act, so the apps are hidden the next time GizliAlan is open while locked (app start or return). Kept visible: GizliAlan itself and Google Play services / installer / settings components needed to manage the profile.',
+  'spWorkGuideTitle': 'Also hide the Work tab',
+  'spWorkGuideBody':
+      'GizliAlan hides the work apps while the vault is locked. To also turn off or pause the launcher\'s Work tab yourself, the next step opens the system settings. Switch this off there:\n\n• Work profile / Work apps: turn off "Work apps" (pause work profile)\n• Xiaomi / POCO launcher: Home screen settings → turn off "Show work apps"\n• Otherwise: Settings → Accounts → Work profile → Pause\n\nTurn it back on in the same place (or from the Work tab) when you need it.',
+  'spWorkGuideOpen': 'Open settings',
+  'spWorkGuideLater': 'Not now',
+  'spWorkGuideReopen': 'Open settings again',
+  'spWorkGuideFailed':
+      'Could not open the settings. Open Settings → Accounts → Work profile manually.',
   'spPauseToo': 'Also try to pause the work profile',
   'spPauseTooHint':
       'Android lets only the default home-screen app pause a work profile, so on most phones only hiding takes effect. A paused profile\'s icons stay visible (greyed out) in some launchers, e.g. Xiaomi — hiding is what removes them. You can also use the "Work apps" quick-settings tile.',
