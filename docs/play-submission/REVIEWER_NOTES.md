@@ -2,39 +2,41 @@
 
 > **TR özet.** Uygulamada hesap yok, ama kasa kullanıcının ilk açılışta belirlediği PIN'in arkasında ve giriş (PIN + "=") ilk bakışta belli değil. Bu yüzden App access'te
 > **"Tüm veya bazı işlevler kısıtlı"** seçilip aşağıdaki talimat verilmeli (en dürüst ve en güvenli yol: inceleyici kasayı bulamazsa "gizli işlev" ya da "bozuk işlev" sanabilir).
-> `<DEMO_PIN>` yer tutucusunu **sahibi** belirler (4–8 hane, örn. kolay ama gerçek PIN'inle aynı olmayan bir sayı); PIN inceleyicinin kendi cihazında ilk kurulumda oluşturulur, sunucu yok.
+> Örnek PIN **2468**: inceleyici bunu kendi cihazında ilk kurulumda kendisi belirler (sunucu yok, gerçek PIN'le ilgisi yok).
 > Kısa sürüm (≤ 500 karakter, Console alanı için) + uzun sürüm (özellik açıklamaları) + `full` için iş profili açıklaması + isteğe bağlı demo video bağlantısı.
 
-Replace `<DEMO_PIN>` (e.g. a 4–6 digit number chosen by the owner, **not** the owner's personal PIN) and
+Example PIN: **2468** (the reviewer sets it during onboarding; unrelated to the owner's PIN). Replace
 `<DEMO_VIDEO_URL>` (optional unlisted YouTube link, see `DECLARATIONS.md` §3) before pasting.
 
 Console form: **"All or some functionality in my app is restricted"** → *Add instructions*:
 - Name: `Vault (PIN set on first launch)`
 - Username: `(none – no account)`
-- Password: `<DEMO_PIN>` (to be created by the reviewer during onboarding)
+- Password: `2468` (to be created by the reviewer during onboarding)
 - "Any other instructions": the short version below.
 
 > **[UNCERTAIN]** The "Any other instructions" field has historically had a ~500-character limit. The
 > short version fits; paste the long version only if the field allows it, or host it next to the privacy policy
 > and link it.
 
-## 1. Short version (≤ 500 characters)
+## 1. Reviewer note (App access → "Any other instructions")
+
+Verified against the code (v0.4.6): onboarding checkbox/toggle labels, 4–8 digit PIN, launcher label, ⓘ sheet, system pickers, play manifest permissions (USE_BIOMETRIC, INTERNET; no DeviceAdminReceiver in `play`), vault-only downloads, FLAG_SECURE, Settings → Entry. ~1,000 characters: if the field is limited to 500, paste up to "…at any time." and host the rest.
 
 ```
-No account. First launch: tick "own device", keep "Open as calculator" on, set PIN <DEMO_PIN>. The app then opens as a real working calculator (launcher label "Calculator"). Type <DEMO_PIN> and press "=" to open the vault. The ⓘ button explains this. Long-press "=" = biometrics (enable in vault Settings). Turn the calculator entry off in Settings > Entry. No server, no analytics, same behaviour for everyone; INTERNET is used only by the in-vault browser (vault home → Tarayıcı/Browser) for pages the user opens.
+There is no account: on first launch, tick 'This is my own device', keep 'Open as calculator' on, and set any 4–8 digit PIN (for example 2468). After setup the app opens as a fully working calculator (launcher label 'Calculator'); type the PIN and press '=' to open the vault, and the ⓘ button explains this at any time. Inside the vault you will find an encrypted gallery, files and notes (added via the system pickers, no storage permission), plus a private in-vault browser whose downloads are saved only into the encrypted vault. The only permissions are USE_BIOMETRIC (optional unlock) and INTERNET (used solely by the in-vault browser for pages the user opens); there is no server, no analytics, no ads and no device-admin component in this build. FLAG_SECURE is always on, so pre-launch report screenshots will appear black by design, and the calculator entry can be turned off in Settings → Entry.
 ```
 
 ## 2. Long version (feature by feature)
 
 ```
-GizliAlan is an on-device personal vault. There is no account and no server; the app contacts no developer server, so there is no remote configuration and no reviewer-specific behaviour. The INTERNET permission exists only for the in-vault private browser (Android System WebView), which loads only pages the user opens; cookies/cache are wiped when the vault locks (setting "Kilitlenince temizle", on by default). Downloads are disabled. Everything described here is in the build you received.
+GizliAlan is an on-device personal vault. There is no account and no server; the app contacts no developer server, so there is no remote configuration and no reviewer-specific behaviour. The INTERNET permission exists only for the in-vault private browser (Android System WebView), which loads only pages the user opens; cookies/cache are wiped when the vault locks (setting "Kilitlenince temizle", on by default). Downloads started in the browser (and long-press "Save image to vault") are saved only into the encrypted vault, never to shared storage. Everything described here is in the build you received.
 
 OPEN THE VAULT
 1. First launch – onboarding:
    Step 1: what the app is + "This is my own device" checkbox.
    Step 2: "Calculator entry" disclosure: the app opens as a working calculator; PIN then "=" opens the vault; the launcher shows "Calculator"/"Hesap Makinesi" with a calculator icon and that icon is GizliAlan. Toggle "Open as calculator" (on by default).
-   Step 3: set PIN <DEMO_PIN> (4-8 digits) and confirm. Note: no PIN recovery by design.
-2. The app now shows a real calculator (try 12×3=). Type <DEMO_PIN> then "=" -> the vault home opens.
+   Step 3: set PIN 2468 (4-8 digits) and confirm. Note: no PIN recovery by design.
+2. The app now shows a real calculator (try 12×3=). Type 2468 then "=" -> the vault home opens.
 3. The ⓘ button on the calculator explains the vault entry at any time.
 4. Vault -> Settings -> Entry: turn the calculator entry off -> the app opens directly at a PIN screen.
 

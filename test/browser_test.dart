@@ -314,7 +314,7 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('browser_save_image')));
       await settle(tester);
       await untilGone(tester, 'Kasaya indiriliyor…');
-      expect(find.textContaining("Fotoğraflar'a kaydedildi"), findsOneWidget);
+      expect(find.textContaining("Galeri'ye kaydedildi"), findsOneWidget);
       final photos = await tester.runAsync(() => state.session!.gallery.list());
       expect(photos!.single.mime, 'image/png');
 

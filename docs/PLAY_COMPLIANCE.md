@@ -22,7 +22,7 @@ integration are out of scope for this branch (owner decision required).
 | Permission | Source | Needed for |
 |-----------|--------|-----------|
 | `android.permission.USE_BIOMETRIC` | app + `local_auth` | Optional biometric unlock |
-| `android.permission.INTERNET` | app (since 0.4.0, #32) | **Only** the in-vault private browser (`webview_flutter`, Android System WebView) loading pages the user opens. Normal (install-time) permission, no declaration form. No app code opens sockets; no analytics/telemetry/crash reporting/ads; no developer server. See `docs/PRIVATE_BROWSER.md`. |
+| `android.permission.INTERNET` | app (since 0.4.0, #32) | **Only** the in-vault private browser (`webview_flutter`, Android System WebView) loading pages the user opens. Normal (install-time) permission, no declaration form. Plus browser downloads: Browser downloads (v0.4.4+): when the user starts a download or long-presses an image → "Save image to vault", **app code** fetches the file (Dart `HttpClient` in `lib/services/browser_download.dart`, sending that site's own cookies, the WebView user agent and the page as Referer) directly from the site the user chose, into memory, and stores it only in the encrypted vault (no shared storage, no Downloads folder, no DownloadManager). Nothing is sent to the developer or any third party. No analytics/telemetry/crash reporting/ads; no developer server. See `docs/PRIVATE_BROWSER.md`. |
 
 Explicitly removed with `tools:node="remove"`: `READ_EXTERNAL_STORAGE`,
 `WRITE_EXTERNAL_STORAGE`, `READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`,
@@ -55,6 +55,9 @@ Re-verified 2026-09-26 on the v0.3 arm64 release APKs of **both** flavors: same 
 AndroidX-internal `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` — nothing else (asserted by
 `test/flavor_sources_test.dart`; re-verified with `aapt2 dump permissions` on the release APKs
 before the v0.4.0-test prerelease).
+
+**v0.4.6+14:** re-verified 2026-09-27 — same list; `bundletool dump manifest` of the signed
+play AAB (versionCode 14, targetSdk 36) shows only these permissions and no device-admin receiver.
 
 Not used anywhere: Accessibility Service, Notification Listener, SMS/Call log,
 Contacts, Location, `QUERY_ALL_PACKAGES`, `REQUEST_INSTALL_PACKAGES`, overlays,

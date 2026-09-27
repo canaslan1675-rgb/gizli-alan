@@ -23,7 +23,7 @@ Alternatif: `Hesap Makineli Kasa: GizliAlan` (30).
 Çalışan bir hesap makinesinin arkasında şifreli fotoğraf, dosya ve not kasası.
 ```
 
-**Tam açıklama (1981/4000):**
+**Tam açıklama (2184/4000):**
 ```
 GizliAlan, telefonunun sahibi için cihazında çalışan kişisel bir kasadır. Fotoğrafların, belgelerin ve notların PIN (isteğe bağlı parmak izi/yüz) ile korunur ve yalnızca cihazında AES-256-GCM ile şifrelenir.
 
@@ -33,6 +33,7 @@ Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simg
 ÖZELLİKLER
 • Şifreli galeri: fotoğrafları sistem seçicisiyle ekle, ızgarada gör, dışa aktar veya sil
 • Şifreli notlar (arama ile) ve şifreli dosyalar (PDF vb.)
+• Kasa içi gizli tarayıcı; indirilenler şifreli kasaya kaydedilir
 • Kasa içinde kendi ana ekranı ve duvar kağıdı seçimi
 • PIN + isteğe bağlı parmak izi/yüz, arka plana geçince otomatik kilit
 • Hatalı deneme sınırı ve bekleme süresi; son kilit açmadan beri kaç hatalı deneme olduğunu kasa içinde görürsün
@@ -42,7 +43,7 @@ Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simg
 
 GİZLİLİK
 • Hesap yok, sunucu yok, reklam yok, analitik yok
-• Takip yok, reklam yok: uygulama verini hiçbir yere göndermez. Dahili gizli tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
+• Takip yok: uygulama verini hiçbir yere göndermez. Dahili gizli tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
 • Az izin: isteğe bağlı biyometrik kilit ve yalnızca dahili tarayıcı için internet. Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
 • Bulut yedeklemesi kapalıdır; uygulamayı kaldırmak kasayı siler
 • PIN kurtarma yoktur. PIN'ini unutursan içerik çözülemez; bunu bilerek kullan
@@ -86,7 +87,7 @@ GizliAlan: Kasa ve İş Profili
 Hesap makinesi girişli şifreli kasa + iş profiliyle ayrı bir ikinci alan.
 ```
 
-**Tam açıklama (3174/4000):**
+**Tam açıklama (3377/4000):**
 ```
 GizliAlan, telefonunun sahibi için cihazında çalışan kişisel bir kasadır. Fotoğrafların, belgelerin ve notların PIN (isteğe bağlı parmak izi/yüz) ile korunur ve yalnızca cihazında AES-256-GCM ile şifrelenir.
 
@@ -96,6 +97,7 @@ Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simg
 ÖZELLİKLER
 • Şifreli galeri: fotoğrafları sistem seçicisiyle ekle, ızgarada gör, dışa aktar veya sil
 • Şifreli notlar (arama ile) ve şifreli dosyalar (PDF vb.)
+• Kasa içi gizli tarayıcı; indirilenler şifreli kasaya kaydedilir
 • Kasa içinde kendi ana ekranı ve duvar kağıdı seçimi
 • PIN + isteğe bağlı parmak izi/yüz, arka plana geçince otomatik kilit
 • Hatalı deneme sınırı ve bekleme süresi; son kilit açmadan beri kaç hatalı deneme olduğunu kasa içinde görürsün
@@ -114,7 +116,7 @@ Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simg
 
 GİZLİLİK
 • Hesap yok, sunucu yok, reklam yok, analitik yok
-• Takip yok, reklam yok: uygulama verini hiçbir yere göndermez. Dahili gizli tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
+• Takip yok: uygulama verini hiçbir yere göndermez. Dahili gizli tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
 • Az izin: isteğe bağlı biyometrik kilit ve yalnızca dahili tarayıcı için internet (iş profili ek izin gerektirmez). Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
 • Bulut yedeklemesi kapalıdır; uygulamayı kaldırmak kasayı siler
 • PIN kurtarma yoktur. PIN'ini unutursan içerik çözülemez; bunu bilerek kullan

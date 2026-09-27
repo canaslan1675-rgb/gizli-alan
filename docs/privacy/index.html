@@ -16,11 +16,12 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid #2ecc8f;backgroun
 </head>
 <body>
 <h1>Privacy Policy — GizliAlan</h1>
-<p><strong>Last updated:</strong> 2026-09-26
+<p><strong>Last updated:</strong> 2026-09-27 (v0.4.6)
+<strong>Data controller:</strong> Demirhan Çelik (OfferForge), Van, Türkiye — delibaltabaris5@gmail.com
 <strong>App:</strong> GizliAlan (package <code>com.offerforge.gizlialan</code>)
 <strong>Audience:</strong> The owner of the device, for their own content only.</p>
 <blockquote>
-<p>TR özet aşağıda. / Turkish summary below.</p>
+<p>Türkçe tam metin aşağıdadır (KVKK aydınlatma metni). / Full Turkish version below.</p>
 </blockquote>
 <h2>Summary</h2>
 <p>GizliAlan is an <strong>on-device</strong> personal vault. Photos, files and notes you add are
@@ -119,9 +120,9 @@ stores</strong> fingerprint/face data; Android only tells it "success" or "failu
 <p>Photos and files are imported only when <strong>you</strong> pick them in the system Photo
 Picker / file picker (no storage or media permission). Export uses the system
 "save as" dialog. Location permissions that the WebView plugin would add are
-removed from the manifest. If a build shows a link to this
-policy (Settings → Privacy &amp; permissions) and you tap "Open in browser", your
-browser app opens the page — GizliAlan itself sends nothing.</p>
+removed from the manifest. The app links to this policy (setup
+screen and Settings → Privacy &amp; permissions); if you tap "Open in browser",
+your own browser app opens the page — GizliAlan itself sends nothing.</p>
 <h2>Private browser (since 0.4.0)</h2>
 <p>The vault home screen has an optional <strong>Browser</strong> ("Tarayıcı"). It uses
 Android System WebView. GizliAlan adds no tracking to it and sends nothing to
@@ -129,7 +130,9 @@ the developer. What happens when you use it:</p>
 <ul>
 <li>Only the pages <strong>you</strong> type or open are loaded. Searches go to the search
   engine you choose (default DuckDuckGo; Startpage, Brave, Google or Bing
-  selectable). No search-suggestion requests are made while you type.</li>
+  selectable). No search-suggestion requests are made while you type. The
+  search engine you pick is a third-party service you choose; its own privacy
+  policy applies.</li>
 <li>Those websites see your IP address and whatever you send them, as with any
   browser. Their own privacy policies apply.</li>
 <li>Android System WebView's <strong>Safe Browsing</strong> is left at the platform default:
@@ -140,10 +143,14 @@ the developer. What happens when you use it:</p>
   <strong>deleted when the vault locks</strong> (setting "Kilitlenince temizle / Clear on
   lock", on by default; also "Clear now"). History exists only in memory.</li>
 <li>Third-party cookies are blocked. File access, JavaScript bridges to the app,
-  location, camera, microphone and file uploads are disabled. Downloads (and
-  long-press "Save image to vault") go <strong>only into the encrypted vault</strong>
-  (images to Photos, other files to Files); nothing is written to shared
-  storage or the Downloads folder.</li>
+  location, camera, microphone and file uploads are disabled.</li>
+<li><strong>Downloads</strong> (since 0.4.4): when you start a download or long-press an image
+  → "Save image to vault", GizliAlan's own code fetches the file directly from
+  that website (sending the site's own cookies, the browser's user agent and
+  the page address as Referer, exactly like the browser would), keeps it in
+  memory and saves it <strong>only into the encrypted vault</strong> (images → Photos,
+  other files → Files). Nothing is written to shared storage or the Downloads
+  folder, and nothing is sent to the developer.</li>
 <li>Screenshots and recent-apps previews stay blocked (FLAG_SECURE).</li>
 </ul>
 <h2>Calculator entry and decoy PIN (disclosed features)</h2>
@@ -155,7 +162,20 @@ the developer. What happens when you use it:</p>
   is a working calculator; the vault behind it is disclosed as above.</li>
 <li>An optional decoy PIN opens a separate, initially empty vault with its own key.</li>
 </ul>
+<h2>"Delete original after import" (optional, off by default)</h2>
+<p>If you turn on <strong>"Delete original after import"</strong> ("Kasaya aktarınca orijinali
+sil"), GizliAlan deletes the original photo/file on your phone only <strong>after</strong>
+its encrypted copy has been written to the vault and read back successfully.
+For gallery media Android shows its <strong>own system confirmation dialog</strong> and
+nothing is deleted unless you confirm; files picked in the system file picker
+are deleted using the access you granted in that picker. No storage permission
+is used. If anything fails, the original is kept.</p>
 <h2>Second phone (optional Android work profile)</h2>
+<blockquote>
+<p>Applies <strong>only to the sideloaded "full" APK</strong> distributed outside Google
+Play. The Google Play version has no Second phone, no work-profile code and
+no device-admin component.</p>
+</blockquote>
 <ul>
 <li>If you choose <strong>Second phone → Set up</strong>, Android creates a <em>work profile</em> on
   your device and GizliAlan becomes the <strong>profile owner of that profile only</strong>
@@ -191,33 +211,159 @@ the developer. What happens when you use it:</p>
 the app's files. It cannot fully protect against a rooted/compromised device or
 someone who knows your PIN. GizliAlan does not hide itself from the launcher (it is
 listed as "Calculator") and is not a replacement for Android Private Space.</p>
-<h2>Children</h2>
-<p>Not directed at children under 13.</p>
+<h2>Age</h2>
+<p>GizliAlan is intended for adults (18+) and is not directed at children.</p>
 <h2>Changes</h2>
 <p>If features that touch data (e.g. optional backup, purchases) are added, this
 policy and the Play Data safety form will be updated <strong>before</strong> release.</p>
 <h2>Contact</h2>
-<p>Developer: OfferForge (Demirhan, personal project).
+<p>Data controller / developer: Demirhan Çelik (OfferForge), Van, Türkiye.
 Support e-mail: <strong>delibaltabaris5@gmail.com</strong>
 This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
 <hr />
-<h2>TR — Özet</h2>
+<h2>TR — Gizlilik Politikası ve KVKK Aydınlatma Metni</h2>
+<p><strong>Son güncelleme:</strong> 2026-09-27 (v0.4.6)</p>
+<h3>1. Veri sorumlusu (KVKK md.10/a)</h3>
+<p>Demirhan Çelik (OfferForge), Van, Türkiye. İletişim ve başvuru:
+<strong>delibaltabaris5@gmail.com</strong></p>
+<h3>2. Özet</h3>
 <p>GizliAlan <strong>cihazda çalışan</strong> kişisel bir kasadır. Eklediğin fotoğraf, dosya ve
 notlar <strong>yalnızca cihazında, AES-256-GCM ile şifreli</strong> saklanır. Hesap, sunucu,
 analitik, telemetri, reklam veya hata raporlama SDK'sı yoktur; uygulama kasa
-içeriğini veya kullanım verisini hiçbir yere göndermez. 0.4.0'dan itibaren
-internet izni <strong>yalnızca</strong> isteğe bağlı kasa içi gizli tarayıcı içindir: tek ağ
-trafiği, tarayıcıda <strong>senin</strong> açtığın sayfalaradır (Android System WebView;
-çerez/önbellek kasa kilitlenince silinir, üçüncü taraf çerezler engelli,
-indirilenler yalnızca şifreli kasaya kaydedilir, telefon depolamasına yazılmaz). PIN yalnızca tuzlanmış PBKDF2 özeti olarak, anahtarlar Android
-Keystore destekli güvenli depoda tutulur. İzinler: isteğe bağlı biyometrik
-kilit (<code>USE_BIOMETRIC</code>) ve yalnızca kasa içi tarayıcı için <code>INTERNET</code>. Fotoğraf/dosyaları sistem seçicileriyle sen seçersin.
-SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik Hizmeti veya Cihaz
-Yöneticisi kullanılmaz; başkalarını izleme aracı değildir. Kasa içi bildirim listesi (içe/dışa aktarma, silme, İkinci telefon
-değişiklikleri, hatalı PIN sayısı) de şifreli saklanır ve yalnızca kasa içinde görünür;
-sistem bildirimi gönderilmez. Uygulama yedeği
-kapalıdır. PIN kurtarma yoktur. Hesap makinesi girişi ve sahte PIN özellikleri
-kurulumda, uygulama içinde ve mağaza açıklamasında açıkça belirtilir.</p>
+içeriğini veya kullanım verisini geliştiriciye ya da üçüncü kişilere
+göndermez. Geliştirici senin kasa verilerine <strong>hiçbir şekilde erişemez</strong>.</p>
+<h3>3. Cihazında işlenen veriler ve amaçları (md.10/b, md.10/d)</h3>
+<p>Aşağıdaki veriler yalnızca senin cihazında, senin kullanımın için işlenir;
+geliştiriciye aktarılmaz:</p>
+<table>
+<thead>
+<tr>
+<th>Veri</th>
+<th>Nerede / nasıl</th>
+<th>Amaç</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kasa fotoğrafları, dosyaları, notları</td>
+<td>Uygulamaya özel depolama, AES-256-GCM</td>
+<td>Kasan</td>
+</tr>
+<tr>
+<td>Kasa anahtarları</td>
+<td>Android Keystore destekli güvenli depo</td>
+<td>Kasayı açmak</td>
+</tr>
+<tr>
+<td>PIN ve isteğe bağlı sahte PIN</td>
+<td>Yalnızca tuzlanmış PBKDF2-HMAC-SHA256 özeti</td>
+<td>Kilit açma</td>
+</tr>
+<tr>
+<td>Kasa içi bildirim listesi (içe/dışa aktarma, silme, hatalı PIN sayısı)</td>
+<td>Şifreli, yalnızca kasa içinde görünür</td>
+<td>Kasada ne olduğunu göstermek</td>
+</tr>
+<tr>
+<td>Hatalı deneme sayaçları</td>
+<td>Güvenli depo</td>
+<td>Kaba kuvvet denemelerini yavaşlatmak</td>
+</tr>
+<tr>
+<td>Tercihler (dil, otomatik kilit, hesap makinesi girişi, biyometri, duvar kağıdı)</td>
+<td>Uygulamaya özel ayarlar</td>
+<td>Uygulama ayarları</td>
+</tr>
+</tbody>
+</table>
+<p>Biyometrik kilit Android BiometricPrompt kullanır; parmak izi/yüz verisi
+uygulamaya <strong>hiç gelmez</strong>, Android yalnızca "başarılı/başarısız" bildirir.
+Toplama yöntemi: verileri sen uygulamaya kendin eklersin (sistem fotoğraf/dosya
+seçicisi, not yazma); depolama izni kullanılmaz. Hukuki sebep: bu işlemler
+senin cihazında, senin talebinle gerçekleşir; geliştirici bu verileri işlemez.</p>
+<h3>4. Kasa içi gizli tarayıcı ve indirilenler</h3>
+<ul>
+<li><code>INTERNET</code> izni <strong>yalnızca</strong> kasa içi tarayıcı içindir; tek ağ trafiği
+  <strong>senin</strong> açtığın sayfalaradır (Android System WebView). Bu siteler, her
+  tarayıcıda olduğu gibi IP adresini ve onlara gönderdiklerini görür; kendi
+  gizlilik politikaları geçerlidir.</li>
+<li>Arama motoru (varsayılan DuckDuckGo; Startpage, Brave, Google, Bing) <strong>senin
+  seçtiğin</strong> üçüncü taraf bir hizmettir. WebView'in <strong>Güvenli Tarama (Safe
+  Browsing)</strong> özelliği Android/WebView platform bileşenidir, GizliAlan'ın
+  içindeki bir SDK değildir; Android/Google Play hizmetleri ziyaret edilen
+  adresleri Google'ın tehlikeli siteler listesiyle karşılaştırabilir. WebView
+  kullanım ölçümleri kapalıdır.</li>
+<li>Çerez, önbellek ve site verileri uygulamanın özel alanında tutulur ve kasa
+  kilitlenince <strong>silinir</strong> ("Kilitlenince temizle", varsayılan açık). Geçmiş
+  yalnızca bellekte tutulur. Üçüncü taraf çerezler engellidir; konum, kamera,
+  mikrofon ve dosya yükleme kapalıdır.</li>
+<li><strong>İndirilenler:</strong> bir indirme başlattığında veya bir resme uzun basıp
+  "Resmi kasaya kaydet" dediğinde, dosyayı GizliAlan'ın kendi kodu doğrudan o
+  siteden çeker (sitenin kendi çerezleri, tarayıcı kimliği ve sayfa adresi ile,
+  tarayıcının yapacağı gibi), bellekte tutar ve <strong>yalnızca şifreli kasaya</strong>
+  kaydeder (resimler → Fotoğraflar, diğerleri → Dosyalar). Telefon depolamasına
+  veya İndirilenler klasörüne hiçbir şey yazılmaz, geliştiriciye hiçbir şey
+  gönderilmez.</li>
+</ul>
+<h3>5. "Kasaya aktarınca orijinali sil" (isteğe bağlı, varsayılan kapalı)</h3>
+<p>Bu seçeneği açarsan, telefondaki orijinal fotoğraf/dosya <strong>ancak</strong> şifreli
+kopyası kasaya yazılıp başarıyla geri okunduktan <strong>sonra</strong> silinir. Galeri
+öğelerinde Android <strong>kendi sistem onay penceresini</strong> gösterir; onaylamazsan
+hiçbir şey silinmez. Dosya seçiciyle seçilen dosyalar, o seçicide verdiğin
+erişimle silinir. Depolama izni kullanılmaz; bir hata olursa orijinal korunur.</p>
+<h3>6. Hesap makinesi girişi ve sahte PIN (açıkça belirtilen özellikler)</h3>
+<p>Uygulama çalışan bir hesap makinesi olarak açılabilir; PIN'ini yazıp <code>=</code>
+tuşuna basınca kasa açılır. Bu, kurulumda, hesap makinesindeki ⓘ düğmesinde ve
+mağaza açıklamasında anlatılır. Başlatıcıda "Hesap Makinesi" adıyla görünür.
+İsteğe bağlı sahte PIN, kendi anahtarı olan ayrı ve başlangıçta boş bir kasa
+açar.</p>
+<h3>7. İkinci telefon (iş profili)</h3>
+<blockquote>
+<p>Bu bölüm <strong>yalnızca Google Play dışında dağıtılan "full" APK</strong> için
+geçerlidir. <strong>Google Play sürümünde</strong> İkinci telefon, iş profili kodu veya
+cihaz yöneticisi bileşeni <strong>yoktur</strong>.</p>
+</blockquote>
+<p>"İkinci telefon → Kur" dersen Android cihazında bir iş profili oluşturur ve
+GizliAlan <strong>yalnızca o profilin</strong> sahibi olur (Shelter/Island ile aynı yöntem).
+GizliAlan bu rolü yalnızca şunlar için kullanır: kasa kilitliyken profil
+uygulamalarını gizlemek ve kilidi açınca geri göstermek, ana profildeki bir
+uygulamayı profilde kullanılabilir yapmak, profilin Play Store'unu açmak,
+profil uygulamalarını listelemek/başlatmak ve profili silmek. Profil içindeki
+uygulamaların verilerini, mesajlarını veya bildirimlerini okumaz; uygulama
+listesi (başlatılabilir uygulamaların adı ve simgesi) cihazda kalır.</p>
+<h3>8. Aktarım (md.10/c)</h3>
+<p>Uygulama verileri geliştiriciye veya üçüncü kişilere <strong>aktarılmaz</strong>, yurt
+dışına aktarılmaz. Yalnızca sen destek için e-posta yazarsan, e-posta adresin
+ve mesajın geliştirici tarafından sorunu çözmek amacıyla işlenir (KVKK
+md.5/2-c ve f); bu e-posta Google'ın e-posta hizmeti (Gmail) üzerinden alındığı
+için yurt dışındaki sunucularda saklanabilir (md.9). Bu işlem yalnızca sen
+yazmayı seçersen gerçekleşir ve talebin sonuçlandıktan sonra e-posta silinir.</p>
+<h3>9. Haklarınız (KVKK md.11) ve başvuru</h3>
+<p>KVKK md.11 uyarınca; kişisel verilerinin işlenip işlenmediğini öğrenme,
+işlenmişse bilgi talep etme, işlenme amacını ve amacına uygun kullanılıp
+kullanılmadığını öğrenme, yurt içinde veya yurt dışında aktarıldığı üçüncü
+kişileri bilme, eksik veya yanlış işlenmişse düzeltilmesini, md.7 şartları
+çerçevesinde silinmesini veya yok edilmesini isteme, bu işlemlerin aktarılan
+üçüncü kişilere bildirilmesini isteme, münhasıran otomatik sistemlerle analiz
+edilmesi sonucu aleyhine bir sonuç çıkmasına itiraz etme ve kanuna aykırı
+işleme nedeniyle zarara uğrarsan zararın giderilmesini talep etme haklarına
+sahipsin.</p>
+<p>Başvurunu <strong>delibaltabaris5@gmail.com</strong> adresine yazılı olarak iletebilirsin;
+talebin en geç <strong>30 gün</strong> içinde ücretsiz sonuçlandırılır (md.13). Kasa
+verilerin yalnızca cihazındadır; onları uygulama içinden (öğe silme veya
+Ayarlar → Her şeyi sıfırla) ya da uygulamayı kaldırarak kendin silebilirsin.
+<strong>PIN kurtarma yoktur</strong>; verin bizde olmadığı için kurtaramayız.</p>
+<h3>10. Güvenlik sınırları</h3>
+<p>Şifreleme kasanı diğer uygulamalara, gelişigüzel erişime ve uygulama
+dosyalarının kopyalanmasına karşı korur; root'lu/ele geçirilmiş bir cihaza veya
+PIN'ini bilen birine karşı tam koruma sağlayamaz. Ekran görüntüsü ve son
+uygulamalar önizlemesi her zaman engellidir (FLAG_SECURE). Uygulama yedeği
+kapalıdır.</p>
+<h3>11. Yaş</h3>
+<p>GizliAlan yetişkinler (18+) içindir; çocuklara yönelik değildir.</p>
+<h3>12. Değişiklikler</h3>
+<p>Veriye dokunan yeni özellikler (ör. yedekleme, satın alma) eklenirse bu metin
+ve Play Veri güvenliği formu yayından <strong>önce</strong> güncellenir.</p>
 <p><strong>İletişim / destek:</strong> delibaltabaris5@gmail.com — Politika: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
 <p><em>This document is provided for transparency and Play policy readiness. It is not legal advice.</em></p>
 </body>

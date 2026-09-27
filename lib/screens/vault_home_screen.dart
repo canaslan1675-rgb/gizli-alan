@@ -410,10 +410,13 @@ class _AppTile extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             icon.label,
-            maxLines: 1,
+            // Two lines so "Hesap Makinesi" is not cut to "Hesap Makin…".
+            maxLines: 2,
+            textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 12,
+              height: 1.15,
               color: GizliTheme.textPrimary,
               shadows: _homeTextShadow,
             ),

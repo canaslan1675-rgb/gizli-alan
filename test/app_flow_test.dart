@@ -82,6 +82,27 @@ void main() {
     await tapVisible(tester, find.text('Continue'));
     await tester.pumpAndSettle();
 
+    // System back (#48): step 3 → step 2 → step 1, not out of setup.
+    expect(find.text('3 / 3'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Calculator entry'), findsOneWidget);
+    expect(find.text('2 / 3'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Welcome to GizliAlan'), findsOneWidget);
+    // Privacy policy link on step 1, without any dart-define.
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('onboarding_privacy')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.byKey(const ValueKey('onboarding_privacy')), findsOneWidget);
+    await tapVisible(tester, find.text('Continue'));
+    await tester.pumpAndSettle();
+    await tapVisible(tester, find.text('Continue'));
+    await tester.pumpAndSettle();
+
     // Step 3: PIN.
     await tester.enterText(find.byKey(const ValueKey('pin_new')), '2580');
     await tester.enterText(find.byKey(const ValueKey('pin_confirm')), '2580');

@@ -264,7 +264,7 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.4.5 · Play'), findsOneWidget);
+      expect(find.text('GizliAlan 0.4.6 · Play'), findsOneWidget);
       await tester.pageBack();
       await settle(tester);
 
@@ -311,7 +311,7 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.4.5 · Full'), findsOneWidget);
+      expect(find.text('GizliAlan 0.4.6 · Full'), findsOneWidget);
     });
   });
 

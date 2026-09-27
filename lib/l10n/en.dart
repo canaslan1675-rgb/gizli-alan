@@ -55,6 +55,12 @@ const Map<String, String> en = {
   'deleteOriginal': 'Delete original after import',
   'deleteOriginalHint':
       "When you import private photos and files into the vault, the originals stay in your phone's gallery, Downloads folder and Files app. Anyone who picks up your phone could see them there. With this option on, the original on your phone is deleted after the file has been encrypted and safely saved in the vault. The file then exists only in the vault, encrypted, and no one can see it without your PIN. The vault copy and files inside the second phone (work profile) are not affected. Android may ask you to confirm the deletion.",
+  'deleteOriginalHintPlay':
+      'When on, the original photo or file on your phone is deleted after it has been encrypted and saved in the vault, so it exists only in the vault. Android may ask you to confirm.',
+  'supportEmail': 'Support e-mail',
+  'copyEmail': 'Copy e-mail',
+  'emailCopied': 'E-mail address copied',
+  'privacyPolicy': 'Privacy policy',
   'originalsDeletedN': '{n} original(s) deleted.',
   'originalsKeptN':
       '{n} original(s) could not be deleted; the vault copy is safe.',

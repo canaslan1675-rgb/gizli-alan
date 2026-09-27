@@ -22,7 +22,7 @@ Alternative: `Calculator Vault: GizliAlan` (27).
 Encrypted vault for photos, files and notes behind a working calculator.
 ```
 
-**Full description (1935/4000):**
+**Full description (2169/4000):**
 ```
 GizliAlan is a private, on-device personal vault for the owner of the phone. Your photos, documents and notes are protected by a PIN (plus optional fingerprint/face unlock) and encrypted with AES-256-GCM on your device only.
 
@@ -32,6 +32,7 @@ On your phone the app is named "Calculator" and has an original calculator icon.
 FEATURES
 • Encrypted gallery: add photos with the system picker, grid view, export or delete
 • Encrypted notes (with search) and encrypted files (PDF etc.)
+• Private in-vault browser; downloads are saved into the encrypted vault
 • A home screen of its own inside the vault, with wallpapers
 • PIN + optional fingerprint/face, auto-lock when the app goes to the background
 • Wrong-attempt limit with cool-down; the vault shows how many wrong PINs were entered since your last unlock
@@ -41,7 +42,7 @@ FEATURES
 
 PRIVACY
 • No account, no server, no ads, no analytics
-• No tracking, no ads: the app sends none of your data anywhere. The built-in private browser only connects to sites you open, and its cookies/cache are wiped when the vault locks
+• No tracking: the app sends none of your data anywhere. The built-in private browser only connects to sites you open, and its cookies/cache are wiped when the vault locks
 • Minimal permissions: optional biometric unlock, and internet only for the built-in browser. You pick photos and files yourself; no storage permission
 • Cloud backup is disabled; uninstalling deletes the vault
 • There is no PIN recovery. If you forget your PIN, the content cannot be decrypted
@@ -84,7 +85,7 @@ GizliAlan Vault & Work Profile
 Encrypted calculator vault + a separate space via Android work profile.
 ```
 
-**Full description (3073/4000):**
+**Full description (3307/4000):**
 ```
 GizliAlan is a private, on-device personal vault for the owner of the phone. Your photos, documents and notes are protected by a PIN (plus optional fingerprint/face unlock) and encrypted with AES-256-GCM on your device only.
 
@@ -94,6 +95,7 @@ On your phone the app is named "Calculator" and has an original calculator icon.
 FEATURES
 • Encrypted gallery: add photos with the system picker, grid view, export or delete
 • Encrypted notes (with search) and encrypted files (PDF etc.)
+• Private in-vault browser; downloads are saved into the encrypted vault
 • A home screen of its own inside the vault, with wallpapers
 • PIN + optional fingerprint/face, auto-lock when the app goes to the background
 • Wrong-attempt limit with cool-down; the vault shows how many wrong PINs were entered since your last unlock
@@ -112,8 +114,8 @@ SECOND PHONE (OPTIONAL, ANDROID WORK PROFILE)
 
 PRIVACY
 • No account, no server, no ads, no analytics
-• No tracking, no ads: the app sends none of your data anywhere. The built-in private browser only connects to sites you open, and its cookies/cache are wiped when the vault locks
-• One permission only: optional biometric unlock (the work profile needs no extra permission). You pick photos and files yourself; no storage permission
+• No tracking: the app sends none of your data anywhere. The built-in private browser only connects to sites you open, and its cookies/cache are wiped when the vault locks
+• Minimal permissions: optional biometric unlock, and internet only for the built-in browser (the work profile needs no extra permission). You pick photos and files yourself; no storage permission
 • Cloud backup is disabled; uninstalling deletes the vault
 • There is no PIN recovery. If you forget your PIN, the content cannot be decrypted
 

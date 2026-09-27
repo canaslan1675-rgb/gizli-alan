@@ -31,7 +31,7 @@ const Map<String, String> tr = {
       'Uygulama hesap makinesiyle açılır — PIN ve "=" kasayı açar',
   'calculatorEntryOff': 'Uygulama PIN ekranıyla açılır',
   'setPin': 'PIN Belirle',
-  'confirmPin': 'PIN Tekrar',
+  'confirmPin': "PIN'i tekrar gir",
   'pinFormat': 'PIN 4–8 haneli rakam olmalı',
   'pinMismatch': 'PIN\'ler eşleşmiyor',
   'pinNoRecovery':
@@ -57,6 +57,12 @@ const Map<String, String> tr = {
   'deleteOriginal': 'Kasaya aktarınca orijinali sil',
   'deleteOriginalHint':
       "Özel fotoğraf ve dosyalarını kasaya aktardığında, orijinalleri telefonun galerisinde, İndirilenler klasöründe ve Dosyalar uygulamasında kalmaya devam eder. Telefonunu eline alan biri bunları oradan görebilir. Bu seçenek açıkken, dosya kasaya şifrelenerek güvenle kaydedildikten sonra telefondaki orijinali silinir. Böylece dosya yalnızca kasada, şifreli olarak kalır ve PIN'in olmadan kimse göremez. Kasadaki kopya ve ikinci telefon (iş profili) içindeki dosyalar etkilenmez. Android silme için onay isteyebilir.",
+  'deleteOriginalHintPlay':
+      "Açıkken, fotoğraf veya dosya kasaya şifrelenerek kaydedildikten sonra telefondaki orijinali silinir; böylece yalnızca kasada kalır. Android silme için onay isteyebilir.",
+  'supportEmail': 'Destek e-postası',
+  'copyEmail': 'E-postayı kopyala',
+  'emailCopied': 'E-posta adresi kopyalandı',
+  'privacyPolicy': 'Gizlilik politikası',
   'originalsDeletedN': '{n} orijinal silindi.',
   'originalsKeptN': '{n} orijinal silinemedi; kasadaki kopya güvende.',
   'originalsDeclined':
@@ -87,8 +93,8 @@ const Map<String, String> tr = {
   'importFile': 'Dosya ekle',
   'importing': 'Şifreleniyor…',
   'importedN':
-      '{n} fotoğraf kasaya şifrelenerek eklendi. Orijinaller telefon '
-      'galerinde duruyor — istersen oradan sil.',
+      '{n} fotoğraf kasaya şifrelenerek eklendi. Orijinaller telefonunun '
+      'galerisinde duruyor — istersen oradan sil.',
   'importedFilesN':
       '{n} dosya kasaya şifrelenerek eklendi. Orijinaller değiştirilmedi.',
   'tooBig': '100 MB\'tan büyük bazı dosyalar atlandı.',
@@ -171,7 +177,7 @@ const Map<String, String> tr = {
       'Bu tür bağlantılar (uygulama, telefon, e-posta, dosya…) kasa tarayıcısından açılmaz.',
   'browserSaveImage': 'Resmi kasaya kaydet',
   'browserDownloading': 'Kasaya indiriliyor…',
-  'browserSavedPhotos': 'Kasadaki Fotoğraflar\'a kaydedildi: {name}',
+  'browserSavedPhotos': 'Kasadaki Galeri\'ye kaydedildi: {name}',
   'browserSavedFiles': 'Kasadaki Dosyalar\'a kaydedildi: {name}',
   'browserDlTooLarge': 'Kaydetmek için çok büyük (en fazla {mb} MB).',
   'browserDlNotImage': 'Bu bir resim değil.',
