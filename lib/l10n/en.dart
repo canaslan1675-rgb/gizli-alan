@@ -266,7 +266,7 @@ const Map<String, String> en = {
       'Apps hidden. Android did not allow pausing the work profile.',
   'spHideWhenLocked': 'Hide work apps while locked',
   'spHideWhenLockedHint':
-      'While the vault is locked, second-phone apps are removed from the phone\'s home screen, its "Work" folder and the app list. Nothing is uninstalled and their data stays. They come back when you unlock with your real PIN or fingerprint. While hidden they do not run and receive no notifications.',
+      'While the vault is locked, second-phone apps, including Play Store and Files, are removed from the home screen, the folder and the app list. The profile is named "Alan". Some launchers still title that folder "Work"; no API changes that title. Nothing is uninstalled and their data stays. They come back when you unlock with your real PIN or fingerprint. While hidden they do not run and receive no notifications.',
   'spHideWhenLockedWhen':
       'Hidden immediately when you press Lock. After a background auto-lock Android does not let GizliAlan act, so the apps are hidden the next time GizliAlan is open while locked (app start or return). Kept visible: GizliAlan itself and Google Play services / installer / settings components needed to manage the profile.',
   'spPauseToo': 'Also try to pause the work profile',

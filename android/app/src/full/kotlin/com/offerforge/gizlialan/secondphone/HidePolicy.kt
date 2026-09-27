@@ -28,6 +28,14 @@ package com.offerforge.gizlialan.secondphone
 object HidePolicy {
     const val PLAY_STORE = "com.android.vending"
 
+    /**
+     * Name passed to [android.app.admin.DevicePolicyManager.setProfileName]
+     * and `setOrganizationName`. "Work" / "İş" is the label that marks the
+     * launcher tab, so it is not used. An empty name is rejected by the API.
+     * Some launchers ignore this and draw their own "Work" title anyway.
+     */
+    const val NEUTRAL_PROFILE_NAME = "Alan"
+
     val NEVER_HIDE: Set<String> = setOf(
         // Google Play services / services framework: account sign-in, push,
         // licence checks for every other app in the profile.
@@ -59,6 +67,13 @@ object HidePolicy {
     val ALSO_HIDE: Set<String> = setOf(
         "com.android.documentsui",
         "com.google.android.documentsui",
+        // Google Files and the Xiaomi file managers. They usually have a
+        // launcher icon (and are then hidden with every other launchable
+        // app); listed here so they are still hidden when that icon is absent.
+        "com.google.android.apps.nbu.files",
+        "com.android.fileexplorer",
+        "com.mi.android.globalFileexplorer",
+        "com.miui.fileexplorer",
     )
 
     /**

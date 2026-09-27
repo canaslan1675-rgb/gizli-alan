@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.PersistableBundle
 import com.offerforge.gizlialan.MainActivity
-import com.offerforge.gizlialan.R
 
 /**
  * Runs inside the work profile after provisioning. Only touches the work
@@ -49,7 +48,8 @@ object ProfileSetup {
             IntentFilter(SecondPhoneContract.ACTION),
             DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED,
         )
-        dpm.setProfileName(admin, context.getString(R.string.profile_name))
+        dpm.setProfileName(admin, HidePolicy.NEUTRAL_PROFILE_NAME)
+        dpm.setOrganizationName(admin, HidePolicy.NEUTRAL_PROFILE_NAME)
         dpm.setProfileEnabled(admin)
     }
 

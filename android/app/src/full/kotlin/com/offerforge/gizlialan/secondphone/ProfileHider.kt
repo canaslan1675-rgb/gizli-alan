@@ -139,8 +139,9 @@ class ProfileHider(private val ctx: Context) {
         try { dpm.setCrossProfileCallerIdDisabled(admin, locked) } catch (_: Exception) {}
         try { dpm.setCrossProfileContactsSearchDisabled(admin, locked) } catch (_: Exception) {}
         try { dpm.setBluetoothContactSharingDisabled(admin, locked) } catch (_: Exception) {}
-        // Neutral profile name (Settings / system dialogs show it).
-        try { dpm.setProfileName(admin, ctx.getString(com.offerforge.gizlialan.R.string.profile_name)) } catch (_: Exception) {}
+        // Neutral profile name. The default work-profile title is not used.
+        try { dpm.setProfileName(admin, HidePolicy.NEUTRAL_PROFILE_NAME) } catch (_: Exception) {}
+        try { dpm.setOrganizationName(admin, HidePolicy.NEUTRAL_PROFILE_NAME) } catch (_: Exception) {}
     }
 
     private fun scheduleSweep() {

@@ -265,7 +265,7 @@ const Map<String, String> tr = {
       'Uygulamalar gizlendi. Android iş profilini duraklatmaya izin vermedi.',
   'spHideWhenLocked': 'Kilitliyken iş uygulamalarını gizle',
   'spHideWhenLockedHint':
-      'Kasa kilitliyken ikinci telefondaki uygulamalar telefonun ana ekranından, "İş" klasöründen ve uygulama listesinden kaldırılır. Hiçbir şey silinmez, verileri durur. Gerçek PIN veya parmak izinle açınca geri gelir. Gizliyken bu uygulamalar çalışmaz ve bildirim almaz.',
+      'Kasa kilitliyken ikinci telefondaki uygulamalar, Play Store ve Dosyalar dahil, ana ekrandan, klasörden ve uygulama listesinden kaldırılır. Profilin adı "Alan" yazılır. Bazı başlatıcılar klasöre yine "İş" der; bunu değiştiren bir API yok. Hiçbir şey silinmez, verileri durur. Gerçek PIN veya parmak izinle açınca geri gelir. Gizliyken bu uygulamalar çalışmaz ve bildirim almaz.',
   'spHideWhenLockedWhen':
       'Kilitle düğmesine basınca hemen gizlenir. Arka planda otomatik kilitlenirse Android GizliAlan\'ın işlem yapmasına izin vermez; uygulamalar GizliAlan kilitliyken bir sonraki açılışta (başlatma veya geri dönüş) gizlenir. Görünür kalanlar: GizliAlan ve profili yönetmek için gereken Google Play hizmetleri / yükleyici / ayar bileşenleri.',
   'spPauseToo': 'Ayrıca iş profilini duraklatmayı dene',

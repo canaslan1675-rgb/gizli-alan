@@ -57,3 +57,15 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 | 2.21 | Tap a download link (e.g. a PDF/zip), a `tel:`/`intent:` link and a page asking for location/camera. | Download does nothing (downloads disabled); non-web links show "blocked" snackbar; permission requests are denied silently, no system permission dialog. |
 | 2.22 | Settings → Apps → Calculator → Data usage. | Traffic only while using the browser; none from the rest of the app. |
 | 2.23 | Vault home on a 1080×2400 phone (v0.4.0). | Default sunset/sea picture fills the screen without visible pixelation; clock, tiles, labels, dock readable. Bottom signature (monospace, faint): `GizliAlan Vault · v0.4.0 (build 6) · play/full`, `AES-256-GCM · PIN: PBKDF2-SHA256 120k · FLAG_SECURE`, `● vault: unlocked · © OfferForge`; not tappable, not over tiles. Not on the calculator. Settings → Wallpaper colour swatch → plain gradient; picture swatch → back. Settings bottom shows "Varsayılan arka plan: Created with Grok". |
+
+## 3. Xiaomi launcher after v0.4.4+11 (`full` only)
+
+Not run in the agent environment (no Xiaomi device). Fill the result column on the phone. Expected API behaviour is in `docs/V044_RESMI_SINIRLAR.md`. Do not write "the folder disappeared" until this table is filled.
+
+| # | Step | Expected from the API | Seen on the phone |
+|---|---|---|---|
+| 3.1 | Lock the vault. Open the app drawer. | Play Store, Files and other work-profile icons are hidden. | |
+| 3.2 | Settings → Accounts → the work profile. | Profile name is `Alan`, not İş / Work. | |
+| 3.3 | Look at the MIUI/HyperOS folder or tab title. | The app asked for `Alan`. The launcher may still draw İş. | |
+| 3.4 | With every hideable icon gone, look again. | No API removes the folder. Record whether it is still there. | |
+| 3.5 | Pause from the system "Work apps" quick-settings tile, then look. | Icons may stay, greyed. Record whether the folder stays. | |

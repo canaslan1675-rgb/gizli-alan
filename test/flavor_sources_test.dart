@@ -67,8 +67,14 @@ void main() {
     final action = File(
       '$src/full/kotlin/com/offerforge/gizlialan/secondphone/ProfileHider.kt',
     ).readAsStringSync();
+    expect(p, contains('NEUTRAL_PROFILE_NAME = "Alan"'));
+    expect(p, contains('com.google.android.apps.nbu.files'));
+    expect(p, contains('com.mi.android.globalFileexplorer'));
     expect(action, contains('HidePolicy.toHide'));
     expect(action, contains('HidePolicy.unhideCandidates'));
+    expect(action, contains('HidePolicy.NEUTRAL_PROFILE_NAME'));
+    expect(action.contains('"İş"'), isFalse);
+    expect(action.contains('"Work"'), isFalse);
     expect(
       File(
         '$src/testFull/kotlin/com/offerforge/gizlialan/secondphone/HidePolicyTest.kt',

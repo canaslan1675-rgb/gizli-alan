@@ -82,6 +82,30 @@ class HidePolicyTest {
     }
 
     @Test
+    fun profileNameIsNeutral() {
+        assertEquals("Alan", HidePolicy.NEUTRAL_PROFILE_NAME)
+        assertFalse(HidePolicy.NEUTRAL_PROFILE_NAME.equals("Work", ignoreCase = true))
+        assertFalse(HidePolicy.NEUTRAL_PROFILE_NAME == "İş")
+        assertTrue(HidePolicy.NEUTRAL_PROFILE_NAME.isNotBlank())
+    }
+
+    @Test
+    fun playStoreAndFileManagersAreHideable() {
+        assertTrue(HidePolicy.canHide(HidePolicy.PLAY_STORE, self))
+        for (pkg in listOf(
+            "com.google.android.apps.nbu.files",
+            "com.android.documentsui",
+            "com.google.android.documentsui",
+            "com.android.fileexplorer",
+            "com.mi.android.globalFileexplorer",
+            "com.miui.fileexplorer",
+        )) {
+            assertTrue(pkg, HidePolicy.ALSO_HIDE.contains(pkg))
+            assertTrue(pkg, HidePolicy.canHide(pkg, self))
+        }
+    }
+
+    @Test
     fun lockTargetsAddInstalledFileBrowserEvenWithoutLauncherEntry() {
         val t = HidePolicy.lockTargets(listOf("com.whatsapp")) { it == "com.google.android.documentsui" }
         assertEquals(setOf("com.whatsapp", "com.google.android.documentsui"), t)

@@ -4,5 +4,6 @@
     <!-- Shown by Android in provisioning / device-admin settings. Honest name. -->
     <string name="profile_admin_label">GizliAlan – second phone (work profile)</string>
     <string name="profile_admin_description">Creates and manages only your own separate work profile ("second phone") on this device. It has no control over your main profile and does not monitor anything.</string>
-    <string name="profile_name">Work</string>
+    <!-- Kept in sync with HidePolicy.NEUTRAL_PROFILE_NAME. Not "Work". -->
+    <string name="profile_name">Alan</string>
 </resources>

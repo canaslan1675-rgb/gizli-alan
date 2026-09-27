@@ -86,11 +86,12 @@ where the ROM offers it.
   package-removed/unavailable callback). After unhiding, MIUI usually puts the icons back into the
   "İş" folder, but positions/folders the owner arranged by hand may be reset and some launchers
   add them to the end of the home screen. To verify on the owner's Xiaomi (#14, §3.15–3.20).
-- **Xiaomi specifics:** MIUI/HyperOS groups work apps into an automatically created "İş"/"Work"
-  folder with briefcase badges and has no work tab; when all work apps are hidden the folder
-  should disappear or be empty (to verify). MIUI's "Second space" and "Dual apps" are different
+- **Xiaomi specifics:** MIUI/HyperOS groups work apps into an automatically created folder
+  with briefcase badges. Whether that folder disappears once every hideable app is hidden
+  was not measured on a Xiaomi phone. MIUI's "Second space" and "Dual apps" are different
   features and not affected. Some HyperOS builds restrict work profiles entirely (existing
-  blocked/fallback message).
+  blocked/fallback message). What the official APIs do and do not do is written in
+  `docs/V044_RESMI_SINIRLAR.md`.
 - If the main app's data is cleared (profile becomes "unlinked"), GizliAlan can no longer sign
   requests to the profile, so hidden apps stay hidden until the work profile is removed in Android
   Settings (Accounts → Work → Remove) — the same recovery as before.
@@ -112,12 +113,12 @@ Owner bug (Xiaomi, v0.4.3): apps installed from Play inside the profile stayed i
 Cause: the policy already covered *all* launchable apps, but (1) packages already in our "hidden" record were skipped, so a recorded app that became visible again (Play re-install/update, unhidden elsewhere) was never re-hidden; (2) once "closed", the vault never swept again until the next unlock.
 
 Now, on every lock / every foreground visit while locked / every 15 min inside the profile (JobScheduler, while locked):
-- **Hidden:** every package with a launcher entry (incl. Play Store, Files, Chrome, apps installed at any time) + the system file browser DocumentsUI (no launcher entry, but it is what serves the personal side's "Work" tab in the file picker). Never: GizliAlan itself (its launcher entry is disabled in the profile anyway), Play services, installer/permission UIs, Settings/SystemUI, MIUI security/launcher. Unlock unhides exactly the recorded set (+ Play Store safety net). If a hide fails, the app is **suspended** instead (greyed out, not openable) and unsuspended on unlock.
-- **Profile policies while locked** (cleared on unlock): no cross-profile copy/paste (`DISALLOW_CROSS_PROFILE_COPY_PASTE`), no sharing into the profile (`DISALLOW_SHARE_INTO_MANAGED_PROFILE`), work caller-ID / contacts search / Bluetooth contact sharing disabled. Profile name is now neutral ("Work" / "İş").
+- **Hidden:** every package with a launcher entry (incl. Play Store, Chrome, apps installed at any time) plus, even with no launcher icon: DocumentsUI and the file managers `com.google.android.apps.nbu.files`, `com.android.fileexplorer`, `com.mi.android.globalFileexplorer`, `com.miui.fileexplorer`. Never: GizliAlan itself (its launcher entry is disabled in the profile anyway), Play services, installer/permission UIs, Settings/SystemUI, MIUI security/launcher. Those last ones stay because hiding them can make the profile unmanageable; there is still no API that removes the launcher tab once they are gone. Unlock unhides exactly the recorded set (+ Play Store safety net). If a hide fails, the app is **suspended** instead (greyed out, not openable) and unsuspended on unlock.
+- **Profile policies while locked** (cleared on unlock): no cross-profile copy/paste (`DISALLOW_CROSS_PROFILE_COPY_PASTE`), no sharing into the profile (`DISALLOW_SHARE_INTO_MANAGED_PROFILE`), work caller-ID / contacts search / Bluetooth contact sharing disabled. Profile name and organization name are `Alan` (`HidePolicy.NEUTRAL_PROFILE_NAME`), not "Work" / "İş". `setProfileName("")` is rejected by Android. A launcher may ignore the name and still draw "İş".
 - **Quiet mode (pause profile)** is now the default and always requested — but Android only lets the *default launcher* or system apps pause a profile (`UserManager.requestQuietModeEnabled` → SecurityException for normal apps; there is no profile-owner/DPM equivalent on a personal device). On a normal phone it is refused and hiding is what applies; if the owner ever makes a launcher that allows it, it takes effect automatically.
 
 **Not achievable with public APIs (no root):**
-- **Removing the Work tab/folder itself.** Stock Launcher3, MIUI/HyperOS and Pixel launchers show the Work tab whenever a managed profile exists; with every app hidden it is *empty* (Launcher3 shows its "no work apps"/paused card), but the tab stays. Only deleting the profile removes it. A third-party launcher that can hide the Work tab (user-installed) is the only workaround.
+- **Removing the Work tab/folder itself.** AOSP Launcher3 keeps a Work page for as long as the managed profile exists; with every app hidden the page is empty (its "no work apps" / paused card), and the tab stays. Deleting the profile is what removes it. Whether MIUI/HyperOS hides that folder when it is empty was **not measured on a Xiaomi phone** (no device in this environment). Do not treat the empty-folder case as a result. Steps to look at on the phone are in `docs/V044_RESMI_SINIRLAR.md`.
 - **Immediate hide when auto-locking in the background** (Home button): Android blocks the cross-profile request from a backgrounded app; the profile-side job / next foreground visit catch up (≤15 min, usually at the next GizliAlan open).
 - **Instant reaction to an install while locked:** `ACTION_PACKAGE_ADDED` is not delivered to manifest receivers (API 26+) and the profile has no running process; covered by the 15-min job and the foreground sweep. Installing is practically impossible while locked anyway (Play Store is hidden).
 - **Blocking the personal side from all work files without quiet mode:** Android's own default cross-profile filters (set by the system, not by us) can't be removed by a profile owner; hiding DocumentsUI in the profile removes the file picker's Work tab target, but full isolation needs quiet mode.
