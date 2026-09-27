@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 /// channel is unavailable (tests, non-Android). Must match `version:` in
 /// pubspec.yaml; a unit test enforces it.
 const String appVersion = '0.4.4';
-const int appBuild = 11;
+const int appBuild = 12;
 
 /// Version of the installed APK, read at runtime from Android's
 /// PackageManager via the `gizlialan/system` channel (`appInfo`).

@@ -38,4 +38,6 @@
 
 **2026-09-26 (Sat, #45):** v0.4.4: work-profile lock hides every launchable app each sweep (recorded-but-visible bug fixed), profile-side 15-min re-hide job, DocumentsUI hidden, suspend fallback, cross-profile lock policies, quiet mode default (only effective if Android permits); browser downloads + long-press images saved straight into the encrypted vault.
 
+**2026-09-27 (Sun, v0.4.4+12):** The manually uploaded `v0.4.4-11-test` APK was signed with a different debug key than the installed `com.offerforge.gizlialan.full`, so the system installer stopped at "Uygulama yüklenmedi." Build 12 is the same app with a higher versionCode, published only from GitHub Actions with the shared debug key so it updates in place.
+
 **2026-09-27 (Sun, v0.4.4+11):** Official-API pass on the work profile, no root. Profile and organization name are `Alan` (the previous "İş"/"Work" string was the label that marks the launcher tab; an empty name is rejected). File managers without a launcher icon (Google Files, Xiaomi Dosyalar, DocumentsUI) are hide targets along with Play Store and every other launchable app. Quiet mode stays a request that Android grants only to the foreground default launcher. Xiaomi's empty-folder behavior was not measured here. Write-up: `docs/V044_RESMI_SINIRLAR.md`.
