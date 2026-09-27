@@ -268,6 +268,14 @@ const Map<String, String> tr = {
       'Kasa kilitliyken ikinci telefondaki uygulamalar telefonun ana ekranından, "İş" klasöründen ve uygulama listesinden kaldırılır. Hiçbir şey silinmez, verileri durur. Gerçek PIN veya parmak izinle açınca geri gelir. Gizliyken bu uygulamalar çalışmaz ve bildirim almaz.',
   'spHideWhenLockedWhen':
       'Kilitle düğmesine basınca hemen gizlenir. Arka planda otomatik kilitlenirse Android GizliAlan\'ın işlem yapmasına izin vermez; uygulamalar GizliAlan kilitliyken bir sonraki açılışta (başlatma veya geri dönüş) gizlenir. Görünür kalanlar: GizliAlan ve profili yönetmek için gereken Google Play hizmetleri / yükleyici / ayar bileşenleri.',
+  'spWorkGuideTitle': 'İş sekmesini de gizle',
+  'spWorkGuideBody':
+      'Kasa kilitliyken GizliAlan iş uygulamalarını gizler. Başlatıcıdaki İş sekmesini kendin de kapatmak veya duraklatmak için sonraki adımda sistem ayarları açılır. Orada şunu kapat:\n\n• İş profili / İş uygulamaları: "İş uygulamaları" anahtarını kapat (iş profilini duraklat)\n• Xiaomi / POCO başlatıcı: Ana ekran ayarları → "İş uygulamalarını göster" kapat\n• Aksi halde: Ayarlar → Hesaplar → İş profili → Duraklat\n\nGerektiğinde aynı yerden (veya İş sekmesinden) tekrar aç.',
+  'spWorkGuideOpen': 'Ayarları aç',
+  'spWorkGuideLater': 'Şimdi değil',
+  'spWorkGuideReopen': 'Ayarları tekrar aç',
+  'spWorkGuideFailed':
+      'Ayarlar açılamadı. Ayarlar → Hesaplar → İş profili yolunu elle aç.',
   'spPauseToo': 'Ayrıca iş profilini duraklatmayı dene',
   'spPauseTooHint':
       'Android iş profilini duraklatmaya çoğu telefonda yalnızca varsayılan ana ekran uygulamasına izin verir; bu yüzden çoğu zaman yalnızca gizleme uygulanır. Duraklatılmış profilin simgeleri bazı ana ekranlarda (ör. Xiaomi) gri olarak görünmeye devam eder — simgeleri kaldıran gizlemedir. Hızlı ayarlardaki "İş uygulamaları" düğmesini de kullanabilirsin.',
