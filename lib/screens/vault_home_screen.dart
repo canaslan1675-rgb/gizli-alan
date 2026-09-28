@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../app.dart';
-import '../app_version.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
-import '../services/crypto_service.dart';
 import '../theme.dart';
 import 'browser_screen.dart';
 import 'decoy_calculator_screen.dart';
@@ -302,7 +300,6 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                       ],
                     ),
                   ),
-                  const _HomeWatermark(),
                   // Dock
                   Container(
                     margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -453,89 +450,6 @@ class _DockButton extends StatelessWidget {
             : Colors.transparent,
       ),
       icon: Icon(icon, color: highlight ? GizliTheme.mint : null),
-    );
-  }
-}
-
-/// Subtle terminal-style signature above the dock (vault home only, never
-/// on the calculator). Every term is taken from the code it describes:
-/// version/build from the installed APK ([AppInfo]), flavor from
-/// [Flavor.current], cipher and PIN-hash parameters from [CryptoService].
-/// Not interactive and excluded from accessibility.
-class _HomeWatermark extends StatefulWidget {
-  const _HomeWatermark();
-
-  @override
-  State<_HomeWatermark> createState() => _HomeWatermarkState();
-}
-
-class _HomeWatermarkState extends State<_HomeWatermark> {
-  AppInfo _info = AppInfo.fallback;
-
-  @override
-  void initState() {
-    super.initState();
-    AppInfo.load().then((i) {
-      if (mounted) setState(() => _info = i);
-    });
-  }
-
-  static String get cipherLine {
-    const bits = CryptoService.keyLength * 8;
-    const k = CryptoService.defaultPbkdf2Iterations ~/ 1000;
-    return 'AES-$bits-GCM  ·  PIN: PBKDF2-SHA256 ${k}k  ·  FLAG_SECURE';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final style = TextStyle(
-      fontFamily: 'monospace',
-      fontFamilyFallback: const ['RobotoMono', 'Courier New', 'Courier'],
-      fontSize: 9.5,
-      height: 1.45,
-      letterSpacing: 0.2,
-      color: Colors.white.withValues(alpha: 0.42),
-      shadows: [
-        Shadow(color: Colors.black.withValues(alpha: 0.55), blurRadius: 3),
-      ],
-    );
-    return IgnorePointer(
-      child: ExcludeSemantics(
-        child: Padding(
-          key: const ValueKey('home_watermark'),
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
-          child: DefaultTextStyle(
-            style: style,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.fade,
-            softWrap: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'GizliAlan Vault  ·  v${_info.version} (build ${_info.build})'
-                  '  ·  ${Flavor.current.name}',
-                ),
-                Text(cipherLine),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '● ',
-                        style: TextStyle(
-                          color: GizliTheme.mint.withValues(alpha: 0.7),
-                        ),
-                      ),
-                      const TextSpan(text: 'vault: unlocked  ·  © OfferForge'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
