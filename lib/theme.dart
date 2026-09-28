@@ -10,7 +10,9 @@ class GizliTheme {
   static const Color mintDim = Color(0xFF3D9A6C);
   static const Color textPrimary = Color(0xFFE8EEF7);
   static const Color textSecondary = Color(0xFF9AA8BC);
-  static const Color danger = Color(0xFFFF6B7A);
+  static const Color danger = Color(
+    0xFFFF5252,
+  ); // clear red (errors, danger zone)
   static const Color warning = Color(0xFFFFC857);
 
   /// Vault home wallpapers (gradients, no image assets needed).

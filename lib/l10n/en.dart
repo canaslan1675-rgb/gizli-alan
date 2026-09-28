@@ -54,9 +54,12 @@ const Map<String, String> en = {
   'proStubToggleHint': 'No purchase; a local switch to try Pro features only.',
   'deleteOriginal': 'Delete original after import',
   'deleteOriginalHint':
-      "When you import private photos and files into the vault, the originals stay in your phone's gallery, Downloads folder and Files app. Anyone who picks up your phone could see them there. With this option on, the original on your phone is deleted after the file has been encrypted and safely saved in the vault. The file then exists only in the vault, encrypted, and no one can see it without your PIN. The vault copy and files inside the second phone (work profile) are not affected. Android may ask you to confirm the deletion.",
-  'deleteOriginalHintPlay':
-      'When on, the original photo or file on your phone is deleted after it has been encrypted and saved in the vault, so it exists only in the vault. Android may ask you to confirm.',
+      'The phone original is deleted once saved in the vault.',
+  'deleteOriginalAskTitle': 'Delete originals from the gallery?',
+  'deleteOriginalAskBody':
+      'If you turn this on, photos you import into the vault are deleted from the phone gallery from now on. You can change it in Settings.',
+  'deleteOriginalAskYes': 'Yes, delete',
+  'deleteOriginalAskNo': 'No',
   'supportEmail': 'Support',
   'copyEmail': 'Copy e-mail',
   'emailCopied': 'E-mail address copied',
@@ -158,7 +161,6 @@ const Map<String, String> en = {
   'homeBackgroundPhoto':
       'A photo from this vault. Remove it to go back to the default below.',
   'wallpaperDefaultImage': 'Default picture',
-  'wallpaperAttribution': 'Default background: Created with Grok',
   'wallpaperPlain': 'Plain colour',
   'homeBackgroundRemove': 'Remove background',
   'homeBackgroundSet':
@@ -170,7 +172,7 @@ const Map<String, String> en = {
   'browserSearchWith':
       'Searches use {engine}. No search suggestions are sent while you type.',
   'browserPrivacyNote':
-      'Private browser inside the vault. GizliAlan adds no tracking, analytics or ads — only the sites you open are contacted. Third-party cookies are blocked, history is kept only while this screen is open, and cookies, cache and site data are erased when the vault locks (Settings → Browser). Sites can still see your IP address, like any browser. Downloads go straight into the encrypted vault (images to Photos, other files to Files), never to phone storage; long-press an image to save it. File uploads, location, camera and microphone are off. Android System WebView may check pages with Google Safe Browsing (Android default).',
+      'Private browser inside the vault; no tracking or ads. Cookies and history are erased when the vault locks; downloads go to the encrypted vault.',
   'browserBack': 'Back',
   'browserForward': 'Forward',
   'browserReload': 'Reload',

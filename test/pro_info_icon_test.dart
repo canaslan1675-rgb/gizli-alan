@@ -184,7 +184,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('pro_stub_toggle')));
     await settle(tester);
     expect(settings.proStubActive, isTrue);
-    await tester.pageBack();
+    await tester.tap(find.byTooltip('Geri').last); // TR Back tooltip
     await settle(tester);
 
     tile = find.byKey(const ValueKey('settings_hide_calc_info'));
@@ -243,9 +243,10 @@ void main() {
       scrollable: find.byType(Scrollable).last,
     );
     expect(find.byKey(const ValueKey('settings_hide_calc_info')), findsNothing);
+    // Delete original after import is free in play.
     expect(
       find.byKey(const ValueKey('settings_delete_original')),
-      findsNothing,
+      findsOneWidget,
     );
     expect(find.text('Pro yakında'), findsNothing);
     expect(find.text('PRO'), findsNothing);

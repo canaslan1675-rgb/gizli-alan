@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gizlialan/app_version.dart';
 import 'package:gizlialan/theme.dart';
 import 'package:gizlialan/app.dart';
 import 'package:gizlialan/flavor.dart';
@@ -163,19 +162,9 @@ void main() {
         (homeDecoration().image!.image as AssetImage).assetName,
         GizliTheme.defaultWallpaperAsset,
       );
-      // Desktop-style watermark above the dock, not interactive.
-      expect(find.byKey(const ValueKey('home_watermark')), findsOneWidget);
-      expect(
-        find.textContaining('v$appVersion (build $appBuild)  ·  play'),
-        findsOneWidget,
-      );
-      expect(
-        find.ancestor(
-          of: find.byKey(const ValueKey('home_watermark')),
-          matching: find.byType(IgnorePointer),
-        ),
-        findsWidgets,
-      );
+      // No developer footer on the vault home.
+      expect(find.byKey(const ValueKey('home_watermark')), findsNothing);
+      expect(find.textContaining('vault: unlocked'), findsNothing);
 
       final state = tester.state<GizliAlanAppState>(find.byType(GizliAlanApp));
       await tester.runAsync(
@@ -200,7 +189,7 @@ void main() {
         await tester.runAsync(() => state.session!.homeBackgroundId()),
         isNotNull,
       );
-      await tester.pageBack();
+      await tester.tap(find.byTooltip('Geri').last); // TR Back tooltip
       await settle();
       await settle();
 
@@ -208,7 +197,7 @@ void main() {
       expect(withPhoto.image, isNotNull);
       expect(withPhoto.image!.image, isA<MemoryImage>());
       expect(withPhoto.image!.colorFilter, isNotNull); // readability scrim
-      expect(find.byKey(const ValueKey('home_watermark')), findsOneWidget);
+      expect(find.byKey(const ValueKey('home_watermark')), findsNothing);
 
       // Settings shows the state and only offers removal.
       // Through the home icon, like the owner (home reloads on return).
@@ -227,7 +216,7 @@ void main() {
       await settle();
       await tester.tap(remove);
       await settle();
-      await tester.pageBack();
+      await tester.tap(find.byTooltip('Geri').last); // TR Back tooltip
       await settle();
       await settle();
       // Removing the vault photo goes back to the default picture.
@@ -247,7 +236,7 @@ void main() {
       await tester.tap(swatch);
       await settle();
       expect(settings.wallpaperImage, isFalse);
-      await tester.pageBack();
+      await tester.tap(find.byTooltip('Geri').last); // TR Back tooltip
       await settle();
       expect(homeDecoration().image, isNull);
       expect(homeDecoration().gradient, isNotNull);

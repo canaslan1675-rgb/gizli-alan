@@ -26,6 +26,11 @@ void main() {
     }
     await press(t, '2 + 3 × 4 =');
     expect(display(t), '14');
+    // Top line keeps the expression, result below.
+    expect(
+      t.widget<Text>(find.byKey(const ValueKey('calc_expression'))).data,
+      '2+3×4',
+    );
     await press(t, 'C 0 . 1 + 0 . 2 =');
     expect(display(t), '0.3');
     await press(t, 'C 5 ÷ 0 =');

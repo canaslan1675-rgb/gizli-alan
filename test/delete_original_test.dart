@@ -12,27 +12,36 @@ void main() {
   tearDown(() => Flavor.debugOverride = null);
 
   group('gating (ProEntitlement.deleteOriginalAfterImport)', () {
-    test('default off; play never deletes even if opted in', () async {
-      SharedPreferences.setMockInitialValues({
-        'delete_original_after_import': true,
-        'pro_stub_active': true,
+    for (final f in AppFlavor.values) {
+      test('${f.name}: free, default off, follows the opt-in only', () async {
+        SharedPreferences.setMockInitialValues({});
+        final s = await SettingsService.create();
+        Flavor.debugOverride = f;
+        expect(ProEntitlement.deleteOriginalAfterImport(s), isFalse);
+        expect(s.deleteOriginalAsked, isFalse);
+        await s.setDeleteOriginalAfterImport(true);
+        expect(ProEntitlement.deleteOriginalAfterImport(s), isTrue);
+        await s.setDeleteOriginalAfterImport(false);
+        expect(ProEntitlement.deleteOriginalAfterImport(s), isFalse);
+        await s.setDeleteOriginalAsked();
+        expect(s.deleteOriginalAsked, isTrue);
       });
-      final s = await SettingsService.create();
-      Flavor.debugOverride = AppFlavor.play;
-      expect(ProEntitlement.deleteOriginalAfterImport(s), isFalse);
-    });
+    }
 
-    test('full: needs opt-in AND Pro; lapse turns it off', () async {
-      SharedPreferences.setMockInitialValues({});
-      final s = await SettingsService.create();
-      Flavor.debugOverride = AppFlavor.full;
-      expect(s.deleteOriginalAfterImport, isFalse);
-      await s.setDeleteOriginalAfterImport(true);
-      expect(ProEntitlement.deleteOriginalAfterImport(s), isFalse);
-      await s.setProStubActive(true);
-      expect(ProEntitlement.deleteOriginalAfterImport(s), isTrue);
-      await s.setProStubActive(false);
-      expect(ProEntitlement.deleteOriginalAfterImport(s), isFalse);
+    test('play manifest never requests broad storage permissions', () {
+      final m = File(
+        'android/app/src/main/AndroidManifest.xml',
+      ).readAsStringSync();
+      expect(
+        m.contains(
+          'android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove"',
+        ),
+        isTrue,
+      );
+      final kt = File(
+        'android/app/src/main/kotlin/com/offerforge/gizlialan/ImportChannel.kt',
+      ).readAsStringSync();
+      expect(kt.contains('MediaStore.createDeleteRequest'), isTrue);
     });
   });
 

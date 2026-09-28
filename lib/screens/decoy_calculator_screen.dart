@@ -150,7 +150,7 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        _engine.expression,
+                        _engine.topLine,
                         key: const ValueKey('calc_expression'),
                         maxLines: 2,
                         textAlign: TextAlign.right,

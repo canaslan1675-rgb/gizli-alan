@@ -56,9 +56,12 @@ const Map<String, String> tr = {
       'Satın alma yok; yalnızca Pro özelliklerini denemek için yerel bir anahtar.',
   'deleteOriginal': 'Kasaya aktarınca orijinali sil',
   'deleteOriginalHint':
-      "Özel fotoğraf ve dosyalarını kasaya aktardığında, orijinalleri telefonun galerisinde, İndirilenler klasöründe ve Dosyalar uygulamasında kalmaya devam eder. Telefonunu eline alan biri bunları oradan görebilir. Bu seçenek açıkken, dosya kasaya şifrelenerek güvenle kaydedildikten sonra telefondaki orijinali silinir. Böylece dosya yalnızca kasada, şifreli olarak kalır ve PIN'in olmadan kimse göremez. Kasadaki kopya ve ikinci telefon (iş profili) içindeki dosyalar etkilenmez. Android silme için onay isteyebilir.",
-  'deleteOriginalHintPlay':
-      "Açıkken, fotoğraf veya dosya kasaya şifrelenerek kaydedildikten sonra telefondaki orijinali silinir; böylece yalnızca kasada kalır. Android silme için onay isteyebilir.",
+      'Kasaya kaydedildikten sonra telefondaki orijinal silinir.',
+  'deleteOriginalAskTitle': 'Orijinaller galeriden silinsin mi?',
+  'deleteOriginalAskBody':
+      'Açarsan, kasaya aktardığın fotoğrafların orijinalleri bundan sonra telefon galerisinden silinir. Ayarlar\'dan değiştirebilirsin.',
+  'deleteOriginalAskYes': 'Evet, sil',
+  'deleteOriginalAskNo': 'Hayır',
   'supportEmail': 'Destek',
   'copyEmail': 'E-postayı kopyala',
   'emailCopied': 'E-posta adresi kopyalandı',
@@ -157,7 +160,6 @@ const Map<String, String> tr = {
   'homeBackgroundPhoto':
       'Kasadaki bir fotoğraf. Kaldırınca aşağıdaki varsayılana dönülür.',
   'wallpaperDefaultImage': 'Varsayılan görsel',
-  'wallpaperAttribution': 'Varsayılan arka plan: Created with Grok',
   'wallpaperPlain': 'Düz renk',
   'homeBackgroundRemove': 'Arka planı kaldır',
   'homeBackgroundSet':
@@ -169,7 +171,7 @@ const Map<String, String> tr = {
   'browserSearchWith':
       'Aramalar {engine} ile yapılır. Yazarken arama önerisi gönderilmez.',
   'browserPrivacyNote':
-      'Kasa içinde gizli tarayıcı. GizliAlan izleme, analitik veya reklam eklemez; yalnızca açtığın sitelerle bağlantı kurulur. Üçüncü taraf çerezler engellenir, geçmiş yalnızca bu ekran açıkken tutulur; çerezler, önbellek ve site verileri kasa kilitlenince silinir (Ayarlar → Tarayıcı). Her tarayıcıda olduğu gibi siteler IP adresini görebilir. İndirilenler doğrudan şifreli kasaya gider (resimler Fotoğraflar\'a, diğer dosyalar Dosyalar\'a), telefon depolamasına asla yazılmaz; bir resmi kaydetmek için üzerine uzun bas. Dosya yükleme, konum, kamera ve mikrofon kapalıdır. Android System WebView sayfaları Google Güvenli Tarama ile denetleyebilir (Android varsayılanı).',
+      'Kasa içinde gizli tarayıcı; izleme ve reklam yok. Kasa kilitlenince çerezler ve geçmiş silinir, indirilenler şifreli kasaya gider.',
   'browserBack': 'Geri',
   'browserForward': 'İleri',
   'browserReload': 'Yenile',

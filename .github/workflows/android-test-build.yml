@@ -48,9 +48,9 @@ jobs:
 
       - name: Build APKs
         run: |
-          flutter build apk --release --flavor play --target-platform android-arm64
+          flutter build apk --release --flavor play --target-platform android-arm64,android-x64
           cp build/app/outputs/flutter-apk/app-play-release.apk /tmp/play.apk
-          flutter build apk --release --flavor full --target-platform android-arm64
+          flutter build apk --release --flavor full --target-platform android-arm64,android-x64
           cp build/app/outputs/flutter-apk/app-full-release.apk /tmp/full.apk
 
       - name: Kotlin unit tests (full flavor)

@@ -93,6 +93,39 @@ class _GalleryScreenState extends State<GalleryScreen> {
       ),
     );
     _reload();
+    if (count > 0) await _askDeleteOriginalsOnce();
+  }
+
+  /// One-time prompt after the first successful gallery import while
+  /// "Delete original after import" is off. The answer is remembered.
+  Future<void> _askDeleteOriginalsOnce() async {
+    if (!mounted) return;
+    final s = GizliAlanApp.of(context).settings;
+    if (s.deleteOriginalAfterImport || s.deleteOriginalAsked) return;
+    final t = L10n.current;
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        key: const ValueKey('delete_original_ask'),
+        title: Text(t('deleteOriginalAskTitle')),
+        content: Text(t('deleteOriginalAskBody')),
+        actions: [
+          TextButton(
+            key: const ValueKey('delete_original_ask_no'),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(t('deleteOriginalAskNo')),
+          ),
+          TextButton(
+            key: const ValueKey('delete_original_ask_yes'),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(t('deleteOriginalAskYes')),
+          ),
+        ],
+      ),
+    );
+    if (yes == null) return; // dismissed: ask again next time
+    await s.setDeleteOriginalAsked();
+    if (yes) await s.setDeleteOriginalAfterImport(true);
   }
 
   Future<void> _openViewer(List<VaultItem> items, int i) async {
