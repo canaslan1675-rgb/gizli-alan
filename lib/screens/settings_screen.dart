@@ -515,7 +515,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       ListTile(
         key: const ValueKey('settings_support'),
-        leading: const Icon(Icons.mail_outline),
+        leading: const Icon(Icons.support_agent_outlined),
         title: Text(t('supportEmail')),
         subtitle: const Text(PrivacyLink.supportEmail),
         onTap: () async {
