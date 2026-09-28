@@ -27,6 +27,9 @@ import io.flutter.plugin.common.MethodChannel
  */
 object SystemChannel {
     const val NAME = "gizlialan/system"
+    private const val SUPPORT_SUBJECT = "GizliAlan destek"
+    private const val SUPPORT_MAILTO =
+        "mailto:delibaltabaris5@gmail.com?subject=GizliAlan%20destek"
 
     fun attach(activity: Activity, messenger: BinaryMessenger): MethodChannel {
         val channel = MethodChannel(messenger, NAME)
@@ -35,10 +38,17 @@ object SystemChannel {
                 "openUrl" -> {
                     val url = call.argument<String>("url")
                     val uri = url?.let { Uri.parse(it) }
-                    if (uri != null && uri.scheme == "mailto" && url == "mailto:delibaltabaris5@gmail.com") {
-                        // Support e-mail row (Settings): only our own address.
+                    if (uri != null && uri.scheme == "mailto" && url == SUPPORT_MAILTO) {
+                        // Support row (Settings): only our own address, fixed
+                        // subject; no body, logs, device data or attachments.
+                        // startActivity needs no <queries> entry (package
+                        // visibility only limits queryIntentActivities /
+                        // resolveActivity); no mail app -> caught below.
                         try {
-                            activity.startActivity(Intent(Intent.ACTION_SENDTO, uri))
+                            activity.startActivity(
+                                Intent(Intent.ACTION_SENDTO, uri)
+                                    .putExtra(Intent.EXTRA_SUBJECT, SUPPORT_SUBJECT),
+                            )
                             result.success(true)
                         } catch (e: Exception) {
                             result.success(false)
