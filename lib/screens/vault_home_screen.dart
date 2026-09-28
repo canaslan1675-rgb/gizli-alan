@@ -166,6 +166,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
           t('secondPhone'),
           const Color(0xFF6FD6FF),
           () => _open(const SecondPhoneScreen()),
+          key: const ValueKey('tile_second_phone'),
         ),
       _AppIcon(
         Icons.settings_outlined,

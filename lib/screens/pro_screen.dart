@@ -4,6 +4,7 @@ import '../app.dart';
 import '../l10n/l10n.dart';
 import '../services/pro_entitlement.dart';
 import '../theme.dart';
+import '../widgets/pro_gate.dart';
 
 /// "GizliAlan Pro" plans — UI stub only.
 ///
@@ -14,8 +15,8 @@ import '../theme.dart';
 class ProScreen extends StatefulWidget {
   const ProScreen({super.key});
 
-  /// Planned free-tier limit (brief: 30–50 items). Display only for now.
-  static const int freeItemLimit = 50;
+  /// Free-tier limit (enforced, see ItemLimit).
+  static const int freeItemLimit = ItemLimit.freeItemLimit;
 
   @override
   State<ProScreen> createState() => _ProScreenState();

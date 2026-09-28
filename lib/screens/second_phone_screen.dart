@@ -4,8 +4,10 @@ import '../app.dart';
 import '../l10n/l10n.dart';
 import '../util/text_case.dart';
 import '../models/vault_event.dart';
+import '../services/pro_entitlement.dart';
 import '../services/second_phone_service.dart';
 import '../theme.dart';
+import '../widgets/pro_gate.dart';
 import '../widgets/profile_app_tile.dart';
 import '../widgets/work_apps_hide_switches.dart';
 
@@ -112,6 +114,17 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
 
   Future<void> _setUp() async {
     final t = L10n.current;
+    // Setting up the Second phone is a Pro feature (Play free trial covers
+    // it). An existing profile is never locked when Pro lapses.
+    if (!ProEntitlement.isActive(_app.settings)) {
+      await showProRequired(
+        context,
+        title: t('spProTitle'),
+        body: t('spProBody'),
+      );
+      if (mounted) setState(() {});
+      if (!ProEntitlement.isActive(_app.settings)) return;
+    }
     if (!await _confirm(t('spSetUp'), t('spSetUpConfirm'))) return;
     final r = await _run((sp) => sp.provision());
     if (r == null) return;
@@ -370,6 +383,15 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
               t('spXiaomiWarn'),
               color: GizliTheme.warning,
               icon: Icons.warning_amber_outlined,
+            ),
+          );
+        }
+        if (!ProEntitlement.isActive(_app.settings)) {
+          out.add(
+            _card(
+              t('spProBody'),
+              color: GizliTheme.mint,
+              icon: Icons.workspace_premium_outlined,
             ),
           );
         }

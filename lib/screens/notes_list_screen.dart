@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../widgets/pro_gate.dart';
 import '../app.dart';
 import '../l10n/l10n.dart';
 import '../models/note.dart';
@@ -34,6 +35,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
   void _reload() => setState(() => _future = _repo.list());
 
   Future<void> _open(Note? note) async {
+    // Free limit applies to new notes only; existing ones stay editable.
+    if (note == null && !await ItemLimit.ensureRoom(context)) return;
+    if (!mounted) return;
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => NoteEditScreen(repo: _repo, note: note),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/pro_gate.dart';
 import '../app.dart';
 import '../l10n/l10n.dart';
 import '../services/browser_download.dart';
@@ -76,6 +77,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
     if (!mounted) return;
     final session = GizliAlanApp.of(context).session;
     if (session == null) return;
+    if (!await ItemLimit.ensureRoom(context) || !mounted) return;
     final t = L10n.current;
     final messenger = ScaffoldMessenger.of(context);
     messenger
