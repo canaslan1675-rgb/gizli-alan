@@ -59,7 +59,7 @@ const Map<String, String> tr = {
       "Özel fotoğraf ve dosyalarını kasaya aktardığında, orijinalleri telefonun galerisinde, İndirilenler klasöründe ve Dosyalar uygulamasında kalmaya devam eder. Telefonunu eline alan biri bunları oradan görebilir. Bu seçenek açıkken, dosya kasaya şifrelenerek güvenle kaydedildikten sonra telefondaki orijinali silinir. Böylece dosya yalnızca kasada, şifreli olarak kalır ve PIN'in olmadan kimse göremez. Kasadaki kopya ve ikinci telefon (iş profili) içindeki dosyalar etkilenmez. Android silme için onay isteyebilir.",
   'deleteOriginalHintPlay':
       "Açıkken, fotoğraf veya dosya kasaya şifrelenerek kaydedildikten sonra telefondaki orijinali silinir; böylece yalnızca kasada kalır. Android silme için onay isteyebilir.",
-  'supportEmail': 'Destek e-postası',
+  'supportEmail': 'Destek',
   'copyEmail': 'E-postayı kopyala',
   'emailCopied': 'E-posta adresi kopyalandı',
   'privacyPolicy': 'Gizlilik politikası',
