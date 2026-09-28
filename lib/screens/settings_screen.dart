@@ -7,6 +7,7 @@ import '../flavor.dart';
 import '../l10n/l10n.dart';
 import '../services/browser_logic.dart';
 import '../services/privacy_link.dart';
+import '../util/text_case.dart';
 import '../services/pro_entitlement.dart';
 import '../services/settings_service.dart';
 import '../services/vault_session.dart';
@@ -202,6 +203,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     }
     final canGetPro = ProEntitlement.available;
+    // No billing in this build (play): don't show a locked row at all.
+    if (!canGetPro) return const SizedBox.shrink();
     return ListTile(
       key: const ValueKey('settings_hide_calc_info'),
       leading: icon,
@@ -254,6 +257,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final s = app.settings;
     const icon = Icon(Icons.auto_delete_outlined);
     final pro = ProEntitlement.isActive(s);
+    // No billing in this build (play): hide the locked row entirely.
+    if (!pro && !ProEntitlement.available) return const SizedBox.shrink();
+    final hint = t(
+      Flavor.hasSecondPhone ? 'deleteOriginalHint' : 'deleteOriginalHintPlay',
+    );
     return SwitchListTile(
       key: const ValueKey('settings_delete_original'),
       secondary: icon,
@@ -264,12 +272,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const _ProBadge(),
         ],
       ),
-      subtitle: Text(
-        pro
-            ? t('deleteOriginalHint')
-            : '${t('deleteOriginalHint')}\n'
-                  '${ProEntitlement.available ? t('hideCalcInfoLocked') : t('proSoon')}',
-      ),
+      subtitle: Text(pro ? hint : '$hint\n${t('hideCalcInfoLocked')}'),
       isThreeLine: true,
       value: ProEntitlement.deleteOriginalAfterImport(s),
       onChanged: (v) async {
@@ -295,7 +298,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _header(String text) => Padding(
     padding: const EdgeInsets.fromLTRB(16, 20, 16, 6),
     child: Text(
-      text.toUpperCase(),
+      upperFor(text, L10n.lang),
       style: const TextStyle(
         color: GizliTheme.mint,
         fontSize: 12,
@@ -509,6 +512,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text(t('privacyTitle')),
         subtitle: Text(t('dataSafetyShort')),
         onTap: _privacyInfo,
+      ),
+      ListTile(
+        key: const ValueKey('settings_support'),
+        leading: const Icon(Icons.mail_outline),
+        title: Text(t('supportEmail')),
+        subtitle: const Text(PrivacyLink.supportEmail),
+        onTap: () async {
+          final messenger = ScaffoldMessenger.of(context);
+          if (await PrivacyLink.openMail()) return;
+          await Clipboard.setData(
+            const ClipboardData(text: PrivacyLink.supportEmail),
+          );
+          messenger.showSnackBar(SnackBar(content: Text(t('emailCopied'))));
+        },
+        trailing: IconButton(
+          key: const ValueKey('settings_support_copy'),
+          tooltip: t('copyEmail'),
+          icon: const Icon(Icons.copy_outlined),
+          onPressed: () async {
+            final messenger = ScaffoldMessenger.of(context);
+            await Clipboard.setData(
+              const ClipboardData(text: PrivacyLink.supportEmail),
+            );
+            messenger.showSnackBar(SnackBar(content: Text(t('emailCopied'))));
+          },
+        ),
       ),
     ];
 

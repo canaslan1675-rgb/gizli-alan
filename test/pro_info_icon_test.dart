@@ -217,7 +217,7 @@ void main() {
     expect(find.byKey(const ValueKey('calc_info')), findsNothing);
   });
 
-  testWidgets('play: ⓘ always shown, no Pro hint, toggle says "Pro yakında"', (
+  testWidgets('play: ⓘ always shown, no Pro hint, no locked Pro rows', (
     tester,
   ) async {
     await boot(tester, {
@@ -234,9 +234,20 @@ void main() {
     await settle(tester);
 
     await unlock(tester);
-    final tile = await openHideTile(tester);
-    expect(find.text('Pro yakında'), findsOneWidget);
-    expect(tester.widget<ListTile>(tile).onTap, isNull);
-    expect(tester.widget<ListTile>(tile).enabled, isFalse);
+    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await settle(tester);
+    // Help row sits right after the (now hidden) Pro rows.
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('settings_calc_help')),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    expect(find.byKey(const ValueKey('settings_hide_calc_info')), findsNothing);
+    expect(
+      find.byKey(const ValueKey('settings_delete_original')),
+      findsNothing,
+    );
+    expect(find.text('Pro yakında'), findsNothing);
+    expect(find.text('PRO'), findsNothing);
   });
 }

@@ -112,17 +112,21 @@ void main() {
       expect(PrivacyLink.isValid('https://exa mple.org'), isFalse);
     });
 
-    test('no PRIVACY_URL define in tests -> url is null', () {
-      expect(PrivacyLink.configured, isEmpty);
-      expect(PrivacyLink.url, isNull);
+    test('defaults to the GitHub Pages policy without a dart-define', () {
+      expect(
+        PrivacyLink.configured,
+        'https://canaslan1675-rgb.github.io/gizli-alan/privacy/',
+      );
+      expect(PrivacyLink.url, PrivacyLink.defaultUrl);
       PrivacyLink.debugUrlOverride = 'http://insecure.example';
       expect(PrivacyLink.url, isNull);
     });
   });
 
-  testWidgets('no PRIVACY_URL: in-app policy text only, no link buttons', (
+  testWidgets('invalid PRIVACY_URL: in-app policy text only, no link buttons', (
     tester,
   ) async {
+    PrivacyLink.debugUrlOverride = 'http://insecure.example';
     await openPrivacy(tester);
     expect(find.byType(AlertDialog), findsOneWidget);
     expect(find.textContaining('AES-256-GCM'), findsOneWidget);
@@ -161,6 +165,67 @@ void main() {
     expect(opens, hasLength(1));
     expect(opens.single.method, 'openUrl');
     expect(opens.single.arguments, {'url': url});
+  });
+
+  testWidgets('Settings support e-mail row: mailto, copy fallback', (
+    tester,
+  ) async {
+    final calls = <MethodCall>[];
+    var mailOk = true;
+    String? clip;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      PrivacyLink.channel,
+      (call) async {
+        calls.add(call);
+        return mailOk;
+      },
+    );
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          clip = (call.arguments as Map)['text'] as String?;
+        }
+        return null;
+      },
+    );
+    addTearDown(() {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        PrivacyLink.channel,
+        null,
+      );
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
+    });
+    final state = await openVault(tester, VaultSpace.real);
+    state.navKey.currentState!.push(
+      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+    );
+    await settle(tester);
+    final row = find.byKey(const ValueKey('settings_support'));
+    await tester.scrollUntilVisible(
+      row,
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(SettingsScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(find.text('delibaltabaris5@gmail.com'), findsOneWidget);
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+    final opens = calls.where((c) => c.method == 'openUrl').toList();
+    expect(opens.single.arguments, {'url': 'mailto:delibaltabaris5@gmail.com'});
+    expect(clip, isNull);
+    mailOk = false;
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+    expect(clip, 'delibaltabaris5@gmail.com');
+    expect(find.text('E-mail address copied'), findsOneWidget);
   });
 
   testWidgets('no browser: falls back to copying the link', (tester) async {

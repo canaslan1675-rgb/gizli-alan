@@ -35,6 +35,16 @@ object SystemChannel {
                 "openUrl" -> {
                     val url = call.argument<String>("url")
                     val uri = url?.let { Uri.parse(it) }
+                    if (uri != null && uri.scheme == "mailto" && url == "mailto:delibaltabaris5@gmail.com") {
+                        // Support e-mail row (Settings): only our own address.
+                        try {
+                            activity.startActivity(Intent(Intent.ACTION_SENDTO, uri))
+                            result.success(true)
+                        } catch (e: Exception) {
+                            result.success(false)
+                        }
+                        return@setMethodCallHandler
+                    }
                     if (uri == null || uri.scheme != "https" || uri.host.isNullOrEmpty()) {
                         result.success(false)
                         return@setMethodCallHandler

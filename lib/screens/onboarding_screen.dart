@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../app.dart';
 import '../l10n/l10n.dart';
 import '../services/auth_service.dart';
+import '../services/privacy_link.dart';
 import '../theme.dart';
 
 /// First-run flow (3 steps):
@@ -130,6 +132,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       onPressed: _ownDevice ? () => setState(() => _step = 1) : null,
       child: Text(t('continue')),
     ),
+    if (PrivacyLink.url != null)
+      TextButton.icon(
+        key: const ValueKey('onboarding_privacy'),
+        icon: const Icon(Icons.privacy_tip_outlined, size: 18),
+        label: Text(t('privacyPolicy')),
+        onPressed: () async {
+          final url = PrivacyLink.url!;
+          final messenger = ScaffoldMessenger.of(context);
+          if (await PrivacyLink.open(url)) return;
+          await Clipboard.setData(ClipboardData(text: url));
+          messenger.showSnackBar(SnackBar(content: Text(t('noBrowser'))));
+        },
+      ),
   ];
 
   List<Widget> _stepEntry(L10n t) => [
@@ -214,24 +229,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final t = L10n.of(context);
     final steps = [_stepWelcome, _stepEntry, _stepPin];
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            Row(
-              children: [
-                Text(
-                  '${_step + 1} / 3',
-                  style: const TextStyle(color: GizliTheme.textSecondary),
-                ),
-                const Spacer(),
-                _langSwitch(),
-              ],
-            ),
-            const SizedBox(height: 16),
-            ...steps[_step](t),
-          ],
+    // System back on step 2/3 goes to the previous step (not out of setup).
+    return PopScope(
+      canPop: _step == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop || _busy) return;
+        setState(() {
+          _step -= 1;
+          _error = null;
+        });
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(24),
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '${_step + 1} / 3',
+                    style: const TextStyle(color: GizliTheme.textSecondary),
+                  ),
+                  const Spacer(),
+                  _langSwitch(),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ...steps[_step](t),
+            ],
+          ),
         ),
       ),
     );

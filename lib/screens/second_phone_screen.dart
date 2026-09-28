@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../l10n/l10n.dart';
+import '../util/text_case.dart';
 import '../models/vault_event.dart';
 import '../services/second_phone_service.dart';
 import '../theme.dart';
@@ -304,7 +305,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
         ),
       ),
       Text(
-        t('secondPhoneApps').toUpperCase(),
+        upperFor(t('secondPhoneApps'), L10n.lang),
         style: const TextStyle(
           color: GizliTheme.mint,
           fontSize: 12,
