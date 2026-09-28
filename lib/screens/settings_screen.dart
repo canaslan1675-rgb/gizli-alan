@@ -14,7 +14,7 @@ import '../services/vault_session.dart';
 import '../services/vault_space.dart';
 import '../theme.dart';
 import '../widgets/work_apps_hide_switches.dart';
-import 'pro_screen.dart';
+import '../widgets/pro_gate.dart';
 import 'set_pin_screen.dart';
 
 /// Vault settings. In the decoy vault only neutral options are shown
@@ -203,7 +203,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     }
     final canGetPro = ProEntitlement.available;
-    // No billing in this build (play): don't show a locked row at all.
     if (!canGetPro) return const SizedBox.shrink();
     return ListTile(
       key: const ValueKey('settings_hide_calc_info'),
@@ -241,7 +240,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ? () async {
               await Navigator.of(
                 context,
-              ).push(MaterialPageRoute(builder: (_) => const ProScreen()));
+              ).push(MaterialPageRoute(builder: (_) => proScreen()));
               if (mounted) setState(() {});
             }
           : null,
@@ -468,15 +467,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
-      if (Flavor.hasProStub)
+      if (ProEntitlement.available)
         ListTile(
           key: const ValueKey('settings_pro'),
           leading: const Icon(Icons.workspace_premium_outlined),
           title: Text(t('proTitle')),
           subtitle: Text(t('proSettingsHint')),
-          onTap: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const ProScreen())),
+          onTap: () async {
+            await Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => proScreen()));
+            if (mounted) setState(() {});
+          },
         ),
       ListTile(
         leading: const Icon(Icons.privacy_tip_outlined),

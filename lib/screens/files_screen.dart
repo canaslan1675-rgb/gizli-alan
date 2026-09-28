@@ -8,6 +8,7 @@ import '../services/pro_entitlement.dart';
 import '../services/vault_storage.dart';
 import '../theme.dart';
 import '../widgets/import_delete_originals.dart';
+import '../widgets/pro_gate.dart';
 import '../widgets/vault_actions.dart';
 import 'photo_viewer_screen.dart';
 
@@ -38,20 +39,27 @@ class _FilesScreenState extends State<FilesScreen> {
 
   Future<void> _import() async {
     final app = GizliAlanApp.of(context);
+    // Free tier: stop at the item limit (stored items are never touched).
+    final left = await ItemLimit.remaining(context);
+    if (!mounted) return;
+    if (left == 0) return ItemLimit.showLimitReached(context);
     if (ProEntitlement.deleteOriginalAfterImport(app.settings)) {
       await importDeletingOriginals(
         context,
         _store,
         images: false,
         event: VaultEventType.filesImported,
+        maxCount: left,
       );
       if (mounted) _reload();
       return;
     }
     final t = L10n.current;
     final messenger = ScaffoldMessenger.of(context);
-    final picked = await app.withExternalUi(() => FilePicker.pickFiles());
+    var picked = await app.withExternalUi(() => FilePicker.pickFiles());
     if (picked.isEmpty || !mounted) return;
+    final overLimit = left != null && picked.length > left;
+    if (overLimit) picked = picked.take(left).toList();
     var count = 0;
     var tooBig = 0;
     await runWithProgress(context, t('importing'), () async {
@@ -78,6 +86,7 @@ class _FilesScreenState extends State<FilesScreen> {
     if (tooBig > 0) msg += ' ${t('tooBig')}';
     messenger.showSnackBar(SnackBar(content: Text(msg)));
     _reload();
+    if (overLimit) await ItemLimit.showLimitReached(context);
   }
 
   Future<void> _itemMenu(VaultItem item, List<VaultItem> all) async {

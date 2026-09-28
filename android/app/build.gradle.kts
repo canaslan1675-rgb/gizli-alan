@@ -55,11 +55,14 @@ android {
         versionName = flutter.versionName
     }
 
-    // Two distributions (issue #11):
-    //  - play: vault + calculator only. NO Second phone: no device-admin
-    //    receiver, no work-profile code (src/full is not compiled in).
-    //  - full: everything incl. the Second phone (work profile), side-load/test.
-    // Distinct applicationIds so both can be installed side by side.
+    // Two distributions (issue #11, owner decision v0.5.0 #52):
+    //  - full: everything incl. the Second phone (work profile) + Play
+    //    Billing. THIS is the Google Play upload (AAB) since v0.5.0.
+    //  - play: fallback "lite" build — vault + calculator only, NO Second
+    //    phone: no device-admin receiver, no work-profile code (src/full is
+    //    not compiled in). Also has Play Billing.
+    // Both use applicationId com.offerforge.gizlialan (the Play Console app),
+    // so they replace each other on a device.
     // Build with `flutter build apk --flavor play|full` (Dart reads appFlavor).
     flavorDimensions += "distribution"
     productFlavors {
@@ -68,7 +71,6 @@ android {
         }
         create("full") {
             dimension = "distribution"
-            applicationIdSuffix = ".full"
         }
     }
 

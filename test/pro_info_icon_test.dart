@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gizlialan/app.dart';
 import 'package:gizlialan/flavor.dart';
 import 'package:gizlialan/l10n/l10n.dart';
+import 'package:gizlialan/screens/paywall_screen.dart';
 import 'package:gizlialan/screens/decoy_calculator_screen.dart';
 import 'package:gizlialan/screens/pro_screen.dart';
 import 'package:gizlialan/screens/vault_home_screen.dart';
@@ -32,15 +33,19 @@ void main() {
   });
 
   group('ProEntitlement', () {
-    test('play (no Pro stub): never active, icon never hidden', () async {
+    test('play: stub ignored, Play subscription hides the icon', () async {
       SharedPreferences.setMockInitialValues({
         'pro_stub_active': true,
         'hide_calc_info_icon': true,
       });
       final s = await SettingsService.create();
       Flavor.debugOverride = AppFlavor.play;
-      expect(ProEntitlement.available, isFalse);
+      expect(ProEntitlement.available, isTrue);
       expect(ProEntitlement.isActive(s), isFalse);
+      expect(ProEntitlement.hideCalculatorInfo(s), isFalse);
+      await s.setPlayProActive(true);
+      expect(ProEntitlement.hideCalculatorInfo(s), isTrue);
+      await s.setPlayProActive(false); // subscription lapsed
       expect(ProEntitlement.hideCalculatorInfo(s), isFalse);
     });
 
@@ -217,38 +222,39 @@ void main() {
     expect(find.byKey(const ValueKey('calc_info')), findsNothing);
   });
 
-  testWidgets('play: ⓘ always shown, no Pro hint, no locked Pro rows', (
-    tester,
-  ) async {
+  testWidgets('play: locked Pro row opens the Play paywall', (tester) async {
     await boot(tester, {
       'hide_calc_info_icon': true,
-      'pro_stub_active': true,
+      'pro_stub_active': true, // stub is ignored in play
     }, AppFlavor.play);
     Flavor.debugProStubOverride = false;
     await settle(tester);
     expect(find.byKey(const ValueKey('calc_info')), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('calc_info')));
     await settle(tester);
-    expect(find.textContaining('Pro üyeler'), findsNothing);
+    expect(find.textContaining('Pro üyeler'), findsOneWidget);
     await tester.tap(find.text('Tamam').last);
     await settle(tester);
 
     await unlock(tester);
     await tester.tap(find.byIcon(Icons.settings_outlined));
     await settle(tester);
-    // Help row sits right after the (now hidden) Pro rows.
+    final row = find.byKey(const ValueKey('settings_hide_calc_info'));
     await tester.scrollUntilVisible(
-      find.byKey(const ValueKey('settings_calc_help')),
+      row,
       200,
       scrollable: find.byType(Scrollable).last,
     );
-    expect(find.byKey(const ValueKey('settings_hide_calc_info')), findsNothing);
-    // Delete original after import is free in play.
-    expect(
-      find.byKey(const ValueKey('settings_delete_original')),
-      findsOneWidget,
-    );
     expect(find.text('Pro yakında'), findsNothing);
-    expect(find.text('PRO'), findsNothing);
+    expect(find.text('PRO'), findsOneWidget);
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, 250));
+    await settle(tester);
+    await tester.tap(row);
+    await settle(tester);
+    // No billing in tests → honest "unavailable", restore/manage visible.
+    expect(find.byType(PaywallScreen), findsOneWidget);
+    expect(find.byKey(const ValueKey('pay_unavailable')), findsOneWidget);
+    expect(find.byKey(const ValueKey('pay_restore')), findsOneWidget);
+    expect(find.byKey(const ValueKey('pay_manage')), findsOneWidget);
   });
 }

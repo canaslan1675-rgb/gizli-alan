@@ -1,57 +1,43 @@
 #!/usr/bin/env python3
-"""Generates the original "Hesap Makinesi / Calculator" launcher icon.
+"""Generates the launcher icon, variant B (owner choice, 2026-09-28):
+a padlock whose body is a 2x2 calculator keypad (+ − × =), '=' key in mint.
 
-One geometry, three outputs (keeps vector and PNGs identical):
-  * adaptive icon foreground + monochrome vector drawables (API 26+/33+)
-  * legacy/round PNG mipmaps (fallback)
-  * 512x512 Play Store icon (docs/store_icon_512.png)
-
-Design: a plain light calculator body with a dark display and a 3x3 key
-grid, the bottom-right "=" key in the app's mint accent, on a deep navy
-background. Drawn from scratch; not based on any vendor's calculator icon.
+Same design as the store icon generator (store-graphics src/icon.py,
+variant_b), redrawn as flat vector geometry so the adaptive icon is sharp:
+  * adaptive foreground + monochrome vector drawables (API 26+/33+), design
+    scaled into the 66dp safe zone of the 108dp viewport
+  * background: @color/ic_launcher_background (deep navy)
+  * legacy/round PNG mipmaps (fallback; minSdk 28 never uses them)
+The Play Store icon docs/store_icon_512.png is the owner-approved render
+gizlialan_icon_512_b.png (copied, not regenerated here).
 Run: python3 tool/gen_launcher_icon.py (needs Pillow).
 """
+import math
 import os
+
 from PIL import Image, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES = os.path.join(ROOT, 'android', 'app', 'src', 'main', 'res')
 
-BG = '#10263A'
-BODY = '#E8EEF3'
-DISPLAY = '#16324A'
-DIGITS = '#7CFFB2'
-KEY = '#A9B8C8'
-OP_KEY = '#5E7890'
-EQ_KEY = '#2FC57E'
-EQ_BARS = '#FFFFFF'
+BG = '#0B1424'
+MINT = '#7CFFB2'
+BODY = '#1C2A42'
+KEY = '#283A58'
+GLYPH = '#C8D7EB'
+GLYPH_ON_MINT = '#0B1220'
 
-# Geometry in the 108x108 adaptive-icon viewport (safe zone: r=33 circle).
-BODY_R = (36, 29, 36, 50, 7)          # x, y, w, h, radius
-DISPLAY_R = (40, 33, 28, 11, 3)
-DIGIT_BAR = (55, 37.5, 9, 3, 1.5)
-KEY_SIZE, KEY_GAP, KEY_X0, KEY_Y0, KEY_RAD = 7, 3.5, 40, 48, 2
+# Design units: fractions of the square store-icon canvas (icon.py, S=1).
+SCALE = 64.0          # design unit -> dp; content ~37x46dp, inside r=33
+CX, CY = 0.5, 0.52    # design point placed at the viewport centre (54, 54)
 
 
-def keys():
-    out = []
-    for row in range(3):
-        for col in range(3):
-            x = KEY_X0 + col * (KEY_SIZE + KEY_GAP)
-            y = KEY_Y0 + row * (KEY_SIZE + KEY_GAP)
-            if row == 2 and col == 2:
-                kind = 'eq'
-            elif col == 2:
-                kind = 'op'
-            else:
-                kind = 'key'
-            out.append((x, y, kind))
-    return out
+def tx(u):
+    return 54 + (u - CX) * SCALE
 
 
-def eq_bars(x, y):
-    # two short horizontal bars centred in the "=" key
-    return [(x + 1.75, y + 2.0, 3.5, 1.0, 0.5), (x + 1.75, y + 4.0, 3.5, 1.0, 0.5)]
+def ty(v):
+    return 54 + (v - CY) * SCALE
 
 
 def fmt(v):
@@ -66,6 +52,70 @@ def rrect_path(x, y, w, h, r):
             f'V{f(y + r)}A{f(r)},{f(r)} 0,0 1 {f(x + r)},{f(y)}Z')
 
 
+def poly_path(pts):
+    return 'M' + 'L'.join(f'{fmt(x)},{fmt(y)}' for x, y in pts) + 'Z'
+
+
+def D(x, y, w, h, r):
+    """Design-unit rounded rect -> viewport (x, y, w, h, r)."""
+    return (tx(x), ty(y), w * SCALE, h * SCALE, r * SCALE)
+
+
+# ---- geometry (icon.py variant_b) -------------------------------------
+BW, BH = 0.58, 0.46
+BX, BY = 0.5 - BW / 2, 0.42
+BODY_R = D(BX, BY, BW, BH, 0.09)
+RING = 0.016                                  # mint outline width
+SW, ST, STOP = 0.34, 0.062, 0.16              # shackle width/stroke/top
+SHACKLE_OUT = D(0.5 - SW / 2, STOP, SW, BY + 0.12 - STOP, SW / 2)
+SHACKLE_IN = D(0.5 - SW / 2 + ST, STOP + ST, SW - 2 * ST,
+               BY + 0.12 - STOP - 2 * ST, SW / 2 - ST)
+PAD, GAP = 0.05, 0.035
+KW, KH = (BW - 2 * PAD - GAP) / 2, (BH - 2 * PAD - GAP) / 2
+KR = 0.04
+G, T = 0.034, 0.014                           # glyph half-length, thickness
+
+
+def keys():
+    out = []
+    for s, i, j in [('+', 0, 0), ('−', 1, 0), ('×', 0, 1), ('=', 1, 1)]:
+        x0 = BX + PAD + i * (KW + GAP)
+        y0 = BY + PAD + j * (KH + GAP)
+        out.append((s, x0, y0))
+    return out
+
+
+def glyph_polys(s, cx, cy):
+    """Glyph as polygons in design units around the key centre."""
+    def bar(dx, dy, hl, ht, ang=0.0):
+        c, sn = math.cos(ang), math.sin(ang)
+        pts = [(-hl, -ht), (hl, -ht), (hl, ht), (-hl, ht)]
+        return [(cx + dx + x * c - y * sn, cy + dy + x * sn + y * c) for x, y in pts]
+    if s == '+':
+        return [bar(0, 0, G, T / 2), bar(0, 0, T / 2, G)]
+    if s == '−':
+        return [bar(0, 0, G, T / 2)]
+    if s == '×':
+        return [bar(0, 0, G, T / 2, math.pi / 4), bar(0, 0, G, T / 2, -math.pi / 4)]
+    return [bar(0, -0.017, G, T / 2), bar(0, 0.017, G, T / 2)]
+
+
+def shapes():
+    """(kind, colour, data) in viewport units; kinds: rrect, ring, poly."""
+    out = [('ring', MINT, (SHACKLE_OUT, SHACKLE_IN)),
+           ('rrect', MINT, BODY_R)]
+    x, y, w, h, r = BODY_R
+    rs = RING * SCALE
+    out.append(('rrect', BODY, (x + rs, y + rs, w - 2 * rs, h - 2 * rs, r - rs)))
+    for s, x0, y0 in keys():
+        hot = s == '='
+        out.append(('rrect', MINT if hot else KEY, D(x0, y0, KW, KH, KR)))
+        for p in glyph_polys(s, x0 + KW / 2, y0 + KH / 2):
+            out.append(('poly', GLYPH_ON_MINT if hot else GLYPH,
+                        [(tx(a), ty(b)) for a, b in p]))
+    return out
+
+
 def vector(paths):
     body = '\n'.join(
         f'    <path\n        android:fillColor="{c}"\n'
@@ -73,7 +123,7 @@ def vector(paths):
         + f'        android:pathData="{d}" />'
         for c, d, ft in paths)
     return ('<?xml version="1.0" encoding="utf-8"?>\n'
-            '<!-- Generated by tool/gen_launcher_icon.py - original design. -->\n'
+            '<!-- Generated by tool/gen_launcher_icon.py (variant B: padlock with calculator keypad). -->\n'
             '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
             '    android:width="108dp"\n    android:height="108dp"\n'
             '    android:viewportWidth="108"\n    android:viewportHeight="108">\n'
@@ -81,50 +131,59 @@ def vector(paths):
 
 
 def write_vectors():
-    colors = {'key': KEY, 'op': OP_KEY, 'eq': EQ_KEY}
-    fg = [(BODY, rrect_path(*BODY_R), None), (DISPLAY, rrect_path(*DISPLAY_R), None),
-          (DIGITS, rrect_path(*DIGIT_BAR), None)]
-    for x, y, kind in keys():
-        fg.append((colors[kind], rrect_path(x, y, KEY_SIZE, KEY_SIZE, KEY_RAD), None))
-        if kind == 'eq':
-            for b in eq_bars(x, y):
-                fg.append((EQ_BARS, rrect_path(*b), None))
-    os.makedirs(os.path.join(RES, 'drawable'), exist_ok=True)
+    fg = []
+    for kind, col, data in shapes():
+        if kind == 'ring':
+            fg.append((col, rrect_path(*data[0]) + rrect_path(*data[1]), 'evenOdd'))
+        elif kind == 'rrect':
+            fg.append((col, rrect_path(*data), None))
+        else:
+            fg.append((col, poly_path(data), None))
     with open(os.path.join(RES, 'drawable', 'ic_launcher_foreground.xml'), 'w') as fh:
         fh.write(vector(fg))
-
-    # Monochrome (themed icons): body outline + display + keys, alpha only.
-    bx, by, bw, bh, br = BODY_R
-    ring = rrect_path(bx, by, bw, bh, br) + rrect_path(bx + 2.5, by + 2.5, bw - 5, bh - 5, br - 2)
-    mono = [('#FFFFFFFF', ring, 'evenOdd'), ('#FFFFFFFF', rrect_path(*DISPLAY_R), None)]
-    for x, y, _ in keys():
-        mono.append(('#FFFFFFFF', rrect_path(x, y, KEY_SIZE, KEY_SIZE, KEY_RAD), None))
+    # Monochrome (themed icons): shackle + body with the keys cut out,
+    # '=' key solid so it still reads as the "hot" key.
+    white = '#FFFFFFFF'
+    mono = [(white, rrect_path(*SHACKLE_OUT) + rrect_path(*SHACKLE_IN), 'evenOdd')]
+    body = rrect_path(*BODY_R)
+    for s, x0, y0 in keys():
+        if s != '=':
+            body += rrect_path(*D(x0, y0, KW, KH, KR))
+    mono.append((white, body, 'evenOdd'))
+    for s, x0, y0 in keys():
+        if s != '=':
+            for p in glyph_polys(s, x0 + KW / 2, y0 + KH / 2):
+                mono.append((white, poly_path([(tx(a), ty(b)) for a, b in p]), None))
     with open(os.path.join(RES, 'drawable', 'ic_launcher_monochrome.xml'), 'w') as fh:
         fh.write(vector(mono))
 
 
 def render(px, mask):
-    """Renders the visible 72dp area (18..90 of the viewport) at px size."""
+    """Legacy icon: the visible 72dp area (18..90 of the viewport)."""
     ss = 4
     size = px * ss
-    s = size / 72.0
+    k = size / 72.0
+
+    def P(x, y):
+        return ((x - 18) * k, (y - 18) * k)
 
     def box(x, y, w, h, r):
-        return ([(x - 18) * s, (y - 18) * s, (x - 18 + w) * s, (y - 18 + h) * s], r * s)
+        (a, b), (c, d) = P(x, y), P(x + w, y + h)
+        return [a, b, c, d], r * k
 
     img = Image.new('RGBA', (size, size), BG)
-    d = ImageDraw.Draw(img)
-    for spec, col in [(BODY_R, BODY), (DISPLAY_R, DISPLAY), (DIGIT_BAR, DIGITS)]:
-        b, r = box(*spec)
-        d.rounded_rectangle(b, r, fill=col)
-    colors = {'key': KEY, 'op': OP_KEY, 'eq': EQ_KEY}
-    for x, y, kind in keys():
-        b, r = box(x, y, KEY_SIZE, KEY_SIZE, KEY_RAD)
-        d.rounded_rectangle(b, r, fill=colors[kind])
-        if kind == 'eq':
-            for bar in eq_bars(x, y):
-                bb, rr = box(*bar)
-                d.rounded_rectangle(bb, rr, fill=EQ_BARS)
+    dr = ImageDraw.Draw(img)
+    for kind, col, data in shapes():
+        if kind == 'ring':
+            b, r = box(*data[0])
+            dr.rounded_rectangle(b, r, fill=col)
+            b, r = box(*data[1])
+            dr.rounded_rectangle(b, r, fill=BG)
+        elif kind == 'rrect':
+            b, r = box(*data)
+            dr.rounded_rectangle(b, r, fill=col)
+        else:
+            dr.polygon([P(x, y) for x, y in data], fill=col)
     if mask:
         m = Image.new('L', (size, size), 0)
         md = ImageDraw.Draw(m)
@@ -138,12 +197,14 @@ def render(px, mask):
 
 def main():
     write_vectors()
-    for density, px in [('mdpi', 48), ('hdpi', 72), ('xhdpi', 96), ('xxhdpi', 144), ('xxxhdpi', 192)]:
+    for density, px in [('mdpi', 48), ('hdpi', 72), ('xhdpi', 96),
+                        ('xxhdpi', 144), ('xxxhdpi', 192)]:
         folder = os.path.join(RES, f'mipmap-{density}')
         os.makedirs(folder, exist_ok=True)
         render(px, 'square').save(os.path.join(folder, 'ic_launcher.png'), optimize=True)
         render(px, 'circle').save(os.path.join(folder, 'ic_launcher_round.png'), optimize=True)
-    render(512, None).convert('RGB').save(os.path.join(ROOT, 'docs', 'store_icon_512.png'), optimize=True)
+    # Preview of the adaptive foreground on its background (not packaged).
+    render(432, None).save('/tmp/ic_launcher_preview.png')
 
 
 if __name__ == '__main__':

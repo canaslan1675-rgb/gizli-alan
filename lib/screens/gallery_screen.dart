@@ -12,6 +12,7 @@ import '../services/pro_entitlement.dart';
 import '../services/vault_storage.dart';
 import '../theme.dart';
 import '../widgets/import_delete_originals.dart';
+import '../widgets/pro_gate.dart';
 import '../widgets/vault_actions.dart';
 import 'photo_viewer_screen.dart';
 
@@ -48,22 +49,38 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   Future<void> _import() async {
     final app = GizliAlanApp.of(context);
+    // Free tier: stop at the item limit (stored items are never touched).
+    final left = await ItemLimit.remaining(context);
+    if (!mounted) return;
+    if (left == 0) return ItemLimit.showLimitReached(context);
     if (ProEntitlement.deleteOriginalAfterImport(app.settings)) {
       await importDeletingOriginals(
         context,
         _store,
         images: true,
         event: VaultEventType.galleryImported,
+        maxCount: left,
       );
       if (mounted) _reload();
       return;
     }
     final t = L10n.current;
     final messenger = ScaffoldMessenger.of(context);
-    final picked = await app.withExternalUi(
+    var picked = await app.withExternalUi(
       () => ImagePicker().pickMultiImage(requestFullMetadata: false),
     );
     if (picked.isEmpty || !mounted) return;
+    final overLimit = left != null && picked.length > left;
+    if (overLimit) {
+      // Remove the plaintext cache copies we won't import.
+      for (final x in picked.skip(left)) {
+        try {
+          await File(x.path).delete();
+        } catch (_) {}
+      }
+      picked = picked.take(left).toList();
+    }
+    if (!mounted) return;
     var count = 0;
     await runWithProgress(context, t('importing'), () async {
       for (final x in picked) {
@@ -93,6 +110,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
       ),
     );
     _reload();
+    if (overLimit) {
+      await ItemLimit.showLimitReached(context);
+      return;
+    }
     if (count > 0) await _askDeleteOriginalsOnce();
   }
 

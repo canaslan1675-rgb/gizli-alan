@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gizlialan/app.dart';
 import 'package:gizlialan/flavor.dart';
 import 'package:gizlialan/l10n/l10n.dart';
+import 'package:gizlialan/screens/paywall_screen.dart';
 import 'package:gizlialan/screens/pro_screen.dart';
 import 'package:gizlialan/screens/settings_screen.dart';
 import 'package:gizlialan/services/auth_service.dart';
@@ -110,11 +111,8 @@ void main() {
           find.byKey(const ValueKey('pro_test_build_note')),
           findsOneWidget,
         );
-        expect(find.text('7 days · 50 items'), findsOneWidget);
-        expect(
-          find.text('Usage: 1 / 50 items (limit not enforced in this build)'),
-          findsOneWidget,
-        );
+        expect(find.text('Up to 50 items'), findsOneWidget);
+        expect(find.text('Usage: 1 / 50 items'), findsOneWidget);
         await tester.scrollUntilVisible(
           find.text('999 TL / year'),
           200,
@@ -155,7 +153,7 @@ void main() {
     });
 
     for (final space in VaultSpace.values) {
-      testWidgets('play flavor (${space.name}): no Pro entry in settings', (
+      testWidgets('play flavor (${space.name}): Pro opens the Play paywall', (
         tester,
       ) async {
         Flavor.debugOverride = AppFlavor.play;
@@ -165,15 +163,16 @@ void main() {
         );
         await settle(tester);
         await tester.scrollUntilVisible(
-          find.text('Privacy & permissions'),
+          find.byKey(const ValueKey('settings_pro')),
           150,
           scrollable: find.byType(Scrollable).last,
         );
-        expect(find.byKey(const ValueKey('settings_pro')), findsNothing);
-        expect(find.text('GizliAlan Pro'), findsNothing);
+        await tester.tap(find.byKey(const ValueKey('settings_pro')));
+        await settle(tester);
+        expect(find.byType(PaywallScreen), findsOneWidget);
         expect(find.byType(ProScreen), findsNothing);
-        // Privacy entry is still there.
-        expect(find.text('Privacy & permissions'), findsOneWidget);
+        // No test-build stub text / simulate switch in play.
+        expect(find.byKey(const ValueKey('pro_stub_toggle')), findsNothing);
       });
     }
 
@@ -194,9 +193,8 @@ void main() {
     });
   });
 
-  test('no billing dependency in pubspec', () {
+  test('billing uses the official in_app_purchase plugin only', () {
     final pubspec = File('pubspec.yaml').readAsStringSync();
-    expect(pubspec.contains('in_app_purchase'), isFalse);
-    expect(pubspec.contains('billing'), isFalse);
+    expect(pubspec.contains('in_app_purchase:'), isTrue);
   });
 }
