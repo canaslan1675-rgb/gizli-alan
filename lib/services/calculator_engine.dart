@@ -32,6 +32,12 @@ class CalculatorEngine {
   /// Main display value.
   String get display => _display;
 
+  String _evaluated = '';
+
+  /// Top line of the screen: right after `=` the evaluated expression
+  /// (e.g. `12×3`, result below), otherwise what is being typed.
+  String get topLine => _justEvaluated ? _evaluated : _expr;
+
   /// Non-null when the current entry could be a vault PIN.
   /// Results of a previous `=` never count, only freshly typed digits.
   String? get pinCandidate =>
@@ -41,6 +47,7 @@ class CalculatorEngine {
     _expr = '';
     _display = '0';
     _justEvaluated = false;
+    _evaluated = '';
     _carry = null;
     _repeatOp = null;
     _repeatOperand = null;
@@ -144,6 +151,8 @@ class CalculatorEngine {
       // Repeated "=": apply the last operation again.
       final c = _carry;
       if (c == null || _repeatOp == null) return;
+      _evaluated =
+          '${c.text}$_repeatOp${format(_repeatOperand!).replaceAll('-', '−')}';
       final v = _apply(c.value, _repeatOp!, _repeatOperand!);
       _setResult(v);
       return;
@@ -153,6 +162,7 @@ class CalculatorEngine {
       s = s.substring(0, s.length - 1);
     }
     if (s.isEmpty || s == '−') return;
+    _evaluated = s;
     final tokens = _tokenize(s, _carry);
     final value = tokens == null ? null : _evaluateTokens(tokens);
     if (tokens != null && value != null && tokens.length >= 3) {

@@ -24,7 +24,9 @@ class ProEntitlement {
   static bool hideCalculatorInfo(SettingsService s) =>
       s.hideCalcInfoIcon && isActive(s);
 
-  /// Delete originals after import only while opted in AND Pro is active.
+  /// Delete originals after import: free in every flavor (play included),
+  /// only while the user opted in. Uses the system delete confirmation
+  /// (MediaStore.createDeleteRequest / SAF), no storage permission.
   static bool deleteOriginalAfterImport(SettingsService s) =>
-      s.deleteOriginalAfterImport && isActive(s);
+      s.deleteOriginalAfterImport;
 }

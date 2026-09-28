@@ -23,6 +23,7 @@ class SettingsService {
   static const _kProStub = 'pro_stub_active';
   static const _kHideCalcInfo = 'hide_calc_info_icon';
   static const _kDeleteOriginal = 'delete_original_after_import';
+  static const _kDeleteOriginalAsked = 'delete_original_asked';
   static const _kBrowserEngine = 'browser_engine';
   static const _kBrowserWipe = 'browser_wipe_on_lock';
   static const _kSecondPhoneClose = 'second_phone_close';
@@ -57,13 +58,21 @@ class SettingsService {
 
   Future<void> setHideCalcInfoIcon(bool v) => _prefs.setBool(_kHideCalcInfo, v);
 
-  /// User opt-in (Pro only, #37): delete the phone's original after a
-  /// verified import. Effective value: ProEntitlement.
+  /// User opt-in (free, #37): delete the phone's original after a verified
+  /// import. Effective value: ProEntitlement.deleteOriginalAfterImport.
   bool get deleteOriginalAfterImport =>
       _prefs.getBool(_kDeleteOriginal) ?? false;
 
   Future<void> setDeleteOriginalAfterImport(bool v) =>
       _prefs.setBool(_kDeleteOriginal, v);
+
+  /// The one-time "delete originals?" prompt after the first gallery import
+  /// was answered (or the user set the switch in Settings themselves).
+  bool get deleteOriginalAsked =>
+      _prefs.getBool(_kDeleteOriginalAsked) ?? false;
+
+  Future<void> setDeleteOriginalAsked() =>
+      _prefs.setBool(_kDeleteOriginalAsked, true);
 
   /// Biometric unlock for the real vault (never opens the decoy vault).
   bool get biometricEnabled => _prefs.getBool(_kBiometric) ?? false;
