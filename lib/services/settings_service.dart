@@ -21,6 +21,7 @@ class SettingsService {
   static const _kWallpaper = 'wallpaper';
   static const _kWallpaperImage = 'wallpaper_image';
   static const _kProStub = 'pro_stub_active';
+  static const _kPlayPro = 'play_pro_active';
   static const _kHideCalcInfo = 'hide_calc_info_icon';
   static const _kDeleteOriginal = 'delete_original_after_import';
   static const _kDeleteOriginalAsked = 'delete_original_asked';
@@ -50,6 +51,12 @@ class SettingsService {
   bool get proStubActive => _prefs.getBool(_kProStub) ?? false;
 
   Future<void> setProStubActive(bool v) => _prefs.setBool(_kProStub, v);
+
+  /// `play`: cached Google Play subscription state (ProBilling). Re-checked
+  /// against Play on every start; read through [ProEntitlement].
+  bool get playProActive => _prefs.getBool(_kPlayPro) ?? false;
+
+  Future<void> setPlayProActive(bool v) => _prefs.setBool(_kPlayPro, v);
 
   /// User opt-in (Pro only): hide the ⓘ button on the calculator. Must be
   /// readable before unlock, so it lives in app settings (like the
