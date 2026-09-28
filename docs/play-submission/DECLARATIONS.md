@@ -1,5 +1,13 @@
 # Policy declarations, justification texts and reviewer demo video
 
+> **v0.5.0 update (#52):** the Play upload is the **`full` flavor** (Second phone included, same package
+> `com.offerforge.gizlialan`). §1's "no sensitive-permission forms" applied to the old `play` flavor; for v0.5.0 use
+> **§2 (device admin / managed profile justification)** as well, and check App content → "Needs attention" after
+> uploading the AAB. Permissions stay `USE_BIOMETRIC` + `INTERNET`, plus `com.android.vending.BILLING` (merged from the
+> Play Billing Library) for the optional subscription. Payments are processed by Google Play; the app has no server and
+> collects no payment data. In-app products: subscription `gizlialan_pro` (see `docs/PLAY_BILLING_SETUP.md`).
+
+
 > **TR özet.** `play` flavor'u için **hiçbir hassas izin beyan formu gerekmiyor** (yalnızca `USE_BIOMETRIC` + normal izin `INTERNET`); doldurulacaklar standart App content formları (reklam yok, reklam kimliği yok,
 > hedef kitle 18+, içerik derecelendirmesi, veri güvenliği). Bu dosya: (1) standart formlar için hazır cevaplar, (2) `full` flavor'u için cihaz yöneticisi / iş profili gerekçe metni
 > (Play Console'da ayrı bir form çıkmazsa App access notlarına ve olası politika e-postası cevabına kullanılır), (3) inceleyiciler için demo video çekim listesi
