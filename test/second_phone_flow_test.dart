@@ -6,6 +6,7 @@ import 'package:gizlialan/app_version.dart';
 import 'package:gizlialan/app.dart';
 import 'package:gizlialan/flavor.dart';
 import 'package:gizlialan/l10n/l10n.dart';
+import 'package:gizlialan/screens/pro_screen.dart';
 import 'package:gizlialan/screens/vault_home_screen.dart';
 import 'package:gizlialan/services/auth_service.dart';
 import 'package:gizlialan/services/secure_kv.dart';
@@ -210,6 +211,59 @@ void main() {
     expect(find.textContaining('Second space'), findsOneWidget);
     expect(find.textContaining('Private space'), findsWidgets);
     expect(find.byKey(const ValueKey('sp_setup')), findsNothing);
+  });
+
+  testWidgets('Second phone setup needs Pro: free user gets the paywall', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1080, 2340);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    sp = FakeSecondPhone(
+      const SecondPhoneStatus(
+        featureSupported: true,
+        provisioningAllowed: true,
+        sdkInt: 34,
+      ),
+    );
+    await tester.runAsync(() => auth.setPin('2580'));
+    await tester.pumpWidget(
+      GizliAlanApp(
+        settings: settings,
+        auth: auth,
+        biometrics: FakeBiometrics(),
+        baseDirProvider: () async => tmp,
+        secondPhone: sp,
+      ),
+    );
+    await settle(tester);
+    await typePin(tester, '2580');
+    // Free users still see the tile.
+    await tester.tap(find.byKey(const ValueKey('tile_second_phone')));
+    await settle(tester);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('sp_setup')),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -300));
+    await settle(tester);
+    expect(find.textContaining('7-day free trial'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('sp_setup')));
+    await settle(tester);
+    expect(find.byKey(const ValueKey('pro_required')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('pro_required_open')));
+    await settle(tester);
+    // Debug/test full build → Pro test stub page; release → Play paywall.
+    expect(find.byType(ProScreen), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('pro_stub_toggle')));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Back').last);
+    await settle(tester);
+    // Pro now active → setup continues with Android's normal confirmation.
+    expect(find.byKey(const ValueKey('pro_required')), findsNothing);
+    expect(find.textContaining('work profile setup'), findsOneWidget);
+    expect(find.textContaining('7-day free trial'), findsNothing);
   });
 
   group('flavor gating (#11)', () {

@@ -2,9 +2,10 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// Static checks on the Android sources (issues #11, #30): the `play`
-/// flavor must not contain any device-admin / profile-owner / work-profile
-/// code, and the hide-while-locked feature must stay in `src/full`.
+/// Static checks on the Android sources (issues #11, #30, #52): the lite
+/// `play` flavor must not contain any device-admin / profile-owner /
+/// work-profile code (that stays in `src/full`). Since v0.5.0 `full`
+/// (Second phone + Play Billing) is the Play upload, same applicationId.
 void main() {
   const src = 'android/app/src';
 
@@ -103,5 +104,29 @@ void main() {
       '$src/main/kotlin/com/offerforge/gizlialan/MainActivity.kt',
     ).readAsStringSync();
     expect(activity, contains('WindowManager.LayoutParams.FLAG_SECURE'));
+  });
+
+  test('v0.5.0: full is the Play build (same applicationId, AAB = full)', () {
+    final gradle = File('android/app/build.gradle.kts').readAsStringSync();
+    expect(gradle, contains('applicationId = "com.offerforge.gizlialan"'));
+    expect(gradle, isNot(contains('applicationIdSuffix')));
+    expect(gradle, contains('create("play")'));
+    expect(gradle, contains('create("full")'));
+
+    final ci = File(
+      '.github/workflows/android-test-build.yml',
+    ).readAsStringSync();
+    final lines = ci.split('\n');
+    final apks = lines.where((l) => l.contains('flutter build apk')).toList();
+    expect(apks, hasLength(2));
+    for (final l in apks) {
+      expect(l, contains('--target-platform android-arm64,android-x64'));
+      expect(l, contains('--dart-define=PRO_STUB=true')); // test APKs only
+    }
+    expect(apks.any((l) => l.contains('--flavor play')), isTrue);
+    expect(apks.any((l) => l.contains('--flavor full')), isTrue);
+    final aab = lines.singleWhere((l) => l.contains('flutter build appbundle'));
+    expect(aab, contains('--flavor full'));
+    expect(aab, isNot(contains('PRO_STUB'))); // Play: real billing only
   });
 }

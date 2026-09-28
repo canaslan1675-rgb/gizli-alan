@@ -299,6 +299,11 @@ void main() {
     testWidgets('long-press image -> Save to vault -> encrypted Photos; '
         'other downloads -> vault Files (#45)', (tester) async {
       final state = await openVault(tester);
+      // Pro: skip the free-limit count (its file IO would need runAsync).
+      await tester.runAsync(() async {
+        await state.settings.setPlayProActive(true);
+        await state.settings.setProStubActive(true);
+      });
       await tester.tap(find.text('Tarayıcı'));
       await settle(tester);
       const pngB64 =
