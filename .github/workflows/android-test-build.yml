@@ -1,4 +1,8 @@
-# Debug-signed test APKs (play + full, arm64) → GitHub prerelease v<version>-test.
+# Debug-signed test APKs (play + full, arm64 + x64) → GitHub prerelease v<version>-test.
+# Both flavors use applicationId com.offerforge.gizlialan since v0.5.0; test
+# APKs are built with PRO_STUB=true (local "simulate Pro" switch, no Play)
+# so side-loaded testers can try Pro features. The Play AAB (main only) is
+# the `full` flavor (Second phone + Play Billing) WITHOUT PRO_STUB.
 # Signed with the same Android debug key as earlier *-test releases (secret
 # DEBUG_KEYSTORE_B64) so they install over them. The Play upload key is NEVER
 # used in CI; the Play AAB is built locally on the owner's box.
@@ -48,9 +52,9 @@ jobs:
 
       - name: Build APKs
         run: |
-          flutter build apk --release --flavor play --target-platform android-arm64,android-x64
+          flutter build apk --release --flavor play --target-platform android-arm64,android-x64 --dart-define=PRO_STUB=true
           cp build/app/outputs/flutter-apk/app-play-release.apk /tmp/play.apk
-          flutter build apk --release --flavor full --target-platform android-arm64,android-x64
+          flutter build apk --release --flavor full --target-platform android-arm64,android-x64 --dart-define=PRO_STUB=true
           cp build/app/outputs/flutter-apk/app-full-release.apk /tmp/full.apk
 
       - name: Kotlin unit tests (full flavor)
@@ -66,14 +70,15 @@ jobs:
         env:
           EXPECTED_CERT_SHA256: 090ace425849fcf2a7dae20af382784fe0e721719eec3230fb5a36fb92f5c321
 
-      # Play AAB (main only): debug-signed here, uploaded as a short-lived
-      # workflow artifact (NOT a release). The owner re-signs it locally with
-      # the upload key, which never leaves the owner's box.
-      - name: Build Play AAB (debug-signed, for local re-signing)
+      # Play AAB (main only): `full` flavor = Second phone + Play Billing, no
+      # PRO_STUB. Debug-signed here, uploaded as a short-lived workflow
+      # artifact (NOT a release). The owner re-signs it locally with the
+      # upload key, which never leaves the owner's box.
+      - name: Build Play AAB (full flavor, debug-signed, for local re-signing)
         if: github.ref == 'refs/heads/main'
         run: |
-          flutter build appbundle --release --flavor play
-          cp build/app/outputs/bundle/playRelease/app-play-release.aab /tmp/app-play-release.aab
+          flutter build appbundle --release --flavor full
+          cp build/app/outputs/bundle/fullRelease/app-full-release.aab /tmp/app-play-release.aab
 
       - name: Upload Play AAB artifact
         if: github.ref == 'refs/heads/main'
@@ -112,5 +117,5 @@ jobs:
           else
             gh release create "$TAG" dist/* --prerelease --target "$GITHUB_SHA" \
               --title "GizliAlan ${TAG}" \
-              --notes "Debug-signed arm64 test builds (not for Play), built by GitHub Actions from ${GITHUB_SHA}. play = no Second phone; full = with Second phone. SHA256SUMS.txt attached."
+              --notes "Debug-signed arm64+x64 test builds (not for Play), built by GitHub Actions from ${GITHUB_SHA}. Both are com.offerforge.gizlialan (they replace each other). full = with Second phone (the Play build); play = lite fallback without Second phone. Test builds have a local Simulate Pro switch (no real purchases). SHA256SUMS.txt attached."
           fi
