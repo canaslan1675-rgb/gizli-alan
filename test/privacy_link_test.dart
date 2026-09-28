@@ -49,10 +49,11 @@ void main() {
 
   Future<GizliAlanAppState> openVault(
     WidgetTester tester,
-    VaultSpace space,
-  ) async {
+    VaultSpace space, {
+    String lang = 'en',
+  }) async {
     await initializeDateFormatting();
-    SharedPreferences.setMockInitialValues({'lang': 'en'});
+    SharedPreferences.setMockInitialValues({'lang': lang});
     final settings = await SettingsService.create();
     final auth = AuthService(storage: MemorySecureKv(), pbkdf2Iterations: 1000);
     await tester.runAsync(() async {
@@ -215,17 +216,58 @@ void main() {
           )
           .first,
     );
+    expect(find.text('Support'), findsOneWidget);
     expect(find.text('delibaltabaris5@gmail.com'), findsOneWidget);
     await tester.tap(row);
     await tester.pumpAndSettle();
     final opens = calls.where((c) => c.method == 'openUrl').toList();
-    expect(opens.single.arguments, {'url': 'mailto:delibaltabaris5@gmail.com'});
+    // Fixed subject only: no body, logs or device data in the mailto.
+    expect(opens.single.arguments, {
+      'url': 'mailto:delibaltabaris5@gmail.com?subject=GizliAlan%20destek',
+    });
     expect(clip, isNull);
     mailOk = false;
     await tester.tap(row);
     await tester.pumpAndSettle();
     expect(clip, 'delibaltabaris5@gmail.com');
     expect(find.text('E-mail address copied'), findsOneWidget);
+  });
+
+  testWidgets('Settings support row is localized (TR: Destek)', (tester) async {
+    final state = await openVault(tester, VaultSpace.real, lang: 'tr');
+    state.navKey.currentState!.push(
+      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+    );
+    await settle(tester);
+    final row = find.byKey(const ValueKey('settings_support'));
+    await tester.scrollUntilVisible(
+      row,
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(SettingsScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(
+      find.descendant(of: row, matching: find.text('Destek')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: row,
+        matching: find.text('delibaltabaris5@gmail.com'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  test('support mailto carries only the fixed subject', () {
+    final uri = Uri.parse(PrivacyLink.supportMailto);
+    expect(uri.scheme, 'mailto');
+    expect(uri.path, PrivacyLink.supportEmail);
+    expect(uri.queryParameters, {'subject': 'GizliAlan destek'});
   });
 
   testWidgets('no browser: falls back to copying the link', (tester) async {
