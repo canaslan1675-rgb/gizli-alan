@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../app.dart';
@@ -5,6 +7,7 @@ import '../l10n/l10n.dart';
 import '../models/vault_event.dart';
 import '../services/original_import.dart';
 import '../services/vault_storage.dart';
+import 'pro_gate.dart';
 import 'vault_actions.dart';
 
 /// Import flow used when "Delete original after import" is effective
@@ -17,14 +20,27 @@ Future<void> importDeletingOriginals(
   VaultStorage store, {
   required bool images,
   required VaultEventType event,
+  int? maxCount,
 }) async {
   final app = GizliAlanApp.of(context);
   final t = L10n.current;
   final messenger = ScaffoldMessenger.of(context);
-  final picked = await app.withExternalUi(
+  var picked = await app.withExternalUi(
     () => OriginalImport.pick(images: images),
   );
   if (picked.isEmpty || !context.mounted) return;
+  // Free item limit: import (and later delete) only what fits; drop the
+  // plaintext cache copies of the rest. Their originals are untouched.
+  final overLimit = maxCount != null && picked.length > maxCount;
+  if (overLimit) {
+    for (final s in picked.skip(maxCount)) {
+      try {
+        await File(s.path).delete();
+      } catch (_) {}
+    }
+    picked = picked.take(maxCount).toList();
+  }
+  if (!context.mounted) return;
   var safe = <String>[];
   var tooBig = 0;
   await runWithProgress(context, t('importing'), () async {
@@ -61,4 +77,5 @@ Future<void> importDeletingOriginals(
   messenger.showSnackBar(
     SnackBar(content: Text(msg), duration: const Duration(seconds: 6)),
   );
+  if (overLimit && context.mounted) await ItemLimit.showLimitReached(context);
 }
