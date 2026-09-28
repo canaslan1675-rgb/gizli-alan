@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gizlialan/app_version.dart';
 import 'package:gizlialan/app.dart';
 import 'package:gizlialan/flavor.dart';
 import 'package:gizlialan/l10n/l10n.dart';
@@ -264,8 +265,8 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.4.7 · Play'), findsOneWidget);
-      await tester.pageBack();
+      expect(find.text('GizliAlan $appVersion · Play'), findsOneWidget);
+      await tester.tap(find.byTooltip('Back').last); // EN Back tooltip
       await settle(tester);
 
       // Locking in play never touches the (absent) second phone.
@@ -311,7 +312,7 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      expect(find.text('GizliAlan 0.4.7 · Full'), findsOneWidget);
+      expect(find.text('GizliAlan $appVersion · Full'), findsOneWidget);
     });
   });
 
