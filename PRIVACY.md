@@ -1,7 +1,7 @@
 # Privacy Policy — GizliAlan
 
 **Last updated:** 2026-09-27 (v0.4.6)
-**Data controller:** Demirhan Çelik (OfferForge), Van, Türkiye — delibaltabaris5@gmail.com
+**Data controller:** Demirhan Çelik (OfferForge), Türkiye — delibaltabaris5@gmail.com
 **App:** GizliAlan (package `com.offerforge.gizlialan`)
 **Audience:** The owner of the device, for their own content only.
 
@@ -164,7 +164,7 @@ policy and the Play Data safety form will be updated **before** release.
 
 ## Contact
 
-Data controller / developer: Demirhan Çelik (OfferForge), Van, Türkiye.
+Data controller / developer: Demirhan Çelik (OfferForge), Türkiye.
 Support e-mail: **delibaltabaris5@gmail.com**
 This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/
 
@@ -176,7 +176,7 @@ This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/
 
 ### 1. Veri sorumlusu (KVKK md.10/a)
 
-Demirhan Çelik (OfferForge), Van, Türkiye. İletişim ve başvuru:
+Demirhan Çelik (OfferForge), Türkiye. İletişim ve başvuru:
 **delibaltabaris5@gmail.com**
 
 ### 2. Özet
