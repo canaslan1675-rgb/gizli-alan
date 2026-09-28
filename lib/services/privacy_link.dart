@@ -24,6 +24,15 @@ class PrivacyLink {
   /// Support / KVKK application address (also in the privacy policy).
   static const String supportEmail = 'delibaltabaris5@gmail.com';
 
+  /// Fixed subject for support e-mails. Nothing else is prefilled: no body,
+  /// no logs, no device data, no attachments.
+  static const String supportSubject = 'GizliAlan destek';
+
+  /// The only `mailto:` the app ever opens (the Kotlin side accepts exactly
+  /// this string).
+  static const String supportMailto =
+      'mailto:$supportEmail?subject=GizliAlan%20destek';
+
   static const MethodChannel channel = MethodChannel('gizlialan/system');
 
   static String? _override;
@@ -45,12 +54,13 @@ class PrivacyLink {
         !u.contains(' ');
   }
 
-  /// Opens the user's e-mail app for [supportEmail] (`mailto:`). Returns
-  /// false when there is none; callers then copy the address.
+  /// Opens the user's e-mail app for [supportEmail] with the subject
+  /// [supportSubject] ([supportMailto]). Returns false when there is none;
+  /// callers then copy the address.
   static Future<bool> openMail() async {
     try {
       return await channel.invokeMethod<bool>('openUrl', {
-            'url': 'mailto:$supportEmail',
+            'url': supportMailto,
           }) ??
           false;
     } on PlatformException {
