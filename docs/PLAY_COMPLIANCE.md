@@ -1,11 +1,13 @@
 # Play Store readiness — GizliAlan v0.3 (two build flavors: `play` + `full`)
 
+> **v0.5.0 (#52):** `full` (Second phone + Play Billing) is the Play upload: `flutter build appbundle --release --flavor full`. Both flavors now share `com.offerforge.gizlialan`; `play` stays buildable as a lite fallback. Sections below that assume `play` are historical.
+
 ## 0. Build flavors (#11, owner: "ikisini de üretip deneyelim")
 
 | Flavor | applicationId | Second phone | For |
 |--------|---------------|--------------|-----|
 | **`play`** | `com.offerforge.gizlialan` | **No.** Merged manifest has **no** `DeviceAdminReceiver`, no `BIND_DEVICE_ADMIN`, no provisioning/profile-action activities, no `profile_admin.xml`, no `managed_users`/`device_admin` uses-feature, no LAUNCHER `<queries>`. The Kotlin code (`secondphone/`) is not compiled in; the Dart UI hides every Second phone entry. | Google Play candidate |
-| `full` | `com.offerforge.gizlialan.full` | Yes (v0.2 behaviour, components in `android/app/src/full/`) | Side-load / GitHub test builds |
+| `full` | `com.offerforge.gizlialan` (since v0.5.0; was `.full`) | Yes (v0.2 behaviour, components in `android/app/src/full/`) | **Google Play upload since v0.5.0** (owner decision #52), + Play Billing |
 
 Both: launcher label "Calculator"/"Hesap Makinesi", FLAG_SECURE, only `USE_BIOMETRIC` + `INTERNET` (in-vault browser, since 0.4.0),
 same `key.properties` release signing. They install side by side. Which flavor is
