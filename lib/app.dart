@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'flavor.dart';
@@ -379,6 +380,15 @@ class GizliAlanAppState extends State<GizliAlanApp>
         title: L10n.current('launcherName'),
         debugShowCheckedModeBanner: false,
         theme: GizliTheme.dark(),
+        // Framework strings (Back tooltip, copy/paste menu…) follow the
+        // app's TR/EN toggle.
+        locale: Locale(L10n.lang),
+        supportedLocales: const [Locale('tr'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         navigatorKey: navKey,
         // Key on entry mode so switching it swaps the root screen cleanly.
         home: KeyedSubtree(
