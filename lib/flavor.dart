@@ -33,16 +33,15 @@ class Flavor {
   /// Whether this build contains the Second phone feature.
   static bool get hasSecondPhone => current == AppFlavor.full;
 
-  /// Whether Settings shows the "GizliAlan Pro" UI stub (planned prices,
-  /// purchase buttons that only say "not available"). Hidden in the `play`
-  /// build so Google Play reviewers never see non-working purchase buttons
-  /// (docs/play-submission/RESEARCH.md §3, finding "Broken functionality");
-  /// kept in `full` test builds. `--dart-define=PRO_STUB=true` forces it on
-  /// (e.g. to review the stub in a play build). No billing exists either way,
-  /// and the free-tier item limit is displayed only, never enforced.
+  /// Whether Pro is the local test stub ("Pro'yu simüle et", no billing)
+  /// instead of Google Play Billing. Never in release builds that go to
+  /// Play: only `full` DEBUG builds (flutter run / tests), or when a test
+  /// artifact is built with `--dart-define=PRO_STUB=true` (CI test APKs, so
+  /// side-loaded testers can try Pro features without Play).
   static bool get hasProStub =>
       _proStubOverride ??
-      (current == AppFlavor.full || const bool.fromEnvironment('PRO_STUB'));
+      ((kDebugMode && current == AppFlavor.full) ||
+          const bool.fromEnvironment('PRO_STUB'));
 
   static bool? _proStubOverride;
 

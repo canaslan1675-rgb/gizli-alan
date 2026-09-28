@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app.dart';
+import 'services/play_billing_backend.dart';
+import 'services/pro_billing.dart';
+import 'services/pro_entitlement.dart';
 import 'services/auth_service.dart';
 import 'services/biometric_service.dart';
 import 'services/settings_service.dart';
@@ -29,6 +32,14 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   final settings = await SettingsService.create();
+
+  // Play build: Pro via Google Play Billing. Not awaited — the cached
+  // entitlement is used until Play answers (offline-safe).
+  if (ProEntitlement.viaPlayBilling) {
+    final billing = ProBilling(settings, PlayBillingBackend());
+    ProBilling.instance = billing;
+    billing.start();
+  }
 
   runApp(
     GizliAlanApp(

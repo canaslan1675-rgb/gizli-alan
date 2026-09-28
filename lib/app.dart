@@ -14,6 +14,7 @@ import 'screens/vault_home_screen.dart';
 import 'services/auth_service.dart';
 import 'services/biometric_service.dart';
 import 'services/browser_engine.dart';
+import 'services/pro_billing.dart';
 import 'services/pro_entitlement.dart';
 import 'services/legacy_migration.dart';
 import 'services/second_phone_service.dart';
@@ -37,6 +38,7 @@ class GizliAlanApp extends StatefulWidget {
     this.secondPhone,
     this.browserEngineFactory,
     this.wipeBrowserData,
+    this.billing,
   });
 
   final SettingsService settings;
@@ -54,6 +56,9 @@ class GizliAlanApp extends StatefulWidget {
 
   /// Wipes browser cookies/cache/storage (injectable for tests).
   final Future<bool> Function()? wipeBrowserData;
+
+  /// Google Play Billing for Pro (`play`); defaults to [ProBilling.instance].
+  final ProBilling? billing;
 
   @override
   State<GizliAlanApp> createState() => GizliAlanAppState();
@@ -113,7 +118,16 @@ class GizliAlanAppState extends State<GizliAlanApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    billing?.addListener(_billingChanged);
     _bootstrap();
+  }
+
+  /// Pro billing (null in `full` builds and most tests).
+  ProBilling? get billing => widget.billing ?? ProBilling.instance;
+
+  // Pro may turn on/off (purchase, lapse): rebuild Pro-gated UI.
+  void _billingChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _bootstrap() async {
@@ -131,6 +145,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    billing?.removeListener(_billingChanged);
     secondPhoneChanged.dispose();
     _session?.close();
     super.dispose();
