@@ -6,7 +6,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class HidePolicyTest {
-    private val self = "com.offerforge.gizlialan.full"
+    private val self = "com.offerforge.gizlialan"
 
     @Test
     fun neverHidesItselfOrEssentials() {
