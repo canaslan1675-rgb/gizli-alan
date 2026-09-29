@@ -9,7 +9,7 @@ const String kProProductId = 'gizlialan_pro';
 
 /// Base plans of [kProProductId].
 const String kPlanMonthly = 'monthly';
-const String kPlanYearly = 'yearly';
+const String kPlanYearly = 'yearly-1';
 
 /// One purchasable base plan as reported by Play. [price] is Play's
 /// localized base-plan price string (never hardcoded in the app).
