@@ -17,8 +17,10 @@ debug builds and in CI test APKs built with `--dart-define=PRO_STUB=true`
 | Product type | Subscription |
 | Product ID | `gizlialan_pro` |
 | Base plan 1 | `monthly` — auto-renewing, billing period **1 month**, price **150 TL** |
-| Base plan 2 | `yearly` — auto-renewing, billing period **1 year**, price **999 TL** |
+| Base plan 2 | `yearly-1` — auto-renewing, billing period **1 year**, price **999 TL** |
 | Offer (optional, recommended) | Free trial **7 days** on each base plan, eligibility "New customer acquisition — never had this subscription" |
+
+> Note: Console ID `yearly` was created with a monthly period by mistake and deactivated; the live annual plan ID is `yearly-1` (Play does not reuse deactivated base-plan IDs).
 
 Prices shown in the app always come from Play (`ProductDetails.price`), so
 changing prices in Play Console needs no app update. The app buys the
@@ -46,7 +48,7 @@ otherwise the plain base plan. Other product IDs are ignored.
    Billing period 1 month → Grace period (default ok) → *Set prices* →
    Turkey **150 TRY** (let Play convert other countries, or set them) →
    Save → **Activate**.
-5. **Base plan `yearly`**: same with ID `yearly`, billing period 1 year,
+5. **Base plan `yearly-1`**: same with ID `yearly-1`, billing period 1 year,
    Turkey **999 TRY** → Save → **Activate**.
 6. **7-day free trial**: on each base plan → *Add offer* → Offer ID e.g.
    `trial7` → Eligibility *New customer acquisition* ("Never had this
