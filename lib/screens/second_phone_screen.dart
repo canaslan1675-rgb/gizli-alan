@@ -22,6 +22,8 @@ class SecondPhoneScreen extends StatefulWidget {
 }
 
 class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   SecondPhoneStatus? _st;
   List<ProfileApp> _apps = const [];
   bool _busy = false;
@@ -100,7 +102,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: danger
-                ? TextButton.styleFrom(foregroundColor: GizliTheme.danger)
+                ? TextButton.styleFrom(foregroundColor: gc.danger)
                 : null,
             child: Text(t('ok')),
           ),
@@ -245,31 +247,34 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
 
   // ------------------------------------------------------------------ UI
 
-  Widget _card(String text, {Color color = GizliTheme.mint, IconData? icon}) =>
-      Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: GizliTheme.bgCard,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.35)),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: 10),
-            ],
-            Expanded(
-              child: Text(
-                text,
-                style: TextStyle(color: color, fontSize: 13, height: 1.45),
-              ),
+  Widget _card(String text, {Color? color, IconData? icon}) => Container(
+    margin: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: gc.bgCard,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: (color ?? gc.accent).withValues(alpha: 0.35)),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (icon != null) ...[
+          Icon(icon, color: (color ?? gc.accent), size: 20),
+          const SizedBox(width: 10),
+        ],
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: (color ?? gc.accent),
+              fontSize: 13,
+              height: 1.45,
             ),
-          ],
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
   List<Widget> _readyBody(L10n t) {
     final closed = _closed;
@@ -283,7 +288,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
         contentPadding: EdgeInsets.zero,
         leading: Icon(
           closed ? Icons.lock_outline : Icons.lock_open_outlined,
-          color: closed ? GizliTheme.warning : GizliTheme.mint,
+          color: closed ? gc.warning : gc.accent,
         ),
         title: Text(t('spStatus')),
         subtitle: Text(status),
@@ -314,13 +319,13 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
         padding: const EdgeInsets.only(top: 4, bottom: 16),
         child: Text(
           t('spAddAppHint'),
-          style: const TextStyle(color: GizliTheme.textSecondary, fontSize: 12),
+          style: TextStyle(color: gc.textSecondary, fontSize: 12),
         ),
       ),
       Text(
         upperFor(t('secondPhoneApps'), L10n.lang),
-        style: const TextStyle(
-          color: GizliTheme.mint,
+        style: TextStyle(
+          color: gc.accent,
           fontSize: 12,
           letterSpacing: 1.1,
           fontWeight: FontWeight.w600,
@@ -330,7 +335,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
       if (_apps.isEmpty)
         Text(
           closed ? t('spStatusFrozen') : t('spNoApps'),
-          style: const TextStyle(color: GizliTheme.textSecondary),
+          style: TextStyle(color: gc.textSecondary),
         )
       else
         GridView.count(
@@ -347,7 +352,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
       const SizedBox(height: 28),
       TextButton.icon(
         onPressed: _busy ? null : _remove,
-        style: TextButton.styleFrom(foregroundColor: GizliTheme.danger),
+        style: TextButton.styleFrom(foregroundColor: gc.danger),
         icon: const Icon(Icons.delete_forever_outlined),
         label: Text(t('spRemove')),
       ),
@@ -360,7 +365,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
       _card(t('spIntro'), icon: Icons.phone_android_outlined),
       _card(
         t('spDisclosure'),
-        color: GizliTheme.textSecondary,
+        color: gc.textSecondary,
         icon: Icons.info_outline,
       ),
     ];
@@ -369,11 +374,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
         out.addAll(_readyBody(t));
       case SecondPhoneAvailability.unlinked:
         out.add(
-          _card(
-            t('spUnlinked'),
-            color: GizliTheme.warning,
-            icon: Icons.link_off,
-          ),
+          _card(t('spUnlinked'), color: gc.warning, icon: Icons.link_off),
         );
       case SecondPhoneAvailability.canSetUp:
       case SecondPhoneAvailability.canSetUpXiaomiRisk:
@@ -381,7 +382,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
           out.add(
             _card(
               t('spXiaomiWarn'),
-              color: GizliTheme.warning,
+              color: gc.warning,
               icon: Icons.warning_amber_outlined,
             ),
           );
@@ -390,7 +391,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
           out.add(
             _card(
               t('spProBody'),
-              color: GizliTheme.mint,
+              color: gc.accent,
               icon: Icons.workspace_premium_outlined,
             ),
           );
@@ -405,27 +406,13 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
         );
       case SecondPhoneAvailability.blockedXiaomi:
         out.add(
-          _card(
-            t('spXiaomiBlocked'),
-            color: GizliTheme.warning,
-            icon: Icons.block,
-          ),
+          _card(t('spXiaomiBlocked'), color: gc.warning, icon: Icons.block),
         );
       case SecondPhoneAvailability.notAllowed:
-        out.add(
-          _card(
-            t('spNotAllowed'),
-            color: GizliTheme.warning,
-            icon: Icons.block,
-          ),
-        );
+        out.add(_card(t('spNotAllowed'), color: gc.warning, icon: Icons.block));
       case SecondPhoneAvailability.unsupported:
         out.add(
-          _card(
-            t('spUnsupported'),
-            color: GizliTheme.warning,
-            icon: Icons.block,
-          ),
+          _card(t('spUnsupported'), color: gc.warning, icon: Icons.block),
         );
     }
     if (a != SecondPhoneAvailability.ready && st.privateSpaceAvailable) {

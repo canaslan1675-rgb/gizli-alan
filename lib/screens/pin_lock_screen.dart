@@ -19,6 +19,8 @@ class PinLockScreen extends StatefulWidget {
 }
 
 class _PinLockScreenState extends State<PinLockScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   String _pin = '';
   String? _error;
   bool _busy = false;
@@ -116,13 +118,10 @@ class _PinLockScreenState extends State<PinLockScreen> {
             height: 64,
             child: Center(
               child: icon != null
-                  ? Icon(icon, color: GizliTheme.mint, size: 28)
+                  ? Icon(icon, color: gc.accent, size: 28)
                   : Text(
                       label,
-                      style: const TextStyle(
-                        fontSize: 26,
-                        color: GizliTheme.textPrimary,
-                      ),
+                      style: TextStyle(fontSize: 26, color: gc.textPrimary),
                     ),
             ),
           ),
@@ -143,7 +142,7 @@ class _PinLockScreenState extends State<PinLockScreen> {
         child: Column(
           children: [
             const Spacer(),
-            const Icon(Icons.lock, size: 48, color: GizliTheme.mint),
+            Icon(Icons.lock, size: 48, color: gc.accent),
             const SizedBox(height: 16),
             Text(t('unlock'), style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 16),
@@ -158,8 +157,8 @@ class _PinLockScreenState extends State<PinLockScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: filled
-                        ? GizliTheme.mint
-                        : GizliTheme.textSecondary.withValues(alpha: 0.25),
+                        ? gc.accent
+                        : gc.textSecondary.withValues(alpha: 0.25),
                   ),
                 );
               }),
@@ -171,10 +170,10 @@ class _PinLockScreenState extends State<PinLockScreen> {
                   '{s}',
                   '${(_lockout!.inMilliseconds / 1000).ceil()}',
                 ),
-                style: const TextStyle(color: GizliTheme.warning),
+                style: TextStyle(color: gc.warning),
               )
             else if (_error != null)
-              Text(_error!, style: const TextStyle(color: GizliTheme.danger)),
+              Text(_error!, style: TextStyle(color: gc.danger)),
             if (_busy) ...[
               const SizedBox(height: 12),
               const SizedBox(

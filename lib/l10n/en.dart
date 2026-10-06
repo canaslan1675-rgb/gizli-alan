@@ -391,4 +391,41 @@ const Map<String, String> en = {
   'copyLink': 'Copy link',
   'linkCopied': 'Link copied',
   'noBrowser': 'No browser found. The link was copied instead.',
+  // v0.5.1: appearance, help, share / rate / feedback (tester feedback)
+  'appearance': 'Appearance',
+  'themeSystem': 'System',
+  'themeLight': 'Light',
+  'themeDark': 'Dark',
+  'appearanceHint': 'Theme for the calculator and the vault screens',
+  'helpFeedback': 'Help & feedback',
+  'helpTitle': 'Help: how it works',
+  'helpHint': 'Calculator entry, decoy PIN, vault and second phone',
+  'helpCalcTitle': 'Calculator entry',
+  'helpCalcBody':
+      'The app appears in your app list as "Calculator" and opens as a real, working calculator. To open the vault, type your PIN and press "=". If biometric unlock is on, just long-press "=". Any number that is not your PIN is simply calculated. You can turn this entry off in Settings → Entry; the app then opens straight to the PIN screen.',
+  'helpDecoyTitle': 'Decoy PIN',
+  'helpDecoyBody':
+      'In Settings → Security you can set a second PIN. The decoy PIN opens a separate vault that starts empty and has its own encryption key; your real vault and its content are not visible there. The decoy PIN must differ from your real PIN. Biometric unlock always opens the real vault only.',
+  'helpVaultTitle': 'Vault',
+  'helpVaultBody':
+      'In the vault you can keep photos, notes and files (including videos and documents) and use the private browser. All content is encrypted on this device with AES-256-GCM; there is no account, no cloud and no server. Screenshots, screen recording and the recent-apps preview are blocked. The vault locks when the app goes to the background; change the delay in Settings → Auto-lock.',
+  'helpPinTitle': 'What if I forget my PIN?',
+  'helpPinBody':
+      'There is no PIN recovery: your PIN is never sent anywhere and the content can only be decrypted on this device. If you forget your PIN, the vault content cannot be opened; you can only reset the app completely (or uninstall and reinstall it).',
+  'helpSecondPhoneTitle': 'Second phone (work profile)',
+  'helpSecondPhoneBody':
+      'Second phone uses Android\'s own work-profile feature to create a separate space on this device. It has its own Play Store, so you can use a separate Google account and separate apps. Setup and management are only possible while the real vault is unlocked. Optionally, the work apps are hidden while the vault is locked and come back when you unlock. GizliAlan only manages the work profile it created; it does not monitor your main phone and sends no data anywhere.',
+  'helpSecondPhonePro': 'Setting up the Second phone is a Pro feature.',
+  'shareApp': 'Share app',
+  'shareAppHint': 'Send the Google Play link to a friend',
+  // Neutral on purpose: never mention the vault in shared text.
+  'shareAppText': 'Check out this app:',
+  'shareAppFailed': 'Could not share. The link was copied instead.',
+  'rateApp': 'Rate app',
+  'rateAppHint': 'Rate or review it on Google Play',
+  'rateAppFailed': 'Could not open Google Play. The link was copied instead.',
+  'feedback': 'Send feedback',
+  'feedbackHint': 'E-mail us ideas or bug reports',
+  'feedbackSubject': 'GizliAlan feedback',
+  'feedbackFailed': 'No e-mail app found. The address was copied instead.',
 };

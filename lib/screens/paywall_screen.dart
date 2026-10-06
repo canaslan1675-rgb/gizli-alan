@@ -22,6 +22,8 @@ class PaywallScreen extends StatefulWidget {
 }
 
 class _PaywallScreenState extends State<PaywallScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   ProBilling? _billing;
   bool _busy = false;
 
@@ -135,7 +137,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check, size: 18, color: GizliTheme.mint),
+                  Icon(Icons.check, size: 18, color: gc.accent),
                   const SizedBox(width: 8),
                   Expanded(child: Text(f)),
                 ],
@@ -145,7 +147,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
           if (isPro)
             ListTile(
               key: const ValueKey('pay_active'),
-              leading: const Icon(Icons.verified, color: GizliTheme.mint),
+              leading: Icon(Icons.verified, color: gc.accent),
               title: Text(t('payActive')),
             )
           else if (loading)
@@ -161,13 +163,13 @@ class _PaywallScreenState extends State<PaywallScreen> {
             Text(
               t('payUnavailable'),
               key: const ValueKey('pay_unavailable'),
-              style: const TextStyle(color: GizliTheme.textSecondary),
+              style: TextStyle(color: gc.textSecondary),
             )
           else if (plans.isEmpty)
             Text(
               t('payNoPlans'),
               key: const ValueKey('pay_no_plans'),
-              style: const TextStyle(color: GizliTheme.textSecondary),
+              style: TextStyle(color: gc.textSecondary),
             )
           else ...[
             planButton(kPlanMonthly, 'payMonthly', 'payPerMonth'),
@@ -189,10 +191,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
           const SizedBox(height: 8),
           Text(
             t('payTerms'),
-            style: const TextStyle(
-              fontSize: 12,
-              color: GizliTheme.textSecondary,
-            ),
+            style: TextStyle(fontSize: 12, color: gc.textSecondary),
           ),
         ],
       ),

@@ -236,12 +236,13 @@ class _StartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gc = GizliColors.of(context);
     final t = L10n.of(context);
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
         const SizedBox(height: 24),
-        const Icon(Icons.travel_explore, size: 56, color: GizliTheme.mint),
+        Icon(Icons.travel_explore, size: 56, color: gc.accent),
         const SizedBox(height: 16),
         Text(
           t('browser'),
@@ -252,17 +253,13 @@ class _StartPage extends StatelessWidget {
         Text(
           t('browserSearchWith').replaceAll('{engine}', engine),
           textAlign: TextAlign.center,
-          style: const TextStyle(color: GizliTheme.textSecondary),
+          style: TextStyle(color: gc.textSecondary),
         ),
         const SizedBox(height: 24),
         Text(
           t('browserPrivacyNote'),
           key: const ValueKey('browser_privacy_note'),
-          style: const TextStyle(
-            color: GizliTheme.textSecondary,
-            fontSize: 13,
-            height: 1.45,
-          ),
+          style: TextStyle(color: gc.textSecondary, fontSize: 13, height: 1.45),
         ),
       ],
     );

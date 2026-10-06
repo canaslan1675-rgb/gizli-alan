@@ -19,6 +19,8 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   // Captured once (the session may close while this route animates away).
   VaultEventLog? _logRef;
   VaultEventLog get _log => _logRef!;
@@ -55,7 +57,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           TextButton(
             key: const ValueKey('notif_clear_ok'),
             onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: GizliTheme.danger),
+            style: TextButton.styleFrom(foregroundColor: gc.danger),
             child: Text(t('delete')),
           ),
         ],
@@ -103,7 +105,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: Text(
                   t('notifEmpty'),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: GizliTheme.textSecondary),
+                  style: TextStyle(color: gc.textSecondary),
                 ),
               ),
             );
@@ -117,15 +119,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Text(
                     t('notifFooter'),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: GizliTheme.textSecondary,
-                    ),
+                    style: TextStyle(fontSize: 12, color: gc.textSecondary),
                   ),
                 );
               }
               final e = events[i];
-              final (icon, color) = eventIcon(e.type);
+              final (icon, color) = eventIcon(e.type, gc);
               return ListTile(
                 leading: Icon(icon, color: color),
                 title: Text(
@@ -137,11 +136,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 subtitle: Text(fmt.format(e.at)),
                 trailing: e.read
                     ? null
-                    : const Icon(
-                        Icons.circle,
-                        size: 10,
-                        color: GizliTheme.mint,
-                      ),
+                    : Icon(Icons.circle, size: 10, color: gc.accent),
               );
             },
           );
@@ -171,22 +166,29 @@ String eventMessage(L10n t, VaultEvent e) {
   };
 }
 
-(IconData, Color) eventIcon(VaultEventType type) => switch (type) {
-  VaultEventType.galleryImported => (
-    Icons.photo_library_outlined,
-    const Color(0xFF7CB8FF),
-  ),
-  VaultEventType.filesImported => (
-    Icons.folder_outlined,
-    const Color(0xFFB79CFF),
-  ),
-  VaultEventType.itemExported => (Icons.ios_share, GizliTheme.mint),
-  VaultEventType.itemDeleted => (Icons.delete_outline, GizliTheme.danger),
-  VaultEventType.failedUnlocks => (Icons.warning_amber, GizliTheme.warning),
-  VaultEventType.secondPhoneCreated ||
-  VaultEventType.secondPhoneAppAdded ||
-  VaultEventType.secondPhoneRemoved => (
-    Icons.phone_android_outlined,
-    const Color(0xFF6FD6FF),
-  ),
-};
+(IconData, Color) eventIcon(VaultEventType type, GizliColors gc) =>
+    switch (type) {
+      VaultEventType.galleryImported => (
+        Icons.photo_library_outlined,
+        gc.brightness == Brightness.dark
+            ? const Color(0xFF7CB8FF)
+            : const Color(0xFF1F5FAF),
+      ),
+      VaultEventType.filesImported => (
+        Icons.folder_outlined,
+        gc.brightness == Brightness.dark
+            ? const Color(0xFFB79CFF)
+            : const Color(0xFF6A3FC0),
+      ),
+      VaultEventType.itemExported => (Icons.ios_share, gc.accent),
+      VaultEventType.itemDeleted => (Icons.delete_outline, gc.danger),
+      VaultEventType.failedUnlocks => (Icons.warning_amber, gc.warning),
+      VaultEventType.secondPhoneCreated ||
+      VaultEventType.secondPhoneAppAdded ||
+      VaultEventType.secondPhoneRemoved => (
+        Icons.phone_android_outlined,
+        gc.brightness == Brightness.dark
+            ? const Color(0xFF6FD6FF)
+            : const Color(0xFF00708F),
+      ),
+    };

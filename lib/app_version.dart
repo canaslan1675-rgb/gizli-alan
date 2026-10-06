@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 /// Compile-time fallback for the app version, used when the platform
 /// channel is unavailable (tests, non-Android). Must match `version:` in
 /// pubspec.yaml; a unit test enforces it.
-const String appVersion = '0.5.0';
-const int appBuild = 18;
+const String appVersion = '0.5.1';
+const int appBuild = 20;
 
 /// Version of the installed APK, read at runtime from Android's
 /// PackageManager via the `gizlialan/system` channel (`appInfo`).

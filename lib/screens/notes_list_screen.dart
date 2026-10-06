@@ -18,6 +18,8 @@ class NotesListScreen extends StatefulWidget {
 }
 
 class _NotesListScreenState extends State<NotesListScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   NotesRepository? _repoRef;
   NotesRepository get _repo => _repoRef!;
   late Future<List<Note>> _future;
@@ -95,9 +97,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                           child: Text(
                             t('emptyNotes'),
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: GizliTheme.textSecondary,
-                            ),
+                            style: TextStyle(color: gc.textSecondary),
                           ),
                         ),
                       )
@@ -117,8 +117,8 @@ class _NotesListScreenState extends State<NotesListScreen> {
                               '${fmt.format(n.updatedAt)}  ·  ${n.body.replaceAll('\n', ' ')}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: GizliTheme.textSecondary,
+                              style: TextStyle(
+                                color: gc.textSecondary,
                                 fontSize: 12,
                               ),
                             ),

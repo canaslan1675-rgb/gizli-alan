@@ -26,6 +26,8 @@ class DecoyCalculatorScreen extends StatefulWidget {
 }
 
 class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   final _engine = CalculatorEngine();
   bool _checking = false;
 
@@ -84,7 +86,7 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
       child: Padding(
         padding: const EdgeInsets.all(6),
         child: Material(
-          color: bg ?? GizliTheme.bgCard,
+          color: bg ?? gc.calcKey,
           borderRadius: BorderRadius.circular(20),
           child: InkWell(
             key: ValueKey('calc_$label'),
@@ -99,7 +101,7 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w500,
-                    color: fg ?? GizliTheme.textPrimary,
+                    color: fg ?? gc.textPrimary,
                   ),
                 ),
               ),
@@ -113,8 +115,8 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     final t = L10n.of(context);
-    const opBg = GizliTheme.bgElevated;
-    const opFg = GizliTheme.mint;
+    final opBg = gc.calcOpKey;
+    final opFg = gc.accent;
     return Scaffold(
       appBar: AppBar(
         title: Text(t('decoyTitle')),
@@ -154,10 +156,7 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
                         key: const ValueKey('calc_expression'),
                         maxLines: 2,
                         textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          color: GizliTheme.textSecondary,
-                        ),
+                        style: TextStyle(fontSize: 22, color: gc.textSecondary),
                       ),
                       const SizedBox(height: 8),
                       FittedBox(
@@ -165,10 +164,10 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
                         child: Text(
                           _engine.display,
                           key: const ValueKey('calc_display'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 56,
                             fontWeight: FontWeight.w300,
-                            color: GizliTheme.textPrimary,
+                            color: gc.textPrimary,
                           ),
                         ),
                       ),
@@ -184,7 +183,7 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
                 children: [
                   Row(
                     children: [
-                      _key('C', bg: opBg, fg: GizliTheme.danger),
+                      _key('C', bg: opBg, fg: gc.danger),
                       _key('⌫', bg: opBg, fg: opFg),
                       _key('%', bg: opBg, fg: opFg),
                       _key('÷', bg: opBg, fg: opFg),
@@ -219,7 +218,7 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
                       _key('±', bg: opBg, fg: opFg),
                       _key('0'),
                       _key('.'),
-                      _key('=', bg: GizliTheme.mint, fg: GizliTheme.bg),
+                      _key('=', bg: gc.accent, fg: gc.onAccent),
                     ],
                   ),
                 ],

@@ -21,6 +21,8 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   int _step = 0;
   bool _ownDevice = false;
   bool _calculator = true;
@@ -78,40 +80,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _card(String text, {Color color = GizliTheme.mint}) => Container(
+  Widget _card(String text, {Color? color}) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: GizliTheme.bgCard,
+      color: gc.bgCard,
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: color.withValues(alpha: 0.35)),
+      border: Border.all(color: (color ?? gc.accent).withValues(alpha: 0.35)),
     ),
     child: Text(
       text,
-      style: TextStyle(color: color, fontSize: 13, height: 1.45),
+      style: TextStyle(color: (color ?? gc.accent), fontSize: 13, height: 1.45),
     ),
   );
 
   Widget _title(IconData icon, String text) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Icon(icon, size: 52, color: GizliTheme.mint),
+      Icon(icon, size: 52, color: gc.accent),
       const SizedBox(height: 14),
       Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 26,
           fontWeight: FontWeight.bold,
-          color: GizliTheme.textPrimary,
+          color: gc.textPrimary,
         ),
       ),
       const SizedBox(height: 12),
     ],
   );
 
-  Widget _body(String text) => Text(
-    text,
-    style: const TextStyle(color: GizliTheme.textSecondary, height: 1.5),
-  );
+  Widget _body(String text) =>
+      Text(text, style: TextStyle(color: gc.textSecondary, height: 1.5));
 
   List<Widget> _stepWelcome(L10n t) => [
     _title(Icons.shield_outlined, t('onboardingTitle')),
@@ -151,7 +151,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _title(Icons.calculate_outlined, t('entryTitle')),
     _body(t('entryBody')),
     const SizedBox(height: 16),
-    _card(t('entryDisclosure'), color: GizliTheme.warning),
+    _card(t('entryDisclosure'), color: gc.warning),
     const SizedBox(height: 12),
     SwitchListTile(
       value: _calculator,
@@ -160,7 +160,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       title: Text(t('calculatorEntry')),
       subtitle: Text(
         _calculator ? t('calculatorEntryOn') : t('calculatorEntryOff'),
-        style: const TextStyle(color: GizliTheme.textSecondary),
+        style: TextStyle(color: gc.textSecondary),
       ),
     ),
     const SizedBox(height: 16),
@@ -197,10 +197,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
     if (_error != null) ...[
       const SizedBox(height: 4),
-      Text(_error!, style: const TextStyle(color: GizliTheme.danger)),
+      Text(_error!, style: TextStyle(color: gc.danger)),
     ],
     const SizedBox(height: 12),
-    _card(t('pinNoRecovery'), color: GizliTheme.warning),
+    _card(t('pinNoRecovery'), color: gc.warning),
     const SizedBox(height: 20),
     ElevatedButton(
       key: const ValueKey('onboarding_finish'),
@@ -221,7 +221,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Text(
       t('dataSafetyShort'),
       textAlign: TextAlign.center,
-      style: const TextStyle(color: GizliTheme.textSecondary, fontSize: 12),
+      style: TextStyle(color: gc.textSecondary, fontSize: 12),
     ),
   ];
 
@@ -248,7 +248,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   Text(
                     '${_step + 1} / 3',
-                    style: const TextStyle(color: GizliTheme.textSecondary),
+                    style: TextStyle(color: gc.textSecondary),
                   ),
                   const Spacer(),
                   _langSwitch(),

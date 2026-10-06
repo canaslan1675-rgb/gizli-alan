@@ -18,6 +18,8 @@ class NoteEditScreen extends StatefulWidget {
 }
 
 class _NoteEditScreenState extends State<NoteEditScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   late final TextEditingController _title = TextEditingController(
     text: widget.note?.title ?? '',
   );
@@ -71,7 +73,7 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: GizliTheme.danger),
+            style: TextButton.styleFrom(foregroundColor: gc.danger),
             child: Text(t('delete')),
           ),
         ],
@@ -92,7 +94,7 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
         actions: [
           IconButton(
             tooltip: t('delete'),
-            icon: const Icon(Icons.delete_outline, color: GizliTheme.danger),
+            icon: Icon(Icons.delete_outline, color: gc.danger),
             onPressed: _delete,
           ),
           IconButton(
