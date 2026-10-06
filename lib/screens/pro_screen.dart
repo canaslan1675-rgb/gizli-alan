@@ -23,6 +23,8 @@ class ProScreen extends StatefulWidget {
 }
 
 class _ProScreenState extends State<ProScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   int? _items;
   bool _init = false;
 
@@ -77,15 +79,13 @@ class _ProScreenState extends State<ProScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: GizliTheme.warning.withValues(alpha: 0.12),
+              color: gc.warning.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: GizliTheme.warning.withValues(alpha: 0.5),
-              ),
+              border: Border.all(color: gc.warning.withValues(alpha: 0.5)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, color: GizliTheme.warning),
+                Icon(Icons.info_outline, color: gc.warning),
                 const SizedBox(width: 10),
                 Expanded(
                   key: const ValueKey('pro_test_build_note'),
@@ -141,10 +141,7 @@ class _ProScreenState extends State<ProScreen> {
           const SizedBox(height: 8),
           Text(
             t('proFooter'),
-            style: const TextStyle(
-              fontSize: 12,
-              color: GizliTheme.textSecondary,
-            ),
+            style: TextStyle(fontSize: 12, color: gc.textSecondary),
           ),
         ],
       ),
@@ -178,6 +175,7 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gc = GizliColors.of(context);
     final t = L10n.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -205,17 +203,14 @@ class _PlanCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Text(
-              price,
-              style: const TextStyle(fontSize: 16, color: GizliTheme.mint),
-            ),
+            Text(price, style: TextStyle(fontSize: 16, color: gc.accent)),
             if (badge != null) ...[
               const SizedBox(height: 6),
               Chip(
                 key: const ValueKey('plan_best_value'),
                 label: Text(badge!),
                 visualDensity: VisualDensity.compact,
-                backgroundColor: GizliTheme.mint.withValues(alpha: 0.18),
+                backgroundColor: gc.accent.withValues(alpha: 0.18),
               ),
             ],
             const SizedBox(height: 8),
@@ -225,7 +220,7 @@ class _PlanCard extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.check, size: 18, color: GizliTheme.mint),
+                    Icon(Icons.check, size: 18, color: gc.accent),
                     const SizedBox(width: 8),
                     Expanded(child: Text(f)),
                   ],
@@ -233,10 +228,7 @@ class _PlanCard extends StatelessWidget {
               ),
             if (footer != null) ...[
               const SizedBox(height: 8),
-              Text(
-                footer!,
-                style: const TextStyle(color: GizliTheme.textSecondary),
-              ),
+              Text(footer!, style: TextStyle(color: gc.textSecondary)),
             ],
             if (action != null) ...[
               const SizedBox(height: 12),

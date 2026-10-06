@@ -390,4 +390,42 @@ const Map<String, String> tr = {
   'copyLink': 'Bağlantıyı kopyala',
   'linkCopied': 'Bağlantı kopyalandı',
   'noBrowser': 'Tarayıcı bulunamadı. Bunun yerine bağlantı kopyalandı.',
+  // v0.5.1: appearance, help, share / rate / feedback (tester feedback)
+  'appearance': 'Görünüm',
+  'themeSystem': 'Sistem',
+  'themeLight': 'Açık',
+  'themeDark': 'Koyu',
+  'appearanceHint': 'Hesap makinesi ve kasa ekranları için tema',
+  'helpFeedback': 'Yardım ve geri bildirim',
+  'helpTitle': 'Yardım: nasıl kullanılır?',
+  'helpHint': 'Hesap makinesi girişi, sahte PIN, kasa ve ikinci telefon',
+  'helpCalcTitle': 'Hesap makinesi girişi',
+  'helpCalcBody':
+      'Uygulama, telefonunun uygulama listesinde "Hesap Makinesi" adıyla görünür ve gerçek, çalışan bir hesap makinesi olarak açılır. Kasayı açmak için PIN\'ini yazıp "=" tuşuna bas. Biyometrik kilit açma etkinse "=" tuşuna uzun basman yeterli. PIN olmayan bir sayı yazarsan normal hesaplama yapılır. Bu girişi Ayarlar → Giriş bölümünden kapatabilirsin; o zaman uygulama doğrudan PIN ekranıyla açılır.',
+  'helpDecoyTitle': 'Sahte PIN',
+  'helpDecoyBody':
+      'İstersen Ayarlar → Güvenlik bölümünden ikinci bir PIN belirleyebilirsin. Sahte PIN, boş başlayan ve kendi şifreleme anahtarı olan ayrı bir kasa açar; gerçek kasan ve içeriği orada görünmez. Sahte PIN gerçek PIN\'inden farklı olmalıdır. Biyometrik kilit açma her zaman yalnızca gerçek kasayı açar.',
+  'helpVaultTitle': 'Kasa',
+  'helpVaultBody':
+      'Kasada fotoğrafları, notları ve dosyaları (video ve belgeler dahil) saklayabilir, özel tarayıcıyı kullanabilirsin. Tüm içerik bu cihazda AES-256-GCM ile şifrelenir; hesap, bulut ve sunucu yoktur. Ekran görüntüsü, ekran kaydı ve son uygulamalar önizlemesi engellenir. Uygulama arka plana geçince kasa kilitlenir; süreyi Ayarlar → Otomatik kilit ile değiştirebilirsin.',
+  'helpPinTitle': 'PIN\'imi unutursam?',
+  'helpPinBody':
+      'PIN kurtarma yoktur: PIN\'in hiçbir yere gönderilmez ve içerik yalnızca bu cihazda çözülebilir. PIN\'ini unutursan kasa içeriği açılamaz; yalnızca uygulamayı tamamen sıfırlamak (veya silip yeniden kurmak) mümkündür.',
+  'helpSecondPhoneTitle': 'İkinci telefon (iş profili)',
+  'helpSecondPhoneBody':
+      'İkinci telefon, Android\'in kendi iş profili özelliğiyle bu cihazda ayrı bir alan oluşturur. İçinde kendi Play Store\'u vardır; ayrı bir Google hesabı ve ayrı uygulamalar kullanabilirsin. Kurulum ve yönetim yalnızca gerçek kasa açıkken yapılır. İstersen kasa kilitliyken iş uygulamaları gizlenir ve kilidi açınca geri gelir. GizliAlan yalnızca kendi oluşturduğu iş profilini yönetir; ana telefonunu izlemez ve hiçbir yere veri göndermez.',
+  'helpSecondPhonePro': 'İkinci telefonu kurmak Pro özelliğidir.',
+  'shareApp': 'Uygulamayı paylaş',
+  'shareAppHint': 'Google Play bağlantısını bir arkadaşına gönder',
+  // Neutral on purpose: never mention the vault in shared text.
+  'shareAppText': 'Bu uygulamaya bir göz at:',
+  'shareAppFailed': 'Paylaşılamadı. Bunun yerine bağlantı kopyalandı.',
+  'rateApp': 'Uygulamayı değerlendir',
+  'rateAppHint': 'Google Play\'de puan ver veya yorum yaz',
+  'rateAppFailed': 'Google Play açılamadı. Bunun yerine bağlantı kopyalandı.',
+  'feedback': 'Geri bildirim gönder',
+  'feedbackHint': 'Öneri veya hata bildirimi için e-posta',
+  'feedbackSubject': 'GizliAlan geri bildirim',
+  'feedbackFailed':
+      'E-posta uygulaması bulunamadı. Bunun yerine adres kopyalandı.',
 };

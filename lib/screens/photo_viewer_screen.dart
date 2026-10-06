@@ -59,34 +59,38 @@ class _PhotoViewerScreenState extends State<PhotoViewerScreen> {
     final t = L10n.of(context);
     if (_items.isEmpty) return const Scaffold();
     final item = _items[_index];
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
+    // Black viewer: keep dark app-bar colours in every theme mode.
+    return Theme(
+      data: GizliTheme.dark(),
+      child: Scaffold(
         backgroundColor: Colors.black,
-        title: Text(
-          item.name,
-          style: const TextStyle(fontSize: 14),
-          overflow: TextOverflow.ellipsis,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Text(
+            item.name,
+            style: const TextStyle(fontSize: 14),
+            overflow: TextOverflow.ellipsis,
+          ),
+          actions: [
+            IconButton(
+              tooltip: t('export'),
+              icon: const Icon(Icons.ios_share),
+              onPressed: () => VaultActions.export(context, widget.store, item),
+            ),
+            IconButton(
+              tooltip: t('delete'),
+              icon: const Icon(Icons.delete_outline, color: GizliTheme.danger),
+              onPressed: _delete,
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            tooltip: t('export'),
-            icon: const Icon(Icons.ios_share),
-            onPressed: () => VaultActions.export(context, widget.store, item),
-          ),
-          IconButton(
-            tooltip: t('delete'),
-            icon: const Icon(Icons.delete_outline, color: GizliTheme.danger),
-            onPressed: _delete,
-          ),
-        ],
-      ),
-      body: PageView.builder(
-        controller: _pc,
-        itemCount: _items.length,
-        onPageChanged: (i) => setState(() => _index = i),
-        itemBuilder: (context, i) =>
-            _Page(store: widget.store, item: _items[i]),
+        body: PageView.builder(
+          controller: _pc,
+          itemCount: _items.length,
+          onPageChanged: (i) => setState(() => _index = i),
+          itemBuilder: (context, i) =>
+              _Page(store: widget.store, item: _items[i]),
+        ),
       ),
     );
   }

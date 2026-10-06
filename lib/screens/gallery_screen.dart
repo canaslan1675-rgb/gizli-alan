@@ -26,6 +26,8 @@ class GalleryScreen extends StatefulWidget {
 }
 
 class _GalleryScreenState extends State<GalleryScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   late Future<List<VaultItem>> _future;
 
   VaultSession? _sessionRef;
@@ -198,14 +200,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
             ),
             ListTile(
               key: const ValueKey('photo_opt_delete'),
-              leading: const Icon(
-                Icons.delete_outline,
-                color: GizliTheme.danger,
-              ),
-              title: Text(
-                t('delete'),
-                style: const TextStyle(color: GizliTheme.danger),
-              ),
+              leading: Icon(Icons.delete_outline, color: gc.danger),
+              title: Text(t('delete'), style: TextStyle(color: gc.danger)),
               onTap: () => Navigator.pop(ctx, 'delete'),
             ),
           ],
@@ -297,6 +293,8 @@ class _Thumb extends StatefulWidget {
 }
 
 class _ThumbState extends State<_Thumb> {
+  GizliColors get gc => GizliColors.of(context);
+
   late final Future<Uint8List> _bytes = widget.store.read(widget.item);
 
   @override
@@ -307,16 +305,13 @@ class _ThumbState extends State<_Thumb> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(6),
         child: Container(
-          color: GizliTheme.bgCard,
+          color: gc.bgCard,
           child: FutureBuilder<Uint8List>(
             future: _bytes,
             builder: (context, snap) {
               if (!snap.hasData) {
-                return const Center(
-                  child: Icon(
-                    Icons.lock_outline,
-                    color: GizliTheme.textSecondary,
-                  ),
+                return Center(
+                  child: Icon(Icons.lock_outline, color: gc.textSecondary),
                 );
               }
               return Image.memory(
@@ -341,22 +336,23 @@ class _Empty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gc = GizliColors.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.photo_library_outlined,
               size: 56,
-              color: GizliTheme.textSecondary,
+              color: gc.textSecondary,
             ),
             const SizedBox(height: 12),
             Text(
               text,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: GizliTheme.textSecondary),
+              style: TextStyle(color: gc.textSecondary),
             ),
           ],
         ),

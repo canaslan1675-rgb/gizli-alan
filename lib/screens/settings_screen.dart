@@ -5,6 +5,7 @@ import '../app.dart';
 import '../app_version.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
+import '../services/app_actions.dart';
 import '../services/browser_logic.dart';
 import '../services/privacy_link.dart';
 import '../util/text_case.dart';
@@ -15,6 +16,7 @@ import '../services/vault_space.dart';
 import '../theme.dart';
 import '../widgets/work_apps_hide_switches.dart';
 import '../widgets/pro_gate.dart';
+import 'help_screen.dart';
 import 'set_pin_screen.dart';
 
 /// Vault settings. In the decoy vault only neutral options are shown
@@ -95,6 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<bool> _confirm(String title, String body) async {
     final t = L10n.current;
+    final c = GizliColors.of(context);
     final r = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -107,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: GizliTheme.danger),
+            style: TextButton.styleFrom(foregroundColor: c.danger),
             child: Text(t('ok')),
           ),
         ],
@@ -118,6 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _privacyInfo() {
     final t = L10n.current;
+    final c = GizliColors.of(context);
     final url = PrivacyLink.url;
     final messenger = ScaffoldMessenger.of(context);
     Future<void> copy(String msgKey) async {
@@ -145,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SelectableText(
                   url,
                   key: const ValueKey('privacy_url'),
-                  style: const TextStyle(color: GizliTheme.mint),
+                  style: TextStyle(color: c.accent),
                 ),
               ],
             ],
@@ -173,6 +177,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  /// Copies [text] and tells the user why (no app could take the intent).
+  Future<void> _copyFallback(String text, String msgKey) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final t = L10n.current;
+    await Clipboard.setData(ClipboardData(text: text));
+    messenger.showSnackBar(SnackBar(content: Text(t(msgKey))));
+  }
+
+  /// Share app: neutral text + Play link only — nothing about the vault.
+  Future<void> _shareApp() async {
+    final t = L10n.current;
+    final text = AppActions.shareText(t('shareAppText'));
+    if (await AppActions.share(text, title: t('shareApp'))) return;
+    await _copyFallback(AppActions.storeUrl, 'shareAppFailed');
+  }
+
+  Future<void> _rateApp() async {
+    if (await AppActions.openStore()) return;
+    await _copyFallback(AppActions.storeUrl, 'rateAppFailed');
+  }
+
+  /// Feedback e-mail to the support address; subject carries the version.
+  Future<void> _sendFeedback() async {
+    final t = L10n.current;
+    final info = await AppInfo.load();
+    final subject = AppActions.feedbackSubject(
+      t('feedbackSubject'),
+      info.version,
+      info.build,
+    );
+    if (await AppActions.sendFeedback(subject)) return;
+    await _copyFallback(AppActions.feedbackEmail, 'feedbackFailed');
+  }
+
   String _timeoutLabel(int s, L10n t) {
     if (s == 0) return t('lockImmediately');
     if (s < 60) return t('lockAfterSec').replaceAll('{n}', '$s');
@@ -187,6 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final t = L10n.of(context);
     final app = GizliAlanApp.of(context);
     final s = app.settings;
+    final c = GizliColors.of(context);
     const icon = Icon(Icons.info_outline);
     if (ProEntitlement.isActive(s)) {
       return SwitchListTile(
@@ -217,18 +256,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             key: const ValueKey('settings_hide_calc_info_pro_badge'),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: GizliTheme.warning.withValues(alpha: 0.15),
+              color: c.warning.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: GizliTheme.warning.withValues(alpha: 0.6),
-              ),
+              border: Border.all(color: c.warning.withValues(alpha: 0.6)),
             ),
-            child: const Text(
+            child: Text(
               'PRO',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: GizliTheme.warning,
+                color: c.warning,
               ),
             ),
           ),
@@ -269,8 +306,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     padding: const EdgeInsets.fromLTRB(16, 20, 16, 6),
     child: Text(
       upperFor(text, L10n.lang),
-      style: const TextStyle(
-        color: GizliTheme.mint,
+      style: TextStyle(
+        color: GizliColors.of(context).accent,
         fontSize: 12,
         letterSpacing: 1.1,
         fontWeight: FontWeight.w600,
@@ -283,6 +320,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final t = L10n.of(context);
     final app = GizliAlanApp.of(context);
     final s = app.settings;
+    final c = GizliColors.of(context);
 
     final browser = <Widget>[
       _header(t('browser')),
@@ -307,7 +345,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           e == s.browserSearchEngine
                               ? Icons.radio_button_checked
                               : Icons.radio_button_unchecked,
-                          color: GizliTheme.mint,
+                          color: c.accent,
                           size: 20,
                         ),
                         const SizedBox(width: 12),
@@ -387,6 +425,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       ListTile(
+        key: const ValueKey('settings_theme'),
+        leading: const Icon(Icons.brightness_6_outlined),
+        title: Text(t('appearance')),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: SegmentedButton<ThemeMode>(
+            segments: [
+              ButtonSegment(
+                value: ThemeMode.system,
+                label: Text(
+                  t('themeSystem'),
+                  key: const ValueKey('theme_system'),
+                ),
+              ),
+              ButtonSegment(
+                value: ThemeMode.light,
+                label: Text(
+                  t('themeLight'),
+                  key: const ValueKey('theme_light'),
+                ),
+              ),
+              ButtonSegment(
+                value: ThemeMode.dark,
+                label: Text(t('themeDark'), key: const ValueKey('theme_dark')),
+              ),
+            ],
+            selected: {s.themeMode},
+            showSelectedIcon: false,
+            onSelectionChanged: (v) async {
+              await s.setThemeMode(v.first);
+              app.refresh();
+            },
+          ),
+        ),
+      ),
+      ListTile(
         key: const ValueKey('settings_home_background'),
         leading: const Icon(Icons.image_outlined),
         title: Text(t('homeBackground')),
@@ -432,9 +506,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         fit: BoxFit.cover,
                       ),
                       border: Border.all(
-                        color: s.wallpaperImage
-                            ? GizliTheme.mint
-                            : Colors.white24,
+                        color: s.wallpaperImage ? c.accent : c.swatchBorder,
                         width: s.wallpaperImage ? 3 : 1,
                       ),
                     ),
@@ -456,7 +528,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       shape: BoxShape.circle,
                       gradient: GizliTheme.wallpaper(i),
                       border: Border.all(
-                        color: selected ? GizliTheme.mint : Colors.white24,
+                        color: selected ? c.accent : c.swatchBorder,
                         width: selected ? 3 : 1,
                       ),
                     ),
@@ -513,11 +585,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     ];
+    // Help & feedback (v0.5.1). Neutral, so also shown in the decoy vault.
+    final about = <Widget>[
+      _header(t('helpFeedback')),
+      ListTile(
+        key: const ValueKey('settings_help'),
+        leading: const Icon(Icons.menu_book_outlined),
+        title: Text(t('helpTitle')),
+        subtitle: Text(t('helpHint')),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const HelpScreen())),
+      ),
+      ListTile(
+        key: const ValueKey('settings_share'),
+        leading: const Icon(Icons.share_outlined),
+        title: Text(t('shareApp')),
+        subtitle: Text(t('shareAppHint')),
+        onTap: _shareApp,
+      ),
+      ListTile(
+        key: const ValueKey('settings_rate'),
+        leading: const Icon(Icons.star_outline),
+        title: Text(t('rateApp')),
+        subtitle: Text(t('rateAppHint')),
+        onTap: _rateApp,
+      ),
+      ListTile(
+        key: const ValueKey('settings_feedback'),
+        leading: const Icon(Icons.feedback_outlined),
+        title: Text(t('feedback')),
+        subtitle: Text(t('feedbackHint')),
+        onTap: _sendFeedback,
+      ),
+    ];
 
     if (_isDecoy) {
       return Scaffold(
         appBar: AppBar(title: Text(t('settings'))),
-        body: ListView(children: [...browser, ...general]),
+        body: ListView(children: [...browser, ...general, ...about]),
       );
     }
 
@@ -553,10 +659,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: _hasDecoy == true
                 ? IconButton(
                     tooltip: t('decoyRemove'),
-                    icon: const Icon(
-                      Icons.delete_outline,
-                      color: GizliTheme.danger,
-                    ),
+                    icon: Icon(Icons.delete_outline, color: c.danger),
                     onPressed: _removeDecoy,
                   )
                 : const Icon(Icons.chevron_right),
@@ -621,16 +724,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
           ...browser,
           ...general,
+          ...about,
           _header(t('dangerZone')),
           ListTile(
-            leading: const Icon(
-              Icons.delete_forever_outlined,
-              color: GizliTheme.danger,
-            ),
-            title: Text(
-              t('wipeVault'),
-              style: const TextStyle(color: GizliTheme.danger),
-            ),
+            leading: Icon(Icons.delete_forever_outlined, color: c.danger),
+            title: Text(t('wipeVault'), style: TextStyle(color: c.danger)),
             subtitle: Text(t('wipeHint')),
             onTap: _resetAll,
           ),
@@ -639,10 +737,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text(
               'GizliAlan $appVersion · ${Flavor.hasSecondPhone ? 'Full' : 'Play'}',
               key: const ValueKey('settings_version'),
-              style: const TextStyle(
-                color: GizliTheme.textSecondary,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: c.textSecondary, fontSize: 12),
             ),
           ),
           const SizedBox(height: 24),

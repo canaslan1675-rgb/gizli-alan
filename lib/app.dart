@@ -373,7 +373,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
     navKey.currentState?.popUntil((r) => r.isFirst);
   }
 
-  /// Rebuild after language / entry-mode changes.
+  /// Rebuild after language / entry-mode / theme changes.
   void refresh() => setState(() {});
 
   Widget _home() {
@@ -394,7 +394,9 @@ class GizliAlanAppState extends State<GizliAlanApp>
       child: MaterialApp(
         title: L10n.current('launcherName'),
         debugShowCheckedModeBanner: false,
-        theme: GizliTheme.dark(),
+        theme: GizliTheme.light(),
+        darkTheme: GizliTheme.dark(),
+        themeMode: settings.themeMode,
         // Framework strings (Back tooltip, copy/paste menu…) follow the
         // app's TR/EN toggle.
         locale: Locale(L10n.lang),

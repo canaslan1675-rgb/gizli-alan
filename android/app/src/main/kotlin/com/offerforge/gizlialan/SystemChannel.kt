@@ -24,12 +24,25 @@ import io.flutter.plugin.common.MethodChannel
  * Android System WebView) stored in the app-private WebView directory —
  * cookies, cache, DOM/local storage, IndexedDB, geolocation grants, form and
  * HTTP-auth data. Called on vault lock ("Kilitlenince temizle").
+ *
+ * Settings rows added in v0.5.1 (tester feedback), all plain system intents,
+ * no SDK and no network access of our own:
+ *  - `shareApp`: ACTION_SEND text/plain chooser. Dart passes a short neutral
+ *    message; it must contain our Play listing link (nothing about the vault).
+ *  - `openStore`: our Play listing via market:// (Play Store app), falling
+ *    back to the https listing in a browser.
+ *  - `sendFeedback`: ACTION_SENDTO mailto: our support address only; the
+ *    subject carries the app version (no body, logs, device data or files).
  */
 object SystemChannel {
     const val NAME = "gizlialan/system"
     private const val SUPPORT_SUBJECT = "GizliAlan destek"
     private const val SUPPORT_MAILTO =
         "mailto:delibaltabaris5@gmail.com?subject=GizliAlan%20destek"
+    private const val FEEDBACK_ADDRESS = "delibaltabaris5@gmail.com"
+    private const val PACKAGE = "com.offerforge.gizlialan"
+    private const val STORE_HTTPS = "https://play.google.com/store/apps/details?id=$PACKAGE"
+    private const val STORE_MARKET = "market://details?id=$PACKAGE"
 
     fun attach(activity: Activity, messenger: BinaryMessenger): MethodChannel {
         val channel = MethodChannel(messenger, NAME)
@@ -68,12 +81,66 @@ object SystemChannel {
                         result.success(false)
                     }
                 }
+                "shareApp" -> {
+                    val text = call.argument<String>("text")
+                    if (text == null || !text.contains(STORE_HTTPS) || text.length > 500) {
+                        result.success(false)
+                        return@setMethodCallHandler
+                    }
+                    result.success(
+                        start(
+                            activity,
+                            Intent.createChooser(
+                                Intent(Intent.ACTION_SEND)
+                                    .setType("text/plain")
+                                    .putExtra(Intent.EXTRA_TEXT, text),
+                                call.argument<String>("title"),
+                            ),
+                        ),
+                    )
+                }
+                "openStore" -> {
+                    val market = Intent(Intent.ACTION_VIEW, Uri.parse(STORE_MARKET))
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                    val ok = start(activity, market) ||
+                        start(
+                            activity,
+                            Intent(Intent.ACTION_VIEW, Uri.parse(STORE_HTTPS))
+                                .addCategory(Intent.CATEGORY_BROWSABLE),
+                        )
+                    result.success(ok)
+                }
+                "sendFeedback" -> {
+                    val subject = call.argument<String>("subject")
+                    if (subject == null || subject.length > 120) {
+                        result.success(false)
+                        return@setMethodCallHandler
+                    }
+                    result.success(
+                        start(
+                            activity,
+                            Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$FEEDBACK_ADDRESS"))
+                                .putExtra(Intent.EXTRA_EMAIL, arrayOf(FEEDBACK_ADDRESS))
+                                .putExtra(Intent.EXTRA_SUBJECT, subject),
+                        ),
+                    )
+                }
                 "wipeWebData" -> result.success(wipeWebData(activity))
                 "appInfo" -> result.success(appInfo(activity))
                 else -> result.notImplemented()
             }
         }
         return channel
+    }
+
+    /** startActivity; false when no app can handle [intent]. Needs no <queries>. */
+    private fun start(activity: Activity, intent: Intent): Boolean = try {
+        activity.startActivity(intent)
+        true
+    } catch (e: ActivityNotFoundException) {
+        false
+    } catch (e: SecurityException) {
+        false
     }
 
     /** versionName / versionCode of the installed APK (vault home watermark). */

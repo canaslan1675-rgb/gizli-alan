@@ -22,6 +22,8 @@ class FilesScreen extends StatefulWidget {
 }
 
 class _FilesScreenState extends State<FilesScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   VaultStorage? _storeRef;
   VaultStorage get _store => _storeRef!;
   late Future<List<VaultItem>> _future;
@@ -113,10 +115,7 @@ class _FilesScreenState extends State<FilesScreen> {
               onTap: () => Navigator.pop(ctx, 'export'),
             ),
             ListTile(
-              leading: const Icon(
-                Icons.delete_outline,
-                color: GizliTheme.danger,
-              ),
+              leading: Icon(Icons.delete_outline, color: gc.danger),
               title: Text(t('delete')),
               onTap: () => Navigator.pop(ctx, 'delete'),
             ),
@@ -187,7 +186,7 @@ class _FilesScreenState extends State<FilesScreen> {
                 child: Text(
                   t('emptyFiles'),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: GizliTheme.textSecondary),
+                  style: TextStyle(color: gc.textSecondary),
                 ),
               ),
             );
@@ -198,14 +197,11 @@ class _FilesScreenState extends State<FilesScreen> {
             itemBuilder: (context, i) {
               final item = items[i];
               return ListTile(
-                leading: Icon(_iconFor(item), color: GizliTheme.mint),
+                leading: Icon(_iconFor(item), color: gc.accent),
                 title: Text(item.name, overflow: TextOverflow.ellipsis),
                 subtitle: Text(
                   VaultActions.formatSize(item.size),
-                  style: const TextStyle(
-                    color: GizliTheme.textSecondary,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: gc.textSecondary, fontSize: 12),
                 ),
                 trailing: const Icon(Icons.more_vert),
                 onTap: () => _itemMenu(item, items),

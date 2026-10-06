@@ -28,6 +28,8 @@ class WorkAppsHideSwitches extends StatefulWidget {
 }
 
 class _WorkAppsHideSwitchesState extends State<WorkAppsHideSwitches> {
+  GizliColors get gc => GizliColors.of(context);
+
   Future<void> _openSettings() async {
     final open =
         widget.openWorkSettings ??
@@ -79,7 +81,7 @@ class _WorkAppsHideSwitchesState extends State<WorkAppsHideSwitches> {
     final t = L10n.of(context);
     final s = widget.settings;
     final hide = s.hideWorkAppsWhenLocked;
-    const hint = TextStyle(color: GizliTheme.textSecondary, fontSize: 12);
+    final hint = TextStyle(color: gc.textSecondary, fontSize: 12);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

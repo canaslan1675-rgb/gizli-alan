@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
@@ -29,6 +30,7 @@ class SettingsService {
   static const _kBrowserWipe = 'browser_wipe_on_lock';
   static const _kSecondPhoneClose = 'second_phone_close';
   static const _kSecondPhoneClosedBy = 'second_phone_closed_by';
+  static const _kThemeMode = 'theme_mode';
 
   static const lockTimeoutChoices = [0, 15, 60, 300];
 
@@ -164,6 +166,20 @@ class SettingsService {
 
   Future<void> setBrowserWipeOnLock(bool v) => _prefs.setBool(_kBrowserWipe, v);
 
+  /// Appearance (v0.5.1): System / Light / Dark for the calculator and the
+  /// vault screens. Readable before unlock (the calculator uses it), so it
+  /// lives here. Default dark = the look of every earlier version.
+  ThemeMode get themeMode => parseThemeMode(_prefs.getString(_kThemeMode));
+
+  Future<void> setThemeMode(ThemeMode m) =>
+      _prefs.setString(_kThemeMode, m.name);
+
+  static ThemeMode parseThemeMode(String? v) => switch (v) {
+    'system' => ThemeMode.system,
+    'light' => ThemeMode.light,
+    _ => ThemeMode.dark,
+  };
+
   String get language => _prefs.getString(_kLang) ?? 'tr';
 
   Future<void> setLanguage(String code) async {
@@ -173,11 +189,13 @@ class SettingsService {
 
   Future<void> resetAll() async {
     final lang = language;
+    final theme = _prefs.getString(_kThemeMode);
     // Keep "the work apps are currently hidden by us" across a vault reset,
     // so the next real unlock still unhides them (#30).
     final closedBy = _prefs.getString(_kSecondPhoneClosedBy);
     await _prefs.clear();
     await setLanguage(lang);
+    if (theme != null) await _prefs.setString(_kThemeMode, theme);
     if (closedBy != null) {
       await _prefs.setString(_kSecondPhoneClosedBy, closedBy);
     }

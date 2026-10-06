@@ -18,6 +18,8 @@ class SetPinScreen extends StatefulWidget {
 }
 
 class _SetPinScreenState extends State<SetPinScreen> {
+  GizliColors get gc => GizliColors.of(context);
+
   final _current = TextEditingController();
   final _pin = TextEditingController();
   final _confirm = TextEditingController();
@@ -90,10 +92,7 @@ class _SetPinScreenState extends State<SetPinScreen> {
           if (!isChange) ...[
             Text(
               t('decoyPinExplain'),
-              style: const TextStyle(
-                color: GizliTheme.textSecondary,
-                height: 1.45,
-              ),
+              style: TextStyle(color: gc.textSecondary, height: 1.45),
             ),
             const SizedBox(height: 16),
           ],
@@ -124,7 +123,7 @@ class _SetPinScreenState extends State<SetPinScreen> {
           ),
           if (_error != null) ...[
             const SizedBox(height: 4),
-            Text(_error!, style: const TextStyle(color: GizliTheme.danger)),
+            Text(_error!, style: TextStyle(color: gc.danger)),
           ],
           const SizedBox(height: 20),
           ElevatedButton(

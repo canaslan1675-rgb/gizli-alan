@@ -45,6 +45,7 @@ class VaultActions {
 
   static Future<bool> confirmDelete(BuildContext context) async {
     final t = L10n.current;
+    final gc = GizliColors.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -57,7 +58,7 @@ class VaultActions {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: GizliTheme.danger),
+            style: TextButton.styleFrom(foregroundColor: gc.danger),
             child: Text(t('delete')),
           ),
         ],
