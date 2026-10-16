@@ -394,8 +394,8 @@ class GizliAlanAppState extends State<GizliAlanApp>
       child: MaterialApp(
         title: L10n.current('launcherName'),
         debugShowCheckedModeBanner: false,
-        theme: GizliTheme.light(),
-        darkTheme: GizliTheme.dark(),
+        theme: GizliTheme.light(settings.accent),
+        darkTheme: GizliTheme.dark(settings.accent),
         themeMode: settings.themeMode,
         // Framework strings (Back tooltip, copy/paste menu…) follow the
         // app's TR/EN toggle.

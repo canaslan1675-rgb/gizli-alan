@@ -391,6 +391,13 @@ const Map<String, String> tr = {
   'linkCopied': 'Bağlantı kopyalandı',
   'noBrowser': 'Tarayıcı bulunamadı. Bunun yerine bağlantı kopyalandı.',
   // v0.5.1: appearance, help, share / rate / feedback (tester feedback)
+  // v0.5.2: accent colour (tester feedback)
+  'accentColor': 'Vurgu rengi',
+  'accent_mint': 'Nane',
+  'accent_blue': 'Mavi',
+  'accent_purple': 'Mor',
+  'accent_orange': 'Turuncu',
+  'accent_pink': 'Pembe',
   'appearance': 'Görünüm',
   'themeSystem': 'Sistem',
   'themeLight': 'Açık',

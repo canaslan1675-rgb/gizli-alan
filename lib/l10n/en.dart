@@ -392,6 +392,13 @@ const Map<String, String> en = {
   'linkCopied': 'Link copied',
   'noBrowser': 'No browser found. The link was copied instead.',
   // v0.5.1: appearance, help, share / rate / feedback (tester feedback)
+  // v0.5.2: accent colour (tester feedback)
+  'accentColor': 'Accent color',
+  'accent_mint': 'Mint',
+  'accent_blue': 'Blue',
+  'accent_purple': 'Purple',
+  'accent_orange': 'Orange',
+  'accent_pink': 'Pink',
   'appearance': 'Appearance',
   'themeSystem': 'System',
   'themeLight': 'Light',

@@ -167,6 +167,8 @@ void main() {
           150,
           scrollable: find.byType(Scrollable).last,
         );
+        await tester.ensureVisible(find.byKey(const ValueKey('settings_pro')));
+        await settle(tester);
         await tester.tap(find.byKey(const ValueKey('settings_pro')));
         await settle(tester);
         expect(find.byType(PaywallScreen), findsOneWidget);

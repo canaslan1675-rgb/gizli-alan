@@ -52,11 +52,13 @@ class GizliTheme {
   );
 
   /// Theme for the dark palette (default look since v0.1).
-  static ThemeData dark() => build(GizliColors.dark);
+  static ThemeData dark([AccentPreset a = AccentPreset.mint]) =>
+      build(GizliColors.dark.withAccent(a));
 
   /// Light palette (v0.5.1, tester request): same layout, darker accent so
   /// text and icons keep >= 4.5:1 contrast on light surfaces.
-  static ThemeData light() => build(GizliColors.light);
+  static ThemeData light([AccentPreset a = AccentPreset.mint]) =>
+      build(GizliColors.light.withAccent(a));
 
   static ThemeData build(GizliColors c) {
     final isDark = c.brightness == Brightness.dark;
@@ -151,6 +153,67 @@ class GizliTheme {
   }
 }
 
+/// Accent colour presets (v0.5.2, tester feedback: "customize interface
+/// colors"). Each has a pastel tone for the dark palette (dark text on it)
+/// and a deep tone for the light palette (white text on it, >= 4.5:1 on the
+/// light background). Mint is the default = the look of earlier versions.
+enum AccentPreset {
+  mint(
+    Color(0xFF7CFFB2),
+    Color(0xFF3D9A6C),
+    Color(0xFF0A7A4A),
+    Color(0xFF3D9A6C),
+    Color(0xFFD6EFE1),
+  ),
+  blue(
+    Color(0xFF7CC4FF),
+    Color(0xFF3D7A9A),
+    Color(0xFF1565C0),
+    Color(0xFF4A7FB5),
+    Color(0xFFD7E6F7),
+  ),
+  purple(
+    Color(0xFFC3A6FF),
+    Color(0xFF7A5FB0),
+    Color(0xFF6A3FB5),
+    Color(0xFF8A6BC4),
+    Color(0xFFE5DCF5),
+  ),
+  orange(
+    Color(0xFFFFB86C),
+    Color(0xFFB07A3D),
+    Color(0xFFA85400),
+    Color(0xFFC2803D),
+    Color(0xFFF5E2CF),
+  ),
+  pink(
+    Color(0xFFFF8FC7),
+    Color(0xFFB0567F),
+    Color(0xFFB0306E),
+    Color(0xFFC4588A),
+    Color(0xFFF5D9E6),
+  );
+
+  const AccentPreset(
+    this.darkAccent,
+    this.darkDim,
+    this.lightAccent,
+    this.lightDim,
+    this.lightOpKey,
+  );
+
+  final Color darkAccent;
+  final Color darkDim;
+  final Color lightAccent;
+  final Color lightDim;
+
+  /// Tinted operator-key fill of the light calculator.
+  final Color lightOpKey;
+
+  static AccentPreset parse(String? v) =>
+      values.firstWhere((p) => p.name == v, orElse: () => mint);
+}
+
 /// Theme-dependent colours. Screens on normal app surfaces read these via
 /// `GizliColors.of(context)` so they follow the System / Light / Dark
 /// setting. The vault home (always drawn on a dark wallpaper/photo with a
@@ -236,6 +299,30 @@ class GizliColors extends ThemeExtension<GizliColors> {
   /// Colours of the current theme (dark palette if none is installed).
   static GizliColors of(BuildContext context) =>
       Theme.of(context).extension<GizliColors>() ?? dark;
+
+  /// This palette with the accent of [p] (only accent-derived colours
+  /// change; backgrounds and text stay as they are).
+  GizliColors withAccent(AccentPreset p) {
+    // Default keeps the exact v0.5.1 palette object.
+    if (p == AccentPreset.mint) return this;
+    final isDark = brightness == Brightness.dark;
+    return GizliColors(
+      brightness: brightness,
+      bg: bg,
+      bgElevated: bgElevated,
+      bgCard: bgCard,
+      accent: isDark ? p.darkAccent : p.lightAccent,
+      accentDim: isDark ? p.darkDim : p.lightDim,
+      onAccent: onAccent,
+      textPrimary: textPrimary,
+      textSecondary: textSecondary,
+      danger: danger,
+      warning: warning,
+      calcKey: calcKey,
+      calcOpKey: isDark ? calcOpKey : p.lightOpKey,
+      swatchBorder: swatchBorder,
+    );
+  }
 
   @override
   GizliColors copyWith() => this;

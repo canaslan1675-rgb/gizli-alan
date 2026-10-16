@@ -461,6 +461,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       ListTile(
+        key: const ValueKey('settings_accent'),
+        leading: const Icon(Icons.palette_outlined),
+        title: Text(t('accentColor')),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              for (final p in AccentPreset.values)
+                _AccentSwatch(
+                  key: ValueKey('accent_${p.name}'),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? p.darkAccent
+                      : p.lightAccent,
+                  label: t('accent_${p.name}'),
+                  selected: s.accent == p,
+                  onTap: () async {
+                    await s.setAccent(p);
+                    app.refresh();
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+      ListTile(
         key: const ValueKey('settings_home_background'),
         leading: const Icon(Icons.image_outlined),
         title: Text(t('homeBackground')),
@@ -742,6 +769,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 24),
         ],
+      ),
+    );
+  }
+}
+
+/// Round accent-colour choice in Settings → Appearance (v0.5.2).
+class _AccentSwatch extends StatelessWidget {
+  const _AccentSwatch({
+    super.key,
+    required this.color,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final Color color;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final gc = GizliColors.of(context);
+    return Semantics(
+      label: label,
+      selected: selected,
+      button: true,
+      child: Tooltip(
+        message: label,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: selected ? gc.textPrimary : gc.swatchBorder,
+                width: selected ? 3 : 1,
+              ),
+            ),
+            child: selected
+                ? Icon(Icons.check, size: 20, color: gc.onAccent)
+                : null,
+          ),
+        ),
       ),
     );
   }
