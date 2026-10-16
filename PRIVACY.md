@@ -56,6 +56,7 @@ stores** fingerprint/face data; Android only tells it "success" or "failure".
 | `INTERNET` | Only for the in-vault private browser, to load pages **you** open (since 0.4.0) |
 | `com.android.vending.BILLING` | Optional GizliAlan Pro subscription via Google Play Billing (since 0.4.9 / Play build 0.5.0) |
 | `ACCESS_NETWORK_STATE` | Brought in by the Play Billing library so the app can tell online vs offline for purchase restore; no other network use |
+| `<package>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | Internal signature-level permission added automatically by AndroidX; only GizliAlan itself can use it; collects nothing |
 
 Photos and files are imported only when **you** pick them in the system Photo
 Picker / file picker (no storage or media permission). Export uses the system
