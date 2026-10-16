@@ -16,7 +16,7 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid #2ecc8f;backgroun
 </head>
 <body>
 <h1>Privacy Policy — GizliAlan</h1>
-<p><strong>Last updated:</strong> 2026-10-14 (v0.5.2)
+<p><strong>Last updated:</strong> 2026-10-17 (v0.5.3)
 <strong>Data controller:</strong> Demirhan Çelik (OfferForge), Türkiye — delibaltabaris5@gmail.com
 <strong>App:</strong> GizliAlan (package <code>com.offerforge.gizlialan</code>)
 <strong>Audience:</strong> The owner of the device, for their own content only.</p>
@@ -124,6 +124,10 @@ stores</strong> fingerprint/face data; Android only tells it "success" or "failu
 <td><code>ACCESS_NETWORK_STATE</code></td>
 <td>Brought in by the Play Billing library so the app can tell online vs offline for purchase restore; no other network use</td>
 </tr>
+<tr>
+<td><code>&lt;package&gt;.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</code></td>
+<td>Internal signature-level permission added automatically by AndroidX; only GizliAlan itself can use it; collects nothing</td>
+</tr>
 </tbody>
 </table>
 <p>Photos and files are imported only when <strong>you</strong> pick them in the system Photo
@@ -189,12 +193,16 @@ active (and caches that entitlement locally for offline use). You manage or
 cancel the subscription in Google Play's subscription settings. Free use stays
 available (item limits apply; existing vault items are never locked out).</p>
 <h2>Share, rate and feedback (since 0.5.1)</h2>
-<p>In Settings you can <strong>Share the app</strong> (system share sheet with a fixed neutral
-text and Play link), <strong>Rate the app</strong> (opens the Play Store listing via
-<code>market://</code> with an https fallback), or <strong>Send feedback</strong> (opens your mail app
-to the support address with a subject that includes the app version). These
+<p>In Settings you can <strong>Share the app</strong> (you may edit a short neutral intro; the
+system share sheet then receives only that text plus the Play link),
+<strong>Rate the app</strong> (opens the Play Store listing via <code>market://</code> with an https
+fallback), or <strong>Send feedback</strong> (you pick Bug / Suggestion / Other; your mail
+app opens addressed to the support address, with the category and app version
+in the subject and an optional body that only contains what <strong>you</strong> type).
+No device identifiers, logs or vault data are attached automatically. These
 actions use ordinary Android intents; GizliAlan adds no analytics SDK and does
-not learn who you shared with.</p>
+not learn who you shared with. If you send an e-mail, its content is received
+by the developer through your mail provider (see Contact).</p>
 <h2>Second phone (optional Android work profile)</h2>
 <blockquote>
 <p>Since v0.5.0 the Google Play upload is the <strong>full</strong> build: Second phone
@@ -241,7 +249,7 @@ listed as "Calculator") and is not a replacement for Android Private Space.</p>
 <p>GizliAlan is intended for adults (18+) and is not directed at children.</p>
 <h2>Changes</h2>
 <p>This policy was updated for Play Billing / Pro, the billing-related permissions,
-Share / Rate / Feedback, theme and accent preferences, and Second phone in the
+Share / Rate / Feedback (category and editable text), in-app Help, theme and accent preferences, and Second phone in the
 Play full build. If further features that touch data (e.g. optional backup) are
 added, this policy and the Play Data safety form will be updated <strong>before</strong>
 release.</p>
@@ -251,7 +259,7 @@ Support e-mail: <strong>delibaltabaris5@gmail.com</strong>
 This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
 <hr />
 <h2>TR — Gizlilik Politikası ve KVKK Aydınlatma Metni</h2>
-<p><strong>Son güncelleme:</strong> 2026-10-14 (v0.5.2)</p>
+<p><strong>Son güncelleme:</strong> 2026-10-17 (v0.5.3)</p>
 <h3>1. Veri sorumlusu (KVKK md.10/a)</h3>
 <p>Demirhan Çelik (OfferForge), Türkiye. İletişim ve başvuru:
 <strong>delibaltabaris5@gmail.com</strong></p>
@@ -356,10 +364,12 @@ yetkiyi yerelde önbellekler). Aboneliği Google Play abonelik ayarlarından
 yönetir veya iptal edersin. Ücretsiz kullanım devam eder (öğe limiti vardır;
 mevcut kasa öğeleri kilitlenmez).</p>
 <h3>6c. Paylaş, değerlendir ve geri bildirim (0.5.1'den)</h3>
-<p>Ayarlar'dan <strong>Uygulamayı paylaş</strong> (sistem paylaşım sayfası, sabit nötr metin +
-Play bağlantısı), <strong>Uygulamayı değerlendir</strong> (<code>market://</code> ile Play listesi,
-https yedek) veya <strong>Geri bildirim gönder</strong> (destek adresine, sürüm içeren
-konulu mailto) kullanabilirsin. Bunlar sıradan Android intent'leridir;
+<p>Ayarlar'dan <strong>Uygulamayı paylaş</strong> (sistem paylaşım sayfası; kısa nötr girişi düzenleyebilirsin,
+yalnızca o metin + Play bağlantısı paylaşılır), <strong>Uygulamayı değerlendir</strong> (<code>market://</code> ile Play listesi,
+https yedek) veya <strong>Geri bildirim gönder</strong> (Hata / Öneri / Diğer seçersin; e-posta
+uygulaman destek adresine, konuda kategori ve sürüm, gövdede yalnızca senin
+yazdığın isteğe bağlı metinle açılır; cihaz kimliği, günlük veya kasa verisi
+otomatik eklenmez) kullanabilirsin. Bunlar sıradan Android intent'leridir;
 analitik SDK yoktur, kiminle paylaştığın uygulamaya gelmez.</p>
 <h3>7. İkinci telefon (iş profili)</h3>
 <blockquote>
@@ -408,7 +418,7 @@ kapalıdır.</p>
 <p>GizliAlan yetişkinler (18+) içindir; çocuklara yönelik değildir.</p>
 <h3>12. Değişiklikler</h3>
 <p>Bu metin Play Faturalandırma / Pro, faturalama izinleri, Paylaş / Değerlendir /
-Geri bildirim, tema ve vurgu rengi tercihleri ile Play full derlemesindeki
+Geri bildirim (kategori, düzenlenebilir metin), Yardım, tema ve vurgu rengi tercihleri ile Play full derlemesindeki
 İkinci telefon için güncellendi. Veriye dokunan başka özellikler (ör. yedekleme)
 eklenirse bu metin ve Play Veri güvenliği formu yayından <strong>önce</strong> güncellenir.</p>
 <p><em>This document is provided for transparency and Play policy readiness. It is not legal advice.</em></p>

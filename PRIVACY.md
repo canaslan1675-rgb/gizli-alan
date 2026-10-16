@@ -1,6 +1,6 @@
 # Privacy Policy — GizliAlan
 
-**Last updated:** 2026-10-14 (v0.5.2)
+**Last updated:** 2026-10-17 (v0.5.3)
 **Data controller:** Demirhan Çelik (OfferForge), Türkiye — delibaltabaris5@gmail.com
 **App:** GizliAlan (package `com.offerforge.gizlialan`)
 **Audience:** The owner of the device, for their own content only.
@@ -56,6 +56,7 @@ stores** fingerprint/face data; Android only tells it "success" or "failure".
 | `INTERNET` | Only for the in-vault private browser, to load pages **you** open (since 0.4.0) |
 | `com.android.vending.BILLING` | Optional GizliAlan Pro subscription via Google Play Billing (since 0.4.9 / Play build 0.5.0) |
 | `ACCESS_NETWORK_STATE` | Brought in by the Play Billing library so the app can tell online vs offline for purchase restore; no other network use |
+| `<package>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | Internal signature-level permission added automatically by AndroidX; only GizliAlan itself can use it; collects nothing |
 
 Photos and files are imported only when **you** pick them in the system Photo
 Picker / file picker (no storage or media permission). Export uses the system
@@ -127,12 +128,16 @@ available (item limits apply; existing vault items are never locked out).
 
 ## Share, rate and feedback (since 0.5.1)
 
-In Settings you can **Share the app** (system share sheet with a fixed neutral
-text and Play link), **Rate the app** (opens the Play Store listing via
-`market://` with an https fallback), or **Send feedback** (opens your mail app
-to the support address with a subject that includes the app version). These
+In Settings you can **Share the app** (you may edit a short neutral intro; the
+system share sheet then receives only that text plus the Play link),
+**Rate the app** (opens the Play Store listing via `market://` with an https
+fallback), or **Send feedback** (you pick Bug / Suggestion / Other; your mail
+app opens addressed to the support address, with the category and app version
+in the subject and an optional body that only contains what **you** type).
+No device identifiers, logs or vault data are attached automatically. These
 actions use ordinary Android intents; GizliAlan adds no analytics SDK and does
-not learn who you shared with.
+not learn who you shared with. If you send an e-mail, its content is received
+by the developer through your mail provider (see Contact).
 
 ## Second phone (optional Android work profile)
 
@@ -184,7 +189,7 @@ GizliAlan is intended for adults (18+) and is not directed at children.
 ## Changes
 
 This policy was updated for Play Billing / Pro, the billing-related permissions,
-Share / Rate / Feedback, theme and accent preferences, and Second phone in the
+Share / Rate / Feedback (category and editable text), in-app Help, theme and accent preferences, and Second phone in the
 Play full build. If further features that touch data (e.g. optional backup) are
 added, this policy and the Play Data safety form will be updated **before**
 release.
@@ -199,7 +204,7 @@ This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/
 
 ## TR — Gizlilik Politikası ve KVKK Aydınlatma Metni
 
-**Son güncelleme:** 2026-10-14 (v0.5.2)
+**Son güncelleme:** 2026-10-17 (v0.5.3)
 
 ### 1. Veri sorumlusu (KVKK md.10/a)
 
@@ -287,10 +292,12 @@ mevcut kasa öğeleri kilitlenmez).
 
 ### 6c. Paylaş, değerlendir ve geri bildirim (0.5.1'den)
 
-Ayarlar'dan **Uygulamayı paylaş** (sistem paylaşım sayfası, sabit nötr metin +
-Play bağlantısı), **Uygulamayı değerlendir** (`market://` ile Play listesi,
-https yedek) veya **Geri bildirim gönder** (destek adresine, sürüm içeren
-konulu mailto) kullanabilirsin. Bunlar sıradan Android intent'leridir;
+Ayarlar'dan **Uygulamayı paylaş** (sistem paylaşım sayfası; kısa nötr girişi düzenleyebilirsin,
+yalnızca o metin + Play bağlantısı paylaşılır), **Uygulamayı değerlendir** (`market://` ile Play listesi,
+https yedek) veya **Geri bildirim gönder** (Hata / Öneri / Diğer seçersin; e-posta
+uygulaman destek adresine, konuda kategori ve sürüm, gövdede yalnızca senin
+yazdığın isteğe bağlı metinle açılır; cihaz kimliği, günlük veya kasa verisi
+otomatik eklenmez) kullanabilirsin. Bunlar sıradan Android intent'leridir;
 analitik SDK yoktur, kiminle paylaştığın uygulamaya gelmez.
 
 ### 7. İkinci telefon (iş profili)
@@ -351,7 +358,7 @@ GizliAlan yetişkinler (18+) içindir; çocuklara yönelik değildir.
 ### 12. Değişiklikler
 
 Bu metin Play Faturalandırma / Pro, faturalama izinleri, Paylaş / Değerlendir /
-Geri bildirim, tema ve vurgu rengi tercihleri ile Play full derlemesindeki
+Geri bildirim (kategori, düzenlenebilir metin), Yardım, tema ve vurgu rengi tercihleri ile Play full derlemesindeki
 İkinci telefon için güncellendi. Veriye dokunan başka özellikler (ör. yedekleme)
 eklenirse bu metin ve Play Veri güvenliği formu yayından **önce** güncellenir.
 
