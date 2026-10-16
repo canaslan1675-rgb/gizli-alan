@@ -261,7 +261,7 @@ const Map<String, String> tr = {
       'Nasıl çalışır: GizliAlan yalnızca kendi oluşturduğu bu iş profilinin "profil sahibi" olur. Ana profilin veya cihazın yöneticisi olmaz; hiçbir şeyi izlemez, başka uygulamaların verisini okumaz, hiçbir yere bir şey göndermez. Android kurulumda kendi bilgilendirmesini gösterir. Profildeki uygulamalar çanta rozetiyle, telefonun uygulama listesindeki "İş" sekmesinde de görünür. Kurulum ve yönetim yalnızca kasa açıkken yapılabilir.',
   'spSetUp': 'İkinci telefonu kur',
   'spSetUpConfirm':
-      'Android şimdi iş profili kurulumunu başlatacak. Birkaç dakika sürebilir ve sistem ekranları gösterilir. Devam edilsin mi?',
+      'Devam etmeden önce: Android bu telefonda ayrı bir iş profili oluşturacak (Android\'in cihaz yönetimi API\'si kullanılır; Android bunu iş profili olarak gösterir). GizliAlan yalnızca bu yeni profilin profil sahibi olur; ana profilin veya cihazın yöneticisi değildir ve şifre, kilit, silme gibi hiçbir yönetici politikası istemez. İş profilinin içinde GizliAlan\'ın kendi simgesi görünmez. "Kilitliyken iş uygulamalarını gizle" açıksa (varsayılan) kasa kilitliyken iş profilindeki uygulamalar ana ekranından gizlenir; hiçbir şey kaldırılmaz ve bunu bu ekrandan kapatabilirsin. Her şeyi "İkinci telefonu kaldır" ile veya Android Ayarlar > Hesaplar > İş profili yolundan kaldırabilirsin. Android şimdi kendi bilgilendirmelerini gösterecek. Devam edilsin mi?',
   'spCreated':
       'İkinci telefon hazır. Play Store\'u açıp ikinci Google hesabını ekleyebilirsin.',
   'spCreatedPending':

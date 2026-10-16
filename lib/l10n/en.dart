@@ -262,7 +262,7 @@ const Map<String, String> en = {
       'How it works: GizliAlan becomes the "profile owner" only of this work profile it creates. It is not an admin of your main profile or of the device; it monitors nothing, reads no other app\'s data and sends nothing anywhere. Android shows its own notice during setup. Profile apps carry a briefcase badge and also appear in the "Work" tab of your app list. Setup and management are only possible while the vault is unlocked.',
   'spSetUp': 'Set up second phone',
   'spSetUpConfirm':
-      'Android will now start work profile setup. It can take a few minutes and shows system screens. Continue?',
+      'Before you continue: Android will create a separate work profile on this phone (this uses Android\'s device-management API, shown by Android as a work profile). GizliAlan becomes the profile owner of that new profile only; it is not an admin of your main profile or device and requests no admin policies such as password, lock or wipe. Inside the work profile GizliAlan\'s own icon is not shown. If "Hide work apps while locked" is on (default), apps in the work profile are hidden from your launcher whenever the vault is locked; nothing is uninstalled and you can switch this off on this screen. You can remove everything with "Remove second phone" or in Android Settings > Accounts > Work profile. Android shows its own notices next. Continue?',
   'spCreated':
       'Second phone is ready. Open Play Store to add your second Google account.',
   'spCreatedPending':
