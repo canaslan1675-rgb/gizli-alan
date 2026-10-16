@@ -16,7 +16,7 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid #2ecc8f;backgroun
 </head>
 <body>
 <h1>Privacy Policy — GizliAlan</h1>
-<p><strong>Last updated:</strong> 2026-09-27 (v0.4.6)
+<p><strong>Last updated:</strong> 2026-10-14 (v0.5.2)
 <strong>Data controller:</strong> Demirhan Çelik (OfferForge), Türkiye — delibaltabaris5@gmail.com
 <strong>App:</strong> GizliAlan (package <code>com.offerforge.gizlialan</code>)
 <strong>Audience:</strong> The owner of the device, for their own content only.</p>
@@ -30,7 +30,8 @@ no analytics, no telemetry, no advertising and no crash-reporting SDK. The app
 never sends your vault content or any usage data anywhere. Since version 0.4.0
 the app requests the Internet permission <strong>only</strong> for the optional in-vault
 private browser: the only network traffic is to web pages that <strong>you</strong> open
-there (see "Private browser" below).</p>
+there (see "Private browser" below). Optional Pro is billed only by Google
+Play; vault content still never leaves the device (see "Purchases" below).</p>
 <h2>What the app stores (on your device only)</h2>
 <table>
 <thead>
@@ -73,7 +74,7 @@ there (see "Private browser" below).</p>
 <td>Brute-force throttling; count of wrong PIN attempts since your last unlock (shown in the real vault's notification list)</td>
 </tr>
 <tr>
-<td>Preferences (language, auto-lock, calculator entry, biometrics on/off, wallpaper)</td>
+<td>Preferences (language, theme, accent color, auto-lock, calculator entry, biometrics on/off, wallpaper)</td>
 <td>SharedPreferences (app-private)</td>
 <td>Not secret</td>
 <td>App settings</td>
@@ -114,6 +115,14 @@ stores</strong> fingerprint/face data; Android only tells it "success" or "failu
 <tr>
 <td><code>INTERNET</code></td>
 <td>Only for the in-vault private browser, to load pages <strong>you</strong> open (since 0.4.0)</td>
+</tr>
+<tr>
+<td><code>com.android.vending.BILLING</code></td>
+<td>Optional GizliAlan Pro subscription via Google Play Billing (since 0.4.9 / Play build 0.5.0)</td>
+</tr>
+<tr>
+<td><code>ACCESS_NETWORK_STATE</code></td>
+<td>Brought in by the Play Billing library so the app can tell online vs offline for purchase restore; no other network use</td>
 </tr>
 </tbody>
 </table>
@@ -170,11 +179,28 @@ For gallery media Android shows its <strong>own system confirmation dialog</stro
 nothing is deleted unless you confirm; files picked in the system file picker
 are deleted using the access you granted in that picker. No storage permission
 is used. If anything fails, the original is kept.</p>
+<h2>Purchases / GizliAlan Pro (since 0.4.9; Play since 0.5.0)</h2>
+<p>Optional <strong>GizliAlan Pro</strong> is sold only through <strong>Google Play Billing</strong>
+(subscription product <code>gizlialan_pro</code>, base plans monthly / yearly). Payments
+and invoices are handled by Google Play. GizliAlan <strong>does not</strong> collect card
+numbers, billing addresses or other payment details, and has <strong>no server</strong> that
+receives purchase data. The app only asks Play on the device whether Pro is
+active (and caches that entitlement locally for offline use). You manage or
+cancel the subscription in Google Play's subscription settings. Free use stays
+available (item limits apply; existing vault items are never locked out).</p>
+<h2>Share, rate and feedback (since 0.5.1)</h2>
+<p>In Settings you can <strong>Share the app</strong> (system share sheet with a fixed neutral
+text and Play link), <strong>Rate the app</strong> (opens the Play Store listing via
+<code>market://</code> with an https fallback), or <strong>Send feedback</strong> (opens your mail app
+to the support address with a subject that includes the app version). These
+actions use ordinary Android intents; GizliAlan adds no analytics SDK and does
+not learn who you shared with.</p>
 <h2>Second phone (optional Android work profile)</h2>
 <blockquote>
-<p>Applies <strong>only to the sideloaded "full" APK</strong> distributed outside Google
-Play. The Google Play version has no Second phone, no work-profile code and
-no device-admin component.</p>
+<p>Since v0.5.0 the Google Play upload is the <strong>full</strong> build: Second phone
+(work-profile profile-owner) is included. Setup is optional and Pro-gated.
+A lite <code>play</code> flavor without Second phone remains buildable as a fallback
+but is not the current Play upload.</p>
 </blockquote>
 <ul>
 <li>If you choose <strong>Second phone → Set up</strong>, Android creates a <em>work profile</em> on
@@ -214,15 +240,18 @@ listed as "Calculator") and is not a replacement for Android Private Space.</p>
 <h2>Age</h2>
 <p>GizliAlan is intended for adults (18+) and is not directed at children.</p>
 <h2>Changes</h2>
-<p>If features that touch data (e.g. optional backup, purchases) are added, this
-policy and the Play Data safety form will be updated <strong>before</strong> release.</p>
+<p>This policy was updated for Play Billing / Pro, the billing-related permissions,
+Share / Rate / Feedback, theme and accent preferences, and Second phone in the
+Play full build. If further features that touch data (e.g. optional backup) are
+added, this policy and the Play Data safety form will be updated <strong>before</strong>
+release.</p>
 <h2>Contact</h2>
 <p>Data controller / developer: Demirhan Çelik (OfferForge), Türkiye.
 Support e-mail: <strong>delibaltabaris5@gmail.com</strong>
 This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
 <hr />
 <h2>TR — Gizlilik Politikası ve KVKK Aydınlatma Metni</h2>
-<p><strong>Son güncelleme:</strong> 2026-09-27 (v0.4.6)</p>
+<p><strong>Son güncelleme:</strong> 2026-10-14 (v0.5.2)</p>
 <h3>1. Veri sorumlusu (KVKK md.10/a)</h3>
 <p>Demirhan Çelik (OfferForge), Türkiye. İletişim ve başvuru:
 <strong>delibaltabaris5@gmail.com</strong></p>
@@ -270,7 +299,7 @@ geliştiriciye aktarılmaz:</p>
 <td>Kaba kuvvet denemelerini yavaşlatmak</td>
 </tr>
 <tr>
-<td>Tercihler (dil, otomatik kilit, hesap makinesi girişi, biyometri, duvar kağıdı)</td>
+<td>Tercihler (dil, tema, vurgu rengi, otomatik kilit, hesap makinesi girişi, biyometri, duvar kağıdı)</td>
 <td>Uygulamaya özel ayarlar</td>
 <td>Uygulama ayarları</td>
 </tr>
@@ -317,11 +346,27 @@ tuşuna basınca kasa açılır. Bu, kurulumda, hesap makinesindeki ⓘ düğmes
 mağaza açıklamasında anlatılır. Başlatıcıda "Hesap Makinesi" adıyla görünür.
 İsteğe bağlı sahte PIN, kendi anahtarı olan ayrı ve başlangıçta boş bir kasa
 açar.</p>
+<h3>6b. Satın almalar / GizliAlan Pro (0.4.9'dan; Play'de 0.5.0'dan)</h3>
+<p>İsteğe bağlı <strong>GizliAlan Pro</strong> yalnızca <strong>Google Play Faturalandırma</strong> ile
+satılır (abonelik <code>gizlialan_pro</code>, aylık/yıllık). Ödeme ve faturalar Google
+Play'e aittir. GizliAlan kart numarası, fatura adresi veya başka ödeme bilgisi
+almaz; satın alma verisini alan bir sunucusu yoktur. Uygulama yalnızca cihazda
+Play'e Pro'nun aktif olup olmadığını sorar (ve çevrimdışı kullanım için bu
+yetkiyi yerelde önbellekler). Aboneliği Google Play abonelik ayarlarından
+yönetir veya iptal edersin. Ücretsiz kullanım devam eder (öğe limiti vardır;
+mevcut kasa öğeleri kilitlenmez).</p>
+<h3>6c. Paylaş, değerlendir ve geri bildirim (0.5.1'den)</h3>
+<p>Ayarlar'dan <strong>Uygulamayı paylaş</strong> (sistem paylaşım sayfası, sabit nötr metin +
+Play bağlantısı), <strong>Uygulamayı değerlendir</strong> (<code>market://</code> ile Play listesi,
+https yedek) veya <strong>Geri bildirim gönder</strong> (destek adresine, sürüm içeren
+konulu mailto) kullanabilirsin. Bunlar sıradan Android intent'leridir;
+analitik SDK yoktur, kiminle paylaştığın uygulamaya gelmez.</p>
 <h3>7. İkinci telefon (iş profili)</h3>
 <blockquote>
-<p>Bu bölüm <strong>yalnızca Google Play dışında dağıtılan "full" APK</strong> için
-geçerlidir. <strong>Google Play sürümünde</strong> İkinci telefon, iş profili kodu veya
-cihaz yöneticisi bileşeni <strong>yoktur</strong>.</p>
+<p>v0.5.0'dan beri Google Play'e yüklenen sürüm <strong>full</strong> derlemedir: İkinci
+telefon (iş profili profil sahibi) dahildir. Kurulum isteğe bağlıdır ve
+Pro ile açılır. İkinci telefonsuz <code>play</code> flavor yedek olarak derlenebilir
+ama şu anki Play yüklemesi değildir.</p>
 </blockquote>
 <p>"İkinci telefon → Kur" dersen Android cihazında bir iş profili oluşturur ve
 GizliAlan <strong>yalnızca o profilin</strong> sahibi olur (Shelter/Island ile aynı yöntem).
@@ -362,9 +407,10 @@ kapalıdır.</p>
 <h3>11. Yaş</h3>
 <p>GizliAlan yetişkinler (18+) içindir; çocuklara yönelik değildir.</p>
 <h3>12. Değişiklikler</h3>
-<p>Veriye dokunan yeni özellikler (ör. yedekleme, satın alma) eklenirse bu metin
-ve Play Veri güvenliği formu yayından <strong>önce</strong> güncellenir.</p>
-<p><strong>İletişim / destek:</strong> delibaltabaris5@gmail.com — Politika: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
+<p>Bu metin Play Faturalandırma / Pro, faturalama izinleri, Paylaş / Değerlendir /
+Geri bildirim, tema ve vurgu rengi tercihleri ile Play full derlemesindeki
+İkinci telefon için güncellendi. Veriye dokunan başka özellikler (ör. yedekleme)
+eklenirse bu metin ve Play Veri güvenliği formu yayından <strong>önce</strong> güncellenir.</p>
 <p><em>This document is provided for transparency and Play policy readiness. It is not legal advice.</em></p>
 </body>
 </html>

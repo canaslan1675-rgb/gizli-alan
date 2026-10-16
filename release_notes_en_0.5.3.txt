@@ -1,0 +1,5 @@
+• Help screen: expandable sections (calculator entry open by default)
+• New Appearance and Share / Rate / Feedback help topics
+• Feedback: Bug / Suggestion / Other category in the e-mail subject
+• Optional “What happened / Expected” draft (no device or vault data attached)
+• Share: edit a neutral intro before the system share sheet

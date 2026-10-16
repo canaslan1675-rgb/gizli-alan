@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' show ThemeMode;
+import '../theme.dart' show AccentPreset;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
@@ -31,6 +32,7 @@ class SettingsService {
   static const _kSecondPhoneClose = 'second_phone_close';
   static const _kSecondPhoneClosedBy = 'second_phone_closed_by';
   static const _kThemeMode = 'theme_mode';
+  static const _kAccent = 'accent_color';
 
   static const lockTimeoutChoices = [0, 15, 60, 300];
 
@@ -180,6 +182,11 @@ class SettingsService {
     _ => ThemeMode.dark,
   };
 
+  /// Accent colour preset (v0.5.2). Local only; default mint.
+  AccentPreset get accent => AccentPreset.parse(_prefs.getString(_kAccent));
+
+  Future<void> setAccent(AccentPreset a) => _prefs.setString(_kAccent, a.name);
+
   String get language => _prefs.getString(_kLang) ?? 'tr';
 
   Future<void> setLanguage(String code) async {
@@ -190,12 +197,14 @@ class SettingsService {
   Future<void> resetAll() async {
     final lang = language;
     final theme = _prefs.getString(_kThemeMode);
+    final accent = _prefs.getString(_kAccent);
     // Keep "the work apps are currently hidden by us" across a vault reset,
     // so the next real unlock still unhides them (#30).
     final closedBy = _prefs.getString(_kSecondPhoneClosedBy);
     await _prefs.clear();
     await setLanguage(lang);
     if (theme != null) await _prefs.setString(_kThemeMode, theme);
+    if (accent != null) await _prefs.setString(_kAccent, accent);
     if (closedBy != null) {
       await _prefs.setString(_kSecondPhoneClosedBy, closedBy);
     }

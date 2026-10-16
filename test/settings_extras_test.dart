@@ -22,8 +22,8 @@ import 'package:gizlialan/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// v0.5.1 tester feedback: Share / Rate / Feedback / Help rows and the
-/// System / Light / Dark appearance setting.
+/// v0.5.1+ / v0.5.3 tester feedback: Share / Rate / Feedback / Help rows,
+/// System / Light / Dark appearance, and 0.5.3 help+feedback polish.
 class _NoBiometrics extends BiometricService {
   @override
   Future<bool> isAvailable() async => false;
@@ -66,11 +66,34 @@ void main() {
       }
     });
 
-    test('feedback subject carries the app version', () {
+    test('feedback subject carries category and app version', () {
       expect(
-        AppActions.feedbackSubject('GizliAlan geri bildirim', '0.5.1', 20),
-        'GizliAlan geri bildirim v0.5.1 (20)',
+        AppActions.feedbackSubject('GizliAlan geri bildirim', '0.5.3', 22),
+        'GizliAlan geri bildirim v0.5.3 (22)',
       );
+      expect(
+        AppActions.feedbackSubject(
+          'GizliAlan geri bildirim',
+          '0.5.3',
+          22,
+          category: 'Hata',
+        ),
+        'GizliAlan geri bildirim [Hata] v0.5.3 (22)',
+      );
+      expect(
+        AppActions.feedbackSubject(
+          'GizliAlan feedback',
+          '0.5.3',
+          22,
+          category: 'Bug',
+        ),
+        'GizliAlan feedback [Bug] v0.5.3 (22)',
+      );
+    });
+
+    test('compile-time version is 0.5.3+22', () {
+      expect(appVersion, '0.5.3');
+      expect(appBuild, 22);
     });
 
     test('TR and EN both have every new string', () {
@@ -80,15 +103,30 @@ void main() {
         'themeLight',
         'themeDark',
         'helpTitle',
+        'helpHint',
         'helpCalcBody',
+        'helpAppearanceTitle',
+        'helpAppearanceBody',
+        'helpShareTitle',
+        'helpShareBody',
         'helpDecoyBody',
         'helpVaultBody',
         'helpPinBody',
         'helpSecondPhoneBody',
         'shareApp',
+        'shareIntroTitle',
+        'shareIntroHint',
         'rateApp',
         'feedback',
         'feedbackSubject',
+        'feedbackCategoryTitle',
+        'feedbackCatBug',
+        'feedbackCatSuggestion',
+        'feedbackCatOther',
+        'feedbackBodyTitle',
+        'feedbackBodyWhat',
+        'feedbackBodyExpected',
+        'feedbackBodySkip',
         'shareAppFailed',
         'rateAppFailed',
         'feedbackFailed',
@@ -235,10 +273,37 @@ void main() {
       await settle(tester, 3);
     }
 
+    testWidgets('share dialog keeps neutrality then shares intro + link', (
+      tester,
+    ) async {
+      await openSettings(tester);
+
+      await tapRow(tester, 'settings_share');
+      expect(find.byKey(const ValueKey('share_intro_dialog')), findsOneWidget);
+      final introField = find.byKey(const ValueKey('share_intro_field'));
+      expect(introField, findsOneWidget);
+      expect(
+        tester.widget<TextField>(introField).controller!.text,
+        tr['shareAppText'],
+      );
+      // Default intro must stay vault-neutral.
+      final intro = tr['shareAppText']!.toLowerCase();
+      for (final w in ['kasa', 'vault', 'gizli', 'hidden', 'secret', 'pin']) {
+        expect(intro.contains(w), isFalse, reason: '"$intro" contains $w');
+      }
+      await tester.tap(find.byKey(const ValueKey('share_intro_confirm')));
+      await settle(tester, 3);
+      final share = calls.lastWhere((c) => c.method == 'shareApp');
+      final text = (share.arguments as Map)['text'] as String;
+      expect(text, '${tr['shareAppText']} ${AppActions.storeUrl}');
+    });
+
     testWidgets('share, rate and feedback use plain intents', (tester) async {
       await openSettings(tester);
 
       await tapRow(tester, 'settings_share');
+      await tester.tap(find.byKey(const ValueKey('share_intro_confirm')));
+      await settle(tester, 3);
       final share = calls.lastWhere((c) => c.method == 'shareApp');
       final text = (share.arguments as Map)['text'] as String;
       expect(text, '${tr['shareAppText']} ${AppActions.storeUrl}');
@@ -247,12 +312,48 @@ void main() {
       expect(calls.where((c) => c.method == 'openStore'), hasLength(1));
 
       await tapRow(tester, 'settings_feedback');
+      expect(
+        find.byKey(const ValueKey('feedback_category_sheet')),
+        findsOneWidget,
+      );
+      await tester.tap(find.byKey(const ValueKey('feedback_cat_bug')));
+      await settle(tester, 3);
+      expect(
+        find.byKey(const ValueKey('feedback_body_dialog')),
+        findsOneWidget,
+      );
+      await tester.tap(find.byKey(const ValueKey('feedback_body_skip')));
+      await settle(tester, 3);
       final fb = calls.lastWhere((c) => c.method == 'sendFeedback');
       expect(
         (fb.arguments as Map)['subject'],
-        'GizliAlan geri bildirim v$appVersion ($appBuild)',
+        'GizliAlan geri bildirim [${tr['feedbackCatBug']}] '
+        'v$appVersion ($appBuild)',
       );
+      expect((fb.arguments as Map)['body'], isNull);
       expect(clip, isNull);
+    });
+
+    testWidgets('feedback category lands in subject only', (tester) async {
+      await openSettings(tester);
+      await tapRow(tester, 'settings_feedback');
+      await tester.tap(find.byKey(const ValueKey('feedback_cat_suggestion')));
+      await settle(tester, 3);
+      await tester.enterText(
+        find.byKey(const ValueKey('feedback_body_what')),
+        'Buton tepki vermedi',
+      );
+      await tester.tap(find.byKey(const ValueKey('feedback_body_send')));
+      await settle(tester, 3);
+      final fb = calls.lastWhere((c) => c.method == 'sendFeedback');
+      final args = fb.arguments as Map;
+      expect(
+        args['subject'],
+        'GizliAlan geri bildirim [${tr['feedbackCatSuggestion']}] '
+        'v$appVersion ($appBuild)',
+      );
+      expect(args['body'], contains('Buton tepki vermedi'));
+      expect(args['body'], isNot(contains('vault')));
     });
 
     testWidgets('no app for the intent: link / address copied', (tester) async {
@@ -262,6 +363,10 @@ void main() {
       expect(clip, AppActions.storeUrl);
       expect(find.text(tr['rateAppFailed']!), findsOneWidget);
       await tapRow(tester, 'settings_feedback');
+      await tester.tap(find.byKey(const ValueKey('feedback_cat_other')));
+      await settle(tester, 3);
+      await tester.tap(find.byKey(const ValueKey('feedback_body_skip')));
+      await settle(tester, 3);
       expect(clip, AppActions.feedbackEmail);
     });
 
@@ -289,7 +394,26 @@ void main() {
       await tapRow(tester, 'settings_help');
       expect(find.byType(HelpScreen), findsOneWidget);
       expect(find.text(tr['helpCalcTitle']!), findsOneWidget);
-      expect(find.text(tr['helpDecoyTitle']!), findsOneWidget);
+      // Calculator section starts expanded → body visible.
+      expect(find.text(tr['helpCalcBody']!), findsOneWidget);
+      final helpList = find
+          .descendant(
+            of: find.byType(HelpScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first;
+      for (final title in [
+        tr['helpAppearanceTitle']!,
+        tr['helpShareTitle']!,
+        tr['helpDecoyTitle']!,
+      ]) {
+        await tester.scrollUntilVisible(
+          find.text(title),
+          200,
+          scrollable: helpList,
+        );
+        expect(find.text(title), findsOneWidget);
+      }
       // play flavor: no Second phone section.
       expect(find.text(tr['helpSecondPhoneTitle']!), findsNothing);
     });

@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 
 import 'privacy_link.dart';
 
-/// Share / Rate / Feedback rows in Settings (v0.5.1, tester feedback).
+/// Share / Rate / Feedback rows in Settings (v0.5.1+, tester feedback).
 ///
 /// Plain Android intents through the existing `gizlialan/system` channel
 /// (see SystemChannel.kt): no SDK, no network access of our own, nothing
@@ -26,9 +26,19 @@ class AppActions {
   /// app sits behind a calculator; the recipient sees only this).
   static String shareText(String intro) => '$intro $storeUrl';
 
-  /// Subject of the feedback e-mail: "GizliAlan geri bildirim v0.5.1 (20)".
-  static String feedbackSubject(String prefix, String version, int build) =>
-      '$prefix v$version ($build)';
+  /// Subject of the feedback e-mail, e.g.
+  /// "GizliAlan geri bildirim [Hata] v0.5.3 (22)".
+  /// [category] is a short localized label (Bug / Suggestion / Other);
+  /// it goes in the subject only — never in auto-filled vault/device data.
+  static String feedbackSubject(
+    String prefix,
+    String version,
+    int build, {
+    String? category,
+  }) {
+    final cat = (category == null || category.isEmpty) ? '' : ' [$category]';
+    return '$prefix$cat v$version ($build)';
+  }
 
   static Future<bool> share(String text, {String? title}) =>
       _invoke('shareApp', {'text': text, 'title': title});
@@ -36,8 +46,16 @@ class AppActions {
   /// Opens the Play listing (Play Store app, else a browser).
   static Future<bool> openStore() => _invoke('openStore');
 
-  static Future<bool> sendFeedback(String subject) =>
-      _invoke('sendFeedback', {'subject': subject});
+  /// Opens a mailto: intent. [body] is optional and must be user-typed only
+  /// (never auto-insert device IDs, logs, or vault data).
+  static Future<bool> sendFeedback(String subject, {String? body}) {
+    final args = <String, Object?>{'subject': subject};
+    final trimmed = body?.trim();
+    if (trimmed != null && trimmed.isNotEmpty) {
+      args['body'] = trimmed;
+    }
+    return _invoke('sendFeedback', args);
+  }
 
   static Future<bool> _invoke(
     String method, [

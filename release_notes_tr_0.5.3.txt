@@ -1,0 +1,5 @@
+• Yardım ekranı: katlanabilir bölümler (hesap makinesi girişi varsayılan açık)
+• Görünüm ve Paylaş / Değerlendir / Geri bildirim yardım metinleri eklendi
+• Geri bildirim: Hata / Öneri / Diğer kategorisi konu satırında
+• İsteğe bağlı “Ne oldu / Ne bekliyordun” taslağı (cihaz veya kasa verisi eklenmez)
+• Paylaş: gönderiden önce nötr giriş metnini düzenleyebilirsin
