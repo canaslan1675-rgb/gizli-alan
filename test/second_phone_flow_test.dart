@@ -262,7 +262,7 @@ void main() {
     await settle(tester);
     // Pro now active → setup continues with Android's normal confirmation.
     expect(find.byKey(const ValueKey('pro_required')), findsNothing);
-    expect(find.textContaining('work profile setup'), findsOneWidget);
+    expect(find.textContaining('separate work profile'), findsOneWidget);
     expect(find.textContaining('7-day free trial'), findsNothing);
   });
 
