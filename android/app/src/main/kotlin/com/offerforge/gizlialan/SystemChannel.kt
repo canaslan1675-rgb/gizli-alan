@@ -32,7 +32,9 @@ import io.flutter.plugin.common.MethodChannel
  *  - `openStore`: our Play listing via market:// (Play Store app), falling
  *    back to the https listing in a browser.
  *  - `sendFeedback`: ACTION_SENDTO mailto: our support address only; the
- *    subject carries the app version (no body, logs, device data or files).
+ *    subject carries the category + app version. Optional EXTRA_TEXT body is
+ *    user-typed only (Dart must never auto-insert device IDs, logs, vault
+ *    data or files).
  */
 object SystemChannel {
     const val NAME = "gizlialan/system"
@@ -112,18 +114,24 @@ object SystemChannel {
                 }
                 "sendFeedback" -> {
                     val subject = call.argument<String>("subject")
+                    // Optional body: user-typed draft only. Never auto-fill
+                    // device IDs, logs, vault content or attachments here.
+                    val body = call.argument<String>("body")
                     if (subject == null || subject.length > 120) {
                         result.success(false)
                         return@setMethodCallHandler
                     }
-                    result.success(
-                        start(
-                            activity,
-                            Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$FEEDBACK_ADDRESS"))
-                                .putExtra(Intent.EXTRA_EMAIL, arrayOf(FEEDBACK_ADDRESS))
-                                .putExtra(Intent.EXTRA_SUBJECT, subject),
-                        ),
-                    )
+                    if (body != null && body.length > 4000) {
+                        result.success(false)
+                        return@setMethodCallHandler
+                    }
+                    val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$FEEDBACK_ADDRESS"))
+                        .putExtra(Intent.EXTRA_EMAIL, arrayOf(FEEDBACK_ADDRESS))
+                        .putExtra(Intent.EXTRA_SUBJECT, subject)
+                    if (!body.isNullOrBlank()) {
+                        intent.putExtra(Intent.EXTRA_TEXT, body)
+                    }
+                    result.success(start(activity, intent))
                 }
                 "wipeWebData" -> result.success(wipeWebData(activity))
                 "appInfo" -> result.success(appInfo(activity))

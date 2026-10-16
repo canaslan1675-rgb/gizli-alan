@@ -405,7 +405,8 @@ const Map<String, String> tr = {
   'appearanceHint': 'Hesap makinesi ve kasa ekranları için tema',
   'helpFeedback': 'Yardım ve geri bildirim',
   'helpTitle': 'Yardım: nasıl kullanılır?',
-  'helpHint': 'Hesap makinesi girişi, sahte PIN, kasa ve ikinci telefon',
+  'helpHint':
+      'Hesap makinesi girişi, görünüm, paylaş / değerlendir / geri bildirim, sahte PIN, kasa',
   'helpCalcTitle': 'Hesap makinesi girişi',
   'helpCalcBody':
       'Uygulama, telefonunun uygulama listesinde "Hesap Makinesi" adıyla görünür ve gerçek, çalışan bir hesap makinesi olarak açılır. Kasayı açmak için PIN\'ini yazıp "=" tuşuna bas. Biyometrik kilit açma etkinse "=" tuşuna uzun basman yeterli. PIN olmayan bir sayı yazarsan normal hesaplama yapılır. Bu girişi Ayarlar → Giriş bölümünden kapatabilirsin; o zaman uygulama doğrudan PIN ekranıyla açılır.',
@@ -422,10 +423,19 @@ const Map<String, String> tr = {
   'helpSecondPhoneBody':
       'İkinci telefon, Android\'in kendi iş profili özelliğiyle bu cihazda ayrı bir alan oluşturur. İçinde kendi Play Store\'u vardır; ayrı bir Google hesabı ve ayrı uygulamalar kullanabilirsin. Kurulum ve yönetim yalnızca gerçek kasa açıkken yapılır. İstersen kasa kilitliyken iş uygulamaları gizlenir ve kilidi açınca geri gelir. GizliAlan yalnızca kendi oluşturduğu iş profilini yönetir; ana telefonunu izlemez ve hiçbir yere veri göndermez.',
   'helpSecondPhonePro': 'İkinci telefonu kurmak Pro özelliğidir.',
+  // v0.5.3: görünüm + paylaş/değerlendir/geri bildirim yardım bölümleri
+  'helpAppearanceTitle': 'Görünüm',
+  'helpAppearanceBody':
+      'Ayarlar → Görünüm bölümünden Sistem, Açık veya Koyu temayı seçebilirsin. Vurgu rengi altında nane, mavi, mor, turuncu veya pembe seçebilirsin. Tema ve vurgu rengi yalnızca bu cihazda saklanır; hiçbir yere gönderilmez.',
+  'helpShareTitle': 'Paylaş, değerlendir ve geri bildirim',
+  'helpShareBody':
+      'Ayarlar → Yardım ve geri bildirim altında: Uygulamayı paylaş, kısa ve nötr bir metin ile Google Play bağlantısını gönderir (önce giriş cümlesini düzenleyebilirsin). Uygulamayı değerlendir Play sayfasını açar. Geri bildirim gönder, e-posta uygulamanı konu satırında kategoriyle açar; isteğe bağlı olarak ne olduğunu ve ne beklediğini yazabilirsin. Cihaz kimliği, günlük veya kasa verisi otomatik eklenmez.',
   'shareApp': 'Uygulamayı paylaş',
   'shareAppHint': 'Google Play bağlantısını bir arkadaşına gönder',
   // Neutral on purpose: never mention the vault in shared text.
   'shareAppText': 'Bu uygulamaya bir göz at:',
+  'shareIntroTitle': 'Paylaşım metni',
+  'shareIntroHint': 'Nötr tut — kasa, PIN veya gizli özelliklerden bahsetme.',
   'shareAppFailed': 'Paylaşılamadı. Bunun yerine bağlantı kopyalandı.',
   'rateApp': 'Uygulamayı değerlendir',
   'rateAppHint': 'Google Play\'de puan ver veya yorum yaz',
@@ -433,6 +443,14 @@ const Map<String, String> tr = {
   'feedback': 'Geri bildirim gönder',
   'feedbackHint': 'Öneri veya hata bildirimi için e-posta',
   'feedbackSubject': 'GizliAlan geri bildirim',
+  'feedbackCategoryTitle': 'Konu nedir?',
+  'feedbackCatBug': 'Hata',
+  'feedbackCatSuggestion': 'Öneri',
+  'feedbackCatOther': 'Diğer',
+  'feedbackBodyTitle': 'İsteğe bağlı ayrıntılar',
+  'feedbackBodyWhat': 'Ne oldu',
+  'feedbackBodyExpected': 'Ne bekliyordun',
+  'feedbackBodySkip': 'Atla',
   'feedbackFailed':
       'E-posta uygulaması bulunamadı. Bunun yerine adres kopyalandı.',
 };

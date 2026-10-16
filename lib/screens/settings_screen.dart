@@ -185,10 +185,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
     messenger.showSnackBar(SnackBar(content: Text(t(msgKey))));
   }
 
-  /// Share app: neutral text + Play link only — nothing about the vault.
+  /// Share app: edit a neutral intro, then share intro + Play link only.
   Future<void> _shareApp() async {
     final t = L10n.current;
-    final text = AppActions.shareText(t('shareAppText'));
+    final c = GizliColors.of(context);
+    final controller = TextEditingController(text: t('shareAppText'));
+    final intro = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        key: const ValueKey('share_intro_dialog'),
+        title: Text(t('shareIntroTitle')),
+        content: TextField(
+          key: const ValueKey('share_intro_field'),
+          controller: controller,
+          maxLines: 3,
+          maxLength: 200,
+          decoration: InputDecoration(
+            hintText: t('shareAppText'),
+            helperText: t('shareIntroHint'),
+            helperMaxLines: 3,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(t('cancel')),
+          ),
+          TextButton(
+            key: const ValueKey('share_intro_confirm'),
+            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            style: TextButton.styleFrom(foregroundColor: c.accent),
+            child: Text(t('shareApp')),
+          ),
+        ],
+      ),
+    );
+    // Drop after the route finishes unmounting the TextField.
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
+    if (intro == null || !mounted) return;
+    final line = intro.isEmpty ? t('shareAppText') : intro;
+    final text = AppActions.shareText(line);
     if (await AppActions.share(text, title: t('shareApp'))) return;
     await _copyFallback(AppActions.storeUrl, 'shareAppFailed');
   }
@@ -198,16 +234,133 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _copyFallback(AppActions.storeUrl, 'rateAppFailed');
   }
 
-  /// Feedback e-mail to the support address; subject carries the version.
+  /// Feedback: pick Bug / Suggestion / Other, optional body draft, then mailto.
+  /// Category goes in the subject only. Body is user-typed; never auto-fill
+  /// device IDs, logs or vault data.
   Future<void> _sendFeedback() async {
     final t = L10n.current;
+    final c = GizliColors.of(context);
+    final category = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          key: const ValueKey('feedback_category_sheet'),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                t('feedbackCategoryTitle'),
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: c.textPrimary,
+                ),
+              ),
+            ),
+            for (final (key, labelKey) in const [
+              ('bug', 'feedbackCatBug'),
+              ('suggestion', 'feedbackCatSuggestion'),
+              ('other', 'feedbackCatOther'),
+            ])
+              ListTile(
+                key: ValueKey('feedback_cat_$key'),
+                leading: Icon(
+                  key == 'bug'
+                      ? Icons.bug_report_outlined
+                      : key == 'suggestion'
+                      ? Icons.lightbulb_outline
+                      : Icons.chat_bubble_outline,
+                  color: c.accent,
+                ),
+                title: Text(t(labelKey)),
+                onTap: () => Navigator.pop(ctx, t(labelKey)),
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (category == null || !mounted) return;
+
+    final whatCtrl = TextEditingController();
+    final expectCtrl = TextEditingController();
+    final draft = await showDialog<(String, String)?>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        key: const ValueKey('feedback_body_dialog'),
+        title: Text(t('feedbackBodyTitle')),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                key: const ValueKey('feedback_body_what'),
+                controller: whatCtrl,
+                maxLines: 3,
+                maxLength: 500,
+                decoration: InputDecoration(
+                  labelText: t('feedbackBodyWhat'),
+                  alignLabelWithHint: true,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                key: const ValueKey('feedback_body_expected'),
+                controller: expectCtrl,
+                maxLines: 3,
+                maxLength: 500,
+                decoration: InputDecoration(
+                  labelText: t('feedbackBodyExpected'),
+                  alignLabelWithHint: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(t('cancel')),
+          ),
+          TextButton(
+            key: const ValueKey('feedback_body_skip'),
+            onPressed: () => Navigator.pop(ctx, ('', '')),
+            child: Text(t('feedbackBodySkip')),
+          ),
+          TextButton(
+            key: const ValueKey('feedback_body_send'),
+            onPressed: () => Navigator.pop(ctx, (
+              whatCtrl.text.trim(),
+              expectCtrl.text.trim(),
+            )),
+            style: TextButton.styleFrom(foregroundColor: c.accent),
+            child: Text(t('feedback')),
+          ),
+        ],
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      whatCtrl.dispose();
+      expectCtrl.dispose();
+    });
+    if (draft == null || !mounted) return;
+
     final info = await AppInfo.load();
     final subject = AppActions.feedbackSubject(
       t('feedbackSubject'),
       info.version,
       info.build,
+      category: category,
     );
-    if (await AppActions.sendFeedback(subject)) return;
+    final parts = <String>[];
+    if (draft.$1.isNotEmpty) {
+      parts.add('${t('feedbackBodyWhat')}:\n${draft.$1}');
+    }
+    if (draft.$2.isNotEmpty) {
+      parts.add('${t('feedbackBodyExpected')}:\n${draft.$2}');
+    }
+    final body = parts.isEmpty ? null : parts.join('\n\n');
+    if (await AppActions.sendFeedback(subject, body: body)) return;
     await _copyFallback(AppActions.feedbackEmail, 'feedbackFailed');
   }
 

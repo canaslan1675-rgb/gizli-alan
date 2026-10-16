@@ -406,7 +406,8 @@ const Map<String, String> en = {
   'appearanceHint': 'Theme for the calculator and the vault screens',
   'helpFeedback': 'Help & feedback',
   'helpTitle': 'Help: how it works',
-  'helpHint': 'Calculator entry, decoy PIN, vault and second phone',
+  'helpHint':
+      'Calculator entry, appearance, share / rate / feedback, decoy PIN, vault',
   'helpCalcTitle': 'Calculator entry',
   'helpCalcBody':
       'The app appears in your app list as "Calculator" and opens as a real, working calculator. To open the vault, type your PIN and press "=". If biometric unlock is on, just long-press "=". Any number that is not your PIN is simply calculated. You can turn this entry off in Settings → Entry; the app then opens straight to the PIN screen.',
@@ -423,10 +424,20 @@ const Map<String, String> en = {
   'helpSecondPhoneBody':
       'Second phone uses Android\'s own work-profile feature to create a separate space on this device. It has its own Play Store, so you can use a separate Google account and separate apps. Setup and management are only possible while the real vault is unlocked. Optionally, the work apps are hidden while the vault is locked and come back when you unlock. GizliAlan only manages the work profile it created; it does not monitor your main phone and sends no data anywhere.',
   'helpSecondPhonePro': 'Setting up the Second phone is a Pro feature.',
+  // v0.5.3: appearance + share/rate/feedback help sections
+  'helpAppearanceTitle': 'Appearance',
+  'helpAppearanceBody':
+      'In Settings → Appearance you can pick System, Light or Dark. Under Accent color you can choose mint, blue, purple, orange or pink. Theme and accent are stored only on this device; nothing is sent anywhere.',
+  'helpShareTitle': 'Share, rate and feedback',
+  'helpShareBody':
+      'Under Settings → Help & feedback: Share app sends a short neutral message plus the Google Play link (you can edit the intro first). Rate app opens the Play listing. Send feedback opens your e-mail app with a category in the subject; you can optionally add what happened and what you expected. No device IDs, logs or vault data are attached automatically.',
   'shareApp': 'Share app',
   'shareAppHint': 'Send the Google Play link to a friend',
   // Neutral on purpose: never mention the vault in shared text.
   'shareAppText': 'Check out this app:',
+  'shareIntroTitle': 'Share message',
+  'shareIntroHint':
+      'Keep it neutral — do not mention the vault, PIN or hidden features.',
   'shareAppFailed': 'Could not share. The link was copied instead.',
   'rateApp': 'Rate app',
   'rateAppHint': 'Rate or review it on Google Play',
@@ -434,5 +445,13 @@ const Map<String, String> en = {
   'feedback': 'Send feedback',
   'feedbackHint': 'E-mail us ideas or bug reports',
   'feedbackSubject': 'GizliAlan feedback',
+  'feedbackCategoryTitle': 'What is this about?',
+  'feedbackCatBug': 'Bug',
+  'feedbackCatSuggestion': 'Suggestion',
+  'feedbackCatOther': 'Other',
+  'feedbackBodyTitle': 'Optional details',
+  'feedbackBodyWhat': 'What happened',
+  'feedbackBodyExpected': 'What did you expect',
+  'feedbackBodySkip': 'Skip',
   'feedbackFailed': 'No e-mail app found. The address was copied instead.',
 };
