@@ -16,7 +16,7 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid #2ecc8f;backgroun
 </head>
 <body>
 <h1>Privacy Policy — GizliAlan</h1>
-<p><strong>Last updated:</strong> 2026-10-17 (v0.5.3)
+<p><strong>Last updated:</strong> 2026-10-19 (v0.5.7)
 <strong>Data controller:</strong> Demirhan Çelik (OfferForge), Türkiye — delibaltabaris5@gmail.com
 <strong>App:</strong> GizliAlan (package <code>com.offerforge.gizlialan</code>)
 <strong>Audience:</strong> The owner of the device, for their own content only.</p>
@@ -213,7 +213,16 @@ but is not the current Play upload.</p>
 <ul>
 <li>If you choose <strong>Second phone → Set up</strong>, Android creates a <em>work profile</em> on
   your device and GizliAlan becomes the <strong>profile owner of that profile only</strong>
-  (the same mechanism as Shelter / Island). Android shows its own notice first.</li>
+  (the same mechanism as Shelter / Island). Technically this uses Android's
+  device-management API (Device Administration / <code>DevicePolicyManager</code>), which
+  Android presents as a work profile. <strong>Before setup starts, GizliAlan shows a
+  disclosure dialog and asks for your explicit consent</strong> with the buttons
+  "I agree and continue" / "Cancel" (nothing is pre-selected and nothing is
+  created if you cancel); Android then shows its own notices.</li>
+<li>GizliAlan is <strong>not</strong> an administrator of your main profile or of the device
+  and requests <strong>no</strong> administrator policies (no password, screen-lock or
+  wipe-device policy). If it is ever activated as an administrator of the main
+  profile it deactivates itself.</li>
 <li>Inside it you can add a separate Google account in its Play Store and install
   apps. Those apps, accounts and files are kept apart from your main profile by
   Android; GizliAlan does <strong>not</strong> read their data, messages or notifications.</li>
@@ -224,13 +233,38 @@ but is not the current Play upload.</p>
   profile's apps it hid, on the device), make an app from your
   main profile available in the profile, open the profile's Play Store, list and
   launch the profile's apps from the vault home, and delete the profile.</li>
+<li>While the vault is locked GizliAlan also blocks copy/paste and sharing
+  between your main profile and the work profile, and stops work-profile
+  contacts from appearing in your main profile's caller ID, contact search and
+  Bluetooth contact sharing. These restrictions are lifted when you unlock. The
+  profile's apps are hidden or paused while locked only if "Hide work apps while
+  locked" is on (default; you can switch it off on the Second phone screen);
+  hidden apps are not uninstalled and their data is kept.</li>
+<li>GizliAlan's own launcher icon is not shown inside the work profile (the vault
+  lives in the main profile only).</li>
+<li>Stored on the device only (app-private storage, not encrypted by a hardware
+  key; never sent anywhere): whether the profile exists, which apps GizliAlan
+  hid, your hide preference, and a random key used to authenticate requests
+  between the vault and the profile.</li>
 <li>To show the app grid and the "add app" picker, GizliAlan reads the names and
   icons of <strong>launchable apps</strong> on the device (a launcher-intent query, not
   <code>QUERY_ALL_PACKAGES</code>). This stays on the device.</li>
-<li>No extra permissions are requested and nothing is uploaded. Remove the
-  profile any time in the app or in Android Settings → Accounts → Work.
+<li>If Android does not allow a work profile, the Second phone screen explains
+  why. For this it checks on the device, with public Android APIs only, whether
+  you are in the main user, whether another work/clone profile or a management
+  (device admin / MDM) app or policy exists, and shows the name of a detected
+  management app. This check runs only when you open the Second phone screen,
+  is not stored and is never sent anywhere.</li>
+<li>No extra permissions are requested, the Second phone code uses no network, and
+  nothing is uploaded. Remove the profile any time with <strong>Remove second phone</strong>
+  in the app or in Android Settings → Accounts → Work profile. <strong>Removing the
+  work profile permanently deletes the profile and everything inside it (its
+  apps, accounts and files); the vault in your main profile is not affected.</strong>
   "Reset everything" in GizliAlan does not delete the work profile; remove it
   separately.</li>
+<li>Second phone <strong>setup</strong> requires an active GizliAlan Pro subscription (or the
+  Google Play free trial when offered). If Pro lapses, an existing work profile
+  and your vault items are not locked; you can still use and remove them.</li>
 </ul>
 <h2>Your control / deletion</h2>
 <ul>
@@ -243,14 +277,18 @@ but is not the current Play upload.</p>
 <h2>Security limits (honest)</h2>
 <p>Encryption protects your vault against other apps, casual access and copies of
 the app's files. It cannot fully protect against a rooted/compromised device or
-someone who knows your PIN. GizliAlan does not hide itself from the launcher (it is
-listed as "Calculator") and is not a replacement for Android Private Space.</p>
+someone who knows your PIN. GizliAlan does not hide itself from your main profile's launcher (it is
+listed as "Calculator"; the calculator entry can be turned off in Settings;
+inside an optional work profile its icon is not shown) and is not a replacement for Android Private Space.</p>
 <h2>Age</h2>
 <p>GizliAlan is intended for adults (18+) and is not directed at children.</p>
 <h2>Changes</h2>
-<p>This policy was updated for Play Billing / Pro, the billing-related permissions,
-Share / Rate / Feedback (category and editable text), in-app Help, theme and accent preferences, and Second phone in the
-Play full build. If further features that touch data (e.g. optional backup) are
+<p>This policy was updated (v0.5.5) to describe the consent dialog shown before
+Second phone setup, the work-profile (profile-owner) data handling and the
+restrictions applied while the vault is locked, that GizliAlan's icon is not
+shown in the work profile, that removing the profile deletes its contents, and
+that setup requires Pro. Earlier updates covered Play Billing / Pro, Share /
+Rate / Feedback, in-app Help, theme and accent preferences. If further features that touch data (e.g. optional backup) are
 added, this policy and the Play Data safety form will be updated <strong>before</strong>
 release.</p>
 <h2>Contact</h2>
@@ -259,7 +297,7 @@ Support e-mail: <strong>delibaltabaris5@gmail.com</strong>
 This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
 <hr />
 <h2>TR — Gizlilik Politikası ve KVKK Aydınlatma Metni</h2>
-<p><strong>Son güncelleme:</strong> 2026-10-17 (v0.5.3)</p>
+<p><strong>Son güncelleme:</strong> 2026-10-19 (v0.5.7)</p>
 <h3>1. Veri sorumlusu (KVKK md.10/a)</h3>
 <p>Demirhan Çelik (OfferForge), Türkiye. İletişim ve başvuru:
 <strong>delibaltabaris5@gmail.com</strong></p>
@@ -351,7 +389,8 @@ erişimle silinir. Depolama izni kullanılmaz; bir hata olursa orijinal korunur.
 <h3>6. Hesap makinesi girişi ve sahte PIN (açıkça belirtilen özellikler)</h3>
 <p>Uygulama çalışan bir hesap makinesi olarak açılabilir; PIN'ini yazıp <code>=</code>
 tuşuna basınca kasa açılır. Bu, kurulumda, hesap makinesindeki ⓘ düğmesinde ve
-mağaza açıklamasında anlatılır. Başlatıcıda "Hesap Makinesi" adıyla görünür.
+mağaza açıklamasında anlatılır. Başlatıcıda ana profilde "Hesap Makinesi" adıyla görünür; hesap makinesi
+girişi Ayarlar'dan kapatılabilir. İş profili içinde GizliAlan simgesi yoktur.
 İsteğe bağlı sahte PIN, kendi anahtarı olan ayrı ve başlangıçta boş bir kasa
 açar.</p>
 <h3>6b. Satın almalar / GizliAlan Pro (0.4.9'dan; Play'de 0.5.0'dan)</h3>
@@ -380,12 +419,45 @@ ama şu anki Play yüklemesi değildir.</p>
 </blockquote>
 <p>"İkinci telefon → Kur" dersen Android cihazında bir iş profili oluşturur ve
 GizliAlan <strong>yalnızca o profilin</strong> sahibi olur (Shelter/Island ile aynı yöntem).
+Teknik olarak Android'in cihaz yönetimi arayüzü (Device Administration /
+<code>DevicePolicyManager</code>) kullanılır; Android bunu iş profili olarak gösterir.
+<strong>Kurulum başlamadan önce GizliAlan bir açıklama penceresi gösterir ve açık
+onayını ister</strong>: "Kabul ediyorum ve devam et" / "Vazgeç" düğmeleri (hiçbir şey
+önceden seçili değildir; vazgeçersen hiçbir şey oluşturulmaz). Ardından Android
+kendi bilgilendirmelerini gösterir.
+GizliAlan ana profilinin veya cihazın <strong>yöneticisi değildir</strong> ve <strong>hiçbir</strong>
+yönetici politikası (şifre, ekran kilidi, cihazı silme) istemez; ana profilde
+yönetici olarak etkinleştirilirse kendini devre dışı bırakır.
 GizliAlan bu rolü yalnızca şunlar için kullanır: kasa kilitliyken profil
-uygulamalarını gizlemek ve kilidi açınca geri göstermek, ana profildeki bir
+uygulamalarını gizlemek veya duraklatmak ve kilidi açınca geri göstermek, ana profildeki bir
 uygulamayı profilde kullanılabilir yapmak, profilin Play Store'unu açmak,
 profil uygulamalarını listelemek/başlatmak ve profili silmek. Profil içindeki
 uygulamaların verilerini, mesajlarını veya bildirimlerini okumaz; uygulama
-listesi (başlatılabilir uygulamaların adı ve simgesi) cihazda kalır.</p>
+listesi (başlatılabilir uygulamaların adı ve simgesi) cihazda kalır.
+Kasa kilitliyken ayrıca ana profil ile iş profili arasında kopyala-yapıştır ve
+paylaşımı engeller; iş profilindeki kişilerin ana profildeki arayan kimliği,
+kişi araması ve Bluetooth kişi paylaşımında görünmesini durdurur; kilit açılınca
+bu kısıtlar kalkar. Profil uygulamaları kilitliyken yalnızca "Kilitliyken iş
+uygulamalarını gizle" açıksa (varsayılan; İkinci telefon ekranından
+kapatılabilir) gizlenir/duraklatılır; uygulamalar kaldırılmaz, verileri korunur.
+GizliAlan'ın kendi başlatıcı simgesi iş profilinde gösterilmez (kasa yalnızca
+ana profildedir).
+Cihazda yalnızca şunlar saklanır (uygulamanın özel alanında, donanım anahtarıyla
+şifrelenmeden; hiçbir yere gönderilmez): profilin var olup olmadığı, hangi
+uygulamaları gizlediği, gizleme tercihin ve kasa ile profil arasındaki
+istekleri doğrulayan rastgele bir anahtar. İkinci telefon kodu ağ kullanmaz.
+Android iş profiline izin vermezse İkinci telefon ekranı nedenini açıklar. Bunun
+için cihazda, yalnızca herkese açık Android API'leriyle, ana kullanıcıda olup
+olmadığını, başka bir iş/klon profili ya da yönetim (cihaz yöneticisi / MDM)
+uygulaması veya politikası bulunup bulunmadığını kontrol eder ve algılanan yönetim
+uygulamasının adını gösterir. Bu kontrol yalnızca İkinci telefon ekranını
+açtığında yapılır, saklanmaz ve hiçbir yere gönderilmez.
+Profili kaldırdığında (uygulamada <strong>"İkinci telefonu kaldır"</strong> veya Android
+Ayarlar &gt; Hesaplar &gt; İş profili) <strong>iş profili ve içindeki her şey
+(uygulamalar, hesaplar, dosyalar) kalıcı olarak silinir</strong>; ana profildeki kasan
+etkilenmez. "Her şeyi sıfırla" iş profilini silmez; ayrıca kaldırmalısın.
+İkinci telefon <strong>kurulumu</strong> GizliAlan Pro (veya Google Play'in sunduğu ücretsiz
+deneme) gerektirir; Pro biterse mevcut profil ve kasa öğelerin kilitlenmez.</p>
 <h3>8. Aktarım (md.10/c)</h3>
 <p>Uygulama verileri geliştiriciye veya üçüncü kişilere <strong>aktarılmaz</strong>, yurt
 dışına aktarılmaz. Yalnızca sen destek için e-posta yazarsan, e-posta adresin
@@ -417,9 +489,12 @@ kapalıdır.</p>
 <h3>11. Yaş</h3>
 <p>GizliAlan yetişkinler (18+) içindir; çocuklara yönelik değildir.</p>
 <h3>12. Değişiklikler</h3>
-<p>Bu metin Play Faturalandırma / Pro, faturalama izinleri, Paylaş / Değerlendir /
-Geri bildirim (kategori, düzenlenebilir metin), Yardım, tema ve vurgu rengi tercihleri ile Play full derlemesindeki
-İkinci telefon için güncellendi. Veriye dokunan başka özellikler (ör. yedekleme)
+<p>Bu metin (v0.5.5) İkinci telefon kurulumundan önce gösterilen açık onay
+penceresini, iş profili (profil sahibi) veri işlemesini ve kasa kilitliyken
+uygulanan kısıtları, GizliAlan simgesinin iş profilinde gösterilmediğini,
+profil kaldırılınca içeriğinin silindiğini ve kurulumun Pro gerektirdiğini
+açıklamak için güncellendi. Önceki güncellemeler Play Faturalandırma / Pro,
+Paylaş / Değerlendir / Geri bildirim, Yardım, tema ve vurgu rengini kapsıyordu. Veriye dokunan başka özellikler (ör. yedekleme)
 eklenirse bu metin ve Play Veri güvenliği formu yayından <strong>önce</strong> güncellenir.</p>
 <p><em>This document is provided for transparency and Play policy readiness. It is not legal advice.</em></p>
 </body>
