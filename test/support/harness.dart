@@ -38,6 +38,7 @@ class Harness {
   static Future<Harness> start(
     WidgetTester tester, {
     Map<String, Object> prefs = const {},
+    bool calculator = false,
   }) async {
     await initializeDateFormatting();
     SharedPreferences.setMockInitialValues({'lang': 'en', ...prefs});
@@ -50,7 +51,7 @@ class Harness {
       await auth.setPin('2580');
       await auth.setDecoyPin('1111');
     });
-    await settings.setCalculatorEntryEnabled(false);
+    await settings.setCalculatorEntryEnabled(calculator);
     tester.view.physicalSize = const Size(1080, 2340);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);

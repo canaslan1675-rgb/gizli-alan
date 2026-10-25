@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../widgets/pin_hint_dialog.dart';
 import '../app.dart';
 import '../app_version.dart';
 import '../flavor.dart';
@@ -849,6 +850,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
+          if (!(GizliAlanApp.of(context).session?.isDecoy ?? true))
+            ListTile(
+              key: const ValueKey('settings_pin_hint'),
+              leading: const Icon(Icons.lightbulb_outline),
+              title: Text(t('pinHint')),
+              subtitle: Text(t('pinHintSub')),
+              onTap: () => editPinHint(context),
+            ),
           SwitchListTile(
             secondary: const Icon(Icons.fingerprint),
             title: Text(t('biometric')),

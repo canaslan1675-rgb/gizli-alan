@@ -79,6 +79,12 @@ const Map<String, String> tr = {
   'itemCounter': '{n} öğe',
   'quickLock': 'Hemen kilitle',
   'failedSummary': 'Son girişten beri {n} hatalı deneme',
+  'pinHint': 'PIN ipucu',
+  'pinHintOptional': 'PIN ipucu (isteğe bağlı)',
+  'pinHintSub': 'Hesap makinesinde ekrana uzun basınca görünür',
+  'pinHintExplain':
+      'Yalnızca sana hatırlatacak kısa bir not yaz; PIN\'in kendisini yazma. Cihazda şifreli saklanır, hesap makinesinde sonuç ekranına uzun basınca görünür. E-posta veya sunucu ile kurtarma yoktur.',
+  'pinHintBad': 'İpucu PIN\'i içeremez ve en fazla 60 karakter olabilir.',
   'freeBannerTitle': "Ücretsiz sürümdesin (en fazla {max} öğe)",
   'freeBannerBody':
       "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili) açılır ve gelecek güncellemeler dahil.",

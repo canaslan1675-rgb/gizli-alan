@@ -77,6 +77,12 @@ const Map<String, String> en = {
   'itemCounter': '{n} items',
   'quickLock': 'Lock now',
   'failedSummary': '{n} wrong attempts since your last entry',
+  'pinHint': 'PIN hint',
+  'pinHintOptional': 'PIN hint (optional)',
+  'pinHintSub': 'Shown when you long-press the calculator display',
+  'pinHintExplain':
+      'Write a short reminder only you understand; never the PIN itself. Stored encrypted on the device and shown when you long-press the calculator\'s result display. There is no e-mail or server recovery.',
+  'pinHintBad': 'The hint cannot contain the PIN and is at most 60 characters.',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
       "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",

@@ -60,6 +60,21 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
     await app.unlockWithBiometrics();
   }
 
+  /// Discreet PIN hint path (F): long-press the display. Shows the hint
+  /// only if the owner set one; otherwise nothing happens.
+  Future<void> _showHint() async {
+    if (!widget.vaultEntry) return;
+    final hint = await GizliAlanApp.of(context).auth.pinHint();
+    if (hint == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        key: const ValueKey('calc_hint'),
+        content: Text(hint),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   void _showInfo() {
     final t = L10n.current;
     showDialog<void>(
@@ -139,40 +154,48 @@ class _DecoyCalculatorScreenState extends State<DecoyCalculatorScreen> {
         child: Column(
           children: [
             Expanded(
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                alignment: Alignment.bottomRight,
-                // scaleDown keeps the display readable on short screens.
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
+              child: GestureDetector(
+                key: const ValueKey('calc_display_area'),
+                behavior: HitTestBehavior.opaque,
+                onLongPress: _showHint,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   alignment: Alignment.bottomRight,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        _engine.topLine,
-                        key: const ValueKey('calc_expression'),
-                        maxLines: 2,
-                        textAlign: TextAlign.right,
-                        style: TextStyle(fontSize: 22, color: gc.textSecondary),
-                      ),
-                      const SizedBox(height: 8),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          _engine.display,
-                          key: const ValueKey('calc_display'),
+                  // scaleDown keeps the display readable on short screens.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.bottomRight,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          _engine.topLine,
+                          key: const ValueKey('calc_expression'),
+                          maxLines: 2,
+                          textAlign: TextAlign.right,
                           style: TextStyle(
-                            fontSize: 56,
-                            fontWeight: FontWeight.w300,
-                            color: gc.textPrimary,
+                            fontSize: 22,
+                            color: gc.textSecondary,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                        const SizedBox(height: 8),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            _engine.display,
+                            key: const ValueKey('calc_display'),
+                            style: TextStyle(
+                              fontSize: 56,
+                              fontWeight: FontWeight.w300,
+                              color: gc.textPrimary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 ),
               ),
