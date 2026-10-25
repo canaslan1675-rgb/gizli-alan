@@ -169,7 +169,44 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         ? await sp.listApps()
         : const <ProfileApp>[];
     if (mounted) setState(() => _profileApps = apps);
+    _loadRecent();
   }
+
+  List<String> _recent = const [];
+
+  Future<void> _loadRecent() async {
+    final r = await GizliAlanApp.of(context).session?.recentApps.list();
+    if (mounted && r != null) setState(() => _recent = r);
+  }
+
+  /// Last opened apps that still exist in the profile, newest first.
+  List<ProfileApp> get _recentApps => [
+    for (final pkg in _recent)
+      ..._profileApps.where((a) => a.packageName == pkg).take(1),
+  ];
+
+  Widget _sectionTitle(IconData icon, String text) => SliverToBoxAdapter(
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: GizliTheme.textSecondary),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                letterSpacing: 1.1,
+                color: GizliTheme.textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 
   void _open(Widget screen) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen)).then((
@@ -188,7 +225,18 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
   Future<void> _launchProfileApp(ProfileApp a) async {
     final sp = GizliAlanApp.of(context).secondPhoneIfUnlocked;
     if (sp == null) return;
+    // Recorded before launching: the launch may lock the vault (and drop
+    // the session key) right away.
+    final app = GizliAlanApp.of(context);
+    final recent = app.session?.recentApps;
+    final before = await recent?.list();
+    await recent?.record(a.packageName);
     final r = await sp.launch(a);
+    if (r != 'ok' && before != null && app.isUnlocked) {
+      // Not opened: undo the record.
+      await recent?.restore(before);
+    }
+    if (mounted) _loadRecent();
     if (r != 'ok' && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(L10n.current('spFailed').replaceAll('{s}', r))),
@@ -440,6 +488,20 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                                 .map((a) => _AppTile(key: a.key, icon: a))
                                 .toList(),
                           ),
+                          if (_recentApps.isNotEmpty) ...[
+                            _sectionTitle(Icons.history, t('recentApps')),
+                            _grid(
+                              _recentApps
+                                  .map(
+                                    (a) => ProfileAppTile(
+                                      key: ValueKey('recent_${a.packageName}'),
+                                      app: a,
+                                      onTap: () => _launchProfileApp(a),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
                           if (_profileApps.isNotEmpty) ...[
                             SliverToBoxAdapter(
                               child: Padding(

@@ -98,6 +98,7 @@ const Map<String, String> tr = {
   'trashKindPhoto': 'Fotoğraf',
   'trashKindFile': 'Dosya',
   'trashKindNote': 'Not',
+  'recentApps': 'Son açılanlar',
   'freeBannerTitle': "Ücretsiz sürümdesin (en fazla {max} öğe)",
   'freeBannerBody':
       "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili) açılır ve gelecek güncellemeler dahil.",

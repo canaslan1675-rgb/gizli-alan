@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 
 import 'crypto_service.dart';
 import 'notes_repository.dart';
+import 'recent_apps.dart';
 import 'vault_events.dart';
 import 'vault_space.dart';
 import 'vault_storage.dart';
@@ -51,6 +52,7 @@ class VaultSession {
        ) {
     notes = NotesRepository(_files, File(p.join(dir.path, 'notes.gae')));
     events = VaultEventLog(_files, File(p.join(dir.path, 'events.gae')));
+    recentApps = RecentApps(_files, File(p.join(dir.path, 'recent_apps.gae')));
     gallery = VaultStorage(
       _files,
       Directory(p.join(dir.path, 'gallery')),
@@ -73,6 +75,9 @@ class VaultSession {
   late final VaultEventLog events;
   late final VaultStorage gallery;
   late final VaultStorage files;
+
+  /// Recently opened İkinci telefon apps (our own launches only).
+  late final RecentApps recentApps;
 
   bool get isDecoy => space == VaultSpace.decoy;
 

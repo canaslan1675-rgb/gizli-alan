@@ -96,6 +96,7 @@ const Map<String, String> en = {
   'trashKindPhoto': 'Photo',
   'trashKindFile': 'File',
   'trashKindNote': 'Note',
+  'recentApps': 'Recently opened',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
       "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",
