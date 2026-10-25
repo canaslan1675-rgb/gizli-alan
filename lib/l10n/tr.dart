@@ -111,6 +111,14 @@ const Map<String, String> tr = {
   'albumLimitTitle': 'Ücretsiz sürümde 1 albüm',
   'albumLimitBody':
       'Ücretsiz sürümde bir albüm oluşturabilirsin. Pro ile sınırsız albüm açılır; mevcut albümlerin ve fotoğrafların olduğu gibi kalır.',
+  'bookmarks': 'Yer imleri',
+  'bookmarkAdd': 'Yer imi ekle',
+  'bookmarkAdded': 'Yer imlerine eklendi',
+  'bookmarksEmpty':
+      'Henüz yer imi yok. Bir sayfadayken yer imi simgesine dokun. Yer imleri kasada şifreli saklanır; geçmiş kilitlenince yine silinir.',
+  'bookmarkLimitTitle': 'Ücretsiz sürümde 5 yer imi',
+  'bookmarkLimitBody':
+      'Ücretsiz sürümde en fazla {max} yer imi saklanır. Pro ile sınırsız yer imi açılır; mevcut yer imlerin kalır.',
   'freeBannerTitle': "Ücretsiz sürümdesin (en fazla {max} öğe)",
   'freeBannerBody':
       "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili) açılır ve gelecek güncellemeler dahil.",

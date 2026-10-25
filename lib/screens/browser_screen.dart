@@ -5,7 +5,9 @@ import '../app.dart';
 import '../l10n/l10n.dart';
 import '../services/browser_download.dart';
 import '../services/browser_engine.dart';
+import '../services/bookmarks.dart';
 import '../services/browser_logic.dart';
+import '../services/pro_entitlement.dart';
 import '../theme.dart';
 
 /// In-vault private browser (#32). One tab, Android System WebView. Only
@@ -145,6 +147,77 @@ class _BrowserScreenState extends State<BrowserScreen> {
     await _e.load(uri);
   }
 
+  // --------------------------------------------------------- bookmarks (K)
+
+  Future<void> _addBookmark() async {
+    final t = L10n.current;
+    final app = GizliAlanApp.of(context);
+    final bm = app.session?.bookmarks;
+    final url = _e.url.value;
+    if (bm == null || url.isEmpty) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await bm.add(
+        Uri.tryParse(url)?.host ?? url,
+        url,
+        pro: ProEntitlement.isActive(app.settings),
+      );
+      messenger.showSnackBar(SnackBar(content: Text(t('bookmarkAdded'))));
+    } on StateError {
+      if (!mounted) return;
+      await showProRequired(
+        context,
+        title: t('bookmarkLimitTitle'),
+        body: t(
+          'bookmarkLimitBody',
+        ).replaceAll('{max}', '${BookmarkLimit.freeBookmarks}'),
+      );
+    }
+  }
+
+  Future<void> _showBookmarks() async {
+    final t = L10n.current;
+    final bm = GizliAlanApp.of(context).session?.bookmarks;
+    if (bm == null) return;
+    var list = await bm.list();
+    if (!mounted) return;
+    final url = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => SafeArea(
+          child: list.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(t('bookmarksEmpty')),
+                )
+              : ListView(
+                  shrinkWrap: true,
+                  children: [
+                    for (final b in list)
+                      ListTile(
+                        key: ValueKey('bookmark_${b.url}'),
+                        leading: const Icon(Icons.bookmark_outline),
+                        title: Text(b.title, overflow: TextOverflow.ellipsis),
+                        subtitle: Text(b.url, overflow: TextOverflow.ellipsis),
+                        onTap: () => Navigator.pop(ctx, b.url),
+                        trailing: IconButton(
+                          tooltip: t('delete'),
+                          icon: const Icon(Icons.close),
+                          onPressed: () async {
+                            await bm.remove(b.url);
+                            final next = await bm.list();
+                            setLocal(() => list = next);
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+        ),
+      ),
+    );
+    if (url != null && mounted) await _go(url);
+  }
+
   @override
   void dispose() {
     _engine
@@ -211,6 +284,18 @@ class _BrowserScreenState extends State<BrowserScreen> {
                 tooltip: t('browserForward'),
                 icon: const Icon(Icons.arrow_forward),
                 onPressed: _canForward ? () => _e.goForward() : null,
+              ),
+              IconButton(
+                key: const ValueKey('browser_bookmark_add'),
+                tooltip: t('bookmarkAdd'),
+                icon: const Icon(Icons.bookmark_add_outlined),
+                onPressed: _started ? _addBookmark : null,
+              ),
+              IconButton(
+                key: const ValueKey('browser_bookmarks'),
+                tooltip: t('bookmarks'),
+                icon: const Icon(Icons.bookmarks_outlined),
+                onPressed: _showBookmarks,
               ),
               IconButton(
                 key: const ValueKey('browser_reload'),

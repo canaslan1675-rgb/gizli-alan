@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 
 import 'crypto_service.dart';
+import 'bookmarks.dart';
 import 'gallery_albums.dart';
 import 'notes_repository.dart';
 import 'recent_apps.dart';
@@ -53,6 +54,7 @@ class VaultSession {
        ) {
     notes = NotesRepository(_files, File(p.join(dir.path, 'notes.gae')));
     events = VaultEventLog(_files, File(p.join(dir.path, 'events.gae')));
+    bookmarks = Bookmarks(_files, File(p.join(dir.path, 'bookmarks.gae')));
     recentApps = RecentApps(_files, File(p.join(dir.path, 'recent_apps.gae')));
     gallery = VaultStorage(
       _files,
@@ -81,6 +83,9 @@ class VaultSession {
   late final VaultEventLog events;
   late final VaultStorage gallery;
   late final VaultStorage files;
+
+  /// Browser bookmarks (0.6.0 K).
+  late final Bookmarks bookmarks;
 
   /// Gallery albums (0.6.0 H).
   late final GalleryAlbums albums;

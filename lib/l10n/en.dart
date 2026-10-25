@@ -110,6 +110,14 @@ const Map<String, String> en = {
   'albumLimitTitle': '1 album in the free version',
   'albumLimitBody':
       'The free version has one album. Pro unlocks unlimited albums; your existing albums and photos stay as they are.',
+  'bookmarks': 'Bookmarks',
+  'bookmarkAdd': 'Add bookmark',
+  'bookmarkAdded': 'Added to bookmarks',
+  'bookmarksEmpty':
+      'No bookmarks yet. On a page, tap the bookmark icon. Bookmarks are stored encrypted in the vault; history is still cleared on lock.',
+  'bookmarkLimitTitle': '5 bookmarks in the free version',
+  'bookmarkLimitBody':
+      'The free version keeps up to {max} bookmarks. Pro unlocks unlimited bookmarks; your existing bookmarks stay.',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
       "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",
