@@ -76,6 +76,7 @@ const Map<String, String> en = {
   'payBuyOnce': "Buy once – {price}",
   'itemCounter': '{n} items',
   'quickLock': 'Lock now',
+  'failedSummary': '{n} wrong attempts since your last entry',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
       "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",

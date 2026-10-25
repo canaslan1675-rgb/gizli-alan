@@ -219,7 +219,12 @@ class GizliAlanAppState extends State<GizliAlanApp>
   // ------------------------------------------------------------ unlock / lock
 
   /// Opens [space] and shows the vault home on top of the entry screen.
+  /// Wrong PIN-pad attempts reported on this real-vault entry (0.6.0 E);
+  /// shown as a neutral text line on the vault home. Never set for decoy.
+  int failedSinceLastUnlock = 0;
+
   Future<void> enterVault(VaultSpace space) async {
+    failedSinceLastUnlock = 0;
     final key = await auth.dataKey(space);
     final dir = await baseDir();
     _session?.close();
@@ -236,6 +241,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
     }
     if (space == VaultSpace.real) {
       final failed = await auth.takeFailuresSinceUnlock();
+      failedSinceLastUnlock = failed;
       if (failed > 0) {
         await session.events.add(VaultEventType.failedUnlocks, {
           'n': '$failed',

@@ -63,6 +63,37 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
   }
 
   int? _stored;
+  bool _failedSeen = false;
+
+  /// Neutral text summary of wrong PIN attempts since the last entry (E).
+  static String? failedSummary(int n, L10n t) =>
+      n <= 0 ? null : t('failedSummary').replaceAll('{n}', '$n');
+
+  Widget _failed(GizliAlanAppState app, L10n t) {
+    final text = (_failedSeen || (app.session?.isDecoy ?? true))
+        ? null
+        : failedSummary(app.failedSinceLastUnlock, t);
+    if (text == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: InkWell(
+        key: const ValueKey('failed_summary'),
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => setState(() => _failedSeen = true),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 12,
+              color: GizliTheme.textSecondary,
+              shadows: _homeTextShadow,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   /// Item counter for free users (B): photos + files + notes vs the limit.
   Future<void> _loadCount() async {
@@ -397,6 +428,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                       ),
                     ),
                     _counter(app, t),
+                    _failed(app, t),
                     const SizedBox(height: 32),
                     Expanded(
                       child: CustomScrollView(
