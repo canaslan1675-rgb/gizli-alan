@@ -57,3 +57,24 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 | 2.21 | Tap a download link (e.g. a PDF/zip), a `tel:`/`intent:` link and a page asking for location/camera. | Download does nothing (downloads disabled); non-web links show "blocked" snackbar; permission requests are denied silently, no system permission dialog. |
 | 2.22 | Settings → Apps → Calculator → Data usage. | Traffic only while using the browser; none from the rest of the app. |
 | 2.23 | Vault home on a 1080×2400 phone (v0.4.0). | Default sunset/sea picture fills the screen without visible pixelation; clock, tiles, labels, dock readable. Bottom signature (monospace, faint): `GizliAlan Vault · v0.4.0 (build 6) · play/full`, `AES-256-GCM · PIN: PBKDF2-SHA256 120k · FLAG_SECURE`, `● vault: unlocked · © OfferForge`; not tappable, not over tiles. Not on the calculator. Settings → Wallpaper colour swatch → plain gradient; picture swatch → back. Settings bottom shows "Varsayılan arka plan: Created with Grok". |
+
+
+## 0.6.0 — tek seferlik Pro + tutundurma / one-time Pro + retention (branch `joi/060-retention`)
+
+| # | Step | Expected |
+|---|------|----------|
+| 6.1 | Play test track, license tester, free account: open Pro. | Only "GizliAlan Pro – tek seferlik", Play price (fallback text "499 TL"), no trial, no monthly/yearly. Buy → Pro active; reopen app → still Pro; Play Console shows the order **acknowledged** (not refunded after 3 days). |
+| 6.2 | Account with an old `gizlialan_pro` subscription → "Satın alımları geri yükle". | Pro stays active (subscription still recognised, not sold). |
+| 6.3 | Reinstall, same Google account → Restore. | One-time Pro restored. |
+| 6.4 | Free user, first vault entry after update. | One unobtrusive card "Ücretsiz sürümdesin (en fazla 50 öğe)…"; lock + unlock → card does not return. |
+| 6.5 | Free vault home. | Counter "n/50 öğe" under the title; at 50 it turns amber, tap → single limit offer; existing items stay visible and openable. Pro → no counter. |
+| 6.6 | Gallery/Notes/Files app bar lock icon; double-tap the home clock. | Vault locks at once (back to calculator). |
+| 6.7 | Type a wrong PIN 3× on the PIN pad, then the right PIN. | Home shows "Son girişten beri 3 hatalı deneme" (text only, tap hides). Decoy vault never shows it. No camera use. |
+| 6.8 | Settings → PIN ipucu: try a hint containing the PIN; then a normal hint. Lock, long-press the calculator result display. | PIN-containing hint rejected; normal hint shown in a snackbar; without a hint long-press does nothing. Onboarding has the optional hint field. |
+| 6.9 | Delete a photo, a file and a note → Settings → Çöp kutusu. | All three listed with "30 gün sonra silinecek"; Restore puts them back; Delete for good / Empty asks first. Bin items do not count toward 50. |
+| 6.10 | Gallery: create album, long-press photo → Albüme taşı; free: try a 2nd album. | Filter chips work; 2nd album → Pro offer; deleting an album keeps photos; counter unchanged. |
+| 6.11 | Files: import an .mp4 → Oynat; then Lock during playback. | Plays inside the vault with play/pause/scrub; screenshot blocked (FLAG_SECURE) — **check the video surface too**; after close/lock `cache/vplay` is empty (adb run-as). |
+| 6.12 | Browser: add 5 bookmarks (free), try a 6th. | 6th → Pro offer; bookmarks survive lock; history/cookies still wiped on lock. |
+| 6.13 | Pro: Settings → Şifreli yedek oluştur → save to Downloads/USB; on a 2nd phone (or after reset) → Yedekten geri yükle with the password; wrong password once. | One `.gabk` file, nothing uploaded; wrong password → "Şifre yanlış veya dosya bozuk"; right one → photos/files/notes/albums/bookmarks back; restoring twice adds nothing. Free user: create → Pro offer, restore works. |
+| 6.14 | İkinci telefon (full): open 2 work apps from the vault grid. | "Son açılanlar" row shows them (newest first, max 4). No usage-access prompt. |
+| 6.15 | `aapt2 dump badging` on the APK. | Permissions unchanged vs 0.5.9 (USE_BIOMETRIC, INTERNET, BILLING + androidx receiver); no ACCESS_NETWORK_STATE / WAKE_LOCK / PACKAGE_USAGE_STATS / CAMERA. |
