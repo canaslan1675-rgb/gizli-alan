@@ -12,7 +12,10 @@ import 'browser_screen.dart';
 import 'decoy_calculator_screen.dart';
 import 'files_screen.dart';
 import 'gallery_screen.dart';
+import '../services/pro_billing.dart';
+import '../services/pro_entitlement.dart';
 import '../services/second_phone_service.dart';
+import '../widgets/pro_gate.dart';
 import '../widgets/profile_app_tile.dart';
 import 'notes_list_screen.dart';
 import 'notifications_screen.dart';
@@ -113,6 +116,83 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         SnackBar(content: Text(L10n.current('spFailed').replaceAll('{s}', r))),
       );
     }
+  }
+
+  /// Free tier notice on vault entry (and later, until dismissed): the
+  /// item limit, the one-time Pro price and what Pro unlocks.
+  /// Shown once: on the first vault entry where it applies it is marked as
+  /// seen right away, so later entries/launches do not show it again.
+  bool? _bannerThisSession;
+  bool _showFreeBanner(GizliAlanAppState app) {
+    if (_bannerThisSession == null) {
+      final show =
+          ProEntitlement.available &&
+          !ProEntitlement.isActive(app.settings) &&
+          !app.settings.freeBannerDismissed;
+      _bannerThisSession = show;
+      if (show) app.settings.setFreeBannerDismissed(true);
+    }
+    return _bannerThisSession! && !ProEntitlement.isActive(app.settings);
+  }
+
+  Widget _freeBanner(GizliAlanAppState app, L10n t) {
+    final price = app.billing?.plan(kPlanLifetime)?.price ?? kProFallbackPrice;
+    final body =
+        (Flavor.hasSecondPhone ? t('freeBannerBody') : t('freeBannerBodyPlay'))
+            .replaceAll('{price}', price);
+    return Container(
+      key: const ValueKey('free_banner'),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.fromLTRB(14, 12, 6, 6),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: GizliTheme.mint.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            t(
+              'freeBannerTitle',
+            ).replaceAll('{max}', '${ItemLimit.freeItemLimit}'),
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: GizliTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            body,
+            style: const TextStyle(
+              fontSize: 13,
+              color: GizliTheme.textSecondary,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                key: const ValueKey('free_banner_dismiss'),
+                onPressed: () async {
+                  await app.settings.setFreeBannerDismissed(true);
+                  if (mounted) setState(() => _bannerThisSession = false);
+                },
+                child: Text(t('freeBannerDismiss')),
+              ),
+              FilledButton(
+                key: const ValueKey('free_banner_cta'),
+                onPressed: () async {
+                  await openPro(context);
+                  if (mounted) setState(() {});
+                },
+                child: Text(t('freeBannerCta')),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -267,6 +347,8 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                     Expanded(
                       child: CustomScrollView(
                         slivers: [
+                          if (_showFreeBanner(app))
+                            SliverToBoxAdapter(child: _freeBanner(app, t)),
                           _grid(
                             apps
                                 .map((a) => _AppTile(key: a.key, icon: a))

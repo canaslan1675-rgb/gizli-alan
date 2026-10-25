@@ -4,8 +4,22 @@ import 'package:flutter/foundation.dart';
 
 import 'settings_service.dart';
 
-/// Google Play subscription product (docs/PLAY_BILLING_SETUP.md).
+/// Legacy Google Play subscription product (docs/PLAY_BILLING_SETUP.md).
+/// No longer sold (0.5.8+), but an active subscription still grants Pro.
 const String kProProductId = 'gizlialan_pro';
+
+/// One-time (non-consumable, INAPP) Pro purchase sold from 0.5.8.
+const String kProLifetimeId = 'gizlialan_pro_lifetime';
+
+/// [ProPlan.basePlanId] used for the one-time product.
+const String kPlanLifetime = 'lifetime';
+
+/// Shown only when Play's formatted price could not be loaded.
+const String kProFallbackPrice = '499 TL';
+
+/// Products that grant Pro: the one-time purchase and the legacy
+/// subscription (existing subscribers keep Pro).
+bool isProProduct(String id) => id == kProProductId || id == kProLifetimeId;
 
 /// Base plans of [kProProductId].
 const String kPlanMonthly = 'monthly';
@@ -157,7 +171,7 @@ class ProBilling extends ChangeNotifier {
     var pro = false;
     for (final p in owned) {
       final ok =
-          p.productId == kProProductId &&
+          isProProduct(p.productId) &&
           (p.status == BillingStatus.purchased ||
               p.status == BillingStatus.restored);
       if (ok) pro = true;
@@ -183,7 +197,7 @@ class ProBilling extends ChangeNotifier {
 
   Future<void> _onUpdates(List<BillingPurchase> list) async {
     for (final p in list) {
-      if (p.productId != kProProductId) {
+      if (!isProProduct(p.productId)) {
         if (p.needsCompletion) await _complete(p);
         continue;
       }

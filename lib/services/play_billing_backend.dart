@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart'
+    show ProductType;
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 import 'pro_billing.dart';
@@ -17,35 +19,20 @@ class PlayBillingBackend implements BillingBackend {
 
   @override
   Future<List<ProPlan>> loadPlans() async {
-    final r = await _iap.queryProductDetails({kProProductId});
+    // Only the one-time product is sold (0.5.8+); the legacy subscription
+    // is still recognised in ownedPurchases() but no longer offered.
+    final r = await _iap.queryProductDetails({kProLifetimeId});
     if (r.error != null && r.productDetails.isEmpty) {
       throw StateError(r.error!.message);
     }
-    // One GooglePlayProductDetails per offer. Show the base-plan price;
-    // buy the free-trial offer when Play offers one (eligible users only).
-    final base = <String, GooglePlayProductDetails>{};
-    final trial = <String, GooglePlayProductDetails>{};
+    final out = <ProPlan>[];
     for (final d in r.productDetails.whereType<GooglePlayProductDetails>()) {
-      final i = d.subscriptionIndex;
-      final offers = d.productDetails.subscriptionOfferDetails;
-      if (i == null || offers == null) continue;
-      final o = offers[i];
-      if (o.offerId == null) {
-        base[o.basePlanId] = d;
-      } else if (o.pricingPhases.isNotEmpty &&
-          o.pricingPhases.first.priceAmountMicros == 0) {
-        trial[o.basePlanId] = d;
+      if (d.id == kProLifetimeId &&
+          d.productDetails.productType == ProductType.inapp) {
+        out.add(ProPlan(basePlanId: kPlanLifetime, price: d.price, handle: d));
       }
     }
-    return [
-      for (final e in base.entries)
-        ProPlan(
-          basePlanId: e.key,
-          price: e.value.price,
-          hasTrial: trial.containsKey(e.key),
-          handle: trial[e.key] ?? e.value,
-        ),
-    ];
+    return out;
   }
 
   @override
@@ -78,6 +65,7 @@ class PlayBillingBackend implements BillingBackend {
     await _iap.buyNonConsumable(
       purchaseParam: GooglePlayPurchaseParam(
         productDetails: d,
+        // null for the one-time (INAPP) product.
         offerToken: d.offerToken,
       ),
     );

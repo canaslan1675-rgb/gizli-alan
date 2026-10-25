@@ -26,6 +26,7 @@ class SettingsService {
   static const _kWallpaperImage = 'wallpaper_image';
   static const _kProStub = 'pro_stub_active';
   static const _kPlayPro = 'play_pro_active';
+  static const _kFreeBannerDismissed = 'free_banner_dismissed';
   static const _kHideCalcInfo = 'hide_calc_info_icon';
   static const _kDeleteOriginal = 'delete_original_after_import';
   static const _kDeleteOriginalAsked = 'delete_original_asked';
@@ -72,6 +73,13 @@ class SettingsService {
   bool get playProActive => _prefs.getBool(_kPlayPro) ?? false;
 
   Future<void> setPlayProActive(bool v) => _prefs.setBool(_kPlayPro, v);
+
+  /// The vault-home "limited free version" card was dismissed.
+  bool get freeBannerDismissed =>
+      _prefs.getBool(_kFreeBannerDismissed) ?? false;
+
+  Future<void> setFreeBannerDismissed(bool v) =>
+      _prefs.setBool(_kFreeBannerDismissed, v);
 
   /// User opt-in (Pro only): hide the ⓘ button on the calculator. Must be
   /// readable before unlock, so it lives in app settings (like the
