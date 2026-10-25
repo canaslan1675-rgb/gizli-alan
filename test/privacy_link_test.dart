@@ -99,6 +99,8 @@ void main() {
       200,
       scrollable: list,
     );
+    await tester.ensureVisible(find.text('Privacy & permissions'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Privacy & permissions'));
     await tester.pumpAndSettle();
   }

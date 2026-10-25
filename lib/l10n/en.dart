@@ -83,6 +83,19 @@ const Map<String, String> en = {
   'pinHintExplain':
       'Write a short reminder only you understand; never the PIN itself. Stored encrypted on the device and shown when you long-press the calculator\'s result display. There is no e-mail or server recovery.',
   'pinHintBad': 'The hint cannot contain the PIN and is at most 60 characters.',
+  'trash': 'Recycle bin',
+  'trashSub': 'Deleted items are kept for 30 days, then deleted for good',
+  'trashEmpty': 'The recycle bin is empty',
+  'trashEmptyAll': 'Empty recycle bin',
+  'trashEmptyConfirm':
+      'Delete everything in the recycle bin for good? This cannot be undone.',
+  'trashRestore': 'Restore',
+  'trashDeleteForever': 'Delete for good',
+  'trashDaysLeft': 'Deleted in {d} days',
+  'trashRestored': 'Restored',
+  'trashKindPhoto': 'Photo',
+  'trashKindFile': 'File',
+  'trashKindNote': 'Note',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
       "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",
@@ -164,7 +177,8 @@ const Map<String, String> en = {
   'exported': 'Exported (decrypted copy saved where you chose)',
   'exportFailed': 'Export failed',
   'delete': 'Delete',
-  'deleteItemConfirm': 'Permanently delete this item from the vault?',
+  'deleteItemConfirm':
+      'Move this item to the recycle bin? It is deleted for good after 30 days.',
   // Notes
   'newNote': 'New note',
   'editNote': 'Edit note',
@@ -175,7 +189,8 @@ const Map<String, String> en = {
   'search': 'Search',
   'emptyNotes':
       'No notes yet.\nYour first private note stays encrypted on this device.',
-  'deleteNoteConfirm': 'Delete this note?',
+  'deleteNoteConfirm':
+      'Move this note to the recycle bin? It is deleted for good after 30 days.',
   // Settings
   'security': 'Security',
   'changePin': 'Change PIN',

@@ -11,6 +11,7 @@ import 'screens/decoy_calculator_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/pin_lock_screen.dart';
 import 'screens/vault_home_screen.dart';
+import 'services/recycle_bin.dart';
 import 'services/auth_service.dart';
 import 'services/auto_lock.dart';
 import 'services/biometric_service.dart';
@@ -247,6 +248,11 @@ class GizliAlanAppState extends State<GizliAlanApp>
           'n': '$failed',
         });
       }
+    }
+    try {
+      await RecycleBin(session).purgeExpired();
+    } catch (e) {
+      debugPrint('recycle bin purge skipped: $e');
     }
     setState(() => _session = session);
     navKey.currentState?.pushAndRemoveUntil(

@@ -18,6 +18,7 @@ import '../theme.dart';
 import '../widgets/work_apps_hide_switches.dart';
 import '../widgets/pro_gate.dart';
 import 'help_screen.dart';
+import 'trash_screen.dart';
 import 'set_pin_screen.dart';
 
 /// Vault settings. In the decoy vault only neutral options are shown
@@ -858,6 +859,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               subtitle: Text(t('pinHintSub')),
               onTap: () => editPinHint(context),
             ),
+          ListTile(
+            key: const ValueKey('settings_trash'),
+            leading: const Icon(Icons.delete_outline),
+            title: Text(t('trash')),
+            subtitle: Text(t('trashSub')),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const TrashScreen())),
+          ),
           SwitchListTile(
             secondary: const Icon(Icons.fingerprint),
             title: Text(t('biometric')),

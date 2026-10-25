@@ -85,6 +85,19 @@ const Map<String, String> tr = {
   'pinHintExplain':
       'Yalnızca sana hatırlatacak kısa bir not yaz; PIN\'in kendisini yazma. Cihazda şifreli saklanır, hesap makinesinde sonuç ekranına uzun basınca görünür. E-posta veya sunucu ile kurtarma yoktur.',
   'pinHintBad': 'İpucu PIN\'i içeremez ve en fazla 60 karakter olabilir.',
+  'trash': 'Çöp kutusu',
+  'trashSub': 'Silinenler 30 gün saklanır, sonra kalıcı olarak silinir',
+  'trashEmpty': 'Çöp kutusu boş',
+  'trashEmptyAll': 'Çöp kutusunu boşalt',
+  'trashEmptyConfirm':
+      'Çöp kutusundaki her şey kalıcı olarak silinsin mi? Bu geri alınamaz.',
+  'trashRestore': 'Geri yükle',
+  'trashDeleteForever': 'Kalıcı olarak sil',
+  'trashDaysLeft': '{d} gün sonra silinecek',
+  'trashRestored': 'Geri yüklendi',
+  'trashKindPhoto': 'Fotoğraf',
+  'trashKindFile': 'Dosya',
+  'trashKindNote': 'Not',
   'freeBannerTitle': "Ücretsiz sürümdesin (en fazla {max} öğe)",
   'freeBannerBody':
       "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili) açılır ve gelecek güncellemeler dahil.",
@@ -165,7 +178,8 @@ const Map<String, String> tr = {
   'exported': 'Dışa aktarıldı (şifresiz kopya seçtiğin yere kaydedildi)',
   'exportFailed': 'Dışa aktarma başarısız',
   'delete': 'Sil',
-  'deleteItemConfirm': 'Bu öğe kasadan kalıcı olarak silinsin mi?',
+  'deleteItemConfirm':
+      'Bu öğe çöp kutusuna taşınsın mı? 30 gün sonra kalıcı olarak silinir.',
   // Notes
   'newNote': 'Yeni not',
   'editNote': 'Notu düzenle',
@@ -175,7 +189,8 @@ const Map<String, String> tr = {
   'save': 'Kaydet',
   'search': 'Ara',
   'emptyNotes': 'Henüz not yok.\nİlk özel notun bu cihazda şifreli kalır.',
-  'deleteNoteConfirm': 'Bu not silinsin mi?',
+  'deleteNoteConfirm':
+      'Bu not çöp kutusuna taşınsın mı? 30 gün sonra kalıcı olarak silinir.',
   // Settings
   'security': 'Güvenlik',
   'changePin': 'PIN değiştir',
