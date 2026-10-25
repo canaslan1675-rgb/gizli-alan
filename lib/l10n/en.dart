@@ -429,7 +429,8 @@ const Map<String, String> en = {
   'evSecondPhoneAppAdded': '"{app}" added to the second phone',
   'evSecondPhoneRemoved': 'Second phone removed',
   'proTitle': 'GizliAlan Pro',
-  'proSettingsHint': 'Plans and prices (no purchases in this test build)',
+  'proSettingsHint': 'Buy or restore Pro',
+  'proSettingsHintStub': 'Plans and prices (no purchases in this test build)',
   'proTestBuildNote':
       'This is a test build: there are no purchases and no payment is taken. Prices are planned prices.',
   'proFree': 'Free',

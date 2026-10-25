@@ -13,7 +13,7 @@ Both: launcher label "Calculator"/"Hesap Makinesi", FLAG_SECURE, only `USE_BIOME
 same `key.properties` release signing. They install side by side. Which flavor is
 submitted to Play is still the **owner's** choice after device testing (#11 keeps the
 `owner` label); this document assumes **`play`** for the listing, screenshots and
-reviewer notes. Build: `flutter build appbundle --release --flavor play`.
+reviewer notes. Build: `flutter build appbundle --release --flavor full`.
 
 
 Status: **draft, not submitted.** Publishing, Console setup and any purchase

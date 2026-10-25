@@ -25,7 +25,7 @@ Legend: ✅ done/verified · ⚠️ partial / agent follow-up (code change, not 
 | B1 | Flavor `play`, applicationId `com.offerforge.gizlialan` | ✅ | PR #26 |
 | B2 | **targetSdk ≥ 36** (required for new apps since 31 Aug 2026) | ✅ verified 2026-09-26 | `aapt2 dump badging app-play-release.apk` → `targetSdkVersion:'36'`, compileSdk 36 |
 | B3 | minSdk 28 | ✅ | fine |
-| B4 | **AAB** builds | ✅ verified | `flutter build appbundle --release --flavor play` → `app-play-release.aab` (53.7 MB, debug-signed on the box) |
+| B4 | **AAB** builds | ✅ verified | `flutter build appbundle --release --flavor full` → `app-full-release.aab` (53.7 MB, debug-signed on the box) |
 | B5 | **64-bit** native libs | ✅ verified | AAB contains `arm64-v8a`, `armeabi-v7a`, `x86_64` |
 | B6 | **16 KB page size** | ✅ verified | all 64-bit `.so` have LOAD alignment ≥ 16384 (`libflutter/libapp` 65536; `libdartjni`, `libdatastore_shared_counter` 16384). Re-check in Play Console → App bundle explorer after upload |
 | B7 | Permissions = `USE_BIOMETRIC` + `INTERNET` (browser only, since 0.4.0), no admin, no location | ✅ verified v0.4.0 | + AndroidX-internal `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`; xmltree has 0 `admin`/`secondphone` matches |

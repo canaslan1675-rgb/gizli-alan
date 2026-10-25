@@ -427,7 +427,9 @@ const Map<String, String> tr = {
   'evSecondPhoneAppAdded': 'İkinci telefona "{app}" eklendi',
   'evSecondPhoneRemoved': 'İkinci telefon kaldırıldı',
   'proTitle': 'GizliAlan Pro',
-  'proSettingsHint': 'Planlar ve fiyatlar (bu test sürümünde satın alma yok)',
+  'proSettingsHint': "Pro'yu satın al veya geri yükle",
+  'proSettingsHintStub':
+      'Planlar ve fiyatlar (bu test sürümünde satın alma yok)',
   'proTestBuildNote':
       'Bu bir test sürümüdür: satın alma yoktur, ödeme alınmaz. Fiyatlar planlanan fiyatlardır.',
   'proFree': 'Ücretsiz',
