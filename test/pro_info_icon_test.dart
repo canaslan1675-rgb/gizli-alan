@@ -259,9 +259,10 @@ void main() {
       find.byKey(const ValueKey('pay_restore'), skipOffstage: false),
       findsOneWidget,
     );
+    // 0.6.0+43: "manage subscription" only for legacy-subscription owners.
     expect(
       find.byKey(const ValueKey('pay_manage'), skipOffstage: false),
-      findsOneWidget,
+      findsNothing,
     );
   });
 }

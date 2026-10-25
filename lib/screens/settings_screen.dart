@@ -751,7 +751,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           key: const ValueKey('settings_pro'),
           leading: const Icon(Icons.workspace_premium_outlined),
           title: Text(t('proTitle')),
-          subtitle: Text(t('proSettingsHint')),
+          subtitle: Text(
+            t(Flavor.hasProStub ? 'proSettingsHintStub' : 'proSettingsHint'),
+          ),
           onTap: () async {
             await Navigator.of(
               context,

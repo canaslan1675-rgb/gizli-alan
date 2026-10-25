@@ -122,6 +122,10 @@ class ProBilling extends ChangeNotifier {
 
   bool get isPro => settings.playProActive;
 
+  /// Pro currently comes from the legacy subscription ([kProProductId]),
+  /// as last reported by Play (only then is "manage in Play" useful).
+  bool legacySubscriptionActive = false;
+
   ProPlan? plan(String basePlanId) {
     for (final p in plans) {
       if (p.basePlanId == basePlanId) return p;
@@ -169,14 +173,17 @@ class ProBilling extends ChangeNotifier {
     }
     if (owned == null) return false;
     var pro = false;
+    var legacy = false;
     for (final p in owned) {
       final ok =
           isProProduct(p.productId) &&
           (p.status == BillingStatus.purchased ||
               p.status == BillingStatus.restored);
       if (ok) pro = true;
+      if (ok && p.productId == kProProductId) legacy = true;
       if (ok && p.needsCompletion) await _complete(p);
     }
+    legacySubscriptionActive = legacy;
     await _setPro(pro);
     return true;
   }
@@ -206,6 +213,7 @@ class ProBilling extends ChangeNotifier {
           notice = BillingNotice.pending;
         case BillingStatus.purchased:
         case BillingStatus.restored:
+          if (p.productId == kProProductId) legacySubscriptionActive = true;
           await _setPro(true);
           notice = p.status == BillingStatus.purchased
               ? BillingNotice.purchased

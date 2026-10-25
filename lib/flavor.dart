@@ -4,11 +4,13 @@ import 'package:flutter/services.dart' show appFlavor;
 /// Build distribution (issue #11), set by `flutter build … --flavor play|full`
 /// (Flutter exposes it as [appFlavor]); `--dart-define=FLAVOR=…` also works.
 enum AppFlavor {
-  /// Google Play build: vault + calculator only, NO Second phone. The Android
-  /// side has no device-admin receiver or work-profile code either.
+  /// Lite fallback build: vault + calculator only, NO Second phone. The
+  /// Android side has no device-admin receiver or work-profile code either.
+  /// (Since v0.5.0 the Play upload is [full], not this flavor.)
   play,
 
-  /// Side-load/test build with the Second phone (own work profile).
+  /// Main build with the Second phone (own work profile) and Play Billing:
+  /// this is the Google Play upload (`--flavor full`).
   full,
 }
 
@@ -35,7 +37,7 @@ class Flavor {
 
   /// Whether Pro is the local test stub ("Pro'yu simüle et", no billing)
   /// instead of Google Play Billing. Never in release builds that go to
-  /// Play: only `full` DEBUG builds (flutter run / tests), or when a test
+  /// Play (those use Play Billing in both flavors): only `full` DEBUG builds (flutter run / tests), or when a test
   /// artifact is built with `--dart-define=PRO_STUB=true` (CI test APKs, so
   /// side-loaded testers can try Pro features without Play).
   static bool get hasProStub =>

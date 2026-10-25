@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../services/bookmarks.dart';
 import '../app.dart';
+import '../flavor.dart';
 import '../l10n/l10n.dart';
 import '../services/privacy_link.dart';
 import '../services/pro_billing.dart';
 import '../theme.dart';
 import '../widgets/pro_gate.dart';
 
-/// Google Play subscription page for GizliAlan Pro (`play` flavor).
+/// Google Play purchase page for GizliAlan Pro (release builds).
 /// Prices always come from Play ([ProPlan.price]); nothing is preselected,
 /// no countdowns, restore and "manage in Google Play" are always visible.
 class PaywallScreen extends StatefulWidget {
   const PaywallScreen({super.key});
 
+  /// Manage page of the legacy subscription; shown only to its owners.
   static const String manageUrl =
       'https://play.google.com/store/account/subscriptions'
       '?sku=$kProProductId&package=com.offerforge.gizlialan';
@@ -111,7 +113,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
           Text(t('payIntro')),
           const SizedBox(height: 12),
           for (final f in [
-            t('payF1'),
+            if (Flavor.hasSecondPhone) t('payF1'),
             t('payF2').replaceAll('{max}', '${ItemLimit.freeItemLimit}'),
             t('payF5'),
             t('payF6'),
@@ -210,12 +212,14 @@ class _PaywallScreenState extends State<PaywallScreen> {
             icon: const Icon(Icons.restore),
             label: Text(t('payRestore')),
           ),
-          TextButton.icon(
-            key: const ValueKey('pay_manage'),
-            onPressed: _manage,
-            icon: const Icon(Icons.open_in_new, size: 18),
-            label: Text(t('payManage')),
-          ),
+          // Only the legacy subscription can be managed/cancelled in Play.
+          if (b?.legacySubscriptionActive ?? false)
+            TextButton.icon(
+              key: const ValueKey('pay_manage'),
+              onPressed: _manage,
+              icon: const Icon(Icons.open_in_new, size: 18),
+              label: Text(t('payManage')),
+            ),
           const SizedBox(height: 8),
           Text(
             t('payTerms'),

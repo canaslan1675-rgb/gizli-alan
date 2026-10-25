@@ -3,16 +3,17 @@ import 'settings_service.dart';
 
 /// Single place that answers "is GizliAlan Pro active?".
 ///
-/// * Builds with the Pro UI stub ([Flavor.hasProStub], i.e. `full` test
-///   builds): a local test switch on the Pro screen ("Pro'yu simüle et").
-/// * `play`: Google Play Billing subscription (`ProBilling`), cached in
-///   [SettingsService.playProActive] and re-checked with Play on start.
+/// * Builds with the Pro UI stub ([Flavor.hasProStub], i.e. `full` debug /
+///   `PRO_STUB=true` test builds): a local test switch on the Pro screen.
+/// * Every release build (`full` = the Play upload, and `play` lite): Google
+///   Play Billing one-time purchase (`ProBilling`; the legacy subscription
+///   still counts), cached in [SettingsService.playProActive] and re-checked
+///   with Play on start.
 class ProEntitlement {
   const ProEntitlement._();
 
   /// Whether Pro can be obtained in this build at all (Pro UI exists).
-  static bool get available =>
-      Flavor.hasProStub || Flavor.current == AppFlavor.play;
+  static bool get available => Flavor.hasProStub || viaPlayBilling;
 
   /// Pro is sold through Google Play Billing (paywall) in this build.
   static bool get viaPlayBilling => !Flavor.hasProStub;
