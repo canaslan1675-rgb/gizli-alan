@@ -16,7 +16,7 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid #2ecc8f;backgroun
 </head>
 <body>
 <h1>Privacy Policy — GizliAlan</h1>
-<p><strong>Last updated:</strong> 2026-10-19 (v0.5.7)
+<p><strong>Last updated:</strong> 2026-10-25 (v0.6.0)
 <strong>Data controller:</strong> Demirhan Çelik (OfferForge), Türkiye — delibaltabaris5@gmail.com
 <strong>App:</strong> GizliAlan (package <code>com.offerforge.gizlialan</code>)
 <strong>Audience:</strong> The owner of the device, for their own content only.</p>
@@ -266,6 +266,14 @@ but is not the current Play upload.</p>
   Google Play free trial when offered). If Pro lapses, an existing work profile
   and your vault items are not locked; you can still use and remove them.</li>
 </ul>
+<h2>Encrypted backup, recycle bin, bookmarks, PIN hint (since 0.6.0)</h2>
+<ul>
+<li><strong>Backup (Pro) / restore:</strong> the vault can be saved into ONE file that you pick with Android's system "save" dialog, and restored from a file you pick with the "open" dialog (Storage Access Framework). The file is encrypted with a backup password you choose (PBKDF2-HMAC-SHA256 + AES-256-GCM); without that password it cannot be opened and there is no recovery. GizliAlan never uploads it: there is no account, no Google Drive or other cloud integration and no server. Where you store the file (and whether that location syncs anywhere) is your choice.</li>
+<li><strong>Recycle bin:</strong> deleted photos, files and notes stay encrypted in the vault for 30 days, then are deleted for good (you can restore or empty it earlier).</li>
+<li><strong>Bookmarks:</strong> browser bookmarks (title + address only) are stored encrypted inside the vault. Browsing history is still cleared on lock; no passwords or form data are saved.</li>
+<li><strong>PIN hint:</strong> an optional reminder you write yourself, stored in Android's encrypted secure storage and shown when you long-press the calculator display. It can never contain the PIN. There is no e-mail or server recovery.</li>
+<li><strong>Recently opened Second-phone apps:</strong> only GizliAlan's own launches from the vault home are remembered (encrypted, last 4). The app does not use usage-access permission.</li>
+</ul>
 <h2>Your control / deletion</h2>
 <ul>
 <li>Delete individual items inside the app, or use <strong>Settings → Reset everything</strong>.</li>
@@ -297,7 +305,7 @@ Support e-mail: <strong>delibaltabaris5@gmail.com</strong>
 This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
 <hr />
 <h2>TR — Gizlilik Politikası ve KVKK Aydınlatma Metni</h2>
-<p><strong>Son güncelleme:</strong> 2026-10-19 (v0.5.7)</p>
+<p><strong>Son güncelleme:</strong> 2026-10-25 (v0.6.0)</p>
 <h3>1. Veri sorumlusu (KVKK md.10/a)</h3>
 <p>Demirhan Çelik (OfferForge), Türkiye. İletişim ve başvuru:
 <strong>delibaltabaris5@gmail.com</strong></p>
@@ -410,6 +418,14 @@ uygulaman destek adresine, konuda kategori ve sürüm, gövdede yalnızca senin
 yazdığın isteğe bağlı metinle açılır; cihaz kimliği, günlük veya kasa verisi
 otomatik eklenmez) kullanabilirsin. Bunlar sıradan Android intent'leridir;
 analitik SDK yoktur, kiminle paylaştığın uygulamaya gelmez.</p>
+<h3>6d. Şifreli yedek, çöp kutusu, yer imleri, PIN ipucu (0.6.0'dan)</h3>
+<ul>
+<li><strong>Yedek (Pro) / geri yükleme:</strong> kasa, Android'in sistem "kaydet" penceresiyle senin seçtiğin TEK bir dosyaya kaydedilebilir ve "aç" penceresiyle seçtiğin dosyadan geri yüklenebilir (Storage Access Framework). Dosya senin belirlediğin yedek şifresiyle şifrelenir (PBKDF2-HMAC-SHA256 + AES-256-GCM); şifre olmadan açılamaz, kurtarma yoktur. GizliAlan dosyayı hiçbir yere yüklemez: hesap, Google Drive veya başka bulut entegrasyonu ve sunucu yoktur. Dosyayı nerede saklayacağın senin tercihindir.</li>
+<li><strong>Çöp kutusu:</strong> silinen fotoğraf, dosya ve notlar 30 gün kasada şifreli kalır, sonra kalıcı olarak silinir (daha önce geri yükleyebilir veya boşaltabilirsin).</li>
+<li><strong>Yer imleri:</strong> tarayıcı yer imleri (yalnızca başlık + adres) kasada şifreli saklanır. Gezinme geçmişi kilitlenince yine silinir; parola veya form verisi saklanmaz.</li>
+<li><strong>PIN ipucu:</strong> isteğe bağlı, kendi yazdığın bir hatırlatma; Android'in şifreli güvenli deposunda tutulur ve hesap makinesi ekranına uzun basınca görünür. PIN'in kendisini içeremez. E-posta veya sunucu ile kurtarma yoktur.</li>
+<li><strong>İkinci telefonda son açılanlar:</strong> yalnızca GizliAlan'ın kasa ana ekranından yaptığı açılışlar hatırlanır (şifreli, son 4). Uygulama kullanım erişimi izni kullanmaz.</li>
+</ul>
 <h3>7. İkinci telefon (iş profili)</h3>
 <blockquote>
 <p>v0.5.0'dan beri Google Play'e yüklenen sürüm <strong>full</strong> derlemedir: İkinci

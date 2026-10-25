@@ -68,6 +68,19 @@ class NotesRepository {
     await _saveTrash(trash);
   }
 
+  /// Adds backup notes whose ids are not present yet. Returns how many.
+  Future<int> importNotes(List<Note> incoming) async {
+    final notes = await list();
+    final have = {
+      ...notes.map((n) => n.id),
+      ...(await listTrash()).map((n) => n.id),
+    };
+    final add = incoming.where((n) => !have.contains(n.id)).toList();
+    if (add.isEmpty) return 0;
+    await _save([...add..forEach((n) => n.deletedAt = null), ...notes]);
+    return add.length;
+  }
+
   Future<List<Note>> listTrash() async {
     final t = await _read(_trashFile);
     t.sort(

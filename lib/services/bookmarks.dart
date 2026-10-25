@@ -61,6 +61,13 @@ class Bookmarks {
     await _save(all);
   }
 
+  /// Merges bookmarks from a backup (by url; no limit — they already existed).
+  Future<void> importAll(List<Bookmark> incoming) async {
+    final all = await list();
+    final have = all.map((b) => b.url).toSet();
+    await _save([...all, ...incoming.where((b) => !have.contains(b.url))]);
+  }
+
   Future<void> remove(String url) async =>
       _save((await list()).where((b) => b.url != url).toList());
 

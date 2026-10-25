@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../widgets/backup_actions.dart';
 import '../widgets/pin_hint_dialog.dart';
 import '../app.dart';
 import '../app_version.dart';
@@ -859,6 +860,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
               subtitle: Text(t('pinHintSub')),
               onTap: () => editPinHint(context),
             ),
+          ListTile(
+            key: const ValueKey('settings_backup_create'),
+            leading: const Icon(Icons.backup_outlined),
+            title: Text(t('backupCreate')),
+            subtitle: Text(t('backupCreateSub')),
+            trailing: ProEntitlement.isActive(GizliAlanApp.of(context).settings)
+                ? null
+                : const Icon(Icons.workspace_premium_outlined),
+            onTap: () => BackupActions.create(context),
+          ),
+          ListTile(
+            key: const ValueKey('settings_backup_restore'),
+            leading: const Icon(Icons.settings_backup_restore),
+            title: Text(t('backupRestore')),
+            subtitle: Text(t('backupRestoreSub')),
+            onTap: () => BackupActions.restore(context),
+          ),
           ListTile(
             key: const ValueKey('settings_trash'),
             leading: const Icon(Icons.delete_outline),

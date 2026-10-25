@@ -55,6 +55,13 @@ class GalleryAlbums {
     return a;
   }
 
+  /// Merges albums from a backup (by id; no limit — they already existed).
+  Future<void> importAll(List<Album> incoming) async {
+    final all = await list();
+    final have = all.map((a) => a.id).toSet();
+    await _save([...all, ...incoming.where((a) => !have.contains(a.id))]);
+  }
+
   Future<void> rename(String id, String name) async => _save([
     for (final a in await list()) a.id == id ? Album(id, name.trim()) : a,
   ]);

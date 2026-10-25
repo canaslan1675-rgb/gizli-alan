@@ -162,6 +162,20 @@ class VaultStorage {
     await _saveTrash(trash);
   }
 
+  /// Restores an item from a backup with its original id/metadata. Returns
+  /// false (nothing written) if that id is already in the vault or bin.
+  Future<bool> importItem(VaultItem item, Uint8List bytes) async {
+    final items = await list();
+    if (items.any((i) => i.id == item.id) ||
+        (await listTrash()).any((i) => i.id == item.id)) {
+      return false;
+    }
+    await _enc.write(_blob(item.id), bytes);
+    items.insert(0, item.copyWith(clearDeleted: true));
+    await _saveIndex(items);
+    return true;
+  }
+
   /// Items in the recycle bin, newest deletion first.
   Future<List<VaultItem>> listTrash() async {
     final t = await _readIndex(_trashIndex);

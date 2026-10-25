@@ -119,6 +119,26 @@ const Map<String, String> tr = {
   'bookmarkLimitTitle': 'Ücretsiz sürümde 5 yer imi',
   'bookmarkLimitBody':
       'Ücretsiz sürümde en fazla {max} yer imi saklanır. Pro ile sınırsız yer imi açılır; mevcut yer imlerin kalır.',
+  'backupCreate': 'Şifreli yedek oluştur',
+  'backupCreateSub': 'Kasayı seçtiğin tek bir dosyaya şifreli kaydeder (Pro)',
+  'backupRestore': 'Yedekten geri yükle',
+  'backupRestoreSub': 'Bir GizliAlan yedek dosyasını seç; olanlar korunur',
+  'backupPassword': 'Yedek şifresi',
+  'backupPasswordConfirm': 'Yedek şifresi (tekrar)',
+  'backupPasswordShort': 'En az 6 karakter olmalı',
+  'backupPasswordExplain':
+      'Yedek bu şifreyle şifrelenir (AES-256-GCM). Şifreyi unutursan yedek açılamaz; kurtarma yoktur. Dosya yalnızca senin seçtiğin yere kaydedilir, hiçbir sunucuya gönderilmez.',
+  'backupRestoreExplain':
+      'Yedeği oluştururken belirlediğin şifreyi gir. Yedekteki fotoğraf, dosya, not, albüm ve yer imleri bu kasaya eklenir; mevcut içerik silinmez.',
+  'backupWorking': 'Şifreleniyor / çözülüyor…',
+  'backupSaved': 'Yedek kaydedildi',
+  'backupFailed': 'Yedek oluşturulamadı',
+  'backupRestored': 'Geri yüklendi: {p} fotoğraf, {f} dosya, {n} not',
+  'backupWrongPassword': 'Şifre yanlış veya dosya bozuk',
+  'backupBadFile': 'Bu bir GizliAlan yedek dosyası değil',
+  'backupProTitle': 'Şifreli yedek Pro ile',
+  'backupProBody':
+      'Kasanın tamamını tek bir şifreli dosyaya yedeklemek Pro özelliğidir. Yedekten geri yükleme her zaman ücretsizdir.',
   'freeBannerTitle': "Ücretsiz sürümdesin (en fazla {max} öğe)",
   'freeBannerBody':
       "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili) açılır ve gelecek güncellemeler dahil.",

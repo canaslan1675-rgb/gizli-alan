@@ -118,6 +118,26 @@ const Map<String, String> en = {
   'bookmarkLimitTitle': '5 bookmarks in the free version',
   'bookmarkLimitBody':
       'The free version keeps up to {max} bookmarks. Pro unlocks unlimited bookmarks; your existing bookmarks stay.',
+  'backupCreate': 'Create encrypted backup',
+  'backupCreateSub': 'Saves the vault encrypted into one file you choose (Pro)',
+  'backupRestore': 'Restore from backup',
+  'backupRestoreSub': 'Pick a GizliAlan backup file; existing content is kept',
+  'backupPassword': 'Backup password',
+  'backupPasswordConfirm': 'Backup password (again)',
+  'backupPasswordShort': 'At least 6 characters',
+  'backupPasswordExplain':
+      'The backup is encrypted with this password (AES-256-GCM). If you forget it, the backup cannot be opened; there is no recovery. The file is only saved where you choose and is never sent to a server.',
+  'backupRestoreExplain':
+      'Enter the password you set when creating the backup. Its photos, files, notes, albums and bookmarks are added to this vault; nothing existing is deleted.',
+  'backupWorking': 'Encrypting / decrypting…',
+  'backupSaved': 'Backup saved',
+  'backupFailed': 'Could not create the backup',
+  'backupRestored': 'Restored: {p} photos, {f} files, {n} notes',
+  'backupWrongPassword': 'Wrong password or damaged file',
+  'backupBadFile': 'This is not a GizliAlan backup file',
+  'backupProTitle': 'Encrypted backup is Pro',
+  'backupProBody':
+      'Backing up the whole vault into one encrypted file is a Pro feature. Restoring from a backup is always free.',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
       "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",
