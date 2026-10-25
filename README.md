@@ -82,7 +82,7 @@ Build-time options (#28):
   `play` too (review only). No billing either way; the 50-item free limit is displayed, not enforced.
 - Store feature graphic: `python3 tool/gen_feature_graphic.py` (Pillow) →
   `docs/store/feature_graphic/feature_graphic_{tr,en}.png` (1024×500 RGB).
-- Play upload example: `flutter build appbundle --release --flavor play --dart-define=PRIVACY_URL=https://canaslan1675-rgb.github.io/gizli-alan/privacy/`.
+- Play upload example (since v0.5.0 Play = `full`): `flutter build appbundle --release --flavor full --dart-define=PRIVACY_URL=https://canaslan1675-rgb.github.io/gizli-alan/privacy/`.
 
 TR: `play` = Google Play adayı, İkinci telefon yok (APK'da cihaz yöneticisi bileşeni bile yok);
 `full` = İkinci telefonlu test/yan yükleme sürümü. İkisi aynı telefona birlikte kurulabilir.
@@ -126,7 +126,7 @@ key** — fine for test APKs (GitHub pre-releases), **not** for Google Play.
 2. `cp android/key.properties.example android/key.properties` and fill in
    `storeFile` (absolute path, or relative to `android/`), `storePassword`,
    `keyAlias`, `keyPassword`. Missing values fail the build with a clear message.
-3. `flutter build appbundle --release --flavor play` (Play) or `flutter build apk --release --flavor play|full`.
+3. `flutter build appbundle --release --flavor full` (Play upload) or `flutter build apk --release --flavor play|full` (`play` = lite fallback without İkinci telefon).
    The same `key.properties` signs both flavors.
    Check the signer: `apksigner verify --print-certs build/app/outputs/flutter-apk/app-play-release.apk`
    (must **not** say `CN=Android Debug`).
