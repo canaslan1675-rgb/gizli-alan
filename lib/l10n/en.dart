@@ -62,7 +62,13 @@ const Map<String, String> en = {
   'deleteOriginalAskNo': 'No',
   'proSettingsHint_play': "Buy or restore Pro",
   'payIntro':
-      "The vault, encryption, calculator entry and browser are free. Buy Pro once to unlock:",
+      "The vault, encryption, calculator entry, decoy PIN, screenshot protection, quick lock, recycle bin, video playback, browser and restoring backups are free. Buy Pro once to unlock:",
+  'payF5': 'Unlimited albums (free: 1)',
+  'payF6': 'Encrypted backup of the whole vault into one file',
+  'payF7': 'Unlimited bookmarks (free: {max})',
+  'proF4': 'Unlimited albums',
+  'proF5': 'Encrypted backup',
+  'proF6': 'Unlimited bookmarks',
   'payF1': 'Second phone (work profile) setup',
   'payF2': 'Unlimited items (free: {max})',
   'payF3': 'Hide the ⓘ icon on the calculator',
@@ -143,7 +149,7 @@ const Map<String, String> en = {
       'This video cannot be played on this device. You can export it and open it in another app.',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
-      "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",
+      "You're on the limited plan. Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile), unlimited albums, encrypted backup and includes future updates.",
   'freeBannerBodyPlay':
       "Buy Pro once for {price}: removes the item limit and includes future updates.",
   'freeBannerCta': "Get Pro",

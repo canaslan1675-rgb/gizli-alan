@@ -64,7 +64,13 @@ const Map<String, String> tr = {
   'deleteOriginalAskNo': 'Hayır',
   'proSettingsHint_play': "Pro'yu satın al veya geri yükle",
   'payIntro':
-      "Kasa, şifreleme, hesap makinesi girişi ve tarayıcı ücretsizdir. Pro'yu bir kez satın al, şunlar açılsın:",
+      "Kasa, şifreleme, hesap makinesi girişi, sahte PIN, ekran görüntüsü koruması, hızlı kilit, çöp kutusu, video oynatma, tarayıcı ve yedekten geri yükleme ücretsizdir. Pro'yu bir kez satın al, şunlar açılsın:",
+  'payF5': 'Sınırsız albüm (ücretsiz: 1)',
+  'payF6': 'Kasanın tamamını tek dosyaya şifreli yedekleme',
+  'payF7': 'Sınırsız yer imi (ücretsiz: {max})',
+  'proF4': 'Sınırsız albüm',
+  'proF5': 'Şifreli yedek',
+  'proF6': 'Sınırsız yer imi',
   'payF1': 'İkinci telefon (iş profili) kurulumu',
   'payF2': 'Sınırsız öğe (ücretsiz: {max})',
   'payF3': 'Hesap makinesindeki ⓘ simgesini gizleme',
@@ -144,7 +150,7 @@ const Map<String, String> tr = {
       'Bu video bu cihazda oynatılamadı. Dışa aktarıp başka bir uygulamayla açabilirsin.',
   'freeBannerTitle': "Ücretsiz sürümdesin (en fazla {max} öğe)",
   'freeBannerBody':
-      "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili) açılır ve gelecek güncellemeler dahil.",
+      "Sınırlı plandasın. Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili), sınırsız albüm, şifreli yedek açılır ve gelecek güncellemeler dahil.",
   'freeBannerBodyPlay':
       "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar ve gelecek güncellemeler dahil.",
   'freeBannerCta': "Pro'yu al",

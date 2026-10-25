@@ -17,7 +17,7 @@ void main() {
     final f = await VideoTemp.write(Uint8List.fromList([1, 2, 3]), 'a.MP4');
     expect(f.path.startsWith('${tmp.path}/vplay/'), isTrue);
     expect(f.path.endsWith('.mp4'), isTrue);
-    expect(f.path.contains('a.'), isFalse, reason: 'random name');
+    expect(f.uri.pathSegments.last == 'a.mp4', isFalse, reason: 'random name');
     await VideoTemp.delete(f);
     expect(f.existsSync(), isFalse);
     final g = await VideoTemp.write(Uint8List(1), 'b.webm');

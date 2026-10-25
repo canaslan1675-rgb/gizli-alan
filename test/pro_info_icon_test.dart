@@ -254,7 +254,14 @@ void main() {
     // No billing in tests → honest "unavailable", restore/manage visible.
     expect(find.byType(PaywallScreen), findsOneWidget);
     expect(find.byKey(const ValueKey('pay_unavailable')), findsOneWidget);
-    expect(find.byKey(const ValueKey('pay_restore')), findsOneWidget);
-    expect(find.byKey(const ValueKey('pay_manage')), findsOneWidget);
+    // 0.6.0: longer feature list; the buttons may be below the fold.
+    expect(
+      find.byKey(const ValueKey('pay_restore'), skipOffstage: false),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('pay_manage'), skipOffstage: false),
+      findsOneWidget,
+    );
   });
 }

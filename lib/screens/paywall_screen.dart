@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/bookmarks.dart';
 import '../app.dart';
 import '../l10n/l10n.dart';
 import '../services/privacy_link.dart';
@@ -112,6 +113,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
           for (final f in [
             t('payF1'),
             t('payF2').replaceAll('{max}', '${ItemLimit.freeItemLimit}'),
+            t('payF5'),
+            t('payF6'),
+            t('payF7').replaceAll('{max}', '${BookmarkLimit.freeBookmarks}'),
             t('payF3'),
             t('payF4'),
           ])
