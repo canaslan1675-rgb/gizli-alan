@@ -218,6 +218,8 @@ void main() {
     );
     expect(find.text('Support'), findsOneWidget);
     expect(find.text('delibaltabaris5@gmail.com'), findsOneWidget);
+    await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
     await tester.tap(row);
     await tester.pumpAndSettle();
     final opens = calls.where((c) => c.method == 'openUrl').toList();

@@ -265,6 +265,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Scaffold(
         body: SafeArea(
           child: ListView(
+            // New scroll position per step: each step starts at the top.
+            key: ValueKey('onboarding_step_$_step'),
             padding: const EdgeInsets.all(24),
             children: [
               Row(
