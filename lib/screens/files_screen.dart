@@ -11,6 +11,7 @@ import '../theme.dart';
 import '../widgets/import_delete_originals.dart';
 import '../widgets/pro_gate.dart';
 import '../widgets/vault_actions.dart';
+import 'video_player_screen.dart';
 import 'photo_viewer_screen.dart';
 
 /// Encrypted document vault (PDFs, any file). Imports only via the system
@@ -109,6 +110,13 @@ class _FilesScreenState extends State<FilesScreen> {
               title: Text(item.name, overflow: TextOverflow.ellipsis),
               subtitle: Text(VaultActions.formatSize(item.size)),
             ),
+            if (item.isVideo)
+              ListTile(
+                key: const ValueKey('file_play_video'),
+                leading: const Icon(Icons.play_circle_outline),
+                title: Text(t('videoPlay')),
+                onTap: () => Navigator.pop(ctx, 'play'),
+              ),
             if (item.isImage)
               ListTile(
                 leading: const Icon(Icons.visibility_outlined),
@@ -131,6 +139,13 @@ class _FilesScreenState extends State<FilesScreen> {
     );
     if (!mounted || action == null) return;
     switch (action) {
+      case 'play':
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => VideoPlayerScreen(store: _store, item: item),
+          ),
+        );
+        break;
       case 'view':
         final images = all.where((i) => i.isImage).toList();
         await Navigator.of(context).push(

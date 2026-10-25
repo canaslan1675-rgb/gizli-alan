@@ -138,6 +138,9 @@ const Map<String, String> en = {
   'backupProTitle': 'Encrypted backup is Pro',
   'backupProBody':
       'Backing up the whole vault into one encrypted file is a Pro feature. Restoring from a backup is always free.',
+  'videoPlay': 'Play',
+  'videoFailed':
+      'This video cannot be played on this device. You can export it and open it in another app.',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
       "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",

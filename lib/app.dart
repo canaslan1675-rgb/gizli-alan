@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'screens/decoy_calculator_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/pin_lock_screen.dart';
 import 'screens/vault_home_screen.dart';
+import 'services/video_temp.dart';
 import 'services/recycle_bin.dart';
 import 'services/auth_service.dart';
 import 'services/auto_lock.dart';
@@ -124,6 +126,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     billing?.addListener(_billingChanged);
+    unawaited(VideoTemp.wipe()); // leftovers after a crash / kill
     _bootstrap();
   }
 
@@ -368,6 +371,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
     if (s == null) return;
     s.close();
     _wipeBrowserIfEnabled();
+    unawaited(VideoTemp.wipe()); // decrypted temp videos (0.6.0 I)
     // Drop decoded vault photos (gallery thumbnails, home background) from
     // Flutter's in-memory image cache.
     PaintingBinding.instance.imageCache

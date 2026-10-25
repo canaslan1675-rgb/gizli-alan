@@ -139,6 +139,9 @@ const Map<String, String> tr = {
   'backupProTitle': 'Şifreli yedek Pro ile',
   'backupProBody':
       'Kasanın tamamını tek bir şifreli dosyaya yedeklemek Pro özelliğidir. Yedekten geri yükleme her zaman ücretsizdir.',
+  'videoPlay': 'Oynat',
+  'videoFailed':
+      'Bu video bu cihazda oynatılamadı. Dışa aktarıp başka bir uygulamayla açabilirsin.',
   'freeBannerTitle': "Ücretsiz sürümdesin (en fazla {max} öğe)",
   'freeBannerBody':
       "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili) açılır ve gelecek güncellemeler dahil.",
