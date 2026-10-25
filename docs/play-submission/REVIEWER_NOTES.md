@@ -57,7 +57,7 @@ FEATURES INSIDE THE VAULT
 - Notifications tile: the app's own events only (imports, exports, deletions, wrong PIN attempts). The app posts no system notifications and reads no other app's notifications.
 - Settings: change PIN, biometric unlock (Android BiometricPrompt; then long-press "=" on the calculator), auto-lock delay, decoy PIN, wallpaper, language, "Reset everything", privacy & permissions text.
 - Decoy PIN (optional): Settings -> Decoy PIN. It opens a separate vault that starts empty. Biometrics always open the real vault.
-- Auto-lock when the app goes to background. FLAG_SECURE blocks screenshots/recents previews (pre-launch report screenshots will appear black – intended).
+- Back inside the vault goes to the previous screen (gallery, viewer, notes, settings). Back on the vault home locks and returns to the calculator. Auto-lock when the app goes to the background or the screen turns off, after Settings → Lock delay (Immediately by default, or 30 seconds / 1 minute). Returning from a screen the app itself opened (photo/file picker, share sheet, Play purchase, work-profile setup) does not ask for the PIN. FLAG_SECURE blocks screenshots/recents previews (pre-launch report screenshots will appear black – intended).
 
 WHAT THE APP DOES NOT DO
 No Accessibility service, no device admin, no SMS/call log/contacts/location/camera/microphone access, no monitoring of other apps or people, no data collection, no ads, no analytics. Permissions: USE_BIOMETRIC (optional) and INTERNET, used only by the in-vault browser for pages the user opens (no analytics, no ads, no developer server).

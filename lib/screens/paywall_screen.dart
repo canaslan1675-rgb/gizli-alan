@@ -83,9 +83,10 @@ class _PaywallScreenState extends State<PaywallScreen> {
   }
 
   Future<void> _manage() async {
-    final ok = await GizliAlanApp.of(
-      context,
-    ).withExternalUi(() => PrivacyLink.open(PaywallScreen.manageUrl));
+    final ok = await GizliAlanApp.of(context).withExternalUi(
+      () => PrivacyLink.open(PaywallScreen.manageUrl),
+      untilResume: true,
+    );
     if (!ok && mounted) _show(BillingNotice.unavailable);
   }
 

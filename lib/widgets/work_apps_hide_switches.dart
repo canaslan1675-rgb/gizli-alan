@@ -34,13 +34,16 @@ class _WorkAppsHideSwitchesState extends State<WorkAppsHideSwitches> {
     final open =
         widget.openWorkSettings ??
         () async =>
-            await GizliAlanApp.of(
-              context,
-            ).secondPhoneIfUnlocked?.openWorkSettings() ??
+            await GizliAlanApp.of(context).secondPhoneIfUnlocked
+                ?.openWorkSettings() ??
             'none';
     String r;
     try {
-      r = await open();
+      // The system screen returns from startActivity immediately. Hold the
+      // vault unlocked until the user comes back from it.
+      r = await GizliAlanApp.of(
+        context,
+      ).withExternalUi(open, untilResume: true, launched: (s) => s != 'none');
     } catch (_) {
       r = 'none';
     }

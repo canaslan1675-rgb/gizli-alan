@@ -35,7 +35,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  void _reload() => setState(() => _future = _log.list());
+  void _reload() {
+    final next = _log.list();
+    setState(() {
+      _future = next;
+    });
+  }
 
   Future<void> _markAllRead() async {
     await _log.markAllRead();

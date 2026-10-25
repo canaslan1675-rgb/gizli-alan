@@ -37,7 +37,12 @@ class _FilesScreenState extends State<FilesScreen> {
     }
   }
 
-  void _reload() => setState(() => _future = _store.list());
+  void _reload() {
+    final next = _store.list();
+    setState(() {
+      _future = next;
+    });
+  }
 
   Future<void> _import() async {
     final app = GizliAlanApp.of(context);

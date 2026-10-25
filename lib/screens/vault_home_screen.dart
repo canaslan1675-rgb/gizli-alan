@@ -92,14 +92,14 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
   }
 
   void _open(Widget screen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen)).then((
-      _,
-    ) {
-      if (mounted) setState(() {}); // e.g. wallpaper changed in settings
-      _loadProfileApps();
-      _loadUnread();
-      _loadBackground();
-    });
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => screen))
+        .then((_) {
+          if (mounted) setState(() {}); // e.g. wallpaper changed in settings
+          _loadProfileApps();
+          _loadUnread();
+          _loadBackground();
+        });
   }
 
   /// Launches a second-phone app in the work profile. The vault then goes to
@@ -181,9 +181,20 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
     return Theme(
       data: GizliTheme.dark(),
       child: PopScope(
+        // The vault route itself never pops: Back on this home locks.
+        // Screens pushed on top (gallery, a photo, notes, settings) are
+        // separate routes and pop normally. If a back event is ever delivered
+        // here while one of those is still current, pop that screen instead
+        // of locking the whole vault.
         canPop: false,
         onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) app.lockVaultExplicit();
+          if (didPop) return;
+          final route = ModalRoute.of(context);
+          if (route != null && !route.isCurrent) {
+            Navigator.of(context).maybePop();
+            return;
+          }
+          app.lockVaultExplicit();
         },
         child: Scaffold(
           body: Container(

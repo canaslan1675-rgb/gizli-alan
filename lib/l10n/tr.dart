@@ -182,9 +182,12 @@ const Map<String, String> tr = {
       'Her zaman açık: ekran görüntüsü, ekran kaydı ve son uygulamalar önizlemesi engellenir (FLAG_SECURE)',
   'entry': 'Giriş',
   'general': 'Genel',
-  'lockTimeout': 'Otomatik kilit',
-  'lockTimeoutHint': 'Uygulama arka plana geçince kilitlenir',
+  'lockTimeout': 'Kilit süresi',
+  'lockTimeoutHint':
+      'Uygulamadan çıkınca veya ekran kapanınca kasa bu sürede kilitlenir. Süre bitmeden dönersen PIN istenmez.',
   'lockImmediately': 'Hemen',
+  'lockAfter30': '30 saniye',
+  'lockAfter60': '1 dakika',
   'lockAfterSec': '{n} sn sonra',
   'lockAfterMin': '{n} dk sonra',
   'language': 'Dil',
@@ -415,7 +418,7 @@ const Map<String, String> tr = {
       'İstersen Ayarlar → Güvenlik bölümünden ikinci bir PIN belirleyebilirsin. Sahte PIN, boş başlayan ve kendi şifreleme anahtarı olan ayrı bir kasa açar; gerçek kasan ve içeriği orada görünmez. Sahte PIN gerçek PIN\'inden farklı olmalıdır. Biyometrik kilit açma her zaman yalnızca gerçek kasayı açar.',
   'helpVaultTitle': 'Kasa',
   'helpVaultBody':
-      'Kasada fotoğrafları, notları ve dosyaları (video ve belgeler dahil) saklayabilir, özel tarayıcıyı kullanabilirsin. Tüm içerik bu cihazda AES-256-GCM ile şifrelenir; hesap, bulut ve sunucu yoktur. Ekran görüntüsü, ekran kaydı ve son uygulamalar önizlemesi engellenir. Uygulama arka plana geçince kasa kilitlenir; süreyi Ayarlar → Otomatik kilit ile değiştirebilirsin.',
+      'Kasada fotoğrafları, notları ve dosyaları (video ve belgeler dahil) saklayabilir, özel tarayıcıyı kullanabilirsin. Tüm içerik bu cihazda AES-256-GCM ile şifrelenir; hesap, bulut ve sunucu yoktur. Ekran görüntüsü, ekran kaydı ve son uygulamalar önizlemesi engellenir. Geri tuşu klasör ve görüntüleyiciden bir önceki ekrana döner; kasadan çıkarmaz. Uygulamadan çıkınca veya ekran kapanınca kasa kilitlenir; süreyi Ayarlar → Kilit süresi ile değiştirebilirsin (Hemen, 30 saniye veya 1 dakika).',
   'helpPinTitle': 'PIN\'imi unutursam?',
   'helpPinBody':
       'PIN kurtarma yoktur: PIN\'in hiçbir yere gönderilmez ve içerik yalnızca bu cihazda çözülebilir. PIN\'ini unutursan kasa içeriği açılamaz; yalnızca uygulamayı tamamen sıfırlamak (veya silip yeniden kurmak) mümkündür.',
