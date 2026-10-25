@@ -34,8 +34,9 @@ class _WorkAppsHideSwitchesState extends State<WorkAppsHideSwitches> {
     final open =
         widget.openWorkSettings ??
         () async =>
-            await GizliAlanApp.of(context).secondPhoneIfUnlocked
-                ?.openWorkSettings() ??
+            await GizliAlanApp.of(
+              context,
+            ).secondPhoneIfUnlocked?.openWorkSettings() ??
             'none';
     String r;
     try {

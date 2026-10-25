@@ -10,7 +10,24 @@ asks Play for the purchase state, acknowledges purchases, and caches
 debug builds and in CI test APKs built with `--dart-define=PRO_STUB=true`
 (never in the Play AAB).
 
-## What the app expects (must match exactly)
+## 0.6.0+: one-time Pro (current)
+
+From 0.5.8/0.6.0 the app **sells only a one-time, non-consumable in-app
+product** and no longer offers the subscription:
+
+| Item | Value |
+|---|---|
+| Product type | One-time product (in-app, non-consumable / "managed") |
+| Product ID | `gizlialan_pro_lifetime` (constant `kProLifetimeId` in `lib/services/pro_billing.dart`) |
+| Price | **499 TL** (Türkiye); app shows Play's formatted price, "499 TL" only as fallback text |
+| Trial | none |
+
+Existing `gizlialan_pro` subscribers keep Pro: the app still queries and
+restores that subscription, it just does not sell it. Purchases are
+acknowledged by the app (`completePurchase`). Keep the subscription active
+in Play Console as long as subscribers exist (do not delete it).
+
+## Legacy subscription (no longer sold)
 
 | Item | Value |
 |---|---|

@@ -76,7 +76,10 @@ void main() {
 
   setUp(() async {
     await initializeDateFormatting();
-    SharedPreferences.setMockInitialValues({'lang': 'en'});
+    SharedPreferences.setMockInitialValues({
+      'lang': 'en',
+      'free_banner_dismissed': true,
+    });
     settings = await SettingsService.create();
     auth = AuthService(storage: MemorySecureKv(), pbkdf2Iterations: 1000);
     sp = FakeSecondPhone();
@@ -248,7 +251,7 @@ void main() {
     );
     await tester.drag(find.byType(Scrollable).last, const Offset(0, -300));
     await settle(tester);
-    expect(find.textContaining('7-day free trial'), findsOneWidget);
+    expect(find.textContaining('one-time payment'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('sp_setup')));
     await settle(tester);
     expect(find.byKey(const ValueKey('pro_required')), findsOneWidget);

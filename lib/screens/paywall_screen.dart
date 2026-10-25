@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/bookmarks.dart';
 import '../app.dart';
 import '../l10n/l10n.dart';
 import '../services/privacy_link.dart';
@@ -98,29 +99,10 @@ class _PaywallScreenState extends State<PaywallScreen> {
     final isPro = app.settings.playProActive;
     final loading = b?.loading ?? false;
     final available = b?.available ?? false;
-    final plans = b?.plans ?? const <ProPlan>[];
-    Widget planButton(String id, String titleKey, String perKey) {
-      final p = b?.plan(id);
-      if (p == null) return const SizedBox.shrink();
-      return Card(
-        margin: const EdgeInsets.only(bottom: 12),
-        child: ListTile(
-          key: ValueKey('pay_$id'),
-          title: Text(t(titleKey)),
-          subtitle: Text(
-            [
-              t(perKey).replaceAll('{price}', p.price),
-              if (p.hasTrial) t('payTrial'),
-            ].join('\n'),
-          ),
-          trailing: FilledButton(
-            onPressed: _busy || isPro ? null : () => _run((b) => b.buy(p)),
-            child: Text(t('proSubscribe')),
-          ),
-        ),
-      );
-    }
-
+    // One-time purchase only (no subscription, no trial). Price text is
+    // Play's formatted price; the fallback constant only when Play couldn't be asked.
+    final lifetime = b?.plan(kPlanLifetime);
+    final price = lifetime?.price ?? kProFallbackPrice;
     return Scaffold(
       appBar: AppBar(title: Text(t('proTitle'))),
       body: ListView(
@@ -131,7 +113,11 @@ class _PaywallScreenState extends State<PaywallScreen> {
           for (final f in [
             t('payF1'),
             t('payF2').replaceAll('{max}', '${ItemLimit.freeItemLimit}'),
+            t('payF5'),
+            t('payF6'),
+            t('payF7').replaceAll('{max}', '${BookmarkLimit.freeBookmarks}'),
             t('payF3'),
+            t('payF4'),
           ])
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 3),
@@ -151,31 +137,72 @@ class _PaywallScreenState extends State<PaywallScreen> {
               leading: Icon(Icons.verified, color: gc.accent),
               title: Text(t('payActive')),
             )
-          else if (loading)
-            ListTile(
-              leading: const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+          else
+            Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      t('payLifetime'),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      price,
+                      key: const ValueKey('pay_price'),
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: gc.accent,
+                      ),
+                    ),
+                    Text(
+                      t('payLifetimeSub'),
+                      style: TextStyle(color: gc.textSecondary),
+                    ),
+                    const SizedBox(height: 12),
+                    if (loading)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        title: Text(t('payLoading')),
+                      )
+                    else if (!available)
+                      Text(
+                        t('payUnavailable'),
+                        key: const ValueKey('pay_unavailable'),
+                        style: TextStyle(color: gc.textSecondary),
+                      )
+                    else if (lifetime == null)
+                      Text(
+                        t('payNoPlans'),
+                        key: const ValueKey('pay_no_plans'),
+                        style: TextStyle(color: gc.textSecondary),
+                      )
+                    else
+                      FilledButton(
+                        key: const ValueKey('pay_$kPlanLifetime'),
+                        onPressed: _busy
+                            ? null
+                            : () => _run((b) => b.buy(lifetime)),
+                        child: Text(
+                          t('payBuyOnce').replaceAll('{price}', price),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-              title: Text(t('payLoading')),
-            )
-          else if (!available)
-            Text(
-              t('payUnavailable'),
-              key: const ValueKey('pay_unavailable'),
-              style: TextStyle(color: gc.textSecondary),
-            )
-          else if (plans.isEmpty)
-            Text(
-              t('payNoPlans'),
-              key: const ValueKey('pay_no_plans'),
-              style: TextStyle(color: gc.textSecondary),
-            )
-          else ...[
-            planButton(kPlanMonthly, 'payMonthly', 'payPerMonth'),
-            planButton(kPlanYearly, 'payYearly', 'payPerYear'),
-          ],
+            ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             key: const ValueKey('pay_restore'),

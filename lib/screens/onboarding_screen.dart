@@ -28,6 +28,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _calculator = true;
   final _pin = TextEditingController();
   final _confirm = TextEditingController();
+  final _hint = TextEditingController();
   String? _error;
   bool _busy = false;
 
@@ -35,6 +36,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void dispose() {
     _pin.dispose();
     _confirm.dispose();
+    _hint.dispose();
     super.dispose();
   }
 
@@ -50,6 +52,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       setState(() => _error = t('pinMismatch'));
       return;
     }
+    if (_hint.text.contains(p1)) {
+      setState(() => _error = t('pinHintBad'));
+      return;
+    }
     setState(() {
       _busy = true;
       _error = null;
@@ -57,6 +63,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final app = GizliAlanApp.of(context);
     await app.settings.setCalculatorEntryEnabled(_calculator);
     await app.auth.setPin(p1);
+    try {
+      await app.auth.setPinHint(_hint.text);
+    } on ArgumentError {
+      // Hint contains the PIN or is too long: save no hint, never the PIN.
+      await app.auth.setPinHint(null);
+    }
     if (!mounted) return;
     app.markOnboarded();
   }
@@ -195,6 +207,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       maxLength: AuthService.maxPinLength,
       decoration: InputDecoration(labelText: t('confirmPin')),
     ),
+    const SizedBox(height: 8),
+    TextField(
+      key: const ValueKey('pin_hint_new'),
+      controller: _hint,
+      maxLength: AuthService.maxHintLength,
+      decoration: InputDecoration(
+        labelText: t('pinHintOptional'),
+        helperText: t('pinHintExplain'),
+        helperMaxLines: 3,
+      ),
+    ),
     if (_error != null) ...[
       const SizedBox(height: 4),
       Text(_error!, style: TextStyle(color: gc.danger)),
@@ -242,6 +265,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Scaffold(
         body: SafeArea(
           child: ListView(
+            // New scroll position per step: each step starts at the top.
+            key: ValueKey('onboarding_step_$_step'),
             padding: const EdgeInsets.all(24),
             children: [
               Row(

@@ -51,6 +51,9 @@ class AuthService {
   // so it is only ever reported inside the real vault).
   static const _kFailSinceUnlock = 'ga_fail_since_unlock';
   // Legacy scaffold format (sha256(salt::pin)). Migrated on first success.
+  // Optional PIN hint the owner wrote (0.6.0 F). Kept in the encrypted
+  // secret store (Android Keystore), readable before unlock by design.
+  static const _kPinHint = 'ga_pin_hint';
   static const _kLegacySalt = 'ga_pin_salt';
   static const _kLegacyHash = 'ga_pin_hash';
 
@@ -138,6 +141,51 @@ class AuthService {
     }
     if (countFailure) await _registerFailure();
     return PinCheck.invalid;
+  }
+
+  // ------------------------------------------------------------ PIN hint
+
+  static const int maxHintLength = 60;
+
+  /// The owner's PIN hint, or null when none is set.
+  Future<String?> pinHint() async {
+    final h = (await _kv.read(_kPinHint))?.trim();
+    return (h == null || h.isEmpty) ? null : h;
+  }
+
+  /// Sets (or with null/empty removes) the hint. Throws [ArgumentError] if
+  /// it is too long or contains the real or decoy PIN itself.
+  Future<void> setPinHint(String? hint) async {
+    final h = hint?.trim() ?? '';
+    if (h.isEmpty) {
+      await _kv.delete(_kPinHint);
+      return;
+    }
+    if (h.length > maxHintLength) throw ArgumentError('hint too long');
+    if (await hintContainsPin(h)) throw ArgumentError('hint contains PIN');
+    await _kv.write(_kPinHint, h);
+  }
+
+  /// Digit runs of PIN length inside [hint] (bounded, for the check below).
+  static Iterable<String> pinCandidatesIn(String hint) sync* {
+    final digits = RegExp(r'\d+').allMatches(hint).map((m) => m.group(0)!);
+    var n = 0;
+    for (final run in digits) {
+      for (var len = minPinLength; len <= maxPinLength; len++) {
+        for (var i = 0; i + len <= run.length; i++) {
+          if (n++ >= 40) return;
+          yield run.substring(i, i + len);
+        }
+      }
+    }
+  }
+
+  /// True if the hint literally contains the real or decoy PIN.
+  Future<bool> hintContainsPin(String hint) async {
+    for (final c in pinCandidatesIn(hint)) {
+      if (await _matchesReal(c) || await _matches(_kDecoyPin, c)) return true;
+    }
+    return false;
   }
 
   /// Back-compat helper used by older call sites.

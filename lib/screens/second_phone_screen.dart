@@ -119,8 +119,7 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
 
   Future<void> _setUp() async {
     final t = L10n.current;
-    // Setting up the Second phone is a Pro feature (Play free trial covers
-    // it). An existing profile is never locked when Pro lapses.
+    // Setting up the Second phone is a Pro feature (one-time Play purchase). An existing profile is never locked when Pro lapses.
     if (!ProEntitlement.isActive(_app.settings)) {
       await showProRequired(
         context,
@@ -385,8 +384,9 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
           out.add(
             _card(
               t('spXiaomiWarn'),
-              color: gc.warning,
-              icon: Icons.warning_amber_outlined,
+              // Informational, not alarming (works e.g. on Redmi MIUI 12.5.7).
+              color: gc.textSecondary,
+              icon: Icons.info_outline,
             ),
           );
         }

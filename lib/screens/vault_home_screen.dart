@@ -12,7 +12,10 @@ import 'browser_screen.dart';
 import 'decoy_calculator_screen.dart';
 import 'files_screen.dart';
 import 'gallery_screen.dart';
+import '../services/pro_billing.dart';
+import '../services/pro_entitlement.dart';
 import '../services/second_phone_service.dart';
+import '../widgets/pro_gate.dart';
 import '../widgets/profile_app_tile.dart';
 import 'notes_list_screen.dart';
 import 'notifications_screen.dart';
@@ -55,7 +58,84 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       _loadProfileApps();
       _loadUnread();
       _loadBackground();
+      _loadCount();
     }
+  }
+
+  int? _stored;
+  bool _failedSeen = false;
+
+  /// Neutral text summary of wrong PIN attempts since the last entry (E).
+  static String? failedSummary(int n, L10n t) =>
+      n <= 0 ? null : t('failedSummary').replaceAll('{n}', '$n');
+
+  Widget _failed(GizliAlanAppState app, L10n t) {
+    final text = (_failedSeen || (app.session?.isDecoy ?? true))
+        ? null
+        : failedSummary(app.failedSinceLastUnlock, t);
+    if (text == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: InkWell(
+        key: const ValueKey('failed_summary'),
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => setState(() => _failedSeen = true),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 12,
+              color: GizliTheme.textSecondary,
+              shadows: _homeTextShadow,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Item counter for free users (B): photos + files + notes vs the limit.
+  Future<void> _loadCount() async {
+    final s = GizliAlanApp.of(context).session;
+    if (s == null) return;
+    final n = await ItemLimit.storedIn(s);
+    if (mounted && n != _stored) setState(() => _stored = n);
+  }
+
+  Widget _counter(GizliAlanAppState app, L10n t) {
+    final pro = ProEntitlement.isActive(app.settings);
+    final n = _stored;
+    if (!ProEntitlement.available || n == null) return const SizedBox.shrink();
+    final label = ItemLimit.counterLabel(pro: pro, stored: n);
+    if (label == null) return const SizedBox.shrink();
+    final full = ItemLimit.isFull(pro: pro, stored: n);
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: InkWell(
+        key: const ValueKey('item_counter'),
+        borderRadius: BorderRadius.circular(12),
+        onTap: () async {
+          if (full) {
+            await ItemLimit.showLimitReached(context);
+          } else {
+            await openPro(context);
+          }
+          if (mounted) setState(() {});
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          child: Text(
+            t('itemCounter').replaceAll('{n}', label),
+            style: TextStyle(
+              fontSize: 12,
+              color: full ? GizliTheme.warning : GizliTheme.textSecondary,
+              shadows: _homeTextShadow,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _loadUnread() async {
@@ -89,17 +169,55 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         ? await sp.listApps()
         : const <ProfileApp>[];
     if (mounted) setState(() => _profileApps = apps);
+    _loadRecent();
   }
 
+  List<String> _recent = const [];
+
+  Future<void> _loadRecent() async {
+    final r = await GizliAlanApp.of(context).session?.recentApps.list();
+    if (mounted && r != null) setState(() => _recent = r);
+  }
+
+  /// Last opened apps that still exist in the profile, newest first.
+  List<ProfileApp> get _recentApps => [
+    for (final pkg in _recent)
+      ..._profileApps.where((a) => a.packageName == pkg).take(1),
+  ];
+
+  Widget _sectionTitle(IconData icon, String text) => SliverToBoxAdapter(
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: GizliTheme.textSecondary),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                letterSpacing: 1.1,
+                color: GizliTheme.textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
   void _open(Widget screen) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => screen))
-        .then((_) {
-          if (mounted) setState(() {}); // e.g. wallpaper changed in settings
-          _loadProfileApps();
-          _loadUnread();
-          _loadBackground();
-        });
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen)).then((
+      _,
+    ) {
+      if (mounted) setState(() {}); // e.g. wallpaper changed in settings
+      _loadProfileApps();
+      _loadUnread();
+      _loadBackground();
+      _loadCount();
+    });
   }
 
   /// Launches a second-phone app in the work profile. The vault then goes to
@@ -107,12 +225,100 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
   Future<void> _launchProfileApp(ProfileApp a) async {
     final sp = GizliAlanApp.of(context).secondPhoneIfUnlocked;
     if (sp == null) return;
+    // Recorded before launching: the launch may lock the vault (and drop
+    // the session key) right away.
+    final app = GizliAlanApp.of(context);
+    final recent = app.session?.recentApps;
+    final before = await recent?.list();
+    await recent?.record(a.packageName);
     final r = await sp.launch(a);
+    if (r != 'ok' && before != null && app.isUnlocked) {
+      // Not opened: undo the record.
+      await recent?.restore(before);
+    }
+    if (mounted) _loadRecent();
     if (r != 'ok' && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(L10n.current('spFailed').replaceAll('{s}', r))),
       );
     }
+  }
+
+  /// Free tier notice on vault entry (and later, until dismissed): the
+  /// item limit, the one-time Pro price and what Pro unlocks.
+  /// Shown once: on the first vault entry where it applies it is marked as
+  /// seen right away, so later entries/launches do not show it again.
+  bool? _bannerThisSession;
+  bool _showFreeBanner(GizliAlanAppState app) {
+    if (_bannerThisSession == null) {
+      final show =
+          ProEntitlement.available &&
+          !ProEntitlement.isActive(app.settings) &&
+          !app.settings.freeBannerDismissed;
+      _bannerThisSession = show;
+      if (show) app.settings.setFreeBannerDismissed(true);
+    }
+    return _bannerThisSession! && !ProEntitlement.isActive(app.settings);
+  }
+
+  Widget _freeBanner(GizliAlanAppState app, L10n t) {
+    final price = app.billing?.plan(kPlanLifetime)?.price ?? kProFallbackPrice;
+    final body =
+        (Flavor.hasSecondPhone ? t('freeBannerBody') : t('freeBannerBodyPlay'))
+            .replaceAll('{price}', price);
+    return Container(
+      key: const ValueKey('free_banner'),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.fromLTRB(14, 12, 6, 6),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: GizliTheme.mint.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            t(
+              'freeBannerTitle',
+            ).replaceAll('{max}', '${ItemLimit.freeItemLimit}'),
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: GizliTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            body,
+            style: const TextStyle(
+              fontSize: 13,
+              color: GizliTheme.textSecondary,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                key: const ValueKey('free_banner_dismiss'),
+                onPressed: () async {
+                  await app.settings.setFreeBannerDismissed(true);
+                  if (mounted) setState(() => _bannerThisSession = false);
+                },
+                child: Text(t('freeBannerDismiss')),
+              ),
+              FilledButton(
+                key: const ValueKey('free_banner_cta'),
+                onPressed: () async {
+                  await openPro(context);
+                  if (mounted) setState(() {});
+                },
+                child: Text(t('freeBannerCta')),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -237,13 +443,19 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: 36),
-                    Text(
-                      DateFormat.Hm(locale).format(_now),
-                      style: const TextStyle(
-                        fontSize: 64,
-                        fontWeight: FontWeight.w200,
-                        color: GizliTheme.textPrimary,
-                        shadows: _homeTextShadow,
+                    // Quick lock (D): double-tap the clock.
+                    GestureDetector(
+                      key: const ValueKey('clock_quick_lock'),
+                      behavior: HitTestBehavior.opaque,
+                      onDoubleTap: app.lockVaultExplicit,
+                      child: Text(
+                        DateFormat.Hm(locale).format(_now),
+                        style: const TextStyle(
+                          fontSize: 64,
+                          fontWeight: FontWeight.w200,
+                          color: GizliTheme.textPrimary,
+                          shadows: _homeTextShadow,
+                        ),
                       ),
                     ),
                     Text(
@@ -263,15 +475,33 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                         color: GizliTheme.mint.withValues(alpha: 0.8),
                       ),
                     ),
+                    _counter(app, t),
+                    _failed(app, t),
                     const SizedBox(height: 32),
                     Expanded(
                       child: CustomScrollView(
                         slivers: [
+                          if (_showFreeBanner(app))
+                            SliverToBoxAdapter(child: _freeBanner(app, t)),
                           _grid(
                             apps
                                 .map((a) => _AppTile(key: a.key, icon: a))
                                 .toList(),
                           ),
+                          if (_recentApps.isNotEmpty) ...[
+                            _sectionTitle(Icons.history, t('recentApps')),
+                            _grid(
+                              _recentApps
+                                  .map(
+                                    (a) => ProfileAppTile(
+                                      key: ValueKey('recent_${a.packageName}'),
+                                      app: a,
+                                      onTap: () => _launchProfileApp(a),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
                           if (_profileApps.isNotEmpty) ...[
                             SliverToBoxAdapter(
                               child: Padding(

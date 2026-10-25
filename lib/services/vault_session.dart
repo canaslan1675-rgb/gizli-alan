@@ -5,7 +5,10 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 
 import 'crypto_service.dart';
+import 'bookmarks.dart';
+import 'gallery_albums.dart';
 import 'notes_repository.dart';
+import 'recent_apps.dart';
 import 'vault_events.dart';
 import 'vault_space.dart';
 import 'vault_storage.dart';
@@ -51,6 +54,8 @@ class VaultSession {
        ) {
     notes = NotesRepository(_files, File(p.join(dir.path, 'notes.gae')));
     events = VaultEventLog(_files, File(p.join(dir.path, 'events.gae')));
+    bookmarks = Bookmarks(_files, File(p.join(dir.path, 'bookmarks.gae')));
+    recentApps = RecentApps(_files, File(p.join(dir.path, 'recent_apps.gae')));
     gallery = VaultStorage(
       _files,
       Directory(p.join(dir.path, 'gallery')),
@@ -60,6 +65,11 @@ class VaultSession {
       _files,
       Directory(p.join(dir.path, 'files')),
       events: events,
+    );
+    albums = GalleryAlbums(
+      _files,
+      File(p.join(dir.path, 'gallery', 'albums.gae')),
+      gallery,
     );
   }
 
@@ -73,6 +83,15 @@ class VaultSession {
   late final VaultEventLog events;
   late final VaultStorage gallery;
   late final VaultStorage files;
+
+  /// Browser bookmarks (0.6.0 K).
+  late final Bookmarks bookmarks;
+
+  /// Gallery albums (0.6.0 H).
+  late final GalleryAlbums albums;
+
+  /// Recently opened İkinci telefon apps (our own launches only).
+  late final RecentApps recentApps;
 
   bool get isDecoy => space == VaultSpace.decoy;
 

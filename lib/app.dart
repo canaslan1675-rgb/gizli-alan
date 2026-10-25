@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ import 'screens/decoy_calculator_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/pin_lock_screen.dart';
 import 'screens/vault_home_screen.dart';
+import 'services/video_temp.dart';
+import 'services/recycle_bin.dart';
 import 'services/auth_service.dart';
 import 'services/auto_lock.dart';
 import 'services/biometric_service.dart';
@@ -123,6 +126,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     billing?.addListener(_billingChanged);
+    unawaited(VideoTemp.wipe()); // leftovers after a crash / kill
     _bootstrap();
   }
 
@@ -219,7 +223,12 @@ class GizliAlanAppState extends State<GizliAlanApp>
   // ------------------------------------------------------------ unlock / lock
 
   /// Opens [space] and shows the vault home on top of the entry screen.
+  /// Wrong PIN-pad attempts reported on this real-vault entry (0.6.0 E);
+  /// shown as a neutral text line on the vault home. Never set for decoy.
+  int failedSinceLastUnlock = 0;
+
   Future<void> enterVault(VaultSpace space) async {
+    failedSinceLastUnlock = 0;
     final key = await auth.dataKey(space);
     final dir = await baseDir();
     _session?.close();
@@ -236,11 +245,17 @@ class GizliAlanAppState extends State<GizliAlanApp>
     }
     if (space == VaultSpace.real) {
       final failed = await auth.takeFailuresSinceUnlock();
+      failedSinceLastUnlock = failed;
       if (failed > 0) {
         await session.events.add(VaultEventType.failedUnlocks, {
           'n': '$failed',
         });
       }
+    }
+    try {
+      await RecycleBin(session).purgeExpired();
+    } catch (e) {
+      debugPrint('recycle bin purge skipped: $e');
     }
     setState(() => _session = session);
     navKey.currentState?.pushAndRemoveUntil(
@@ -356,6 +371,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
     if (s == null) return;
     s.close();
     _wipeBrowserIfEnabled();
+    unawaited(VideoTemp.wipe()); // decrypted temp videos (0.6.0 I)
     // Drop decoded vault photos (gallery thumbnails, home background) from
     // Flutter's in-memory image cache.
     PaintingBinding.instance.imageCache

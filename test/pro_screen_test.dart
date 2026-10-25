@@ -199,4 +199,51 @@ void main() {
     final pubspec = File('pubspec.yaml').readAsStringSync();
     expect(pubspec.contains('in_app_purchase:'), isTrue);
   });
+
+  group('free banner (0.5.8)', () {
+    for (final f in AppFlavor.values) {
+      testWidgets('${f.name}: shown on entry, dismissible, opens Pro', (
+        tester,
+      ) async {
+        Flavor.debugOverride = f;
+        await openVault(tester, VaultSpace.real);
+        expect(find.byKey(const ValueKey('free_banner')), findsOneWidget);
+        await settle(tester);
+        expect(find.text('1/50 items'), findsOneWidget);
+        // Shown once: already marked as seen for later entries.
+        expect(
+          (await SharedPreferences.getInstance()).getBool(
+            'free_banner_dismissed',
+          ),
+          isTrue,
+        );
+        expect(
+          find.textContaining('limited free version (up to 50 items)'),
+          findsOneWidget,
+        );
+        expect(find.textContaining('499 TL'), findsOneWidget);
+        expect(
+          find.textContaining('Second phone'),
+          f == AppFlavor.full ? findsWidgets : findsNothing,
+        );
+        await tester.tap(find.byKey(const ValueKey('free_banner_cta')));
+        await settle(tester);
+        expect(
+          find.byType(f == AppFlavor.play ? PaywallScreen : ProScreen),
+          findsOneWidget,
+        );
+        if (f == AppFlavor.play) {
+          expect(find.byKey(const ValueKey('pay_price')), findsOneWidget);
+          expect(find.text('499 TL'), findsOneWidget);
+          expect(find.textContaining('free trial'), findsNothing);
+          expect(find.textContaining('/ month'), findsNothing);
+        }
+        await tester.tap(find.byTooltip('Back').last);
+        await settle(tester);
+        await tester.tap(find.byKey(const ValueKey('free_banner_dismiss')));
+        await settle(tester);
+        expect(find.byKey(const ValueKey('free_banner')), findsNothing);
+      });
+    }
+  });
 }

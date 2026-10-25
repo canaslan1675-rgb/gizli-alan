@@ -27,6 +27,7 @@ class FakeBilling implements BillingBackend {
     return const [
       ProPlan(basePlanId: kPlanMonthly, price: '₺150,00', hasTrial: true),
       ProPlan(basePlanId: kPlanYearly, price: '₺999,00'),
+      ProPlan(basePlanId: kPlanLifetime, price: '₺499,00'),
     ];
   }
 
@@ -234,6 +235,64 @@ void main() {
     expect(
       File('lib/widgets/import_delete_originals.dart').readAsStringSync(),
       contains('maxCount'),
+    );
+  });
+
+  group('one-time Pro (0.5.8)', () {
+    test('lifetime purchase grants Pro and is acknowledged', () async {
+      await billing.start();
+      expect(billing.plan(kPlanLifetime)!.price, '₺499,00');
+      final done = billing.buy(billing.plan(kPlanLifetime)!);
+      await tick();
+      expect(fake.bought, [kPlanLifetime]);
+      fake.ctrl.add([
+        pur(BillingStatus.purchased, ack: true, id: kProLifetimeId),
+      ]);
+      await done;
+      expect(billing.isPro, isTrue);
+      expect(fake.completed.single.productId, kProLifetimeId);
+    });
+
+    test('restore finds the one-time product (INAPP)', () async {
+      await billing.start();
+      expect(billing.isPro, isFalse);
+      fake.owned = [pur(BillingStatus.purchased, id: kProLifetimeId)];
+      await billing.restore();
+      expect(billing.isPro, isTrue);
+      expect(billing.takeNotice(), BillingNotice.restored);
+    });
+
+    test('existing subscribers (gizlialan_pro) stay Pro', () async {
+      fake.owned = [pur(BillingStatus.purchased, id: kProProductId)];
+      await billing.start();
+      expect(billing.isPro, isTrue);
+    });
+
+    test('unrelated products never grant Pro', () async {
+      fake.owned = [pur(BillingStatus.purchased, id: 'other')];
+      await billing.start();
+      expect(billing.isPro, isFalse);
+      expect(isProProduct('other'), isFalse);
+      expect(isProProduct(kProLifetimeId), isTrue);
+      expect(kProLifetimeId, 'gizlialan_pro_lifetime');
+      expect(kProFallbackPrice, '499 TL');
+    });
+
+    test(
+      'backend queries the INAPP lifetime product, paywall has no trial',
+      () {
+        final backend = File(
+          'lib/services/play_billing_backend.dart',
+        ).readAsStringSync();
+        expect(backend, contains('queryProductDetails({kProLifetimeId})'));
+        expect(backend, contains('ProductType.inapp'));
+        expect(backend, contains('queryPastPurchases'));
+        final pay = File('lib/screens/paywall_screen.dart').readAsStringSync();
+        expect(pay, isNot(contains('payTrial')));
+        expect(pay, isNot(contains('kPlanMonthly')));
+        expect(pay, isNot(contains('kPlanYearly')));
+        expect(pay, contains('kProFallbackPrice'));
+      },
     );
   });
 }

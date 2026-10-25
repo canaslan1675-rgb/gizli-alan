@@ -51,8 +51,12 @@ void main() {
 
     await s2.gallery.delete(list.single);
     expect(await s2.gallery.list(), isEmpty);
+    // 0.6.0: delete goes to the recycle bin; purge removes the payload.
+    await s2.gallery.purge((await s2.gallery.listTrash()).single);
     expect(
-      (await allFiles()).where((f) => !f.path.endsWith('index.gae')),
+      (await allFiles()).where(
+        (f) => !f.path.endsWith('index.gae') && !f.path.endsWith('trash.gae'),
+      ),
       isEmpty,
     );
   });
