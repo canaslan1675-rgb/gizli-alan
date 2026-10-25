@@ -121,8 +121,15 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 - Finished: #37 — Pro "Kasaya aktarınca orijinali sil" (default off, ProEntitlement-gated). Import via system document picker, encrypt + read-back verify, then delete only verified originals (`ImportChannel.kt`: MediaStore.createDeleteRequest on Android 11+, RecoverableSecurityException flow on 10, DocumentsContract.deleteDocument for SAF). No new permissions. v0.4.2+8, prerelease `v0.4.2-test`, signed AAB in /workspace/release.
 
 ## 2026-10-25 09:50 +03:00 — cursor
-- Finished: vault back / relock (no matching open `task` issue; owner request, not claimed). Branch `cursor/vault-relock-40e1`. Version **0.5.5+24**.
+- Finished: vault back / relock (no matching open `task` issue; owner request, not claimed). Branch `cursor/vault-relock-40e1`. Version **0.5.9+40** (first commit said 0.5.5+24; corrected the same day — see the next entry). Play production 0.5.7 (versionCode 28) and the 0.5.8 review build are not in this repo.
 - Behavior: in-vault Back pops the previous screen; Back locks only on the vault home. Settings → Kilit süresi: Hemen (default), 30 saniye, 1 dakika, persisted. App-launched pickers, share/mailto/Play listing, Play Billing and İkinci telefon setup do not lock on return (hold set before the call, cleared on return / next resume). Work-app launch from the grid still locks, subject to the delay. FLAG_SECURE, calculator disguise and Pro gating unchanged. No Play upload, no keystore.
 - Verify: `flutter analyze` clean; `flutter test` 204 passed, 24 skipped; `flutter build apk --release --flavor full --target-platform android-arm64` → `app-full-release.apk` versionName 0.5.5 versionCode 24, debug-signed (no `key.properties`).
 - Not covered on a device: real Home / recents / screen-off (lifecycle simulated in tests), predictive-back on a phone, camera (the app has no camera capture).
 - Next: owner review/merge. Do not publish. Free task still #10; owner items #11–#16 stay owner.
+
+## 2026-10-25 09:55 +03:00 — cursor
+- Version correction on `cursor/vault-relock-40e1` (PR #57). Play production is 0.5.7 versionCode 28 (listing updated 2026-10-22, one-time Pro). A 0.5.8 review build (~2026-10-23) was reported. Neither versionName nor any versionCode ≥ 25 exists in this repo.
+- Searched: `git fetch --all`, every remote branch and tag, `pubspec.yaml` history (highest **0.5.4+23** on `origin/main` `92f1e7d`), GitHub releases (latest `v0.5.0-test`), open/merged PRs (latest merged #56 is 0.5.4), `docs/AGENT_LOG.md`, `PROGRESS.md`. `92f1e7d` "privacy: v0.5.7" only edits `docs/privacy/index.html`.
+- Play listing "What's new" (one-time Pro, dismissible free card, softer Xiaomi notice, existing subscribers keep Pro) is not in the tree. No 499 TL product id. İkinci telefon is already on `main` since v0.5.0. No rebase target other than `origin/main` (`92f1e7d`); the lock commit stays on top of that. Did not invent the missing billing change (Play Billing changes are an owner stop).
+- Version set to **0.5.9+40**: above known production 28, and above a 0.5.8 that would normally be 29 or a small skip (30–32). No 0.5.8 versionCode was found to exceed exactly.
+- Verify: `flutter analyze lib test` — No issues found. `flutter test` — 204 passed, 24 skipped. No Play upload, no keystore.

@@ -91,9 +91,9 @@ void main() {
       );
     });
 
-    test('compile-time version is 0.5.5+24', () {
-      expect(appVersion, '0.5.5');
-      expect(appBuild, 24);
+    test('compile-time version is 0.5.9+40', () {
+      expect(appVersion, '0.5.9');
+      expect(appBuild, 40);
     });
 
     test('TR and EN both have every new string', () {
