@@ -208,6 +208,8 @@ void main() {
         Flavor.debugOverride = f;
         await openVault(tester, VaultSpace.real);
         expect(find.byKey(const ValueKey('free_banner')), findsOneWidget);
+        await settle(tester);
+        expect(find.text('1/50 items'), findsOneWidget);
         // Shown once: already marked as seen for later entries.
         expect(
           (await SharedPreferences.getInstance()).getBool(

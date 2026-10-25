@@ -451,8 +451,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       onTap: canGetPro
           ? () async {
-              await Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => proScreen()));
+              await Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => proScreen()));
               if (mounted) setState(() {});
             }
           : null,
@@ -749,8 +750,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: Text(t('proTitle')),
           subtitle: Text(t('proSettingsHint')),
           onTap: () async {
-            await Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => proScreen()));
+            await Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => proScreen()));
             if (mounted) setState(() {});
           },
         ),
@@ -767,8 +769,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         subtitle: const Text(PrivacyLink.supportEmail),
         onTap: () async {
           final messenger = ScaffoldMessenger.of(context);
-          if (await GizliAlanApp.of(context)
-              .withExternalUi(PrivacyLink.openMail, untilResume: true)) {
+          if (await GizliAlanApp.of(
+            context,
+          ).withExternalUi(PrivacyLink.openMail, untilResume: true)) {
             return;
           }
           await Clipboard.setData(
@@ -798,9 +801,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         leading: const Icon(Icons.menu_book_outlined),
         title: Text(t('helpTitle')),
         subtitle: Text(t('helpHint')),
-        onTap: () =>
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const HelpScreen())),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const HelpScreen())),
       ),
       ListTile(
         key: const ValueKey('settings_share'),

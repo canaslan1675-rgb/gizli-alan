@@ -5,6 +5,7 @@ import '../l10n/l10n.dart';
 import '../screens/paywall_screen.dart';
 import '../screens/pro_screen.dart';
 import '../services/pro_entitlement.dart';
+import '../services/vault_session.dart';
 
 /// Pro page for this build: Google Play paywall, or the local test stub
 /// (debug builds only, see [Flavor.hasProStub]).
@@ -58,10 +59,21 @@ class ItemLimit {
     if (ProEntitlement.isActive(app.settings)) return null;
     final s = app.session;
     if (s == null) return 0;
-    final n =
-        await s.gallery.count() + await s.files.count() + await s.notes.count();
-    return leftFor(pro: false, stored: n);
+    return leftFor(pro: false, stored: await storedIn(s));
   }
+
+  /// Items that count toward the limit (photos + files + notes; albums and
+  /// the recycle bin do not count).
+  static Future<int> storedIn(VaultSession s) async =>
+      await s.gallery.count() + await s.files.count() + await s.notes.count();
+
+  /// Vault-home counter text, e.g. "42/50"; null for Pro (unlimited).
+  static String? counterLabel({required bool pro, required int stored}) =>
+      pro ? null : '$stored/$freeItemLimit';
+
+  /// True when the free vault is full (the counter turns into an offer).
+  static bool isFull({required bool pro, required int stored}) =>
+      leftFor(pro: pro, stored: stored) == 0;
 
   /// Pure rule: null = unlimited (Pro); otherwise free slots, never < 0
   /// (a vault already above the limit keeps everything, it just can't grow).

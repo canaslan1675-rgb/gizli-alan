@@ -74,6 +74,7 @@ const Map<String, String> en = {
   'payLifetime': "GizliAlan Pro – one-time",
   'payLifetimeSub': "Pay once, yours forever. No subscription.",
   'payBuyOnce': "Buy once – {price}",
+  'itemCounter': '{n} items',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
       "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",

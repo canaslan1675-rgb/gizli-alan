@@ -58,7 +58,53 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       _loadProfileApps();
       _loadUnread();
       _loadBackground();
+      _loadCount();
     }
+  }
+
+  int? _stored;
+
+  /// Item counter for free users (B): photos + files + notes vs the limit.
+  Future<void> _loadCount() async {
+    final s = GizliAlanApp.of(context).session;
+    if (s == null) return;
+    final n = await ItemLimit.storedIn(s);
+    if (mounted && n != _stored) setState(() => _stored = n);
+  }
+
+  Widget _counter(GizliAlanAppState app, L10n t) {
+    final pro = ProEntitlement.isActive(app.settings);
+    final n = _stored;
+    if (!ProEntitlement.available || n == null) return const SizedBox.shrink();
+    final label = ItemLimit.counterLabel(pro: pro, stored: n);
+    if (label == null) return const SizedBox.shrink();
+    final full = ItemLimit.isFull(pro: pro, stored: n);
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: InkWell(
+        key: const ValueKey('item_counter'),
+        borderRadius: BorderRadius.circular(12),
+        onTap: () async {
+          if (full) {
+            await ItemLimit.showLimitReached(context);
+          } else {
+            await openPro(context);
+          }
+          if (mounted) setState(() {});
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          child: Text(
+            t('itemCounter').replaceAll('{n}', label),
+            style: TextStyle(
+              fontSize: 12,
+              color: full ? GizliTheme.warning : GizliTheme.textSecondary,
+              shadows: _homeTextShadow,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _loadUnread() async {
@@ -95,14 +141,15 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
   }
 
   void _open(Widget screen) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => screen))
-        .then((_) {
-          if (mounted) setState(() {}); // e.g. wallpaper changed in settings
-          _loadProfileApps();
-          _loadUnread();
-          _loadBackground();
-        });
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen)).then((
+      _,
+    ) {
+      if (mounted) setState(() {}); // e.g. wallpaper changed in settings
+      _loadProfileApps();
+      _loadUnread();
+      _loadBackground();
+      _loadCount();
+    });
   }
 
   /// Launches a second-phone app in the work profile. The vault then goes to
@@ -343,6 +390,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                         color: GizliTheme.mint.withValues(alpha: 0.8),
                       ),
                     ),
+                    _counter(app, t),
                     const SizedBox(height: 32),
                     Expanded(
                       child: CustomScrollView(
