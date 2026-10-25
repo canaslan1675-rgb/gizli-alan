@@ -119,3 +119,10 @@ Her oturum en alta tarihli bir girdi ekler; eski girdiler değiştirilmez.
 
 ## 2026-09-26 19:52 +03:00 — joi
 - Finished: #37 — Pro "Kasaya aktarınca orijinali sil" (default off, ProEntitlement-gated). Import via system document picker, encrypt + read-back verify, then delete only verified originals (`ImportChannel.kt`: MediaStore.createDeleteRequest on Android 11+, RecoverableSecurityException flow on 10, DocumentsContract.deleteDocument for SAF). No new permissions. v0.4.2+8, prerelease `v0.4.2-test`, signed AAB in /workspace/release.
+
+## 2026-10-25 09:50 +03:00 — cursor
+- Finished: vault back / relock (no matching open `task` issue; owner request, not claimed). Branch `cursor/vault-relock-40e1`. Version **0.5.5+24**.
+- Behavior: in-vault Back pops the previous screen; Back locks only on the vault home. Settings → Kilit süresi: Hemen (default), 30 saniye, 1 dakika, persisted. App-launched pickers, share/mailto/Play listing, Play Billing and İkinci telefon setup do not lock on return (hold set before the call, cleared on return / next resume). Work-app launch from the grid still locks, subject to the delay. FLAG_SECURE, calculator disguise and Pro gating unchanged. No Play upload, no keystore.
+- Verify: `flutter analyze` clean; `flutter test` 204 passed, 24 skipped; `flutter build apk --release --flavor full --target-platform android-arm64` → `app-full-release.apk` versionName 0.5.5 versionCode 24, debug-signed (no `key.properties`).
+- Not covered on a device: real Home / recents / screen-off (lifecycle simulated in tests), predictive-back on a phone, camera (the app has no camera capture).
+- Next: owner review/merge. Do not publish. Free task still #10; owner items #11–#16 stay owner.

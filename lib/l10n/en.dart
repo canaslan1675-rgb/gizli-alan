@@ -183,9 +183,12 @@ const Map<String, String> en = {
       'Always on: screenshots, screen recording and the recent-apps preview are blocked (FLAG_SECURE)',
   'entry': 'Entry',
   'general': 'General',
-  'lockTimeout': 'Auto-lock',
-  'lockTimeoutHint': 'Locks when the app goes to the background',
+  'lockTimeout': 'Lock delay',
+  'lockTimeoutHint':
+      'Locks the vault this long after you leave the app or the screen turns off. Come back sooner and no PIN is needed.',
   'lockImmediately': 'Immediately',
+  'lockAfter30': '30 seconds',
+  'lockAfter60': '1 minute',
   'lockAfterSec': 'After {n} s',
   'lockAfterMin': 'After {n} min',
   'language': 'Language',
@@ -416,7 +419,7 @@ const Map<String, String> en = {
       'In Settings → Security you can set a second PIN. The decoy PIN opens a separate vault that starts empty and has its own encryption key; your real vault and its content are not visible there. The decoy PIN must differ from your real PIN. Biometric unlock always opens the real vault only.',
   'helpVaultTitle': 'Vault',
   'helpVaultBody':
-      'In the vault you can keep photos, notes and files (including videos and documents) and use the private browser. All content is encrypted on this device with AES-256-GCM; there is no account, no cloud and no server. Screenshots, screen recording and the recent-apps preview are blocked. The vault locks when the app goes to the background; change the delay in Settings → Auto-lock.',
+      'In the vault you can keep photos, notes and files (including videos and documents) and use the private browser. All content is encrypted on this device with AES-256-GCM; there is no account, no cloud and no server. Screenshots, screen recording and the recent-apps preview are blocked. Back moves to the previous screen inside the vault; it leaves the vault only from the home screen. The vault locks when you leave the app or the screen turns off; change the delay in Settings → Lock delay (Immediately, 30 seconds or 1 minute).',
   'helpPinTitle': 'What if I forget my PIN?',
   'helpPinBody':
       'There is no PIN recovery: your PIN is never sent anywhere and the content can only be decrypted on this device. If you forget your PIN, the vault content cannot be opened; you can only reset the app completely (or uninstall and reinstall it).',

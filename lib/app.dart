@@ -12,6 +12,7 @@ import 'screens/onboarding_screen.dart';
 import 'screens/pin_lock_screen.dart';
 import 'screens/vault_home_screen.dart';
 import 'services/auth_service.dart';
+import 'services/auto_lock.dart';
 import 'services/biometric_service.dart';
 import 'services/browser_engine.dart';
 import 'services/pro_billing.dart';
@@ -39,6 +40,7 @@ class GizliAlanApp extends StatefulWidget {
     this.browserEngineFactory,
     this.wipeBrowserData,
     this.billing,
+    this.now,
   });
 
   final SettingsService settings;
@@ -60,6 +62,10 @@ class GizliAlanApp extends StatefulWidget {
   /// Google Play Billing for Pro (`play`); defaults to [ProBilling.instance].
   final ProBilling? billing;
 
+  /// Clock for the auto-lock delay. Tests inject one; production uses
+  /// [DateTime.now].
+  final DateTime Function()? now;
+
   @override
   State<GizliAlanApp> createState() => GizliAlanAppState();
 
@@ -74,11 +80,9 @@ class GizliAlanAppState extends State<GizliAlanApp>
   bool _ready = false;
   bool _needsOnboarding = true;
   VaultSession? _session;
-  DateTime? _backgroundedAt;
 
-  /// >0 while a system UI we launched (photo picker, file dialog, biometric
-  /// prompt) is in front, so auto-lock does not fire mid-import.
-  int _externalUi = 0;
+  /// Background delay and the "we launched this activity" hold.
+  late final AutoLockGuard _lock = AutoLockGuard(now: widget.now);
 
   SettingsService get settings => widget.settings;
   AuthService get auth => widget.auth;
@@ -155,7 +159,14 @@ class GizliAlanAppState extends State<GizliAlanApp>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (_externalUi > 0) return;
+    final shouldLock = _lock.onLifecycle(
+      state,
+      timeoutSec: settings.lockTimeoutSec,
+    );
+    // An activity we launched (picker, share sheet, billing, work-profile
+    // setup) is in front. Leaving for that must not lock; a real Home press
+    // after we are back still does. The engine detaching still locks.
+    if (_lock.holding && state != AppLifecycleState.detached) return;
     if (!isUnlocked) {
       // Back in the foreground while locked: hide the work apps if a
       // background auto-lock could not (#30). A new foreground visit may try
@@ -168,41 +179,40 @@ class GizliAlanAppState extends State<GizliAlanApp>
       }
       return;
     }
-    switch (state) {
-      case AppLifecycleState.paused:
-      case AppLifecycleState.hidden:
-        _backgroundedAt ??= DateTime.now();
-        if (settings.lockTimeoutSec <= 0) lockVault();
-        break;
-      case AppLifecycleState.resumed:
-        final since = _backgroundedAt;
-        _backgroundedAt = null;
-        if (since != null &&
-            DateTime.now().difference(since).inSeconds >=
-                settings.lockTimeoutSec) {
-          lockVault();
-          ensureWorkAppsHiddenWhileLocked();
-        }
-        break;
-      case AppLifecycleState.detached:
-        lockVault();
-        break;
-      case AppLifecycleState.inactive:
-        // Notification shade, system dialogs: FLAG_SECURE already hides
-        // content from recents; don't lock for a mere shade pull.
-        break;
+    if (!shouldLock) return;
+    lockVault();
+    // Delay elapsed while we were away: hide on this foreground visit.
+    if (state == AppLifecycleState.resumed) {
+      ensureWorkAppsHiddenWhileLocked();
     }
   }
 
-  /// Runs [action] (which opens a system picker / prompt) without triggering
-  /// auto-lock when our activity is briefly backgrounded.
-  Future<T> withExternalUi<T>(Future<T> Function() action) async {
-    _externalUi++;
+  /// Runs [action] without auto-lock while the UI it opens is in front.
+  ///
+  /// The hold is taken synchronously before [action] is awaited. Pickers,
+  /// biometric prompts and the Play sheet keep their future alive until the
+  /// user returns, so the hold ends with the future. Pass [untilResume] for
+  /// intents whose platform call returns as soon as `startActivity` is
+  /// accepted (share sheet, mailto, Play listing, system settings): the hold
+  /// then stays until the next resume. [launched] decides that from the
+  /// result; a failed launch (nothing started) does not suppress the next
+  /// real leave. Defaults to [externalCallStaysOut].
+  Future<T> withExternalUi<T>(
+    Future<T> Function() action, {
+    bool untilResume = false,
+    bool Function(T result)? launched,
+  }) async {
+    _lock.begin(untilResume: untilResume);
     try {
-      return await action();
-    } finally {
-      _externalUi--;
-      _backgroundedAt = null;
+      final result = await action();
+      final stays =
+          untilResume &&
+          (launched?.call(result) ?? externalCallStaysOut(result));
+      _lock.end(staysOut: stays);
+      return result;
+    } catch (e) {
+      _lock.end(staysOut: false);
+      rethrow;
     }
   }
 
@@ -351,7 +361,6 @@ class GizliAlanAppState extends State<GizliAlanApp>
     PaintingBinding.instance.imageCache
       ..clear()
       ..clearLiveImages();
-    _backgroundedAt = null;
     setState(() => _session = null);
     navKey.currentState?.popUntil((r) => r.isFirst);
   }

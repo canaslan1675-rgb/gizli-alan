@@ -165,7 +165,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextButton(
               key: const ValueKey('privacy_open'),
               onPressed: () async {
-                final ok = await PrivacyLink.open(url);
+                final ok = await GizliAlanApp.of(context).withExternalUi(
+                  () => PrivacyLink.open(url),
+                  untilResume: true,
+                );
                 if (!ok) await copy('noBrowser');
               },
               child: Text(t('openInBrowser')),
@@ -225,12 +228,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (intro == null || !mounted) return;
     final line = intro.isEmpty ? t('shareAppText') : intro;
     final text = AppActions.shareText(line);
-    if (await AppActions.share(text, title: t('shareApp'))) return;
+    final app = GizliAlanApp.of(context);
+    if (await app.withExternalUi(
+      () => AppActions.share(text, title: t('shareApp')),
+      untilResume: true,
+    )) {
+      return;
+    }
     await _copyFallback(AppActions.storeUrl, 'shareAppFailed');
   }
 
   Future<void> _rateApp() async {
-    if (await AppActions.openStore()) return;
+    final app = GizliAlanApp.of(context);
+    if (await app.withExternalUi(
+      () => AppActions.openStore(),
+      untilResume: true,
+    )) {
+      return;
+    }
     await _copyFallback(AppActions.storeUrl, 'rateAppFailed');
   }
 
@@ -360,14 +375,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       parts.add('${t('feedbackBodyExpected')}:\n${draft.$2}');
     }
     final body = parts.isEmpty ? null : parts.join('\n\n');
-    if (await AppActions.sendFeedback(subject, body: body)) return;
+    if (!mounted) return;
+    final app = GizliAlanApp.of(context);
+    if (await app.withExternalUi(
+      () => AppActions.sendFeedback(subject, body: body),
+      untilResume: true,
+    )) {
+      return;
+    }
+    if (!mounted) return;
     await _copyFallback(AppActions.feedbackEmail, 'feedbackFailed');
   }
 
   String _timeoutLabel(int s, L10n t) {
-    if (s == 0) return t('lockImmediately');
-    if (s < 60) return t('lockAfterSec').replaceAll('{n}', '$s');
-    return t('lockAfterMin').replaceAll('{n}', '${s ~/ 60}');
+    if (s <= 0) return t('lockImmediately');
+    if (s <= 30) return t('lockAfter30');
+    return t('lockAfter60');
   }
 
   /// "Hide info icon on calculator": Pro-only opt-in (default off).
@@ -428,9 +451,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       onTap: canGetPro
           ? () async {
-              await Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => proScreen()));
+              await Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => proScreen()));
               if (mounted) setState(() {});
             }
           : null,
@@ -539,6 +561,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final general = <Widget>[
       _header(t('general')),
       ListTile(
+        key: const ValueKey('settings_lock_timeout'),
         leading: const Icon(Icons.timer_outlined),
         title: Text(t('lockTimeout')),
         subtitle: Text(t('lockTimeoutHint')),
@@ -726,9 +749,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: Text(t('proTitle')),
           subtitle: Text(t('proSettingsHint')),
           onTap: () async {
-            await Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (_) => proScreen()));
+            await Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => proScreen()));
             if (mounted) setState(() {});
           },
         ),
@@ -745,7 +767,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         subtitle: const Text(PrivacyLink.supportEmail),
         onTap: () async {
           final messenger = ScaffoldMessenger.of(context);
-          if (await PrivacyLink.openMail()) return;
+          if (await GizliAlanApp.of(context)
+              .withExternalUi(PrivacyLink.openMail, untilResume: true)) {
+            return;
+          }
           await Clipboard.setData(
             const ClipboardData(text: PrivacyLink.supportEmail),
           );
@@ -773,9 +798,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         leading: const Icon(Icons.menu_book_outlined),
         title: Text(t('helpTitle')),
         subtitle: Text(t('helpHint')),
-        onTap: () => Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => const HelpScreen())),
+        onTap: () =>
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const HelpScreen())),
       ),
       ListTile(
         key: const ValueKey('settings_share'),

@@ -77,7 +77,10 @@ class _SecondPhoneScreenState extends State<SecondPhoneScreen> {
     if (sp == null || _busy) return null;
     setState(() => _busy = true);
     try {
-      return await _app.withExternalUi(() => action(sp));
+      // Provisioning, the profile Play Store, clone and remove start system
+      // activities. Some of those platform calls return before the user is
+      // back, so hold the auto-lock until resume.
+      return await _app.withExternalUi(() => action(sp), untilResume: true);
     } finally {
       if (mounted) setState(() => _busy = false);
     }

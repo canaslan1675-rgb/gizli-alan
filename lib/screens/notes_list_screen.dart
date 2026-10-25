@@ -34,7 +34,12 @@ class _NotesListScreenState extends State<NotesListScreen> {
     }
   }
 
-  void _reload() => setState(() => _future = _repo.list());
+  void _reload() {
+    final next = _repo.list();
+    setState(() {
+      _future = next;
+    });
+  }
 
   Future<void> _open(Note? note) async {
     // Free limit applies to new notes only; existing ones stay editable.

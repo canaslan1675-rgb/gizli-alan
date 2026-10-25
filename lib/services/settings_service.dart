@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart' show ThemeMode;
+
 import '../theme.dart' show AccentPreset;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
@@ -34,7 +36,16 @@ class SettingsService {
   static const _kThemeMode = 'theme_mode';
   static const _kAccent = 'accent_color';
 
-  static const lockTimeoutChoices = [0, 15, 60, 300];
+  /// Seconds before auto-lock after leaving the app or the screen turning
+  /// off. 0 = immediately. Legacy values (15 s, 5 min) snap onto these.
+  static const lockTimeoutChoices = [0, 30, 60];
+
+  /// Maps a stored or chosen value onto [lockTimeoutChoices].
+  static int normalizeLockTimeout(int sec) {
+    if (sec <= 0) return 0;
+    if (sec <= 30) return 30;
+    return 60;
+  }
 
   static Future<SettingsService> create() async {
     final prefs = await SharedPreferences.getInstance();
@@ -91,10 +102,12 @@ class SettingsService {
   Future<void> setBiometricEnabled(bool v) => _prefs.setBool(_kBiometric, v);
 
   /// Seconds in background before auto-lock. 0 = lock immediately.
-  int get lockTimeoutSec => _prefs.getInt(_kLockTimeout) ?? 0;
+  /// Reads snap a previously stored 15 s onto 30 s and 5 min onto 1 min.
+  int get lockTimeoutSec =>
+      normalizeLockTimeout(_prefs.getInt(_kLockTimeout) ?? 0);
 
   Future<void> setLockTimeoutSec(int sec) =>
-      _prefs.setInt(_kLockTimeout, sec.clamp(0, 300));
+      _prefs.setInt(_kLockTimeout, normalizeLockTimeout(sec));
 
   /// Index into GizliTheme.wallpapers for the vault home screen.
   int get wallpaper => _prefs.getInt(_kWallpaper) ?? 0;
