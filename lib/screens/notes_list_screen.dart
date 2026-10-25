@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../widgets/quick_lock.dart';
 import '../widgets/pro_gate.dart';
 import '../app.dart';
 import '../l10n/l10n.dart';
@@ -59,7 +60,10 @@ class _NotesListScreenState extends State<NotesListScreen> {
     final fmt = DateFormat.yMMMd(L10n.lang).add_Hm();
 
     return Scaffold(
-      appBar: AppBar(title: Text(t('notes'))),
+      appBar: AppBar(
+        title: Text(t('notes')),
+        actions: const [QuickLockButton()],
+      ),
       floatingActionButton: FloatingActionButton(
         tooltip: t('newNote'),
         onPressed: () => _open(null),

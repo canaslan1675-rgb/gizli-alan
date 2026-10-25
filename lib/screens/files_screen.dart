@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/quick_lock.dart';
 import '../app.dart';
 import '../l10n/l10n.dart';
 import '../models/vault_event.dart';
@@ -170,7 +171,10 @@ class _FilesScreenState extends State<FilesScreen> {
   Widget build(BuildContext context) {
     final t = L10n.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(t('files'))),
+      appBar: AppBar(
+        title: Text(t('files')),
+        actions: const [QuickLockButton()],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _import,
         icon: const Icon(Icons.file_upload_outlined),

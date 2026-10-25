@@ -77,6 +77,7 @@ const Map<String, String> tr = {
   'payLifetimeSub': "Bir kez öde, sonsuza kadar senin. Abonelik yok.",
   'payBuyOnce': "{price} – Bir kez satın al",
   'itemCounter': '{n} öğe',
+  'quickLock': 'Hemen kilitle',
   'freeBannerTitle': "Ücretsiz sürümdesin (en fazla {max} öğe)",
   'freeBannerBody':
       "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili) açılır ve gelecek güncellemeler dahil.",

@@ -364,13 +364,19 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: 36),
-                    Text(
-                      DateFormat.Hm(locale).format(_now),
-                      style: const TextStyle(
-                        fontSize: 64,
-                        fontWeight: FontWeight.w200,
-                        color: GizliTheme.textPrimary,
-                        shadows: _homeTextShadow,
+                    // Quick lock (D): double-tap the clock.
+                    GestureDetector(
+                      key: const ValueKey('clock_quick_lock'),
+                      behavior: HitTestBehavior.opaque,
+                      onDoubleTap: app.lockVaultExplicit,
+                      child: Text(
+                        DateFormat.Hm(locale).format(_now),
+                        style: const TextStyle(
+                          fontSize: 64,
+                          fontWeight: FontWeight.w200,
+                          color: GizliTheme.textPrimary,
+                          shadows: _homeTextShadow,
+                        ),
                       ),
                     ),
                     Text(

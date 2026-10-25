@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../widgets/quick_lock.dart';
 import '../app.dart';
 import '../l10n/l10n.dart';
 import '../models/vault_event.dart';
@@ -239,7 +240,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
   Widget build(BuildContext context) {
     final t = L10n.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(t('gallery'))),
+      appBar: AppBar(
+        title: Text(t('gallery')),
+        actions: const [QuickLockButton()],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _import,
         icon: const Icon(Icons.add_photo_alternate_outlined),
