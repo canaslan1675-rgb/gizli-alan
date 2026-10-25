@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 
 import 'crypto_service.dart';
+import 'gallery_albums.dart';
 import 'notes_repository.dart';
 import 'recent_apps.dart';
 import 'vault_events.dart';
@@ -63,6 +64,11 @@ class VaultSession {
       Directory(p.join(dir.path, 'files')),
       events: events,
     );
+    albums = GalleryAlbums(
+      _files,
+      File(p.join(dir.path, 'gallery', 'albums.gae')),
+      gallery,
+    );
   }
 
   final VaultSpace space;
@@ -75,6 +81,9 @@ class VaultSession {
   late final VaultEventLog events;
   late final VaultStorage gallery;
   late final VaultStorage files;
+
+  /// Gallery albums (0.6.0 H).
+  late final GalleryAlbums albums;
 
   /// Recently opened İkinci telefon apps (our own launches only).
   late final RecentApps recentApps;

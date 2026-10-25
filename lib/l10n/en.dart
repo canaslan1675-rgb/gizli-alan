@@ -97,6 +97,19 @@ const Map<String, String> en = {
   'trashKindFile': 'File',
   'trashKindNote': 'Note',
   'recentApps': 'Recently opened',
+  'albumAll': 'All',
+  'albumNew': 'New album',
+  'albumName': 'Album name',
+  'albumRename': 'Rename',
+  'albumDelete': 'Delete album',
+  'albumDeleteSub': 'Photos stay in the gallery',
+  'albumMoveTo': 'Move to album',
+  'albumRemoveFrom': 'Remove from album',
+  'albumEmpty':
+      'This album is empty. Long-press a photo and choose "Move to album".',
+  'albumLimitTitle': '1 album in the free version',
+  'albumLimitBody':
+      'The free version has one album. Pro unlocks unlimited albums; your existing albums and photos stay as they are.',
   'freeBannerTitle': "You're on the limited free version (up to {max} items)",
   'freeBannerBody':
       "Buy Pro once for {price}: removes the limit, unlocks Second phone (work profile) and includes future updates.",

@@ -99,6 +99,18 @@ const Map<String, String> tr = {
   'trashKindFile': 'Dosya',
   'trashKindNote': 'Not',
   'recentApps': 'Son açılanlar',
+  'albumAll': 'Tümü',
+  'albumNew': 'Yeni albüm',
+  'albumName': 'Albüm adı',
+  'albumRename': 'Yeniden adlandır',
+  'albumDelete': 'Albümü sil',
+  'albumDeleteSub': 'Fotoğraflar galeride kalır',
+  'albumMoveTo': 'Albüme taşı',
+  'albumRemoveFrom': 'Albümden çıkar',
+  'albumEmpty': 'Bu albüm boş. Bir fotoğrafa uzun basıp "Albüme taşı"yı seç.',
+  'albumLimitTitle': 'Ücretsiz sürümde 1 albüm',
+  'albumLimitBody':
+      'Ücretsiz sürümde bir albüm oluşturabilirsin. Pro ile sınırsız albüm açılır; mevcut albümlerin ve fotoğrafların olduğu gibi kalır.',
   'freeBannerTitle': "Ücretsiz sürümdesin (en fazla {max} öğe)",
   'freeBannerBody':
       "Pro'yu {price} karşılığında bir kez satın al: öğe sınırı kalkar, İkinci telefon (iş profili) açılır ve gelecek güncellemeler dahil.",
