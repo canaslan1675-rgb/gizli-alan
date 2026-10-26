@@ -22,7 +22,7 @@ Launcher name: **Hesap Makinesi** (TR) / **Calculator** (EN), original calculato
 - **Dosyalar** (PDF vb.) ve **Notlar** (arama ile), hepsi şifreli
 - **Sanal telefon ana ekranı:** saat, ikon ızgarası, dock, duvar kağıdı seçimi
 - **Bildirimler (yalnızca kasa içinde):** içe/dışa aktarma, silme, İkinci telefon değişiklikleri ve son girişten beri hatalı PIN sayısı; şifreli, kasa başına ayrı; sistem bildirimi yok (izin de yok)
-- **GizliAlan Pro ekranı (yalnızca arayüz):** Ayarlar → planlar ve planlanan fiyatlar (Ücretsiz · 50 öğe; Pro tek seferlik 499 TL); yalnızca test/debug derlemelerinde, satın alma yok. Play derlemesinde gerçek ödeme ekranı tek seferlik `gizlialan_pro_lifetime` satar
+- **GizliAlan Pro ekranı (yalnızca arayüz):** Ayarlar → planlar ve planlanan fiyatlar (Ücretsiz · 10 öğe; Pro tek seferlik 499 TL); yalnızca test/debug derlemelerinde, satın alma yok. Play derlemesinde gerçek ödeme ekranı tek seferlik `gizlialan_pro_lifetime` satar
 - **v0.3.2 — Ana ekran arka planı:** Galeri → fotoğrafa uzun bas → "Ana ekran arka planı yap" (menüde ayrıca Aç / Dışa aktar / Sil). Yalnızca kasa ana ekranında, okunabilirlik için karartma katmanıyla; fotoğraf kasada şifreli kalır, yalnızca bellekte çözülür. Ayarlar → "Ana ekran arka planı" durumu gösterir ve "Arka planı kaldır" sunar. Varsayılan: düz renk geçişi (paketli görsel yok; `assets/wallpapers/` ileride varsayılan görsel için ayrılmış). Her kasanın (gerçek/sahte) kendi arka planı.
 - **v0.4.0 — Gizli tarayıcı (Tarayıcı):** kasa ana ekranında, Android System WebView (`webview_flutter`). Adres/arama çubuğu (varsayılan DuckDuckGo; Ayarlar'dan Startpage/Brave/Google/Bing; öneri API'si yok), geri/ileri/yenile, tek sekme. Çerez/önbellek/site verisi uygulamaya özel depoda, **kasa kilitlenince silinir** (Ayarlar → "Kilitlenince temizle", varsayılan açık; "Şimdi temizle"). Geçmiş yalnızca bellekte. Üçüncü taraf çerezler engelli; dosya/içerik erişimi, JS köprüsü, konum/kamera/mikrofon izni, indirme ve dosya yükleme **kapalı**. FLAG_SECURE tarayıcıyı da kapsar. Uygulama hiçbir yere veri göndermez; tek trafik açtığın sayfalaradır. Bkz. `docs/PRIVATE_BROWSER.md`.
 - **v0.4.0 — Varsayılan arka plan görseli:** `assets/wallpapers/default.jpg` (sahibi tarafından Grok/xAI ile üretildi; Ayarlar'ın altında "Varsayılan arka plan: Created with Grok"). Kasa fotoğrafı seçilirse onun yerine o gösterilir; "Arka planı kaldır" bu görsele döner; Ayarlar → Duvar kağıdı'nda ilk yuvarlak = görsel, diğerleri = düz renk. Açık renkli görsel için üst/alt koyu geçiş, koyu yarı saydam kutucuk/dock ve metin gölgesi.
@@ -79,7 +79,7 @@ Build-time options (#28):
   `gizlialan/system` channel, no url_launcher dependency) and "Copy link".
   Without it (or with a non-https value) only the built-in privacy text is shown.
 - The "GizliAlan Pro" UI stub is shown only in `full`; `--dart-define=PRO_STUB=true` shows it in
-  `play` too (review only). No billing either way; the 50-item free limit is displayed, not enforced.
+  `play` too (review only). No billing either way; the 10-item free limit is displayed, not enforced.
 - Store feature graphic: `python3 tool/gen_feature_graphic.py` (Pillow) →
   `docs/store/feature_graphic/feature_graphic_{tr,en}.png` (1024×500 RGB).
 - Play upload example (since v0.5.0 Play = `full`): `flutter build appbundle --release --flavor full --dart-define=PRIVACY_URL=https://canaslan1675-rgb.github.io/gizli-alan/privacy/`.

@@ -1,9 +1,8 @@
-# Data Safety — Analytics package (AppMetrica + TikTok) — **DRAFT**
+# Data Safety — Analytics package (AppMetrica + TikTok)
 
-> **Status: DRAFT** for GizliAlan **0.6.1+44**. Combine with the base
-> `DATA_SAFETY.md` answers when filling Play Console. Do **not** submit until
-> the owner reviews and the hosted privacy policy (PRIVACY.md /
-> docs/privacy/index.html) is updated to match.
+> **Status: APPROVED** by the owner for GizliAlan **0.6.1+44** (2026-10-26).
+> These answers **replace** the "no data collected" answers in `DATA_SAFETY.md`.
+> Hosted privacy policy (PRIVACY.md / docs/privacy/index.html) updated to match.
 
 Source definitions: [Provide information for Google Play's Data safety section](https://support.google.com/googleplay/android-developer/answer/10787469).
 
@@ -63,8 +62,8 @@ release build:
 - [ ] Purchase history — collected + shared — same — encrypted — optional (only if Purchase event is shipped)
 - [ ] Advertising ID declaration = **Yes**
 - [ ] Ads declaration (“Does your app contain ads?”) = **No**
-- [ ] Privacy policy URL updated with AppMetrica + TikTok sections
-- [ ] This DRAFT reviewed by owner → remove DRAFT marker when live
+- [x] Privacy policy URL updated with AppMetrica + TikTok sections
+- [x] Reviewed by owner (2026-10-26)
 
 ## Build notes
 

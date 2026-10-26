@@ -1,5 +1,13 @@
 # Data safety form — suggested answers
 
+> **⚠ Superseded for 0.6.1+44 and later.** The app now contains AppMetrica (Yandex) and TikTok for Business
+> (optional anonymous install / launch / Pro-purchase measurement + Advertising ID, Settings toggle, default on).
+> Use **[DATA_SAFETY_ANALYTICS.md](DATA_SAFETY_ANALYTICS.md)** for the Play Console form: data collected = **Yes**
+> (Device or other IDs, App interactions, Purchase history — collected + shared, Analytics + Advertising/marketing,
+> optional, encrypted in transit), Advertising ID = **Yes**, Ads = **No**. The text below describes ≤0.6.0 and is kept
+> for history; vault content is still never collected.
+
+
 > **TR özet.** Önerilen cevap: **"Uygulama zorunlu kullanıcı veri türlerinden hiçbirini toplamıyor veya paylaşmıyor."** Gerekçe: Google'ın tanımına göre yalnızca cihazda işlenen ve
 > cihazdan çıkmayan veri "toplanmış" sayılmaz; GizliAlan geliştiriciye/üçüncü tarafa hiçbir veri göndermez, veri toplayan SDK yok. 0.4.0'dan itibaren INTERNET izni var ama yalnızca kasa içi tarayıcı içindir: kullanıcının kendi açtığı sitelere giden trafik, geliştiricinin veri toplaması değildir (tarayıcı uygulamalarındaki gibi). Tarayıcıdan indirilenleri uygulama kodu (Dart `HttpClient`, sitenin çerezleri/UA/Referer ile) doğrudan kullanıcının seçtiği siteden çeker ve yalnızca şifreli kasaya kaydeder; geliştiriciye hiçbir şey gitmez. Form yine de **zorunlu** ve gizlilik politikası URL'si
 > ile birlikte doldurulmalı. `full` flavor'u için de cevap aynı (iş profili uygulamalarının verisi okunmaz, başka uygulamaya kullanıcı verisi aktarılmaz).
@@ -61,6 +69,6 @@ When the answer is **No**, Play shows "No data collected" and "No data shared wi
 ## Consistency checks before submitting
 
 - [ ] `PRIVACY.md` (hosted) says the same: nothing collected, nothing shared, on-device only.
-- [ ] Listing says "No account, no server, no ads, no analytics, no tracking" and mentions the browser only talks to sites you open (no "no internet permission" claim any more).
-- [ ] App content → Ads = **No**; Advertising ID = **No**.
+- [ ] (≤0.6.0 only) Listing said "No account, no server, no ads, no analytics, no tracking"; since 0.6.1 it says "no ads shown" + optional measurement and mentions the browser only talks to sites you open (no "no internet permission" claim any more).
+- [ ] App content → Ads = **No**; Advertising ID = **Yes** (since 0.6.1, see DATA_SAFETY_ANALYTICS.md).
 - [ ] Re-do this form **before** adding Play Billing (#15) — Play Billing itself: purchase history is handled by Google Play; the app would still not collect data unless it sends purchase info to a server. Re-check Google's guidance then.

@@ -618,6 +618,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           setState(() {});
         },
       ),
+      Padding(
+        key: const ValueKey('settings_analytics_notice'),
+        padding: const EdgeInsets.fromLTRB(72, 0, 16, 12),
+        child: Text(
+          t('analyticsPrivacyNotice'),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ),
       ListTile(
         key: const ValueKey('settings_theme'),
         leading: const Icon(Icons.brightness_6_outlined),

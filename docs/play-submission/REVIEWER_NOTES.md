@@ -3,7 +3,7 @@
 > **v0.5.0 update (#52, owner decision):** the build uploaded to Play is now the **`full` flavor** (`com.offerforge.gizlialan`):
 > it **includes the Second phone** (work profile, GizliAlan as profile owner only — use the `full` texts below and
 > `DECLARATIONS.md` §2) and an **optional Google Play subscription "GizliAlan Pro"** (`gizlialan_pro`, monthly/yearly,
-> 7-day free trial if eligible). Free: vault, encryption, calculator entry, browser, up to 50 items. Pro: Second phone
+> 7-day free trial if eligible). Free: vault, encryption, calculator entry, browser, up to 10 items. Pro: Second phone
 > setup, unlimited items, hiding the calculator ⓘ. Existing items / an existing work profile are never locked when Pro
 > lapses. The texts below that say "no device-admin component in this build" describe the old `play` flavor and must
 > not be pasted for the v0.5.0 upload. Add to the reviewer note: *"Second phone setup requires Pro; reviewers can start

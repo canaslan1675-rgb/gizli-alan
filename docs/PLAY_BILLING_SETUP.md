@@ -102,7 +102,7 @@ otherwise the plain base plan. Other product IDs are ignored.
   re-checks Play; if Play answers with no active `gizlialan_pro`, Pro turns
   off. If Play is unreachable (offline) the cache is kept.
 - Free: vault, encryption, calculator entry, browser, delete-original-after-
-  import, up to **50 items** (photos + files + notes per vault space).
+  import, up to **10 items** (photos + files + notes per vault space).
 - Pro: Second phone setup, unlimited items, hiding the calculator ⓘ. When Pro
   lapses nothing stored is locked or deleted and an existing work profile
   keeps working; only new items above 50 and a NEW Second phone setup need Pro.

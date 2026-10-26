@@ -51,7 +51,7 @@ Future<void> showProRequired(
 class ItemLimit {
   const ItemLimit._();
 
-  static const int freeItemLimit = 50;
+  static const int freeItemLimit = 10;
 
   /// How many more items may be added (null = unlimited, Pro).
   static Future<int?> remaining(BuildContext context) async {
@@ -67,7 +67,7 @@ class ItemLimit {
   static Future<int> storedIn(VaultSession s) async =>
       await s.gallery.count() + await s.files.count() + await s.notes.count();
 
-  /// Vault-home counter text, e.g. "42/50"; null for Pro (unlimited).
+  /// Vault-home counter text, e.g. "7/10"; null for Pro (unlimited).
   static String? counterLabel({required bool pro, required int stored}) =>
       pro ? null : '$stored/$freeItemLimit';
 

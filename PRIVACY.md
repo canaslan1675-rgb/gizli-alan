@@ -12,9 +12,9 @@
 GizliAlan is an **on-device** personal vault. Photos, files and notes you add are
 **encrypted and stored only on your device**. There is no account, no server,
 no crash-reporting SDK of our own, and no ads shown in the app. Vault content never leaves the device. Since 0.6.1, optional anonymous install / launch / Pro purchase measurement may be sent to AppMetrica (Yandex) and TikTok for Business when you leave the Settings toggle on (see below). Since version 0.4.0
-the app requests the Internet permission **only** for the optional in-vault
-private browser: the only network traffic is to web pages that **you** open
-there (see "Private browser" below). Optional Pro is billed only by Google
+the app requests the Internet permission for the optional in-vault private
+browser (traffic to web pages that **you** open there) and for the optional
+anonymous measurement described below (see "Private browser" below). Optional Pro is billed only by Google
 Play; vault content still never leaves the device (see "Purchases" below).
 
 ## What the app stores (on your device only)
@@ -42,8 +42,11 @@ stores** fingerprint/face data; Android only tells it "success" or "failure".
   phone" below for the optional work profile).
 - No monitoring of other apps or other people. GizliAlan is not a tracking or
   "spy" tool and must not be installed on someone else's device.
-- No advertising ID, no analytics, no telemetry, no crash reporting, no ads,
-  no third-party SDKs that collect data.
+- No ads shown and no crash-reporting SDK of our own. Vault content never
+  leaves the device. The only third-party SDKs that send data are AppMetrica
+  (Yandex) and TikTok for Business, for optional anonymous install / launch /
+  Pro-purchase measurement plus Advertising ID; Settings toggle, on by default
+  (see "Optional anonymous statistics and ad measurement").
 - No cloud backup: Android auto-backup and device-transfer are disabled for
   this app.
 
@@ -52,7 +55,7 @@ stores** fingerprint/face data; Android only tells it "success" or "failure".
 | Permission | Why |
 |-----------|-----|
 | `USE_BIOMETRIC` | Optional fingerprint/face unlock of your vault |
-| `INTERNET` | Only for the in-vault private browser, to load pages **you** open (since 0.4.0) |
+| `INTERNET` | In-vault private browser, to load pages **you** open (since 0.4.0); optional anonymous measurement via AppMetrica / TikTok (since 0.6.1) |
 | `com.android.vending.BILLING` | Optional GizliAlan Pro one-time purchase via Google Play Billing (since 0.4.9 / Play build 0.5.0) |
 | `ACCESS_NETWORK_STATE` | Brought in by the Play Billing library so the app can tell online vs offline for purchase restore; no other network use |
 | `<package>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | Internal signature-level permission added automatically by AndroidX; only GizliAlan itself can use it; collects nothing |
@@ -67,8 +70,8 @@ your own browser app opens the page — GizliAlan itself sends nothing.
 ## Private browser (since 0.4.0)
 
 The vault home screen has an optional **Browser** ("Tarayıcı"). It uses
-Android System WebView. GizliAlan adds no tracking to it and sends nothing to
-the developer. What happens when you use it:
+Android System WebView. GizliAlan adds no tracking to the browser and sends no
+browsing data to the developer or to analytics SDKs. What happens when you use it:
 
 - Only the pages **you** type or open are loaded. Searches go to the search
   engine you choose (default DuckDuckGo; Startpage, Brave, Google or Bing
@@ -136,7 +139,7 @@ fallback), or **Send feedback** (you pick Bug / Suggestion / Other; your mail
 app opens addressed to the support address, with the category and app version
 in the subject and an optional body that only contains what **you** type).
 No device identifiers, logs or vault data are attached automatically. These
-actions use ordinary Android intents; GizliAlan adds no analytics SDK and does
+actions use ordinary Android intents; GizliAlan attaches nothing to them and does
 not learn who you shared with. If you send an e-mail, its content is received
 by the developer through your mail provider (see Contact).
 
@@ -193,7 +196,7 @@ Settings → Google → Ads. Privacy policies:
 [AppMetrica](https://appmetrica.yandex.com/about/privacy-policy),
 [TikTok](https://www.tiktok.com/legal/page/us/privacy-policy/en).
 Android only (no iOS ATT). Details for Play Console:
-`docs/play-submission/DATA_SAFETY_ANALYTICS.md` (DRAFT).
+`docs/play-submission/DATA_SAFETY_ANALYTICS.md`.
 
 ## Your control / deletion
 
@@ -246,8 +249,10 @@ notlar **yalnızca cihazında, AES-256-GCM ile şifreli** saklanır. Hesap, sunu
 kendi hata-raporlama SDK'mız ve uygulama içi reklam yoktur; kasa içeriği asla
 cihazdan çıkmaz. 0.6.1'den itibaren isteğe bağlı anonim kurulum / açılış / Pro
 satın alma ölçümü (Ayarlar anahtarı) AppMetrica (Yandex) ve TikTok'a gidebilir;
-kasa içeriği veya kullanım metni geliştiriciye ya da üçüncü kişilere
-göndermez. Geliştirici senin kasa verilerine **hiçbir şekilde erişemez**.
+kasa içeriği hiçbir zaman geliştiriciye ya da üçüncü kişilere
+gönderilmez. Geliştirici senin kasa verilerine **hiçbir şekilde erişemez**.
+
+GizliAlan, hizmetini geliştirmek için anonim kullanım verileri toplayabilir. Bu veriler; uygulama açılışları, ekran görüntülenme sayıları ve temel cihaz bilgilerini içerir ve kimliğinizi açığa çıkarmaz. Veriler AppMetrica ve TikTok analitik servisleri aracılığıyla işlenir. İstediğiniz zaman ayarlardan bu paylaşımı kapatabilirsiniz.
 
 ### 3. Cihazında işlenen veriler ve amaçları (md.10/b, md.10/d)
 
@@ -271,7 +276,8 @@ senin cihazında, senin talebinle gerçekleşir; geliştirici bu verileri işlem
 
 ### 4. Kasa içi gizli tarayıcı ve indirilenler
 
-- `INTERNET` izni **yalnızca** kasa içi tarayıcı içindir; tek ağ trafiği
+- `INTERNET` izni kasa içi tarayıcı ve isteğe bağlı anonim ölçüm
+  (AppMetrica / TikTok, Ayarlar anahtarı) içindir; tarayıcı trafiği yalnızca
   **senin** açtığın sayfalaradır (Android System WebView). Bu siteler, her
   tarayıcıda olduğu gibi IP adresini ve onlara gönderdiklerini görür; kendi
   gizlilik politikaları geçerlidir.

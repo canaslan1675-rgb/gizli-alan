@@ -26,11 +26,11 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid #2ecc8f;backgroun
 <h2>Summary</h2>
 <p>GizliAlan is an <strong>on-device</strong> personal vault. Photos, files and notes you add are
 <strong>encrypted and stored only on your device</strong>. There is no account, no server,
-no analytics, no telemetry, no advertising and no crash-reporting SDK. The app
-never sends your vault content to us. Since 0.6.1, optional anonymous install/launch/Pro-purchase measurement may go to AppMetrica (Yandex) and TikTok for Business when enabled in Settings; vault content is never included. Since version 0.4.0
-the app requests the Internet permission <strong>only</strong> for the optional in-vault
-private browser: the only network traffic is to web pages that <strong>you</strong> open
-there (see "Private browser" below). Optional Pro is billed only by Google
+no ads shown and no crash-reporting SDK of our own. Vault content never leaves
+the device. Since 0.6.1, optional anonymous install/launch/Pro-purchase measurement may go to AppMetrica (Yandex) and TikTok for Business when enabled in Settings; vault content is never included. Since version 0.4.0
+the app requests the Internet permission for the optional in-vault private
+browser (traffic to web pages that <strong>you</strong> open there) and for the optional
+anonymous measurement described below (see "Private browser" below). Optional Pro is billed only by Google
 Play; vault content still never leaves the device (see "Purchases" below).</p>
 <h2>What the app stores (on your device only)</h2>
 <table>
@@ -94,8 +94,11 @@ stores</strong> fingerprint/face data; Android only tells it "success" or "failu
   phone" below for the optional work profile).</li>
 <li>No monitoring of other apps or other people. GizliAlan is not a tracking or
   "spy" tool and must not be installed on someone else's device.</li>
-<li>No advertising ID, no analytics, no telemetry, no crash reporting, no ads,
-  no third-party SDKs that collect data.</li>
+<li>No ads shown and no crash-reporting SDK of our own. Vault content never
+  leaves the device. The only third-party SDKs that send data are AppMetrica
+  (Yandex) and TikTok for Business, for optional anonymous install / launch /
+  Pro-purchase measurement plus Advertising ID; Settings toggle, on by default
+  (see "Optional anonymous statistics and ad measurement").</li>
 <li>No cloud backup: Android auto-backup and device-transfer are disabled for
   this app.</li>
 </ul>
@@ -114,7 +117,7 @@ stores</strong> fingerprint/face data; Android only tells it "success" or "failu
 </tr>
 <tr>
 <td><code>INTERNET</code></td>
-<td>Only for the in-vault private browser, to load pages <strong>you</strong> open (since 0.4.0)</td>
+<td>In-vault private browser, to load pages <strong>you</strong> open (since 0.4.0); optional anonymous measurement via AppMetrica / TikTok (since 0.6.1)</td>
 </tr>
 <tr>
 <td><code>com.android.vending.BILLING</code></td>
@@ -138,8 +141,8 @@ screen and Settings → Privacy &amp; permissions); if you tap "Open in browser"
 your own browser app opens the page — GizliAlan itself sends nothing.</p>
 <h2>Private browser (since 0.4.0)</h2>
 <p>The vault home screen has an optional <strong>Browser</strong> ("Tarayıcı"). It uses
-Android System WebView. GizliAlan adds no tracking to it and sends nothing to
-the developer. What happens when you use it:</p>
+Android System WebView. GizliAlan adds no tracking to the browser and sends no
+browsing data to the developer or to analytics SDKs. What happens when you use it:</p>
 <ul>
 <li>Only the pages <strong>you</strong> type or open are loaded. Searches go to the search
   engine you choose (default DuckDuckGo; Startpage, Brave, Google or Bing
@@ -202,7 +205,7 @@ fallback), or <strong>Send feedback</strong> (you pick Bug / Suggestion / Other;
 app opens addressed to the support address, with the category and app version
 in the subject and an optional body that only contains what <strong>you</strong> type).
 No device identifiers, logs or vault data are attached automatically. These
-actions use ordinary Android intents; GizliAlan adds no analytics SDK and does
+actions use ordinary Android intents; GizliAlan attaches nothing to them and does
 not learn who you shared with. If you send an e-mail, its content is received
 by the developer through your mail provider (see Contact).</p>
 <h2>Second phone (optional Android work profile)</h2>
@@ -275,6 +278,23 @@ but is not the current Play upload.</p>
 <li><strong>PIN hint:</strong> an optional reminder you write yourself, stored in Android's encrypted secure storage and shown when you long-press the calculator display. It can never contain the PIN. There is no e-mail or server recovery.</li>
 <li><strong>Recently opened Second-phone apps:</strong> only GizliAlan's own launches from the vault home are remembered (encrypted, last 4). The app does not use usage-access permission.</li>
 </ul>
+<h2>Optional anonymous statistics and ad measurement (since 0.6.1)</h2>
+<p>GizliAlan can send <strong>anonymous</strong> app-install, app-launch and lifetime-Pro
+purchase events to:</p>
+<ul>
+<li><strong>AppMetrica</strong> (Yandex) — analytics and install attribution (e.g. Yandex Direct);</li>
+<li><strong>TikTok / ByteDance</strong> (TikTok for Business App Events SDK) — conversion
+  measurement for TikTok app-install ads.</li>
+</ul>
+<p>Toggle: Settings → <strong>Anonymous statistics and ad measurement</strong> (default on).
+When off, neither SDK sends data. We never send vault photos, files, notes,
+PINs, browser URLs, or e-mail/phone. No crash SDK. Advertising ID
+(GAID) may be read by these SDKs when the toggle is on — reset it in Android
+Settings → Google → Ads. Privacy policies:
+<a href="https://appmetrica.yandex.com/about/privacy-policy">AppMetrica</a>,
+<a href="https://www.tiktok.com/legal/page/us/privacy-policy/en">TikTok</a>.
+Data is encrypted in transit (HTTPS). Deletion: e-mail support; AppMetrica and
+TikTok also offer their own deletion / opt-out flows.</p>
 <h2>Your control / deletion</h2>
 <ul>
 <li>Delete individual items inside the app, or use <strong>Settings → Reset everything</strong>.</li>
@@ -313,9 +333,11 @@ This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/</p>
 <h3>2. Özet</h3>
 <p>GizliAlan <strong>cihazda çalışan</strong> kişisel bir kasadır. Eklediğin fotoğraf, dosya ve
 notlar <strong>yalnızca cihazında, AES-256-GCM ile şifreli</strong> saklanır. Hesap, sunucu,
-analitik, telemetri, reklam veya hata raporlama SDK'sı yoktur; uygulama kasa
-içeriğini veya kullanım verisini geliştiriciye ya da üçüncü kişilere
-göndermez. Geliştirici senin kasa verilerine <strong>hiçbir şekilde erişemez</strong>.</p>
+kendi hata-raporlama SDK'mız ve uygulama içi reklam yoktur; kasa içeriği asla
+cihazdan çıkmaz. 0.6.1'den itibaren isteğe bağlı anonim kurulum / açılış / Pro
+satın alma ölçümü ve Reklam Kimliği (Ayarlar anahtarı, varsayılan açık)
+AppMetrica (Yandex) ve TikTok for Business'a gidebilir. Geliştirici senin kasa verilerine <strong>hiçbir şekilde erişemez</strong>.</p>
+<p>GizliAlan, hizmetini geliştirmek için anonim kullanım verileri toplayabilir. Bu veriler; uygulama açılışları, ekran görüntülenme sayıları ve temel cihaz bilgilerini içerir ve kimliğinizi açığa çıkarmaz. Veriler AppMetrica ve TikTok analitik servisleri aracılığıyla işlenir. İstediğiniz zaman ayarlardan bu paylaşımı kapatabilirsiniz.</p>
 <h3>3. Cihazında işlenen veriler ve amaçları (md.10/b, md.10/d)</h3>
 <p>Aşağıdaki veriler yalnızca senin cihazında, senin kullanımın için işlenir;
 geliştiriciye aktarılmaz:</p>
@@ -367,7 +389,8 @@ seçicisi, not yazma); depolama izni kullanılmaz. Hukuki sebep: bu işlemler
 senin cihazında, senin talebinle gerçekleşir; geliştirici bu verileri işlemez.</p>
 <h3>4. Kasa içi gizli tarayıcı ve indirilenler</h3>
 <ul>
-<li><code>INTERNET</code> izni <strong>yalnızca</strong> kasa içi tarayıcı içindir; tek ağ trafiği
+<li><code>INTERNET</code> izni kasa içi tarayıcı ve isteğe bağlı anonim ölçüm
+  (AppMetrica / TikTok, Ayarlar anahtarı) içindir; tarayıcı trafiği yalnızca
   <strong>senin</strong> açtığın sayfalaradır (Android System WebView). Bu siteler, her
   tarayıcıda olduğu gibi IP adresini ve onlara gönderdiklerini görür; kendi
   gizlilik politikaları geçerlidir.</li>

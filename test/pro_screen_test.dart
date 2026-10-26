@@ -111,8 +111,8 @@ void main() {
           find.byKey(const ValueKey('pro_test_build_note')),
           findsOneWidget,
         );
-        expect(find.text('Up to 50 items'), findsOneWidget);
-        expect(find.text('Usage: 1 / 50 items'), findsOneWidget);
+        expect(find.text('Up to 10 items'), findsOneWidget);
+        expect(find.text('Usage: 1 / 10 items'), findsOneWidget);
         await tester.scrollUntilVisible(
           find.text('499 TL'),
           200,
@@ -204,7 +204,7 @@ void main() {
         await openVault(tester, VaultSpace.real);
         expect(find.byKey(const ValueKey('free_banner')), findsOneWidget);
         await settle(tester);
-        expect(find.text('1/50 items'), findsOneWidget);
+        expect(find.text('1/10 items'), findsOneWidget);
         // Shown once: already marked as seen for later entries.
         expect(
           (await SharedPreferences.getInstance()).getBool(
@@ -213,7 +213,7 @@ void main() {
           isTrue,
         );
         expect(
-          find.textContaining('limited free version (up to 50 items)'),
+          find.textContaining('limited free version (up to 10 items)'),
           findsOneWidget,
         );
         expect(find.textContaining('499 TL'), findsOneWidget);

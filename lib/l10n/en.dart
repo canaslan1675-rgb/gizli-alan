@@ -275,6 +275,8 @@ const Map<String, String> en = {
   'analyticsToggle': 'Anonymous statistics and ad measurement',
   'analyticsToggleHint':
       "App launch, install and Pro purchase events are sent anonymously to AppMetrica (Yandex) and TikTok. Vault content is never sent.",
+  'analyticsPrivacyNotice':
+      "GizliAlan may collect anonymous usage data to improve its service. This data includes app launches, screen view counts and basic device information, and does not reveal your identity. The data is processed through the AppMetrica and TikTok analytics services. You can turn off this sharing in Settings at any time.",
   'language': 'Language',
   'wallpaper': 'Wallpaper',
   'homeBackground': 'Home screen background',
