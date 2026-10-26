@@ -4,8 +4,8 @@
 > `com.offerforge.gizlialan`). §1's "no sensitive-permission forms" applied to the old `play` flavor; for v0.5.0 use
 > **§2 (device admin / managed profile justification)** as well, and check App content → "Needs attention" after
 > uploading the AAB. Permissions stay `USE_BIOMETRIC` + `INTERNET`, plus `com.android.vending.BILLING` (merged from the
-> Play Billing Library) for the optional subscription. Payments are processed by Google Play; the app has no server and
-> collects no payment data. In-app products: subscription `gizlialan_pro` (see `docs/PLAY_BILLING_SETUP.md`).
+> Play Billing Library) for the optional one-time Pro purchase. Payments are processed by Google Play; the app has no server and
+> collects no payment data. In-app products: one-time product `gizlialan_pro_lifetime` (the old subscription `gizlialan_pro` is no longer sold; see `docs/PLAY_BILLING_SETUP.md`).
 
 
 > **TR özet.** `play` flavor'u için **hiçbir hassas izin beyan formu gerekmiyor** (yalnızca `USE_BIOMETRIC` + normal izin `INTERNET`); doldurulacaklar standart App content formları (reklam yok, reklam kimliği yok,
