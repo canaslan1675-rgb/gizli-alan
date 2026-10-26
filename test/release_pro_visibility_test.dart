@@ -103,7 +103,7 @@ void main() {
       release(f);
       final s = await openVault(tester);
       expect(find.byKey(const ValueKey('free_banner')), findsOneWidget);
-      expect(find.text('1/50 items'), findsOneWidget);
+      expect(find.text('1/10 items'), findsOneWidget);
 
       await push(tester, s, const SettingsScreen());
       final scroll = find.byType(Scrollable).last;

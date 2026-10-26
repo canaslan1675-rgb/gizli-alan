@@ -66,8 +66,8 @@ Issue: #7 (plan) · Owner runs on real phones: #14 · Status of the emulator run
 | 6.1 | Play test track, license tester, free account: open Pro. | Only "GizliAlan Pro – tek seferlik", Play price (fallback text "499 TL"), no trial, no monthly/yearly. Buy → Pro active; reopen app → still Pro; Play Console shows the order **acknowledged** (not refunded after 3 days). |
 | 6.2 | Account with an old `gizlialan_pro` subscription → "Satın alımları geri yükle". | Pro stays active (subscription still recognised, not sold). |
 | 6.3 | Reinstall, same Google account → Restore. | One-time Pro restored. |
-| 6.4 | Free user, first vault entry after update. | One unobtrusive card "Ücretsiz sürümdesin (en fazla 50 öğe)…"; lock + unlock → card does not return. |
-| 6.5 | Free vault home. | Counter "n/50 öğe" under the title; at 50 it turns amber, tap → single limit offer; existing items stay visible and openable. Pro → no counter. |
+| 6.4 | Free user, first vault entry after update. | One unobtrusive card "Ücretsiz sürümdesin (en fazla 10 öğe)…"; lock + unlock → card does not return. |
+| 6.5 | Free vault home. | Counter "n/10 öğe" under the title; at 10 it turns amber, tap → single limit offer; existing items stay visible and openable. Pro → no counter. |
 | 6.6 | Gallery/Notes/Files app bar lock icon; double-tap the home clock. | Vault locks at once (back to calculator). |
 | 6.7 | Type a wrong PIN 3× on the PIN pad, then the right PIN. | Home shows "Son girişten beri 3 hatalı deneme" (text only, tap hides). Decoy vault never shows it. No camera use. |
 | 6.8 | Settings → PIN ipucu: try a hint containing the PIN; then a normal hint. Lock, long-press the calculator result display. | PIN-containing hint rejected; normal hint shown in a snackbar; without a hint long-press does nothing. Onboarding has the optional hint field. |

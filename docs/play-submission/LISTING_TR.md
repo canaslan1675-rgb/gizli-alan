@@ -39,12 +39,12 @@ Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simg
 • Hatalı deneme sınırı ve bekleme süresi; son kilit açmadan beri kaç hatalı deneme olduğunu kasa içinde görürsün
 • Ekran görüntüsü ve son uygulamalar önizlemesi engellenir
 • İsteğe bağlı sahte PIN: ayrı, başlangıçta boş ikinci bir kasa açar (biyometri her zaman gerçek kasayı açar)
-• Türkçe ve İngilizce
+• Türkçe, İngilizce ve Rusça
 
 GİZLİLİK
-• Hesap yok, sunucu yok, reklam yok, analitik yok
-• Takip yok: uygulama verini hiçbir yere göndermez. Dahili gizli tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
-• Az izin: isteğe bağlı biyometrik kilit ve yalnızca dahili tarayıcı için internet. Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
+• Hesap yok, sunucu yok, reklam gösterilmez
+• Kasa içeriğin (fotoğraf, dosya, not, PIN, tarayıcı geçmişi) cihazından asla çıkmaz. İsteğe bağlı anonim istatistik ve reklam ölçümü (AppMetrica, TikTok) Ayarlar'dan kapatılabilir. Dahili tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
+• Az izin: isteğe bağlı biyometrik kilit ve dahili tarayıcı ve isteğe bağlı anonim istatistik için internet. Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
 • Bulut yedeklemesi kapalıdır; uygulamayı kaldırmak kasayı siler
 • PIN kurtarma yoktur. PIN'ini unutursan içerik çözülemez; bunu bilerek kullan
 
@@ -103,7 +103,7 @@ Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simg
 • Hatalı deneme sınırı ve bekleme süresi; son kilit açmadan beri kaç hatalı deneme olduğunu kasa içinde görürsün
 • Ekran görüntüsü ve son uygulamalar önizlemesi engellenir
 • İsteğe bağlı sahte PIN: ayrı, başlangıçta boş ikinci bir kasa açar (biyometri her zaman gerçek kasayı açar)
-• Türkçe ve İngilizce
+• Türkçe, İngilizce ve Rusça
 
 İKİNCİ TELEFON (İSTEĞE BAĞLI, ANDROID İŞ PROFİLİ)
 • "İkinci telefon" Android'in kendi iş profili özelliğiyle ayrı bir alan kurar (Shelter/Island yöntemi). Kurulumu Android'in kendi onay ekranları yürütür
@@ -115,9 +115,9 @@ Uygulama telefonunda "Hesap Makinesi" adıyla ve özgün bir hesap makinesi simg
 • Bazı cihazlarda (ör. Xiaomi MIUI/HyperOS) iş profili desteklenmeyebilir
 
 GİZLİLİK
-• Hesap yok, sunucu yok, reklam yok, analitik yok
-• Takip yok: uygulama verini hiçbir yere göndermez. Dahili gizli tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
-• Az izin: isteğe bağlı biyometrik kilit ve yalnızca dahili tarayıcı için internet (iş profili ek izin gerektirmez). Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
+• Hesap yok, sunucu yok, reklam gösterilmez
+• Kasa içeriğin (fotoğraf, dosya, not, PIN, tarayıcı geçmişi) cihazından asla çıkmaz. İsteğe bağlı anonim istatistik ve reklam ölçümü (AppMetrica, TikTok) Ayarlar'dan kapatılabilir. Dahili tarayıcı yalnızca senin açtığın sitelere bağlanır; çerez/önbellek kasa kilitlenince silinir
+• Az izin: isteğe bağlı biyometrik kilit ve dahili tarayıcı ve isteğe bağlı anonim istatistik için internet (iş profili ek izin gerektirmez). Fotoğraf ve dosyaları sen seçersin; depolama izni istenmez
 • Bulut yedeklemesi kapalıdır; uygulamayı kaldırmak kasayı siler
 • PIN kurtarma yoktur. PIN'ini unutursan içerik çözülemez; bunu bilerek kullan
 

@@ -273,6 +273,8 @@ const Map<String, String> tr = {
   'analyticsToggle': 'Anonim istatistik ve reklam ölçümü',
   'analyticsToggleHint':
       "Uygulama açılışı, kurulum ve Pro satın alma olayları AppMetrica (Yandex) ve TikTok'a anonim olarak gönderilir. Kasa içeriği asla gönderilmez.",
+  'analyticsPrivacyNotice':
+      "GizliAlan, hizmetini geliştirmek için anonim kullanım verileri toplayabilir. Bu veriler; uygulama açılışları, ekran görüntülenme sayıları ve temel cihaz bilgilerini içerir ve kimliğinizi açığa çıkarmaz. Veriler AppMetrica ve TikTok analitik servisleri aracılığıyla işlenir. İstediğiniz zaman ayarlardan bu paylaşımı kapatabilirsiniz.",
   'language': 'Dil',
   'wallpaper': 'Duvar kağıdı',
   'homeBackground': 'Ana ekran arka planı',

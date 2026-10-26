@@ -217,11 +217,11 @@ void main() {
     expect(src.toString(), isNot(contains('₺')));
   });
 
-  test('free item limit: 50, never negative, Pro unlimited', () {
-    expect(ItemLimit.freeItemLimit, 50);
-    expect(ItemLimit.leftFor(pro: false, stored: 0), 50);
-    expect(ItemLimit.leftFor(pro: false, stored: 49), 1);
-    expect(ItemLimit.leftFor(pro: false, stored: 50), 0);
+  test('free item limit: 10, never negative, Pro unlimited', () {
+    expect(ItemLimit.freeItemLimit, 10);
+    expect(ItemLimit.leftFor(pro: false, stored: 0), 10);
+    expect(ItemLimit.leftFor(pro: false, stored: 9), 1);
+    expect(ItemLimit.leftFor(pro: false, stored: 10), 0);
     // Already above the limit (e.g. Pro lapsed): nothing is removed.
     expect(ItemLimit.leftFor(pro: false, stored: 120), 0);
     expect(ItemLimit.leftFor(pro: true, stored: 120), isNull);

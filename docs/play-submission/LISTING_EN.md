@@ -38,12 +38,12 @@ FEATURES
 • Wrong-attempt limit with cool-down; the vault shows how many wrong PINs were entered since your last unlock
 • Screenshots and recent-apps previews are blocked
 • Optional decoy PIN: opens a separate second vault that starts empty (biometrics always open the real vault)
-• English and Turkish
+• English, Turkish and Russian
 
 PRIVACY
-• No account, no server, no ads, no analytics
-• No tracking: the app sends none of your data anywhere. The built-in private browser only connects to sites you open, and its cookies/cache are wiped when the vault locks
-• Minimal permissions: optional biometric unlock, and internet only for the built-in browser. You pick photos and files yourself; no storage permission
+• No account, no server, no ads shown
+• Your vault content (photos, files, notes, PIN, browsing) never leaves your device. Optional anonymous statistics and ad measurement (AppMetrica, TikTok) can be turned off in Settings. The built-in browser only connects to sites you open; its cookies/cache are wiped when the vault locks
+• Minimal permissions: optional biometric unlock, and internet for the built-in browser and optional anonymous statistics. You pick photos and files yourself; no storage permission
 • Cloud backup is disabled; uninstalling deletes the vault
 • There is no PIN recovery. If you forget your PIN, the content cannot be decrypted
 
@@ -101,7 +101,7 @@ FEATURES
 • Wrong-attempt limit with cool-down; the vault shows how many wrong PINs were entered since your last unlock
 • Screenshots and recent-apps previews are blocked
 • Optional decoy PIN: opens a separate second vault that starts empty (biometrics always open the real vault)
-• English and Turkish
+• English, Turkish and Russian
 
 SECOND PHONE (OPTIONAL, ANDROID WORK PROFILE)
 • "Second phone" creates a separate space with Android's own work profile feature (the Shelter/Island method). Android's own consent screens run the setup
@@ -113,9 +113,9 @@ SECOND PHONE (OPTIONAL, ANDROID WORK PROFILE)
 • Some devices (e.g. Xiaomi MIUI/HyperOS) may not support work profiles
 
 PRIVACY
-• No account, no server, no ads, no analytics
-• No tracking: the app sends none of your data anywhere. The built-in private browser only connects to sites you open, and its cookies/cache are wiped when the vault locks
-• Minimal permissions: optional biometric unlock, and internet only for the built-in browser (the work profile needs no extra permission). You pick photos and files yourself; no storage permission
+• No account, no server, no ads shown
+• Your vault content (photos, files, notes, PIN, browsing) never leaves your device. Optional anonymous statistics and ad measurement (AppMetrica, TikTok) can be turned off in Settings. The built-in browser only connects to sites you open; its cookies/cache are wiped when the vault locks
+• Minimal permissions: optional biometric unlock, and internet for the built-in browser and optional anonymous statistics (the work profile needs no extra permission). You pick photos and files yourself; no storage permission
 • Cloud backup is disabled; uninstalling deletes the vault
 • There is no PIN recovery. If you forget your PIN, the content cannot be decrypted
 
