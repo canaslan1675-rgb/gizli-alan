@@ -12,7 +12,7 @@ const Map<String, String> en = {
       'photos, notes and files, protected by a PIN (and optionally your '
       'fingerprint/face), encrypted on this device.',
   'onboardingPrivacy':
-      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and has no server: it sends nothing about you anywhere (the built-in browser only loads the pages you open). (The optional "Second phone" only manages the separate work profile you create yourself.) Only use it for your own content on your own device.',
+      "Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and has no server of its own. Your vault content, file names and PIN never leave the device. Only anonymous app launch, install and Pro purchase events go to AppMetrica (Yandex) and TikTok for ad measurement; turn this off in Settings → \"Anonymous statistics and ad measurement\". (The optional \"Second phone\" only manages the separate work profile you create yourself.) Only use it for your own content on your own device.",
   'ownDeviceConfirm':
       'This is my own device and I will only store my own content.',
   'entryTitle': 'Calculator entry',
@@ -40,7 +40,7 @@ const Map<String, String> en = {
   'continue': 'Continue',
   'back': 'Back',
   'dataSafetyShort':
-      'Data stays on this device, encrypted. No account, no cloud, no ads, no analytics.',
+      "Data stays on this device, encrypted. No account, no cloud, no ads shown. Vault content is never sent; only anonymous launch/install/purchase statistics (can be turned off in Settings).",
   // Calculator
   'calcInfoProHint': 'Pro members can hide this icon in Settings.',
   'hideCalcInfo': 'Hide info icon on calculator',
@@ -272,6 +272,9 @@ const Map<String, String> en = {
   'lockAfter60': '1 minute',
   'lockAfterSec': 'After {n} s',
   'lockAfterMin': 'After {n} min',
+  'analyticsToggle': 'Anonymous statistics and ad measurement',
+  'analyticsToggleHint':
+      "App launch, install and Pro purchase events are sent anonymously to AppMetrica (Yandex) and TikTok. Vault content is never sent.",
   'language': 'Language',
   'wallpaper': 'Wallpaper',
   'homeBackground': 'Home screen background',
@@ -316,12 +319,14 @@ const Map<String, String> en = {
       '• All vault content (photos, files, notes) is encrypted with AES-256-GCM '
       'using a key kept in Android Keystore-backed secure storage.\n'
       '• Your PIN is stored only as a salted PBKDF2 hash.\n'
-      '• No account, no analytics, no telemetry, no ads, no server of ours. '
-      'Nothing leaves your device unless you export it — or open a web page '
-      'in the built-in private browser, which then talks only to that site '
-      '(the reason for the internet permission).\n'
+      '• No account, no ads shown, no server of ours. Vault content, file '
+      'names and your PIN never leave the device. Only anonymous app launch, '
+      'install and Pro purchase events (device/advertising ID, device model, '
+      'Android and app version) are sent to AppMetrica (Yandex) and TikTok for '
+      'ad measurement; turn it off in Settings → "Anonymous statistics and ad '
+      'measurement". The built-in private browser talks only to the sites you open.\n'
       '• Permissions: biometric (optional unlock) and internet (browser '
-      'only). Photos and files are '
+      'and statistics). Photos and files are '
       'chosen by you through the system pickers — no storage/media '
       'permission.\n'
       '• No SMS, calls, contacts, location, microphone, camera, Accessibility '
@@ -445,20 +450,22 @@ const Map<String, String> en = {
   'proNotAvailableBody':
       'There are no purchases in this test build and no payment is taken. Pro may be offered through Google Play later.',
   'proFooter':
-      'GizliAlan needs no account and sends no data to any server. The app is not sold on Gumroad or elsewhere.',
+      "GizliAlan needs no account; your vault content is never sent to any server. The app is not sold on Gumroad or elsewhere.",
   // `play` flavor variants (no Second phone in that build), see L10n.t.
   'onboardingPrivacy_play':
-      'Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and has no server: it sends nothing about you anywhere (the built-in browser only loads the pages you open). Only use it for your own content on your own device.',
+      "Not a monitoring tool. GizliAlan never reads SMS, calls, contacts or location, uses no Accessibility Service, is never an admin of your phone, and has no server of its own. Your vault content, file names and PIN never leave the device. Only anonymous app launch, install and Pro purchase events go to AppMetrica (Yandex) and TikTok for ad measurement; turn this off in Settings → \"Anonymous statistics and ad measurement\". Only use it for your own content on your own device.",
   'privacyBody_play':
       '• All vault content (photos, files, notes) is encrypted with AES-256-GCM '
       'using a key kept in Android Keystore-backed secure storage.\n'
       '• Your PIN is stored only as a salted PBKDF2 hash.\n'
-      '• No account, no analytics, no telemetry, no ads, no server of ours. '
-      'Nothing leaves your device unless you export it — or open a web page '
-      'in the built-in private browser, which then talks only to that site '
-      '(the reason for the internet permission).\n'
+      '• No account, no ads shown, no server of ours. Vault content, file '
+      'names and your PIN never leave the device. Only anonymous app launch, '
+      'install and Pro purchase events (device/advertising ID, device model, '
+      'Android and app version) are sent to AppMetrica (Yandex) and TikTok for '
+      'ad measurement; turn it off in Settings → "Anonymous statistics and ad '
+      'measurement". The built-in private browser talks only to the sites you open.\n'
       '• Permissions: biometric (optional unlock) and internet (browser '
-      'only). Photos and files are '
+      'and statistics). Photos and files are '
       'chosen by you through the system pickers — no storage/media '
       'permission.\n'
       '• No SMS, calls, contacts, location, microphone, camera, Accessibility '

@@ -1,9 +1,10 @@
 name: gizlialan
 description: >
   GizliAlan — on-device encrypted vault for photos, files and notes,
-  with an optional calculator entry. No account, no cloud, no tracking.
+  with an optional calculator entry. No account, no cloud; vault content never
+  leaves the device (AppMetrica + TikTok install/purchase measurement only).
 publish_to: "none"
-version: 0.6.0+43
+version: 0.6.1+44
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
@@ -30,6 +31,7 @@ dependencies:
   in_app_purchase: ^3.3.1
   in_app_purchase_android: ^0.5.3
   video_player: ^2.14.1
+  appmetrica_plugin: ^4.1.0
 
 dev_dependencies:
   flutter_test:

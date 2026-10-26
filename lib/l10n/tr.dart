@@ -12,7 +12,7 @@ const Map<String, String> tr = {
       'fotoğraflar, notlar ve dosyalar PIN (ve isteğe bağlı parmak izi/yüz) '
       'ile korunur ve bu cihazda şifrelenir.',
   'onboardingPrivacy':
-      'İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve sunucusu yoktur: senin hakkında hiçbir yere bir şey göndermez (dahili tarayıcı yalnızca senin açtığın sayfaları yükler). (İsteğe bağlı "İkinci telefon" yalnızca senin oluşturduğun ayrı iş profilini yönetir.) Yalnızca kendi cihazında, kendi içeriğin için kullan.',
+      "İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve kendi sunucusu yoktur. Kasa içeriğin, dosya adların ve PIN'in asla cihazdan çıkmaz. Yalnızca anonim uygulama açılışı, kurulum ve Pro satın alma olayları reklam ölçümü için AppMetrica (Yandex) ve TikTok'a gider; Ayarlar → \"Anonim istatistik ve reklam ölçümü\" ile kapatabilirsin. (İsteğe bağlı \"İkinci telefon\" yalnızca senin oluşturduğun ayrı iş profilini yönetir.) Yalnızca kendi cihazında, kendi içeriğin için kullan.",
   'ownDeviceConfirm':
       'Bu benim kendi cihazım ve yalnızca kendi içeriğimi saklayacağım.',
   'entryTitle': 'Hesap makinesi girişi',
@@ -41,7 +41,7 @@ const Map<String, String> tr = {
   'continue': 'Devam',
   'back': 'Geri',
   'dataSafetyShort':
-      'Veriler bu cihazda, şifreli kalır. Hesap yok, bulut yok, reklam yok, analitik yok.',
+      "Veriler bu cihazda, şifreli kalır. Hesap yok, bulut yok, reklam gösterilmez. Kasa içeriği asla gönderilmez; yalnızca anonim açılış/kurulum/satın alma istatistikleri (Ayarlar'dan kapatılabilir).",
   // Calculator
   'calcInfoProHint': "Pro üyeler bu simgeyi Ayarlar'dan gizleyebilir.",
   'hideCalcInfo': 'Hesap makinesinde bilgi simgesini gizle',
@@ -270,6 +270,9 @@ const Map<String, String> tr = {
   'lockAfter60': '1 dakika',
   'lockAfterSec': '{n} sn sonra',
   'lockAfterMin': '{n} dk sonra',
+  'analyticsToggle': 'Anonim istatistik ve reklam ölçümü',
+  'analyticsToggleHint':
+      "Uygulama açılışı, kurulum ve Pro satın alma olayları AppMetrica (Yandex) ve TikTok'a anonim olarak gönderilir. Kasa içeriği asla gönderilmez.",
   'language': 'Dil',
   'wallpaper': 'Duvar kağıdı',
   'homeBackground': 'Ana ekran arka planı',
@@ -314,12 +317,14 @@ const Map<String, String> tr = {
       '• Tüm kasa içeriği (fotoğraf, dosya, not) Android Keystore destekli '
       'güvenli depoda tutulan bir anahtarla AES-256-GCM ile şifrelenir.\n'
       '• PIN\'in yalnızca tuzlanmış PBKDF2 özeti olarak saklanır.\n'
-      '• Hesap, analitik, telemetri, reklam ve bize ait sunucu yok. Sen dışa '
-      'aktarmadıkça ya da dahili gizli tarayıcıda bir web sayfası açmadıkça '
-      'hiçbir şey cihazdan çıkmaz; tarayıcı yalnızca açtığın siteyle konuşur '
-      '(internet izninin tek nedeni).\n'
-      '• İzinler: biyometrik (isteğe bağlı kilit açma) ve internet (yalnızca '
-      'tarayıcı). Fotoğraf ve '
+      '• Hesap, reklam gösterimi ve bize ait sunucu yok. Kasa içeriği, dosya '
+      'adları ve PIN asla cihazdan çıkmaz. Yalnızca anonim uygulama açılışı, '
+      'kurulum ve Pro satın alma olayları (cihaz/reklam kimliği, cihaz modeli, '
+      'Android ve uygulama sürümü) reklam ölçümü için AppMetrica (Yandex) ve '
+      'TikTok\'a gönderilir; Ayarlar → "Anonim istatistik ve reklam ölçümü" ile '
+      'kapatılabilir. Dahili gizli tarayıcı yalnızca açtığın siteyle konuşur.\n'
+      '• İzinler: biyometrik (isteğe bağlı kilit açma) ve internet (tarayıcı '
+      've istatistik). Fotoğraf ve '
       'dosyaları sistem seçicileriyle sen seçersin — depolama/medya izni '
       'yok.\n'
       '• SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik veya '
@@ -444,20 +449,22 @@ const Map<String, String> tr = {
   'proNotAvailableBody':
       'Bu test sürümünde satın alma yoktur ve hiçbir ödeme alınmaz. Pro, ileride Google Play üzerinden sunulabilir.',
   'proFooter':
-      'GizliAlan hesap istemez ve hiçbir veriyi sunucuya göndermez. Uygulama Gumroad vb. yerlerde satılmaz.',
+      "GizliAlan hesap istemez; kasa içeriğin hiçbir sunucuya gönderilmez. Uygulama Gumroad vb. yerlerde satılmaz.",
   // `play` flavor variants (no Second phone in that build), see L10n.t.
   'onboardingPrivacy_play':
-      'İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve sunucusu yoktur: senin hakkında hiçbir yere bir şey göndermez (dahili tarayıcı yalnızca senin açtığın sayfaları yükler). Yalnızca kendi cihazında, kendi içeriğin için kullan.',
+      "İzleme aracı değildir. GizliAlan SMS, arama, rehber veya konum okumaz; Erişilebilirlik Hizmeti kullanmaz, telefonunun cihaz yöneticisi olmaz ve kendi sunucusu yoktur. Kasa içeriğin, dosya adların ve PIN'in asla cihazdan çıkmaz. Yalnızca anonim uygulama açılışı, kurulum ve Pro satın alma olayları reklam ölçümü için AppMetrica (Yandex) ve TikTok'a gider; Ayarlar → \"Anonim istatistik ve reklam ölçümü\" ile kapatabilirsin. Yalnızca kendi cihazında, kendi içeriğin için kullan.",
   'privacyBody_play':
       '• Tüm kasa içeriği (fotoğraf, dosya, not) Android Keystore destekli '
       'güvenli depoda tutulan bir anahtarla AES-256-GCM ile şifrelenir.\n'
       '• PIN\'in yalnızca tuzlanmış PBKDF2 özeti olarak saklanır.\n'
-      '• Hesap, analitik, telemetri, reklam ve bize ait sunucu yok. Sen dışa '
-      'aktarmadıkça ya da dahili gizli tarayıcıda bir web sayfası açmadıkça '
-      'hiçbir şey cihazdan çıkmaz; tarayıcı yalnızca açtığın siteyle konuşur '
-      '(internet izninin tek nedeni).\n'
-      '• İzinler: biyometrik (isteğe bağlı kilit açma) ve internet (yalnızca '
-      'tarayıcı). Fotoğraf ve '
+      '• Hesap, reklam gösterimi ve bize ait sunucu yok. Kasa içeriği, dosya '
+      'adları ve PIN asla cihazdan çıkmaz. Yalnızca anonim uygulama açılışı, '
+      'kurulum ve Pro satın alma olayları (cihaz/reklam kimliği, cihaz modeli, '
+      'Android ve uygulama sürümü) reklam ölçümü için AppMetrica (Yandex) ve '
+      'TikTok\'a gönderilir; Ayarlar → "Anonim istatistik ve reklam ölçümü" ile '
+      'kapatılabilir. Dahili gizli tarayıcı yalnızca açtığın siteyle konuşur.\n'
+      '• İzinler: biyometrik (isteğe bağlı kilit açma) ve internet (tarayıcı '
+      've istatistik). Fotoğraf ve '
       'dosyaları sistem seçicileriyle sen seçersin — depolama/medya izni '
       'yok.\n'
       '• SMS, arama, rehber, konum, mikrofon, kamera, Erişilebilirlik veya '

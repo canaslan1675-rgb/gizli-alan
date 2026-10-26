@@ -39,6 +39,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.offerforge.gizlialan"
         // You can update the following values to match your application needs.
@@ -98,6 +102,11 @@ android {
 
     buildTypes {
         release {
+            // Flutter enables R8 for release; add the TikTok SDK keep rules.
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             signingConfig =
                 if (hasReleaseKeystore) {
                     signingConfigs.getByName("release")
@@ -122,4 +131,13 @@ dependencies {
     // JVM unit tests only (android/app/src/testFull: Second phone HidePolicy,
     // issue #30). Not packaged into any APK.
     testImplementation("junit:junit:4.13.2")
+
+    // TikTok Business (App Events) SDK — install/launch attribution + Pro
+    // Purchase event (lib/services/analytics.dart → TikTokChannel.kt).
+    // Lifecycle + Install Referrer as required by the official integration
+    // guide. Initialised from Dart only when the App Secret was injected.
+    implementation("com.github.tiktok:tiktok-business-android-sdk:1.7.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.8.7")
+    implementation("com.android.installreferrer:installreferrer:2.2")
 }

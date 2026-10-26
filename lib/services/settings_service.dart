@@ -36,6 +36,7 @@ class SettingsService {
   static const _kSecondPhoneClosedBy = 'second_phone_closed_by';
   static const _kThemeMode = 'theme_mode';
   static const _kAccent = 'accent_color';
+  static const _kAnalytics = 'analytics_enabled';
 
   /// Seconds before auto-lock after leaving the app or the screen turning
   /// off. 0 = immediately. Legacy values (15 s, 5 min) snap onto these.
@@ -208,10 +209,16 @@ class SettingsService {
 
   Future<void> setAccent(AccentPreset a) => _prefs.setString(_kAccent, a.name);
 
+  /// "Anonim istatistik ve reklam ölçümü" (0.6.1): AppMetrica + TikTok
+  /// App Events data sending. Default on; see lib/services/analytics.dart.
+  bool get analyticsEnabled => _prefs.getBool(_kAnalytics) ?? true;
+
+  Future<void> setAnalyticsEnabled(bool v) => _prefs.setBool(_kAnalytics, v);
+
   String get language => _prefs.getString(_kLang) ?? 'tr';
 
   Future<void> setLanguage(String code) async {
-    await _prefs.setString(_kLang, code == 'en' ? 'en' : 'tr');
+    await _prefs.setString(_kLang, L10n.supported.contains(code) ? code : 'tr');
     L10n.setLang(language);
   }
 
@@ -222,7 +229,9 @@ class SettingsService {
     // Keep "the work apps are currently hidden by us" across a vault reset,
     // so the next real unlock still unhides them (#30).
     final closedBy = _prefs.getString(_kSecondPhoneClosedBy);
+    final analytics = _prefs.getBool(_kAnalytics);
     await _prefs.clear();
+    if (analytics != null) await _prefs.setBool(_kAnalytics, analytics);
     await setLanguage(lang);
     if (theme != null) await _prefs.setString(_kThemeMode, theme);
     if (accent != null) await _prefs.setString(_kAccent, accent);
