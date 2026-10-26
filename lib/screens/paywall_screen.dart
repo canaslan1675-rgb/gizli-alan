@@ -11,7 +11,8 @@ import '../widgets/pro_gate.dart';
 
 /// Google Play purchase page for GizliAlan Pro (release builds).
 /// Prices always come from Play ([ProPlan.price]); nothing is preselected,
-/// no countdowns, restore and "manage in Google Play" are always visible.
+/// no countdowns, restore is always visible; "manage in Google Play" is
+/// shown only to owners of the legacy subscription.
 class PaywallScreen extends StatefulWidget {
   const PaywallScreen({super.key});
 

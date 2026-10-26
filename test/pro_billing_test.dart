@@ -9,6 +9,10 @@ import 'package:gizlialan/services/settings_service.dart';
 import 'package:gizlialan/widgets/pro_gate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Legacy subscription base-plan ids (test data only; no longer in lib).
+const String kPlanMonthly = 'monthly';
+const String kPlanYearly = 'yearly-1';
+
 class FakeBilling implements BillingBackend {
   bool available = true;
   bool plansThrow = false;

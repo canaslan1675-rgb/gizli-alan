@@ -118,7 +118,7 @@ stores</strong> fingerprint/face data; Android only tells it "success" or "failu
 </tr>
 <tr>
 <td><code>com.android.vending.BILLING</code></td>
-<td>Optional GizliAlan Pro subscription via Google Play Billing (since 0.4.9 / Play build 0.5.0)</td>
+<td>Optional GizliAlan Pro one-time purchase via Google Play Billing (since 0.4.9 / Play build 0.5.0)</td>
 </tr>
 <tr>
 <td><code>ACCESS_NETWORK_STATE</code></td>
@@ -185,12 +185,14 @@ are deleted using the access you granted in that picker. No storage permission
 is used. If anything fails, the original is kept.</p>
 <h2>Purchases / GizliAlan Pro (since 0.4.9; Play since 0.5.0)</h2>
 <p>Optional <strong>GizliAlan Pro</strong> is sold only through <strong>Google Play Billing</strong>
-(subscription product <code>gizlialan_pro</code>, base plans monthly / yearly). Payments
+(one-time, non-consumable product <code>gizlialan_pro_lifetime</code>; no subscription,
+no auto-renewal). Payments
 and invoices are handled by Google Play. GizliAlan <strong>does not</strong> collect card
 numbers, billing addresses or other payment details, and has <strong>no server</strong> that
 receives purchase data. The app only asks Play on the device whether Pro is
-active (and caches that entitlement locally for offline use). You manage or
-cancel the subscription in Google Play's subscription settings. Free use stays
+active (and caches that entitlement locally for offline use).
+Older purchases of the discontinued subscription <code>gizlialan_pro</code> are still
+recognised and can be managed in Google Play's subscription settings. Free use stays
 available (item limits apply; existing vault items are never locked out).</p>
 <h2>Share, rate and feedback (since 0.5.1)</h2>
 <p>In Settings you can <strong>Share the app</strong> (you may edit a short neutral intro; the
@@ -262,8 +264,7 @@ but is not the current Play upload.</p>
   apps, accounts and files); the vault in your main profile is not affected.</strong>
   "Reset everything" in GizliAlan does not delete the work profile; remove it
   separately.</li>
-<li>Second phone <strong>setup</strong> requires an active GizliAlan Pro subscription (or the
-  Google Play free trial when offered). If Pro lapses, an existing work profile
+<li>Second phone <strong>setup</strong> requires GizliAlan Pro (one-time purchase). If Pro lapses, an existing work profile
   and your vault items are not locked; you can still use and remove them.</li>
 </ul>
 <h2>Encrypted backup, recycle bin, bookmarks, PIN hint (since 0.6.0)</h2>
@@ -403,12 +404,13 @@ girişi Ayarlar'dan kapatılabilir. İş profili içinde GizliAlan simgesi yoktu
 açar.</p>
 <h3>6b. Satın almalar / GizliAlan Pro (0.4.9'dan; Play'de 0.5.0'dan)</h3>
 <p>İsteğe bağlı <strong>GizliAlan Pro</strong> yalnızca <strong>Google Play Faturalandırma</strong> ile
-satılır (abonelik <code>gizlialan_pro</code>, aylık/yıllık). Ödeme ve faturalar Google
+satılır (tek seferlik ürün <code>gizlialan_pro_lifetime</code>; abonelik ve otomatik yenileme yok). Ödeme ve faturalar Google
 Play'e aittir. GizliAlan kart numarası, fatura adresi veya başka ödeme bilgisi
 almaz; satın alma verisini alan bir sunucusu yoktur. Uygulama yalnızca cihazda
 Play'e Pro'nun aktif olup olmadığını sorar (ve çevrimdışı kullanım için bu
-yetkiyi yerelde önbellekler). Aboneliği Google Play abonelik ayarlarından
-yönetir veya iptal edersin. Ücretsiz kullanım devam eder (öğe limiti vardır;
+yetkiyi yerelde önbellekler). Artık satılmayan eski <code>gizlialan_pro</code>
+aboneliği olanların Pro'su tanınmaya devam eder; o abonelik Google Play
+abonelik ayarlarından yönetilir. Ücretsiz kullanım devam eder (öğe limiti vardır;
 mevcut kasa öğeleri kilitlenmez).</p>
 <h3>6c. Paylaş, değerlendir ve geri bildirim (0.5.1'den)</h3>
 <p>Ayarlar'dan <strong>Uygulamayı paylaş</strong> (sistem paylaşım sayfası; kısa nötr girişi düzenleyebilirsin,
@@ -472,8 +474,8 @@ Profili kaldırdığında (uygulamada <strong>"İkinci telefonu kaldır"</strong
 Ayarlar &gt; Hesaplar &gt; İş profili) <strong>iş profili ve içindeki her şey
 (uygulamalar, hesaplar, dosyalar) kalıcı olarak silinir</strong>; ana profildeki kasan
 etkilenmez. "Her şeyi sıfırla" iş profilini silmez; ayrıca kaldırmalısın.
-İkinci telefon <strong>kurulumu</strong> GizliAlan Pro (veya Google Play'in sunduğu ücretsiz
-deneme) gerektirir; Pro biterse mevcut profil ve kasa öğelerin kilitlenmez.</p>
+İkinci telefon <strong>kurulumu</strong> GizliAlan Pro (tek seferlik satın alma)
+gerektirir; Pro biterse mevcut profil ve kasa öğelerin kilitlenmez.</p>
 <h3>8. Aktarım (md.10/c)</h3>
 <p>Uygulama verileri geliştiriciye veya üçüncü kişilere <strong>aktarılmaz</strong>, yurt
 dışına aktarılmaz. Yalnızca sen destek için e-posta yazarsan, e-posta adresin

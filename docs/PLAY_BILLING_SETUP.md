@@ -2,8 +2,8 @@
 
 Since v0.5.0 the Play upload is the **`full`** flavor (`com.offerforge.gizlialan`,
 Second phone included; build `flutter build appbundle --release --flavor full`).
-Both `full` and the lite `play` flavor sell **GizliAlan Pro** as an
-auto-renewing subscription through Google Play Billing (official Flutter
+Both `full` and the lite `play` flavor sell **GizliAlan Pro** as a
+one-time, non-consumable product (`gizlialan_pro_lifetime`) through Google Play Billing (official Flutter
 `in_app_purchase` plugin, Play Billing Library 8.0.0). No server: the app
 asks Play for the purchase state, acknowledges purchases, and caches
 "Pro active" on the device. The local "Simulate Pro" switch exists only in
@@ -85,15 +85,16 @@ otherwise the plain base plan. Other product IDs are ignored.
    "Ödeme bekleniyor" and Pro turns on only after approval.
 9. **Store listing / Data safety**: payments are handled by Google Play;
    the app itself collects no payment data and has no server. Mention in the
-   listing that Pro is an optional subscription.
+   listing that Pro is an optional one-time purchase.
 
 ## Behaviour summary (for review)
 
 - Paywall: Settings → "GizliAlan Pro" (or a locked Pro row). Lists benefits,
-  monthly / yearly buttons with Play prices, "Restore purchases", "Manage
-  subscription in Google Play" (opens
-  `play.google.com/store/account/subscriptions?sku=gizlialan_pro&package=com.offerforge.gizlialan`),
-  and the auto-renew / cancel-anytime note. Nothing preselected, no timers.
+  one "Buy once" button for `gizlialan_pro_lifetime` with the Play price
+  (fallback text 499 TL), "Restore purchases", and — only for owners of the
+  legacy `gizlialan_pro` subscription — "Manage an older subscription in
+  Google Play" (opens
+  `play.google.com/store/account/subscriptions?sku=gizlialan_pro&package=com.offerforge.gizlialan`). Nothing preselected, no timers.
 - Purchase: `purchaseStream` → purchased → Pro on + `completePurchase`
   (acknowledge within 3 days, otherwise Play refunds). Pending → no Pro until
   confirmed. Cancelled / error → message, no change.

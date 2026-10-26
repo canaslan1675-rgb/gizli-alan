@@ -54,7 +54,7 @@ stores** fingerprint/face data; Android only tells it "success" or "failure".
 |-----------|-----|
 | `USE_BIOMETRIC` | Optional fingerprint/face unlock of your vault |
 | `INTERNET` | Only for the in-vault private browser, to load pages **you** open (since 0.4.0) |
-| `com.android.vending.BILLING` | Optional GizliAlan Pro subscription via Google Play Billing (since 0.4.9 / Play build 0.5.0) |
+| `com.android.vending.BILLING` | Optional GizliAlan Pro one-time purchase via Google Play Billing (since 0.4.9 / Play build 0.5.0) |
 | `ACCESS_NETWORK_STATE` | Brought in by the Play Billing library so the app can tell online vs offline for purchase restore; no other network use |
 | `<package>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | Internal signature-level permission added automatically by AndroidX; only GizliAlan itself can use it; collects nothing |
 
@@ -118,12 +118,14 @@ is used. If anything fails, the original is kept.
 ## Purchases / GizliAlan Pro (since 0.4.9; Play since 0.5.0)
 
 Optional **GizliAlan Pro** is sold only through **Google Play Billing**
-(subscription product `gizlialan_pro`, base plans monthly / yearly). Payments
+(one-time, non-consumable product `gizlialan_pro_lifetime`; no subscription,
+no auto-renewal). Payments
 and invoices are handled by Google Play. GizliAlan **does not** collect card
 numbers, billing addresses or other payment details, and has **no server** that
 receives purchase data. The app only asks Play on the device whether Pro is
-active (and caches that entitlement locally for offline use). You manage or
-cancel the subscription in Google Play's subscription settings. Free use stays
+active (and caches that entitlement locally for offline use).
+Older purchases of the discontinued subscription `gizlialan_pro` are still
+recognised and can be managed in Google Play's subscription settings. Free use stays
 available (item limits apply; existing vault items are never locked out).
 
 ## Share, rate and feedback (since 0.5.1)
@@ -290,12 +292,13 @@ açar.
 ### 6b. Satın almalar / GizliAlan Pro (0.4.9'dan; Play'de 0.5.0'dan)
 
 İsteğe bağlı **GizliAlan Pro** yalnızca **Google Play Faturalandırma** ile
-satılır (abonelik `gizlialan_pro`, aylık/yıllık). Ödeme ve faturalar Google
+satılır (tek seferlik ürün `gizlialan_pro_lifetime`; abonelik ve otomatik yenileme yok). Ödeme ve faturalar Google
 Play'e aittir. GizliAlan kart numarası, fatura adresi veya başka ödeme bilgisi
 almaz; satın alma verisini alan bir sunucusu yoktur. Uygulama yalnızca cihazda
 Play'e Pro'nun aktif olup olmadığını sorar (ve çevrimdışı kullanım için bu
-yetkiyi yerelde önbellekler). Aboneliği Google Play abonelik ayarlarından
-yönetir veya iptal edersin. Ücretsiz kullanım devam eder (öğe limiti vardır;
+yetkiyi yerelde önbellekler). Artık satılmayan eski `gizlialan_pro`
+aboneliği olanların Pro'su tanınmaya devam eder; o abonelik Google Play
+abonelik ayarlarından yönetilir. Ücretsiz kullanım devam eder (öğe limiti vardır;
 mevcut kasa öğeleri kilitlenmez).
 
 ### 6c. Paylaş, değerlendir ve geri bildirim (0.5.1'den)

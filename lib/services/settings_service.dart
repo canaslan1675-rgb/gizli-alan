@@ -68,7 +68,7 @@ class SettingsService {
 
   Future<void> setProStubActive(bool v) => _prefs.setBool(_kProStub, v);
 
-  /// `play`: cached Google Play subscription state (ProBilling). Re-checked
+  /// `play`: cached Google Play Pro purchase state (ProBilling). Re-checked
   /// against Play on every start; read through [ProEntitlement].
   bool get playProActive => _prefs.getBool(_kPlayPro) ?? false;
 

@@ -21,11 +21,8 @@ const String kProFallbackPrice = '499 TL';
 /// subscription (existing subscribers keep Pro).
 bool isProProduct(String id) => id == kProProductId || id == kProLifetimeId;
 
-/// Base plans of [kProProductId].
-const String kPlanMonthly = 'monthly';
-const String kPlanYearly = 'yearly-1';
-
-/// One purchasable base plan as reported by Play. [price] is Play's
+/// The purchasable Pro product as reported by Play (only the one-time
+/// [kProLifetimeId] is offered; the name is historical). [price] is Play's
 /// localized base-plan price string (never hardcoded in the app).
 class ProPlan {
   const ProPlan({
@@ -70,7 +67,8 @@ class BillingPurchase {
 abstract class BillingBackend {
   Future<bool> isAvailable();
 
-  /// Base plans of [kProProductId]. Throws when Play can't be queried.
+  /// The one-time Pro product ([kProLifetimeId]). Throws when Play can't
+  /// be queried.
   Future<List<ProPlan>> loadPlans();
 
   Stream<List<BillingPurchase>> get updates;
@@ -78,7 +76,8 @@ abstract class BillingBackend {
   /// Starts the Play purchase flow; the result arrives on [updates].
   Future<void> buy(ProPlan plan);
 
-  /// Purchases Play currently reports as owned (active subscriptions), or
+  /// Purchases Play currently reports as owned (the one-time product, or a
+  /// legacy subscription still active), or
   /// null when Play couldn't be asked (offline, service error).
   Future<List<BillingPurchase>?> ownedPurchases();
 
@@ -258,7 +257,8 @@ class ProBilling extends ChangeNotifier {
     await c.future.timeout(timeout, onTimeout: () {});
   }
 
-  /// "Restore purchases": re-query Play for the account's subscription.
+  /// "Restore purchases": re-query Play for the account's Pro purchase
+  /// (one-time product, or a still-active legacy subscription).
   Future<void> restore() async {
     if (!available) {
       available = await backend.isAvailable().catchError((_) => false);
