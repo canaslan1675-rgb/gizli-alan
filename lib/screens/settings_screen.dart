@@ -7,6 +7,7 @@ import '../app.dart';
 import '../app_version.dart';
 import '../flavor.dart';
 import '../l10n/l10n.dart';
+import '../services/analytics.dart';
 import '../services/app_actions.dart';
 import '../services/browser_logic.dart';
 import '../services/privacy_link.dart';
@@ -595,6 +596,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           segments: const [
             ButtonSegment(value: 'tr', label: Text('TR')),
             ButtonSegment(value: 'en', label: Text('EN')),
+            ButtonSegment(value: 'ru', label: Text('RU')),
           ],
           selected: {s.language},
           showSelectedIcon: false,
@@ -603,6 +605,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             app.refresh();
           },
         ),
+      ),
+      SwitchListTile(
+        key: const ValueKey('settings_analytics'),
+        secondary: const Icon(Icons.insights_outlined),
+        title: Text(t('analyticsToggle')),
+        subtitle: Text(t('analyticsToggleHint')),
+        value: s.analyticsEnabled,
+        onChanged: (v) async {
+          await s.setAnalyticsEnabled(v);
+          await Analytics.setEnabled(v);
+          setState(() {});
+        },
       ),
       ListTile(
         key: const ValueKey('settings_theme'),

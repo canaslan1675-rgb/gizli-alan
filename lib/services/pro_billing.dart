@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import 'analytics.dart';
 import 'settings_service.dart';
 
 /// Legacy Google Play subscription product (docs/PLAY_BILLING_SETUP.md).
@@ -214,6 +215,14 @@ class ProBilling extends ChangeNotifier {
         case BillingStatus.restored:
           if (p.productId == kProProductId) legacySubscriptionActive = true;
           await _setPro(true);
+          // Pro purchase event (AppMetrica + TikTok): only a fresh,
+          // not-yet-acknowledged purchase from the purchase stream — never
+          // restores or re-deliveries. Analytics can't break the flow.
+          if (p.status == BillingStatus.purchased &&
+              p.needsCompletion &&
+              p.productId == kProLifetimeId) {
+            unawaited(Analytics.logProPurchase(productId: p.productId));
+          }
           notice = p.status == BillingStatus.purchased
               ? BillingNotice.purchased
               : BillingNotice.restored;

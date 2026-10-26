@@ -143,33 +143,31 @@ void main() {
     expect(s.browserWipeOnLock, isFalse);
   });
 
-  test(
-    'engine source: no JS bridges, no file access, 3rd-party cookies off',
-    () {
-      final src = File('lib/services/browser_engine.dart').readAsStringSync();
-      expect(src, isNot(contains('addJavaScriptChannel')));
-      expect(src, isNot(contains('loadFile')));
-      expect(src, contains('setAllowFileAccess(false)'));
-      expect(src, contains('setAllowContentAccess(false)'));
-      expect(src, contains('setGeolocationEnabled(false)'));
-      expect(src, contains('setAcceptThirdPartyCookies(platform, false)'));
-      expect(src, contains('r.deny()'));
-      expect(src, isNot(contains('setOnShowFileSelector')));
-      // No analytics / crash / ads SDKs in the app.
-      final pubspec = File('pubspec.yaml').readAsStringSync();
-      for (final sdk in [
-        'firebase',
-        'sentry',
-        'crashlytics',
-        'google_mobile_ads',
-        'analytics',
-        'amplitude',
-        'mixpanel',
-      ]) {
-        expect(pubspec.contains(sdk), isFalse, reason: sdk);
-      }
-    },
-  );
+  test('engine source: no JS bridges, no file access, 3rd-party cookies off', () {
+    final src = File('lib/services/browser_engine.dart').readAsStringSync();
+    expect(src, isNot(contains('addJavaScriptChannel')));
+    expect(src, isNot(contains('loadFile')));
+    expect(src, contains('setAllowFileAccess(false)'));
+    expect(src, contains('setAllowContentAccess(false)'));
+    expect(src, contains('setGeolocationEnabled(false)'));
+    expect(src, contains('setAcceptThirdPartyCookies(platform, false)'));
+    expect(src, contains('r.deny()'));
+    expect(src, isNot(contains('setOnShowFileSelector')));
+    // No crash / ad-serving / other analytics SDKs. The only measurement
+    // SDKs are AppMetrica + TikTok App Events (0.6.1, lib/services/analytics.dart).
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+    for (final sdk in [
+      'firebase',
+      'sentry',
+      'crashlytics',
+      'google_mobile_ads',
+      'analytics',
+      'amplitude',
+      'mixpanel',
+    ]) {
+      expect(pubspec.contains(sdk), isFalse, reason: sdk);
+    }
+  });
 
   group('browser in the vault', () {
     late Directory tmp;

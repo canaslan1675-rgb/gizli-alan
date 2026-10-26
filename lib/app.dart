@@ -425,7 +425,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
         // Framework strings (Back tooltip, copy/paste menu…) follow the
         // app's TR/EN toggle.
         locale: Locale(L10n.lang),
-        supportedLocales: const [Locale('tr'), Locale('en')],
+        supportedLocales: const [Locale('tr'), Locale('en'), Locale('ru')],
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,

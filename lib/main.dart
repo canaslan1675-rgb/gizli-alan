@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app.dart';
+import 'services/analytics.dart';
 import 'services/play_billing_backend.dart';
 import 'services/pro_billing.dart';
 import 'services/pro_entitlement.dart';
@@ -15,9 +18,11 @@ import 'services/settings_service.dart';
 /// PLAY COMPLIANCE:
 /// - Not spyware / stalkerware; nothing about other people is collected.
 /// - No SMS/call access, no Accessibility Service, no main-device admin, no
-///   Notification Listener, no analytics/telemetry/ads/own server. INTERNET
-///   (v0.4.0, #32) is used only by the in-vault private browser for pages the
-///   user opens.
+///   Notification Listener, no ads shown, no own server. 0.6.1: AppMetrica
+///   and TikTok App Events SDKs for install attribution / app-launch and Pro
+///   purchase events only (disclosed in PRIVACY.md + Data Safety; user
+///   toggle in Settings; never any vault content). INTERNET is otherwise
+///   used only by the in-vault private browser.
 /// - The calculator entry is disclosed in onboarding, in-app and in the
 ///   store listing; reviewers see exactly what users see. The launcher
 ///   label is "Calculator"/"Hesap Makinesi" (a real calculator).
@@ -32,6 +37,9 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   final settings = await SettingsService.create();
+
+  // Install / launch measurement (inactive when keys aren't injected).
+  unawaited(Analytics.init(enabled: settings.analyticsEnabled));
 
   // Play build: Pro via Google Play Billing. Not awaited — the cached
   // entitlement is used until Play answers (offline-safe).

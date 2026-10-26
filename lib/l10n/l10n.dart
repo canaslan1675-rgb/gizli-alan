@@ -2,9 +2,10 @@ import 'package:flutter/widgets.dart';
 
 import '../flavor.dart';
 import 'en.dart';
+import 'ru.dart';
 import 'tr.dart';
 
-/// Tiny map-based l10n (TR default, EN). Keys missing in a map fall back to
+/// Tiny map-based l10n (TR default, EN, RU). Keys missing in a map fall back to
 /// the other language, then to the key itself.
 class L10n {
   L10n._(this._map, this._fallback);
@@ -15,13 +16,17 @@ class L10n {
 
   static String get lang => _lang;
 
-  static const supported = ['tr', 'en'];
+  static const supported = ['tr', 'en', 'ru'];
 
   static void setLang(String code) {
-    _lang = (code == 'en') ? 'en' : 'tr';
+    _lang = supported.contains(code) ? code : 'tr';
   }
 
-  static L10n get current => _lang == 'en' ? L10n._(en, tr) : L10n._(tr, en);
+  static L10n get current => switch (_lang) {
+    'en' => L10n._(en, tr),
+    'ru' => L10n._(ru, en),
+    _ => L10n._(tr, en),
+  };
 
   /// Same as [current] but registers [context] for rebuilds when the language
   /// changes (see [L10nScope]).

@@ -4,9 +4,11 @@
     <!--
       PERMISSIONS (minimal, see PRIVACY.md / Data safety):
         - USE_BIOMETRIC: optional biometric unlock (merged from local_auth).
-        - INTERNET (since v0.4.0, #32): ONLY for the in-vault private browser
-          (Android System WebView) to load pages the user opens. The app has
-          no analytics, telemetry, crash reporting, ads or own servers.
+        - INTERNET (since v0.4.0, #32): in-vault private browser AND (0.6.1)
+          optional AppMetrica / TikTok measurement when the user leaves the
+          Settings toggle on. No own servers; vault content never leaves.
+        - AD_ID / install-referrer: merged from TikTok Business SDK (and
+          AppMetrica) for attribution; declared in Data Safety.
       Photos/files are chosen via the system Photo Picker / Storage Access
       Framework, which need no permission.
       The removals below guarantee no plugin can sneak in broad permissions.
@@ -28,9 +30,8 @@
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove" />
     <uses-permission android:name="android.permission.CAMERA" tools:node="remove" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" tools:node="remove" />
-    <!-- video_player (0.6.0, ExoPlayer/media3) only plays local temp files: no
-         network-state or wake-lock permission needed. -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
+    <!-- WAKE_LOCK: video_player/media3 may pull it; we don't need it for local
+         playback. ACCESS_NETWORK_STATE is left for AppMetrica / TikTok (0.6.1). -->
     <uses-permission android:name="android.permission.WAKE_LOCK" tools:node="remove" />
 
     <application

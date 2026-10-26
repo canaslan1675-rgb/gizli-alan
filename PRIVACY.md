@@ -1,6 +1,6 @@
 # Privacy Policy — GizliAlan
 
-**Last updated:** 2026-10-25 (v0.6.0)
+**Last updated:** 2026-10-26 (v0.6.1)
 **Data controller:** Demirhan Çelik (OfferForge), Türkiye — delibaltabaris5@gmail.com
 **App:** GizliAlan (package `com.offerforge.gizlialan`)
 **Audience:** The owner of the device, for their own content only.
@@ -11,8 +11,7 @@
 
 GizliAlan is an **on-device** personal vault. Photos, files and notes you add are
 **encrypted and stored only on your device**. There is no account, no server,
-no analytics, no telemetry, no advertising and no crash-reporting SDK. The app
-never sends your vault content or any usage data anywhere. Since version 0.4.0
+no crash-reporting SDK of our own, and no ads shown in the app. Vault content never leaves the device. Since 0.6.1, optional anonymous install / launch / Pro purchase measurement may be sent to AppMetrica (Yandex) and TikTok for Business when you leave the Settings toggle on (see below). Since version 0.4.0
 the app requests the Internet permission **only** for the optional in-vault
 private browser: the only network traffic is to web pages that **you** open
 there (see "Private browser" below). Optional Pro is billed only by Google
@@ -177,6 +176,25 @@ by the developer through your mail provider (see Contact).
 - **PIN hint:** an optional reminder you write yourself, stored in Android's encrypted secure storage and shown when you long-press the calculator display. It can never contain the PIN. There is no e-mail or server recovery.
 - **Recently opened Second-phone apps:** only GizliAlan's own launches from the vault home are remembered (encrypted, last 4). The app does not use usage-access permission.
 
+## Optional anonymous statistics and ad measurement (since 0.6.1)
+
+GizliAlan can send **anonymous** app-install, app-launch and lifetime-Pro
+purchase events to:
+
+- **AppMetrica** (Yandex) — analytics and install attribution (e.g. Yandex Direct);
+- **TikTok / ByteDance** (TikTok for Business App Events SDK) — conversion
+  tracking for TikTok app-install ads.
+
+Toggle: Settings → **Anonymous statistics and ad measurement** (default on).
+When off, neither SDK sends data. We never send vault photos, files, notes,
+PINs, browser URLs, or `identify()` email/phone. No crash SDK. Advertising ID
+(GAID) may be read by these SDKs when the toggle is on — reset it in Android
+Settings → Google → Ads. Privacy policies:
+[AppMetrica](https://appmetrica.yandex.com/about/privacy-policy),
+[TikTok](https://www.tiktok.com/legal/page/us/privacy-policy/en).
+Android only (no iOS ATT). Details for Play Console:
+`docs/play-submission/DATA_SAFETY_ANALYTICS.md` (DRAFT).
+
 ## Your control / deletion
 
 - Delete individual items inside the app, or use **Settings → Reset everything**.
@@ -214,7 +232,7 @@ This policy: https://canaslan1675-rgb.github.io/gizli-alan/privacy/
 
 ## TR — Gizlilik Politikası ve KVKK Aydınlatma Metni
 
-**Son güncelleme:** 2026-10-25 (v0.6.0)
+**Son güncelleme:** 2026-10-26 (v0.6.1)
 
 ### 1. Veri sorumlusu (KVKK md.10/a)
 
@@ -225,8 +243,10 @@ Demirhan Çelik (OfferForge), Türkiye. İletişim ve başvuru:
 
 GizliAlan **cihazda çalışan** kişisel bir kasadır. Eklediğin fotoğraf, dosya ve
 notlar **yalnızca cihazında, AES-256-GCM ile şifreli** saklanır. Hesap, sunucu,
-analitik, telemetri, reklam veya hata raporlama SDK'sı yoktur; uygulama kasa
-içeriğini veya kullanım verisini geliştiriciye ya da üçüncü kişilere
+kendi hata-raporlama SDK'mız ve uygulama içi reklam yoktur; kasa içeriği asla
+cihazdan çıkmaz. 0.6.1'den itibaren isteğe bağlı anonim kurulum / açılış / Pro
+satın alma ölçümü (Ayarlar anahtarı) AppMetrica (Yandex) ve TikTok'a gidebilir;
+kasa içeriği veya kullanım metni geliştiriciye ya da üçüncü kişilere
 göndermez. Geliştirici senin kasa verilerine **hiçbir şekilde erişemez**.
 
 ### 3. Cihazında işlenen veriler ve amaçları (md.10/b, md.10/d)
