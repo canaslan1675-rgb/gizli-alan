@@ -596,4 +596,5 @@ const Map<String, String> en = {
       "Access to Joi's online service was denied (app verification). Online answers aren't available in this build.",
   "joiModelErr":
       "Joi's online model is unavailable right now. An app update may be needed.",
+  "joiTileHint": "Your assistant — ask, chat, search your notes",
 };

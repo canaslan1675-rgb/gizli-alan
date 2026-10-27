@@ -29,11 +29,29 @@ void main() {
   test('system prompt identifies Joi and defaults to Turkish', () {
     final p = JoiService.systemPrompt('tr');
     expect(p, contains("Joi, GizliAlan'ın cihaz içi asistanı"));
-    expect(p, contains('Turkish'));
+    expect(p, contains('Türkçe'));
     expect(JoiService.systemPrompt('en'), contains('English'));
     final c = JoiService.chatPrompt('Aristoteles kim?', lang: 'tr');
     expect(c, contains('User: Aristoteles kim?'));
     expect(c, isNot(contains('(use them only if relevant)')));
+  });
+
+  test('both prompts carry Joi identity; online never claims on-device', () {
+    for (final p in [
+      JoiService.systemPrompt('tr'),
+      JoiService.onlineSystemPrompt('tr'),
+    ]) {
+      expect(p, contains("Sen Joi'sin"));
+      expect(p, contains('OfferForge'));
+      expect(p, contains("Ben Joi, GizliAlan'ın asistanıyım."));
+      expect(p, contains('Asla Gemini, Google'));
+      expect(p, contains('insan olduğunu iddia etme'));
+    }
+    expect(JoiService.onlineSystemPrompt('tr'), isNot(contains('cihaz içi')));
+    expect(
+      JoiService.onlineSystemPrompt('tr'),
+      isNot(contains('cihaz içinde')),
+    );
   });
 
   test('notes context is capped', () {

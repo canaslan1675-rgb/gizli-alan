@@ -187,6 +187,7 @@ void main() {
       );
       await tester.pump();
     }
+    await _showOnHome(tester, find.byKey(const ValueKey('tile_notifications')));
     final tile = find.byKey(const ValueKey('tile_notifications'));
     expect(tile, findsOneWidget);
     expect(find.descendant(of: tile, matching: find.text('1')), findsOneWidget);
@@ -216,4 +217,17 @@ void main() {
     expect(find.byKey(const ValueKey('notif_mark_read')), findsOneWidget);
     expect(find.byKey(const ValueKey('notif_clear')), findsOneWidget);
   });
+}
+
+/// The vault home puts the Joi card first (0.6.2); on a phone-sized test
+
+/// The vault home puts the Joi card first (0.6.2); lower tiles may need a
+/// scroll on a phone-sized test view.
+Future<void> _showOnHome(WidgetTester tester, Finder f) async {
+  final home = find.byKey(const ValueKey('tile_joi'));
+  if (home.evaluate().isEmpty) return;
+  await tester.drag(find.byType(CustomScrollView).first, const Offset(0, -400));
+  for (var i = 0; i < 5; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }

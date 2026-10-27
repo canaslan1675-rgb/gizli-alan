@@ -19,6 +19,7 @@ import '../widgets/pro_gate.dart';
 import '../widgets/profile_app_tile.dart';
 import 'notes_list_screen.dart';
 import 'joi_screen.dart';
+import '../widgets/joi_avatar.dart';
 import 'note_edit_screen.dart';
 import 'notifications_screen.dart';
 import 'second_phone_screen.dart';
@@ -441,13 +442,6 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         GizliTheme.mint,
         () => _open(const SettingsScreen()),
       ),
-      _AppIcon(
-        Icons.auto_awesome_outlined,
-        'Joi',
-        const Color(0xFFFF8FD8),
-        () => _open(const JoiScreen()),
-        key: const ValueKey('tile_joi'),
-      ),
     ];
 
     // The home is always drawn on a dark wallpaper/photo with a scrim, so it
@@ -549,6 +543,13 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                     Expanded(
                       child: CustomScrollView(
                         slivers: [
+                          // Joi first: highlighted full-width tile (0.6.2).
+                          SliverToBoxAdapter(
+                            child: _JoiTile(
+                              subtitle: t('joiTileHint'),
+                              onTap: () => _open(const JoiScreen()),
+                            ),
+                          ),
                           if (_showFreeBanner(app))
                             SliverToBoxAdapter(child: _freeBanner(app, t)),
                           _grid(
@@ -775,3 +776,72 @@ class _DockButton extends StatelessWidget {
 const List<Shadow> _homeTextShadow = [
   Shadow(color: Color(0x99000000), blurRadius: 6, offset: Offset(0, 1)),
 ];
+
+/// Highlighted Joi tile at the top of the vault home (portrait + name).
+class _JoiTile extends StatelessWidget {
+  const _JoiTile({required this.subtitle, required this.onTap});
+  final String subtitle;
+  final VoidCallback onTap;
+
+  static const _pink = Color(0xFFFF8FD8);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          key: const ValueKey('tile_joi'),
+          borderRadius: BorderRadius.circular(22),
+          onTap: onTap,
+          child: Ink(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Color.alphaBlend(
+                _pink.withValues(alpha: 0.16),
+                Colors.black.withValues(alpha: 0.34),
+              ),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: _pink.withValues(alpha: 0.55)),
+            ),
+            child: Row(
+              children: [
+                const JoiAvatar(size: 56),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Joi',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: GizliTheme.textPrimary,
+                          shadows: _homeTextShadow,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          color: GizliTheme.textPrimary,
+                          shadows: _homeTextShadow,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: _pink),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

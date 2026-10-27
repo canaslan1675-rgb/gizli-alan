@@ -597,4 +597,5 @@ const Map<String, String> tr = {
       "Joi'nin çevrimiçi hizmetine erişim reddedildi (uygulama doğrulaması). Bu sürümde çevrimiçi yanıt kullanılamıyor.",
   "joiModelErr":
       "Joi'nin çevrimiçi modeli şu an kullanılamıyor. Uygulama güncellemesi gerekebilir.",
+  "joiTileHint": "Asistanın — sor, sohbet et, notlarında ara",
 };

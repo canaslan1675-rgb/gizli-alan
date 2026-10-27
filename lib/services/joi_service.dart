@@ -377,21 +377,25 @@ class JoiService {
     _ => 'Turkish',
   };
 
-  static String systemPrompt(String lang) =>
-      'You are Joi, GizliAlan\'ın cihaz içi asistanı (GizliAlan\'s on-device '
-      'assistant). You run fully offline on this phone. Be a helpful, '
-      'accurate general assistant: answer general-knowledge questions '
-      'clearly and briefly, and help with the user\'s private notes when '
-      'they are provided. Answer in the same language as the user\'s '
-      'message; if unclear, answer in ${languageName(lang)}. If you do not '
-      'know something, say so instead of inventing it.';
+  /// Joi's identity, shared by both prompts (kept short to save tokens).
+  static String identity(String lang) =>
+      'Sen Joi\'sin: OfferForge\'un GizliAlan uygulamasındaki sıcak, '
+      'samimi asistan. "Sen kimsin / adın ne" sorulursa: "Ben Joi, '
+      'GizliAlan\'ın asistanıyım." de. Asla Gemini, Google ya da başka bir '
+      'model olduğunu söyleme; insan olduğunu iddia etme. Varsayılan dil '
+      '${languageName(lang) == 'Turkish' ? 'Türkçe' : languageName(lang)}; '
+      'kullanıcı başka dilde yazarsa o dilde yanıtla. Bilmiyorsan uydurma.';
 
-  /// System prompt for the online backend (no on-device claim, no notes).
+  /// On-device (Gemini Nano) prompt.
+  static String systemPrompt(String lang) =>
+      '${identity(lang)} Bu telefonda cihaz içinde çalışıyorsun (Joi, '
+      'GizliAlan\'ın cihaz içi asistanı). Genel sorulara kısa ve doğru yanıt '
+      'ver; notlar verilirse onlarla yardım et.';
+
+  /// Online prompt: no on-device claim, no notes.
   static String onlineSystemPrompt(String lang) =>
-      'Sen Joi\'sin, GizliAlan uygulamasının asistanı. Kullanıcının notlarına '
-      'erişimin yok. Genel sorulara kısa ve doğru yanıt ver (en fazla birkaç '
-      'cümle). Kullanıcının dilinde yanıtla; belirsizse ${languageName(lang)}. '
-      'Bilmiyorsan uydurma.';
+      '${identity(lang)} Kullanıcının notlarına erişimin yok. Genel sorulara '
+      'kısa ve doğru yanıt ver (en fazla birkaç cümle).';
 
   /// Prompt for a free question. [notes] (optional) are added as context.
   static String chatPrompt(

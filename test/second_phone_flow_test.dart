@@ -242,6 +242,7 @@ void main() {
     await settle(tester);
     await typePin(tester, '2580');
     // Free users still see the tile.
+    await _showOnHome(tester, find.byKey(const ValueKey('tile_second_phone')));
     await tester.tap(find.byKey(const ValueKey('tile_second_phone')));
     await settle(tester);
     await tester.scrollUntilVisible(
@@ -291,6 +292,7 @@ void main() {
     }
 
     Future<void> openSettings(WidgetTester tester) async {
+      await _showOnHome(tester, find.byIcon(Icons.settings_outlined));
       await tester.tap(find.byIcon(Icons.settings_outlined));
       await settle(tester);
     }
@@ -519,4 +521,15 @@ void main() {
       expect(sp.opens, isEmpty);
     });
   });
+}
+
+/// The vault home puts the Joi card first (0.6.2); lower tiles may need a
+/// scroll on a phone-sized test view.
+Future<void> _showOnHome(WidgetTester tester, Finder f) async {
+  final home = find.byKey(const ValueKey('tile_joi'));
+  if (home.evaluate().isEmpty) return;
+  await tester.drag(find.byType(CustomScrollView).first, const Offset(0, -400));
+  for (var i = 0; i < 5; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }

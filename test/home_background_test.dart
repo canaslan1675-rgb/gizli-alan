@@ -201,6 +201,7 @@ void main() {
 
       // Settings shows the state and only offers removal.
       // Through the home icon, like the owner (home reloads on return).
+      await _showOnHome(tester, find.byIcon(Icons.settings_outlined));
       await tester.tap(find.byIcon(Icons.settings_outlined));
       await settle();
       final remove = find.byKey(
@@ -223,6 +224,7 @@ void main() {
       expect(homeDecoration().image!.image, isA<AssetImage>());
 
       // "Düz renk": picking a colour swatch switches to the plain gradient.
+      await _showOnHome(tester, find.byIcon(Icons.settings_outlined));
       await tester.tap(find.byIcon(Icons.settings_outlined));
       await settle();
       final swatch = find.byKey(const ValueKey('settings_wallpaper_1'));
@@ -246,7 +248,12 @@ void main() {
   test('only the owner default wallpaper is bundled; no new permissions', () {
     final pubspec = File('pubspec.yaml').readAsStringSync();
     expect(pubspec.contains('- assets/wallpapers/default.jpg'), isTrue);
-    expect(RegExp('assets/').allMatches(pubspec).length, 1);
+    // Only the default wallpaper + Joi's own portrait (0.6.2).
+    expect(
+      RegExp('assets/').allMatches(pubspec).length -
+          RegExp('assets/joi/').allMatches(pubspec).length,
+      1,
+    );
     expect(
       File('assets/wallpapers/default.jpg').lengthSync(),
       lessThan(400000),
@@ -256,4 +263,17 @@ void main() {
       isNot(contains('READ_MEDIA_IMAGES"/>')),
     );
   });
+}
+
+/// The vault home puts the Joi card first (0.6.2); on a phone-sized test
+
+/// The vault home puts the Joi card first (0.6.2); lower tiles may need a
+/// scroll on a phone-sized test view.
+Future<void> _showOnHome(WidgetTester tester, Finder f) async {
+  final home = find.byKey(const ValueKey('tile_joi'));
+  if (home.evaluate().isEmpty) return;
+  await tester.drag(find.byType(CustomScrollView).first, const Offset(0, -400));
+  for (var i = 0; i < 5; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }

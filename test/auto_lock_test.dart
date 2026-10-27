@@ -303,6 +303,7 @@ void main() {
       tester,
     ) async {
       final state = await unlock(tester, lang: 'tr');
+      await _showOnHome(tester, find.text('Ayarlar'));
       await tester.tap(find.text('Ayarlar'));
       await settle(tester);
       final tile = find.byKey(const ValueKey('settings_lock_timeout'));
@@ -328,4 +329,15 @@ void main() {
       expect(state.settings.lockTimeoutSec, 60);
     });
   });
+}
+
+/// The vault home puts the Joi card first (0.6.2); lower tiles may need a
+/// scroll on a phone-sized test view.
+Future<void> _showOnHome(WidgetTester tester, Finder f) async {
+  final home = find.byKey(const ValueKey('tile_joi'));
+  if (home.evaluate().isEmpty) return;
+  await tester.drag(find.byType(CustomScrollView).first, const Offset(0, -400));
+  for (var i = 0; i < 5; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }

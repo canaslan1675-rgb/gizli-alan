@@ -5,6 +5,7 @@ import '../l10n/l10n.dart';
 import '../models/note.dart';
 import '../services/joi_service.dart';
 import '../theme.dart';
+import '../widgets/joi_avatar.dart';
 import '../widgets/quick_lock.dart';
 import 'note_edit_screen.dart';
 
@@ -323,87 +324,141 @@ class _JoiScreenState extends State<JoiScreen> {
     final bg = m.fromUser
         ? Theme.of(context).colorScheme.primaryContainer
         : Theme.of(context).colorScheme.surfaceContainerHighest;
+    final bubble = Container(
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      padding: const EdgeInsets.all(12),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.85,
+      ),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (m.online != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    m.online! ? Icons.cloud_outlined : Icons.phone_android,
+                    size: 14,
+                    color: gc.textSecondary,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    t(m.online! ? 'joiBadgeOnline' : 'joiBadgeDevice'),
+                    key: ValueKey(
+                      m.online! ? 'joi_badge_online' : 'joi_badge_device',
+                    ),
+                    style: TextStyle(fontSize: 11, color: gc.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+          SelectableText(m.text),
+          if (m.debug != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                m.debug!,
+                key: const ValueKey('joi_debug'),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 10, color: gc.textSecondary),
+              ),
+            ),
+          for (final n in m.notes)
+            ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.sticky_note_2_outlined, size: 20),
+              title: Text(n.title.isEmpty ? t('untitled') : n.title),
+              subtitle: Text(
+                JoiNoteSearch.snippet(n, m.query),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () async {
+                final repo = GizliAlanApp.of(context).session!.notes;
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => NoteEditScreen(repo: repo, note: n),
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+    );
     return Align(
       alignment: m.fromUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-        padding: const EdgeInsets.all(12),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.85,
-        ),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (m.online != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      m.online! ? Icons.cloud_outlined : Icons.phone_android,
-                      size: 14,
-                      color: gc.textSecondary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      t(m.online! ? 'joiBadgeOnline' : 'joiBadgeDevice'),
-                      key: ValueKey(
-                        m.online! ? 'joi_badge_online' : 'joi_badge_device',
-                      ),
-                      style: TextStyle(fontSize: 11, color: gc.textSecondary),
-                    ),
-                  ],
+      child: m.fromUser
+          ? bubble
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 10, top: 6),
+                  child: JoiAvatar(size: 26),
                 ),
-              ),
-            SelectableText(m.text),
-            if (m.debug != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  m.debug!,
-                  key: const ValueKey('joi_debug'),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 10, color: gc.textSecondary),
-                ),
-              ),
-            for (final n in m.notes)
-              ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.sticky_note_2_outlined, size: 20),
-                title: Text(n.title.isEmpty ? t('untitled') : n.title),
-                subtitle: Text(
-                  JoiNoteSearch.snippet(n, m.query),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                onTap: () async {
-                  final repo = GizliAlanApp.of(context).session!.notes;
-                  await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => NoteEditScreen(repo: repo, note: n),
-                    ),
-                  );
-                },
-              ),
-          ],
-        ),
-      ),
+                Flexible(child: bubble),
+              ],
+            ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final t = L10n.of(context);
+    // Joi portrait as wallpaper, darkened (~62 % black + gradient) so
+    // bubbles and text stay readable.
+    return Container(
+      key: const ValueKey('joi_wallpaper'),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        image: DecorationImage(
+          image: const AssetImage('assets/joi/joi_512.webp'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withValues(alpha: 0.62),
+            BlendMode.darken,
+          ),
+          onError: (_, _) {},
+        ),
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black.withValues(alpha: 0.10),
+              Colors.black.withValues(alpha: 0.45),
+            ],
+          ),
+        ),
+        child: _scaffold(t),
+      ),
+    );
+  }
+
+  Widget _scaffold(L10n t) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text(JoiService.name, key: ValueKey('joi_title')),
+        backgroundColor: Colors.black.withValues(alpha: 0.35),
+        title: const Row(
+          children: [
+            JoiAvatar(size: 36),
+            SizedBox(width: 10),
+            Text(JoiService.name, key: ValueKey('joi_title')),
+          ],
+        ),
         actions: const [QuickLockButton()],
       ),
       body: Column(
