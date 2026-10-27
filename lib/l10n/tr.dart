@@ -672,4 +672,19 @@ const Map<String, String> tr = {
   "joiProWrite": "Not defterine yazma",
   "joiProVoice": "Sesli sohbet",
   "joiProNotes": "Notlarında arama ve özet",
+  "joiListening": "Dinliyorum… (bitince bırak ya da tekrar dokun)",
+  "joiVoiceNoMatch":
+      "Ses algılanmadı. Mikrofona biraz daha yakın ve net konuşup tekrar dene.",
+  "joiVoiceOffline":
+      "Konuşma tanıma için internet gerekiyor (cihazda Türkçe ses modeli yüklü değil). Bağlantını kontrol et.",
+  "joiVoiceBusy": "Konuşma tanıma meşgul. Bir saniye sonra tekrar dene.",
+  "joiVoiceLanguage":
+      "Türkçe konuşma tanıma bu cihazda yok. Google uygulamasında / Ayarlar → Sistem → Diller → Konuşma tanıma'da Türkçe'yi indir.",
+  "joiVoiceUnavailable":
+      "Bu cihazda konuşma tanıma hizmeti bulunamadı. Google uygulamasını veya 'Google Konuşma Hizmetleri'ni yükleyip etkinleştir.",
+  "joiImgSearching": "Wikimedia Commons'ta \"{q}\" fotoğraflarını arıyorum…",
+  "joiImgNothing":
+      "Wikimedia Commons'ta \"{q}\" için fotoğraf bulamadım. Farklı bir yazımla dene.",
+  "joiImgOffline":
+      "Fotoğraf araması için internete bağlanılamadı ya da Wikimedia yanıt vermedi. Tekrar dene.",
 };

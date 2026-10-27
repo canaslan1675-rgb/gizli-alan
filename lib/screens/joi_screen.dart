@@ -118,6 +118,7 @@ class _JoiScreenState extends State<JoiScreen> {
   late final CommonsSearch _commons = widget.commons ?? CommonsSearch();
   late final JoiPlatform _platform = widget.platform ?? const JoiPlatform();
   bool _listening = false;
+  String _partial = '';
   bool _speaking = false;
   bool _historyLoaded = false;
 
@@ -352,7 +353,7 @@ class _JoiScreenState extends State<JoiScreen> {
         return;
       }
       if (intent is JoiImageSearch) {
-        spoken = await _imageSearch(intent.query);
+        spoken = await _imageSearch(intent.query, intent.candidates);
         return;
       }
       if (intent is JoiWriteNote) {
@@ -437,26 +438,46 @@ class _JoiScreenState extends State<JoiScreen> {
 
   // ------------------------------------------------------- image search
 
-  Future<String?> _imageSearch(String query) async {
+  Future<String?> _imageSearch(String query, List<String> candidates) async {
     final t = L10n.current;
     if (!await _ensureConsent()) {
       if (mounted) _add(_Msg(false, t('joiImgNeedsOnline')));
       return null;
     }
+    if (!mounted) return null;
+    // "Arıyorum…" bubble, ALWAYS replaced by results or an error.
+    final idx = _msgs.length;
+    _add(_Msg(false, t('joiImgSearching').replaceAll('{q}', query)));
+    _Msg out;
     try {
-      final r = await _commons.search(query);
-      if (!mounted) return null;
-      final msg = r.isEmpty
-          ? t('joiImgNone').replaceAll('{q}', query)
-          : t('joiImgFound').replaceAll('{q}', query);
-      _add(_Msg(false, msg, images: r));
-      return msg;
+      final r = await _commons
+          .searchAny(candidates)
+          .timeout(const Duration(seconds: 25));
+      out = _Msg(
+        false,
+        r.isEmpty
+            ? t('joiImgNothing').replaceAll('{q}', query)
+            : t('joiImgFound').replaceAll('{q}', query),
+        images: r,
+      );
     } catch (e) {
-      if (!mounted) return null;
-      final msg = joiIsOffline(e) ? t('joiOffline') : t('joiImgError');
-      _add(_Msg(false, msg, debug: joiDebugName(e)));
-      return msg;
+      out = _Msg(
+        false,
+        joiIsOffline(e) ? t('joiImgOffline') : t('joiImgError'),
+        debug: joiDebugName(e),
+      );
     }
+    if (!mounted) return null;
+    setState(() {
+      if (idx < _msgs.length) {
+        _msgs[idx] = out;
+      } else {
+        _msgs.add(out);
+      }
+    });
+    _toBottom();
+    _persist();
+    return out.text;
   }
 
   Future<void> _openImage(CommonsImage img) async {
@@ -666,28 +687,24 @@ class _JoiScreenState extends State<JoiScreen> {
     }
     setState(() => _listening = true);
     _voice.onPartial = (p) {
-      if (mounted) _input.text = p;
+      if (mounted) setState(() => _partial = p);
     };
+    setState(() => _partial = '');
     String? heard;
     try {
       heard = await _voice.listen(L10n.lang);
     } on PlatformException catch (e) {
       if (mounted) {
-        _add(
-          _Msg(
-            false,
-            e.code == 'offline' ? t('joiOffline') : t('joiMicError'),
-            debug: 'voice:${e.code}',
-          ),
-        );
+        _add(_Msg(false, voiceErrorText(t, e.code), debug: 'voice:${e.code}'));
       }
     } catch (_) {}
     if (!mounted) return;
-    setState(() => _listening = false);
+    setState(() {
+      _listening = false;
+      _partial = '';
+    });
     if (heard != null && heard.trim().isNotEmpty) {
       await _send(text: heard, viaVoice: true);
-    } else {
-      _input.clear();
     }
   }
 
@@ -1139,6 +1156,30 @@ class _JoiScreenState extends State<JoiScreen> {
                 ],
               ),
             ),
+          if (_listening)
+            Container(
+              key: const ValueKey('joi_listening'),
+              width: double.infinity,
+              margin: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0x88FF8FD8)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.graphic_eq, color: Color(0xFFFF8FD8)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _partial.isEmpty ? t('joiListening') : _partial,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           SafeArea(
             top: false,
             child: Padding(
@@ -1160,12 +1201,34 @@ class _JoiScreenState extends State<JoiScreen> {
                       ),
                     ),
                   ),
-                  IconButton(
-                    key: const ValueKey('joi_mic'),
-                    tooltip: t('joiMic'),
-                    color: _listening ? const Color(0xFFFF8FD8) : null,
-                    icon: Icon(_listening ? Icons.mic : Icons.mic_none),
-                    onPressed: _busy ? null : _mic,
+                  // Tap = start/stop; press-and-hold = talk while held,
+                  // sends on release.
+                  Tooltip(
+                    message: t('joiMic'),
+                    child: GestureDetector(
+                      key: const ValueKey('joi_mic'),
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _busy ? null : _mic,
+                      onLongPressStart: _busy || _listening
+                          ? null
+                          : (_) => _mic(),
+                      onLongPressEnd: (_) {
+                        if (_listening) _voice.stopListening();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: _listening
+                              ? const Color(0xFFFF8FD8)
+                              : Colors.transparent,
+                          child: Icon(
+                            _listening ? Icons.mic : Icons.mic_none,
+                            color: _listening ? Colors.black : null,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   IconButton(
                     key: const ValueKey('joi_send'),
@@ -1202,3 +1265,14 @@ class _ProBadge extends StatelessWidget {
     ),
   );
 }
+
+/// Turkish/EN message per speech-recognition error code (VoiceChannel.kt).
+String voiceErrorText(L10n t, String code) => switch (code) {
+  'no_match' => t('joiVoiceNoMatch'),
+  'offline' => t('joiVoiceOffline'),
+  'no_permission' => t('joiMicDenied'),
+  'busy' => t('joiVoiceBusy'),
+  'language' => t('joiVoiceLanguage'),
+  'unavailable' => t('joiVoiceUnavailable'),
+  _ => t('joiMicError'),
+};

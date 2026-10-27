@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -145,50 +146,78 @@ sealed class JoiIntent {
 
     // ---- image search
     final tr = RegExp(
-      r"^(.+?)\s+(?:adl[ıi]\s+)?(?:bir\s+)?(fotoğraf|fotograf|resim|görsel|gorsel|foto)\p{L}*\s*(?:indir|bul|göster|goster|getir|ara)\p{L}*[.!?]*$",
+      r"^(.+?)\s+(?:adl[ıi]\s+)?(?:bir\s+)?(fotoğraf|fotograf|foto|resim|resm|görsel|gorsel|görüntü|goruntu)\p{L}*\s*(?:indir|bul|göster|goster|getir|ara|gönder|gonder|yolla)\p{L}*(?:\s+(?:misin|mısın|musun|bana|lütfen|lutfen))*[\s.!?]*$",
       caseSensitive: false,
       unicode: true,
     );
     var m = tr.firstMatch(s);
     if (m != null) {
-      return JoiImageSearch(_cleanSubject(m.group(1)!));
+      return JoiImageSearch(m.group(1)!);
     }
     final tr2 = RegExp(
-      r"^(?:bana\s+)?(?:bir\s+)?(?:fotoğraf|fotograf|resim|görsel|foto)\p{L}*\s*(?:indir|bul|göster|getir)\p{L}*\s*:?\s+(.+)$",
+      r"^(?:bana\s+)?(?:bir\s+)?(?:fotoğraf|fotograf|foto|resim|resm|görsel|gorsel)\p{L}*\s*(?:indir|bul|göster|goster|getir)\p{L}*\s*:?\s+(.+)$",
       caseSensitive: false,
       unicode: true,
     );
     m = tr2.firstMatch(s);
-    if (m != null) return JoiImageSearch(_cleanSubject(m.group(1)!));
+    if (m != null) return JoiImageSearch(m.group(1)!);
     final en = RegExp(
       r"(?:download|find|show|get)(?: me)?(?: an?| some)? (?:photo|picture|image|pic)s? of (.+?)[.!?]*$",
       caseSensitive: false,
       unicode: true,
     );
     m = en.firstMatch(s);
-    if (m != null) return JoiImageSearch(_cleanSubject(m.group(1)!));
+    if (m != null) return JoiImageSearch(m.group(1)!);
     return null;
   }
 
-  /// "Galata Kulesi'nin" → "Galata Kulesi".
-  static String _cleanSubject(String x) {
+  /// Search terms, best first: apostrophe suffix removed; for words without
+  /// an apostrophe ("hadisenin", "kedilerin") the genitive/accusative suffix
+  /// is stripped too, and the raw text is kept as a fallback.
+  static List<String> subjectCandidates(String x) {
     var s = x.trim();
     s = s.replaceAll(
-      RegExp(r"^(bana|benim için|lütfen)\s+", caseSensitive: false),
+      RegExp(r"^(bana|benim için|lütfen|lutfen)\s+", caseSensitive: false),
       '',
     );
-    s = s.replaceAll(
-      RegExp(r"['’](n?[ıiuü]n|n?[ıiuü]|[ae]|d[ae]n|t[ae]n)$"),
-      '',
-    );
-    s = s.replaceAll(RegExp(r"\s+(bir|bi)$"), '');
-    return s.trim();
+    s = s.replaceAll(RegExp(r"\s+(bir|bi|adlı|adli)$"), '').trim();
+    final out = <String>[];
+    // Apostrophe (straight or curly): drop everything after it.
+    final ap = RegExp(
+      r"^(.*?\p{L})['’‘`´][\p{L}]*$",
+      unicode: true,
+    ).firstMatch(s);
+    if (ap != null) {
+      out.add(ap.group(1)!.trim());
+    } else {
+      final words = s.split(RegExp(r'\s+'));
+      final last = words.last;
+      final stripped = last.replaceFirst(
+        RegExp(r"(n[ıiuü]n|[ıiuü]n|y[ıiuü]|n[ıiuü])$", unicode: true),
+        '',
+      );
+      if (stripped != last && stripped.length >= 3) {
+        out.add([...words.take(words.length - 1), stripped].join(' '));
+        // "kedilerin" → also "kediler" handled above; plural → singular too.
+        final sing = stripped.replaceFirst(RegExp(r"(ler|lar)$"), '');
+        if (sing != stripped && sing.length >= 3) {
+          out.add([...words.take(words.length - 1), sing].join(' '));
+        }
+      }
+    }
+    out.add(s);
+    return out.where((e) => e.isNotEmpty).toSet().toList();
   }
 }
 
 class JoiImageSearch extends JoiIntent {
-  const JoiImageSearch(this.query);
+  JoiImageSearch(String raw)
+    : query = JoiIntent.subjectCandidates(raw).first,
+      candidates = JoiIntent.subjectCandidates(raw);
   final String query;
+
+  /// All search terms to try, best first (see [JoiIntent.subjectCandidates]).
+  final List<String> candidates;
 }
 
 class JoiWriteNote extends JoiIntent {
@@ -259,16 +288,22 @@ class CommonsImage {
   }
 }
 
-/// Wikimedia Commons search (free API, no key). Only files with a free
-/// licence name are returned (Commons hosts free content only; anything
-/// without licence metadata or marked non-free is skipped).
+/// Wikimedia Commons search (free API, no key). Commons hosts only freely
+/// licensed / public-domain files, so results are NOT filtered by licence
+/// (test6 did, and dropped everything when metadata was missing); whatever
+/// author/licence metadata exists is shown, fallback "Wikimedia Commons".
 class CommonsSearch {
-  CommonsSearch({HttpClient Function()? client})
-    : _client = client ?? HttpClient.new;
+  CommonsSearch({
+    HttpClient Function()? client,
+    this.timeout = const Duration(seconds: 8),
+  }) : _client = client ?? HttpClient.new;
   final HttpClient Function() _client;
+  final Duration timeout;
 
+  /// Wikimedia API etiquette: descriptive UA with app id + contact URL.
   static const userAgent =
-      'GizliAlan/0.6.2 (Android; com.offerforge.gizlialan; joi image search)';
+      'GizliAlan/0.6.2 (https://play.google.com/store/apps/details?id=com.offerforge.gizlialan) '
+      'dart-io';
 
   static Uri searchUri(String q, {int limit = 12}) =>
       Uri.https('commons.wikimedia.org', '/w/api.php', {
@@ -280,9 +315,9 @@ class CommonsSearch {
         'gsrnamespace': '6',
         'gsrlimit': '$limit',
         'prop': 'imageinfo',
-        'iiprop': 'url|extmetadata|mime',
-        'iiurlwidth': '1280',
-        'iiextmetadatafilter': 'Artist|LicenseShortName|LicenseUrl|NonFree',
+        'iiprop': 'url|extmetadata|mime|size',
+        'iiurlwidth': '320',
+        'iiextmetadatafilter': 'Artist|LicenseShortName|LicenseUrl',
       });
 
   static String _strip(String? html) => (html ?? '')
@@ -292,20 +327,6 @@ class CommonsSearch {
       .replaceAll('&#039;', "'")
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
-
-  static bool _free(String lic) {
-    final l = lic.toLowerCase();
-    if (l.isEmpty || l.contains('fair use') || l.contains('non-free')) {
-      return false;
-    }
-    return l.contains('cc') ||
-        l.contains('public domain') ||
-        l.contains('pd') ||
-        l.contains('gfdl') ||
-        l.contains('attribution') ||
-        l.contains('fal') ||
-        l.contains('free');
-  }
 
   /// Parses an API response (pure; unit-tested).
   static List<CommonsImage> parse(Map<String, dynamic> j, {int max = 6}) {
@@ -327,19 +348,27 @@ class CommonsSearch {
       }
       final md = (ii['extmetadata'] as Map?) ?? const {};
       String v(String k) => _strip(((md[k] as Map?)?['value'])?.toString());
-      final lic = v('LicenseShortName');
-      if (v('NonFree').isNotEmpty || !_free(lic)) continue;
       final thumb = (ii['thumburl'] ?? ii['url'] ?? '').toString();
+      final orig = (ii['url'] ?? thumb).toString();
       if (thumb.isEmpty) continue;
+      final size = (ii['size'] as num?)?.toInt() ?? 0;
+      // Download: original if ≤ 4 MB, else a 1280 px rendition.
+      final dl = size > 0 && size <= 4 * 1024 * 1024
+          ? orig
+          : (thumb.contains('/320px-')
+                ? thumb.replaceFirst('/320px-', '/1280px-')
+                : orig);
       final title = (p['title'] ?? '').toString();
       out.add(
         CommonsImage(
           title: title.replaceFirst(RegExp(r'^File:'), ''),
           thumbUrl: thumb,
-          url: thumb,
+          url: dl,
           pageUrl: (ii['descriptionurl'] ?? '').toString(),
-          author: v('Artist').isEmpty ? 'Bilinmiyor' : v('Artist'),
-          license: lic,
+          author: v('Artist').isEmpty ? 'Wikimedia Commons' : v('Artist'),
+          license: v('LicenseShortName').isEmpty
+              ? 'Wikimedia Commons'
+              : v('LicenseShortName'),
           licenseUrl: v('LicenseUrl').isEmpty ? null : v('LicenseUrl'),
           mime: mime,
         ),
@@ -349,39 +378,91 @@ class CommonsSearch {
     return out;
   }
 
-  Future<Map<String, dynamic>> _getJson(Uri u) async {
-    final c = _client()..connectionTimeout = const Duration(seconds: 8);
+  Future<Map<String, dynamic>> _getJsonOnce(Uri u) async {
+    final c = _client()..connectionTimeout = timeout;
     try {
-      final req = await c.getUrl(u);
-      req.headers.set(HttpHeaders.userAgentHeader, userAgent);
-      final res = await req.close().timeout(const Duration(seconds: 12));
-      if (res.statusCode != 200) throw HttpException('HTTP ${res.statusCode}');
-      return jsonDecode(await res.transform(utf8.decoder).join())
-          as Map<String, dynamic>;
+      Future<Map<String, dynamic>> run() async {
+        final req = await c.getUrl(u);
+        req.headers.set(HttpHeaders.userAgentHeader, userAgent);
+        req.headers.set('Api-User-Agent', userAgent);
+        final res = await req.close();
+        if (res.statusCode != 200) {
+          throw HttpException('HTTP ${res.statusCode}');
+        }
+        return jsonDecode(await res.transform(utf8.decoder).join())
+            as Map<String, dynamic>;
+      }
+
+      // Hard timeout for the WHOLE request incl. body.
+      return await run().timeout(timeout);
     } finally {
-      c.close();
+      c.close(force: true);
+    }
+  }
+
+  /// One retry on timeout / network error.
+  Future<Map<String, dynamic>> _getJson(Uri u) async {
+    try {
+      return await _getJsonOnce(u);
+    } on TimeoutException {
+      return _getJsonOnce(u);
+    } on SocketException {
+      return _getJsonOnce(u);
     }
   }
 
   Future<List<CommonsImage>> search(String q) async =>
       parse(await _getJson(searchUri(q)));
 
-  /// Downloads the (≤1280 px) image bytes.
-  Future<Uint8List> download(CommonsImage img) async {
-    final c = _client()..connectionTimeout = const Duration(seconds: 8);
-    try {
-      final req = await c.getUrl(Uri.parse(img.url));
-      req.headers.set(HttpHeaders.userAgentHeader, userAgent);
-      final res = await req.close().timeout(const Duration(seconds: 20));
-      if (res.statusCode != 200) throw HttpException('HTTP ${res.statusCode}');
-      final b = BytesBuilder(copy: false);
-      await for (final chunk in res) {
-        b.add(chunk);
-        if (b.length > 15 * 1024 * 1024) throw const HttpException('too big');
+  /// Tries [candidates] in order until at least [enough] results (merged,
+  /// de-duplicated). Throws only if every attempt failed with an error.
+  Future<List<CommonsImage>> searchAny(
+    List<String> candidates, {
+    int enough = 3,
+  }) async {
+    final out = <CommonsImage>[];
+    Object? lastErr;
+    var anyOk = false;
+    for (final q in candidates) {
+      try {
+        final r = await search(q);
+        anyOk = true;
+        for (final i in r) {
+          if (out.length < 6 && !out.any((o) => o.title == i.title)) out.add(i);
+        }
+        if (out.length >= enough) break;
+      } catch (e) {
+        lastErr = e;
       }
-      return b.takeBytes();
+    }
+    if (!anyOk && lastErr != null) throw lastErr;
+    return out;
+  }
+
+  /// Downloads the image bytes (original ≤ 4 MB or a 1280 px rendition).
+  Future<Uint8List> download(CommonsImage img) async {
+    final c = _client()..connectionTimeout = timeout;
+    try {
+      Future<Uint8List> run() async {
+        final req = await c.getUrl(Uri.parse(img.url));
+        req.headers.set(HttpHeaders.userAgentHeader, userAgent);
+        final res = await req.close();
+        if (res.statusCode != 200) {
+          throw HttpException('HTTP ${res.statusCode}');
+        }
+        final b = BytesBuilder(copy: false);
+        await for (final chunk in res) {
+          b.add(chunk);
+          if (b.length > 15 * 1024 * 1024) {
+            throw const HttpException('too big');
+          }
+        }
+        return b.takeBytes();
+      }
+
+      return await run().timeout(const Duration(seconds: 30));
     } finally {
-      c.close();
+      c.close(force: true);
     }
   }
 }
@@ -389,6 +470,7 @@ class CommonsSearch {
 /// True for network-type failures (show "internet yok").
 bool joiIsOffline(Object e) =>
     e is SocketException ||
+    e is TimeoutException ||
     e is HandshakeException ||
     (e is HttpException && !e.message.startsWith('HTTP')) ||
     e.toString().contains('Failed host lookup');

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -29,6 +30,8 @@ void main() {
   const ch = MethodChannel('gizlialan/joi');
   const cfg = JoiOnlineConfig(apiKey: 'k', appId: 'a', projectId: 'p');
 
+  Widget app(Widget w) => MaterialApp(theme: GizliTheme.light(), home: w);
+
   tearDown(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(ch, null);
@@ -40,7 +43,8 @@ void main() {
       expect(a, isA<JoiImageSearch>());
       expect((a as JoiImageSearch).query, 'Galata Kulesi');
       final b = JoiIntent.parse('Kedilerin fotoğrafını bul');
-      expect((b as JoiImageSearch).query, 'Kedilerin');
+      expect((b as JoiImageSearch).query, 'Kediler');
+      expect(b.candidates, ['Kediler', 'Kedi', 'Kedilerin']);
       final c = JoiIntent.parse('Download a photo of the Eiffel Tower');
       expect((c as JoiImageSearch).query, 'the Eiffel Tower');
     });
@@ -84,7 +88,119 @@ void main() {
     });
   });
 
-  test('Commons parse: free licences only, attribution kept', () {
+  test('Turkish suffix stripping (straight/curly apostrophe, none)', () {
+    JoiImageSearch img(String q) => JoiIntent.parse(q)! as JoiImageSearch;
+    expect(img("Hadise'nin fotoğrafını indir").candidates, [
+      'Hadise',
+      "Hadise'nin",
+    ]);
+    expect(img('Hadise’nin fotoğrafını indir').query, 'Hadise');
+    expect(img('hadisenin fotoğrafını indir').candidates, [
+      'hadise',
+      'hadisenin',
+    ]);
+    expect(img("Galata Kulesi'nin fotoğrafını indir").query, 'Galata Kulesi');
+    expect(img('Galata Kulesinin fotoğrafını indir').query, 'Galata Kulesi');
+    expect(img("Hadise'nin fotoğrafını indirir misin").query, 'Hadise');
+    expect(img("Hadise'nin resmini bul").query, 'Hadise');
+    expect(img('Hadise fotoğrafı indir').query, 'Hadise');
+  });
+
+  test(
+    'searchAny: falls back to the next term, errors only if all fail',
+    () async {
+      final ok = _ScriptedCommons({
+        'hadise': [],
+        'hadisenin': ['A', 'B'],
+      });
+      expect(
+        (await ok.searchAny(['hadise', 'hadisenin'])).map((e) => e.title),
+        ['A', 'B'],
+      );
+      final bad = _ScriptedCommons({});
+      await expectLater(
+        bad.searchAny(['x', 'y']),
+        throwsA(isA<TimeoutException>()),
+      );
+      expect(joiIsOffline(TimeoutException('t')), isTrue);
+    },
+  );
+
+  test('hard timeout when the server never answers (with one retry)', () async {
+    // flutter_test mocks HttpClient (always 400); use a real one here.
+    final prev = HttpOverrides.current;
+    HttpOverrides.global = null;
+    addTearDown(() => HttpOverrides.global = prev);
+    final server = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+    final held = <Socket>[];
+    server.listen(held.add); // accept, never respond
+    final c = CommonsSearch(
+      timeout: const Duration(milliseconds: 300),
+      client: () =>
+          HttpClient()..findProxy = (_) => 'PROXY 127.0.0.1:${server.port}',
+    );
+    final sw = Stopwatch()..start();
+    await expectLater(c.search('Hadise'), throwsA(isA<TimeoutException>()));
+    expect(sw.elapsed, lessThan(const Duration(seconds: 3)));
+    for (final s in held) {
+      s.destroy();
+    }
+    await server.close();
+  });
+
+  testWidgets('photo search failure always ends the searching bubble', (
+    tester,
+  ) async {
+    L10n.setLang('tr');
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          ch,
+          (c) async => c.method == 'status' ? 'unavailable' : 'x',
+        );
+    await tester.pumpWidget(
+      app(
+        JoiScreen(
+          service: JoiService(onlineConfig: cfg, hasOnlineConsent: () => true),
+          consent: () => true,
+          isPro: () => true,
+          commons: _ScriptedCommons({}),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('joi_input')),
+      "Hadise'nin fotoğrafını indir",
+    );
+    await tester.tap(find.byKey(const ValueKey('joi_send')));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.textContaining('arıyorum'), findsNothing);
+    expect(find.textContaining('Wikimedia yanıt vermedi'), findsOneWidget);
+  });
+
+  test('voice error codes map to specific Turkish messages', () {
+    L10n.setLang('tr');
+    final t = L10n.current;
+    final msgs = {
+      for (final c in [
+        'no_match',
+        'offline',
+        'no_permission',
+        'busy',
+        'language',
+        'unavailable',
+        'error_5',
+      ])
+        c: voiceErrorText(t, c),
+    };
+    expect(msgs.values.toSet(), hasLength(7));
+    expect(msgs['no_match'], contains('Ses algılanmadı'));
+    expect(msgs['unavailable'], contains('Google'));
+  });
+
+  test('Commons parse: all bitmap results, attribution kept', () {
     Map<String, dynamic> page(
       int i,
       String lic, {
@@ -115,7 +231,9 @@ void main() {
         ],
       },
     });
-    expect(r.map((e) => e.title), ['P1.jpg', 'P2.jpg']);
+    // No licence filtering any more (Commons is free-only); TIFF skipped.
+    expect(r.map((e) => e.title), ['P1.jpg', 'P2.jpg', 'P3.jpg', 'P4.jpg']);
+    expect(r[3].license, 'Wikimedia Commons');
     expect(r[1].author, 'Ali');
     expect(r[1].attribution, contains('CC BY-SA 4.0'));
     expect(
@@ -225,7 +343,6 @@ void main() {
     expect(sent.arguments['question'], contains("Sokrates'in hayatı"));
   });
 
-  Widget app(Widget w) => MaterialApp(theme: GizliTheme.light(), home: w);
 
   testWidgets('free user: tool intents upsell, no network', (tester) async {
     L10n.setLang('tr');
@@ -316,4 +433,26 @@ void main() {
       isNull,
     );
   });
+}
+
+/// Scripted search: term → titles; missing term → TimeoutException.
+class _ScriptedCommons extends CommonsSearch {
+  _ScriptedCommons(this.script);
+  final Map<String, List<String>> script;
+  @override
+  Future<List<CommonsImage>> search(String q) async {
+    final r = script[q];
+    if (r == null) throw TimeoutException('no answer');
+    return [
+      for (final t in r)
+        CommonsImage(
+          title: t,
+          thumbUrl: 'https://x/$t',
+          url: 'https://x/$t',
+          pageUrl: 'https://c/$t',
+          author: 'a',
+          license: 'CC0',
+        ),
+    ];
+  }
 }

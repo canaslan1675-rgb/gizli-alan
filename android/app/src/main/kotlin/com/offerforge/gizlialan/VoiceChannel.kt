@@ -36,6 +36,8 @@ class VoiceChannel private constructor(
     val channel = MethodChannel(messenger, NAME)
     private var recognizer: SpeechRecognizer? = null
     private var listenResult: MethodChannel.Result? = null
+    private var lastPartial: String? = null
+    private var triedFallback = false
     private var permResult: MethodChannel.Result? = null
     private var tts: TextToSpeech? = null
     private var ttsReady = false
@@ -58,7 +60,10 @@ class VoiceChannel private constructor(
                 }
                 "isRecognitionAvailable" ->
                     result.success(SpeechRecognizer.isRecognitionAvailable(activity))
-                "listen" -> listen(call.argument<String>("lang") ?: "tr-TR", result)
+                "listen" -> {
+                    triedFallback = false
+                    listen(call.argument<String>("lang") ?: "tr-TR", result, onDevice = false)
+                }
                 "stopListening" -> {
                     try { recognizer?.stopListening() } catch (_: Throwable) {}
                     result.success(null)
@@ -90,17 +95,26 @@ class VoiceChannel private constructor(
         return true
     }
 
-    private fun listen(lang: String, result: MethodChannel.Result) {
+    private fun listen(lang: String, result: MethodChannel.Result, onDevice: Boolean) {
         if (!hasMic()) { result.error("no_permission", null, null); return }
-        if (!SpeechRecognizer.isRecognitionAvailable(activity)) {
+        val anyRecognizer = SpeechRecognizer.isRecognitionAvailable(activity) ||
+            (Build.VERSION.SDK_INT >= 31 && SpeechRecognizer.isOnDeviceRecognitionAvailable(activity))
+        if (!anyRecognizer) {
             result.error("unavailable", null, null); return
         }
-        listenResult?.success(null)
+        // No default recogniser but an on-device one: use that directly.
+        val useOnDevice = onDevice || !SpeechRecognizer.isRecognitionAvailable(activity)
+        if (listenResult !== result) listenResult?.success(null)
         listenResult = result
+        lastPartial = null
         try {
             recognizer?.destroy()
-            // Prefer the on-device recogniser (Android 12+ when present).
-            val r = if (Build.VERSION.SDK_INT >= 31 &&
+            // test6 used the on-device recogniser first; on phones without
+            // the Turkish offline model it fails (language unavailable /
+            // no match). Now: the system default recogniser (Google speech
+            // services, which itself uses offline models when installed);
+            // on-device only as a fallback when the default is unavailable.
+            val r = if (useOnDevice && Build.VERSION.SDK_INT >= 31 &&
                 SpeechRecognizer.isOnDeviceRecognitionAvailable(activity)
             ) {
                 SpeechRecognizer.createOnDeviceSpeechRecognizer(activity)
@@ -117,19 +131,38 @@ class VoiceChannel private constructor(
                 override fun onEvent(t: Int, p: Bundle?) {}
                 override fun onPartialResults(p: Bundle?) {
                     val s = p?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
-                    if (!s.isNullOrBlank()) channel.invokeMethod("partial", mapOf("text" to s))
+                    if (!s.isNullOrBlank()) {
+                        lastPartial = s
+                        channel.invokeMethod("partial", mapOf("text" to s))
+                    }
                 }
                 override fun onResults(p: Bundle?) {
                     val s = p?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
-                    finishListen(s)
+                    finishListen(if (s.isNullOrBlank()) lastPartial else s)
                 }
                 override fun onError(error: Int) {
+                    // Whatever was heard so far wins over an error at the end
+                    // (e.g. released the button → NO_MATCH after partials).
+                    val heard = lastPartial
+                    if (!heard.isNullOrBlank()) { finishListen(heard); return }
+                    val langErr = error == 12 || error == 13 // LANGUAGE_NOT_SUPPORTED / UNAVAILABLE
+                    if (!triedFallback && (langErr || error == SpeechRecognizer.ERROR_CLIENT ||
+                            error == SpeechRecognizer.ERROR_SERVER || error == 11 /* SERVER_DISCONNECTED */)
+                    ) {
+                        // Retry once with the other recogniser.
+                        triedFallback = true
+                        val res = listenResult ?: return
+                        activity.runOnUiThread { listen(lang, res, onDevice = !useOnDevice) }
+                        return
+                    }
                     when (error) {
                         SpeechRecognizer.ERROR_NO_MATCH,
-                        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> finishListen(null)
+                        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> finishListenError("no_match")
                         SpeechRecognizer.ERROR_NETWORK,
                         SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> finishListenError("offline")
                         SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> finishListenError("no_permission")
+                        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> finishListenError("busy")
+                        12, 13 -> finishListenError("language")
                         else -> finishListenError("error_$error")
                     }
                 }
@@ -138,8 +171,12 @@ class VoiceChannel private constructor(
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang)
                 putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, lang)
                 putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                // Hold-to-talk: don't cut off after short pauses.
+                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2500L)
+                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2000L)
+                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 1500L)
             }
             r.startListening(i)
         } catch (t: Throwable) {

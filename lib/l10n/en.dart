@@ -670,4 +670,19 @@ const Map<String, String> en = {
   "joiProWrite": "Writing to notes",
   "joiProVoice": "Voice chat",
   "joiProNotes": "Note search and summaries",
+  "joiListening": "Listening… (release or tap again when done)",
+  "joiVoiceNoMatch":
+      "No speech detected. Speak clearly near the mic and try again.",
+  "joiVoiceOffline":
+      "Speech recognition needs internet (no offline model for this language). Check your connection.",
+  "joiVoiceBusy": "Speech recognition is busy. Try again in a second.",
+  "joiVoiceLanguage":
+      "Speech recognition for this language isn't available. Download it in the Google app / Settings → System → Languages → Speech recognition.",
+  "joiVoiceUnavailable":
+      "No speech recognition service on this device. Install/enable the Google app or 'Speech Services by Google'.",
+  "joiImgSearching": "Searching Wikimedia Commons for \"{q}\"…",
+  "joiImgNothing":
+      "No photos found on Wikimedia Commons for \"{q}\". Try a different spelling.",
+  "joiImgOffline":
+      "Couldn't reach Wikimedia (no internet or no response). Try again.",
 };
