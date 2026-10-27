@@ -78,33 +78,39 @@ void main() {
     );
   });
 
-  test('only USE_BIOMETRIC + INTERNET (browser), FLAG_SECURE stays', () {
-    final main = File('$src/main/AndroidManifest.xml').readAsStringSync();
-    final full = File('$src/full/AndroidManifest.xml').readAsStringSync();
-    final granted = RegExp(
-      r'<uses-permission android:name="([^"]+)"\s*/>',
-    ).allMatches(main + full).map((m) => m.group(1)).toSet();
-    // #32: INTERNET is the only permission added since v0.3 (in-vault
-    // browser). Nothing else may appear, and location stays removed.
-    expect(granted, {
-      'android.permission.USE_BIOMETRIC',
-      'android.permission.INTERNET',
-    });
-    expect(full, isNot(contains('uses-permission')));
-    for (final p in ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION']) {
-      expect(
-        main,
-        contains(
-          '<uses-permission android:name="android.permission.$p" tools:node="remove" />',
-        ),
-      );
-    }
-    expect(main, contains('android.webkit.WebView.MetricsOptOut'));
-    final activity = File(
-      '$src/main/kotlin/com/offerforge/gizlialan/MainActivity.kt',
-    ).readAsStringSync();
-    expect(activity, contains('WindowManager.LayoutParams.FLAG_SECURE'));
-  });
+  test(
+    'only USE_BIOMETRIC + INTERNET + RECORD_AUDIO (Joi voice), FLAG_SECURE stays',
+    () {
+      final main = File('$src/main/AndroidManifest.xml').readAsStringSync();
+      final full = File('$src/full/AndroidManifest.xml').readAsStringSync();
+      final granted = RegExp(
+        r'<uses-permission android:name="([^"]+)"\s*/>',
+      ).allMatches(main + full).map((m) => m.group(1)).toSet();
+      // #32: INTERNET is the only permission added since v0.3 (in-vault
+      // browser). Nothing else may appear, and location stays removed.
+      // 0.6.2: RECORD_AUDIO for Joi's voice input (runtime permission,
+      // requested only when the mic is tapped; Pro feature).
+      expect(granted, {
+        'android.permission.USE_BIOMETRIC',
+        'android.permission.INTERNET',
+        'android.permission.RECORD_AUDIO',
+      });
+      expect(full, isNot(contains('uses-permission')));
+      for (final p in ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION']) {
+        expect(
+          main,
+          contains(
+            '<uses-permission android:name="android.permission.$p" tools:node="remove" />',
+          ),
+        );
+      }
+      expect(main, contains('android.webkit.WebView.MetricsOptOut'));
+      final activity = File(
+        '$src/main/kotlin/com/offerforge/gizlialan/MainActivity.kt',
+      ).readAsStringSync();
+      expect(activity, contains('WindowManager.LayoutParams.FLAG_SECURE'));
+    },
+  );
 
   test('v0.5.0: full is the Play build (same applicationId, AAB = full)', () {
     final gradle = File('android/app/build.gradle.kts').readAsStringSync();

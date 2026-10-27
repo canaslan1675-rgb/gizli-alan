@@ -38,6 +38,9 @@ class SettingsService {
   static const _kAccent = 'accent_color';
   static const _kAnalytics = 'analytics_enabled';
   static const _kJoiOnline = 'joi_online_consent';
+  static const _kJoiSpeak = 'joi_speak';
+  static const _kResume = 'resume_where_left';
+  static const _kResumeMax = 'resume_max_min';
 
   /// Seconds before auto-lock after leaving the app or the screen turning
   /// off. 0 = immediately. Legacy values (15 s, 5 min) snap onto these.
@@ -118,6 +121,36 @@ class SettingsService {
 
   Future<void> setLockTimeoutSec(int sec) =>
       _prefs.setInt(_kLockTimeout, normalizeLockTimeout(sec));
+
+  /// "Çıkınca bıraktığım yerden devam et" (0.6.2). Off (default): leaving
+  /// the app follows [lockTimeoutSec] (back to the calculator). On: the vault
+  /// stays open on the same screen, but still locks after [resumeMaxMin]
+  /// minutes in the background; a process death / reboot always locks
+  /// (the session key lives only in memory).
+  bool get resumeWhereLeft => _prefs.getBool(_kResume) ?? false;
+
+  Future<void> setResumeWhereLeft(bool v) => _prefs.setBool(_kResume, v);
+
+  static const resumeMaxChoices = [1, 5, 15];
+
+  int get resumeMaxMin {
+    final v = _prefs.getInt(_kResumeMax) ?? 5;
+    return resumeMaxChoices.contains(v) ? v : 5;
+  }
+
+  Future<void> setResumeMaxMin(int v) =>
+      _prefs.setInt(_kResumeMax, resumeMaxChoices.contains(v) ? v : 5);
+
+  /// Background seconds before auto-lock, taking [resumeWhereLeft] into
+  /// account (used by the app lifecycle).
+  int get effectiveLockTimeoutSec =>
+      resumeWhereLeft ? resumeMaxMin * 60 : lockTimeoutSec;
+
+  /// Joi reads its answers aloud (0.6.2). Default off; voice questions are
+  /// always answered aloud.
+  bool get joiSpeak => _prefs.getBool(_kJoiSpeak) ?? false;
+
+  Future<void> setJoiSpeak(bool v) => _prefs.setBool(_kJoiSpeak, v);
 
   /// Index into GizliTheme.wallpapers for the vault home screen.
   int get wallpaper => _prefs.getInt(_kWallpaper) ?? 0;

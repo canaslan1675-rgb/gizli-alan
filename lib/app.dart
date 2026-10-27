@@ -165,7 +165,7 @@ class GizliAlanAppState extends State<GizliAlanApp>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final shouldLock = _lock.onLifecycle(
       state,
-      timeoutSec: settings.lockTimeoutSec,
+      timeoutSec: settings.effectiveLockTimeoutSec,
     );
     // An activity we launched (picker, share sheet, billing, work-profile
     // setup) is in front. Leaving for that must not lock; a real Home press

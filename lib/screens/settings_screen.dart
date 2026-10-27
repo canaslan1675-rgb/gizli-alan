@@ -589,6 +589,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
           },
         ),
       ),
+      SwitchListTile(
+        key: const ValueKey('settings_resume'),
+        secondary: const Icon(Icons.restore_page_outlined),
+        title: Text(t('resumeTitle')),
+        subtitle: Text(t('resumeHint')),
+        value: s.resumeWhereLeft,
+        onChanged: (v) async {
+          if (v) {
+            final ok = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                key: const ValueKey('resume_warning'),
+                title: Text(t('resumeWarnTitle')),
+                content: Text(t('resumeWarnBody')),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: Text(t('cancel')),
+                  ),
+                  FilledButton(
+                    key: const ValueKey('resume_warning_ok'),
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: Text(t('resumeWarnOk')),
+                  ),
+                ],
+              ),
+            );
+            if (ok != true) return;
+          }
+          await s.setResumeWhereLeft(v);
+          setState(() {});
+        },
+      ),
+      if (s.resumeWhereLeft)
+        ListTile(
+          key: const ValueKey('settings_resume_max'),
+          leading: const SizedBox(width: 24),
+          title: Text(t('resumeMax')),
+          trailing: DropdownButton<int>(
+            value: s.resumeMaxMin,
+            underline: const SizedBox(),
+            items: SettingsService.resumeMaxChoices
+                .map(
+                  (v) => DropdownMenuItem(
+                    value: v,
+                    child: Text(t('resumeMinutes').replaceAll('{n}', '$v')),
+                  ),
+                )
+                .toList(),
+            onChanged: (v) async {
+              await s.setResumeMaxMin(v ?? 5);
+              setState(() {});
+            },
+          ),
+        ),
       ListTile(
         leading: const Icon(Icons.language),
         title: Text(t('language')),
@@ -625,6 +680,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           t('analyticsPrivacyNotice'),
           style: Theme.of(context).textTheme.bodySmall,
         ),
+      ),
+      SwitchListTile(
+        key: const ValueKey('settings_joi_speak'),
+        secondary: const Icon(Icons.record_voice_over_outlined),
+        title: Text(t('joiSpeakSetting')),
+        subtitle: Text(t('joiSpeakSettingHint')),
+        value: s.joiSpeak,
+        onChanged: (v) async {
+          await s.setJoiSpeak(v);
+          setState(() {});
+        },
       ),
       SwitchListTile(
         key: const ValueKey('settings_joi_online'),

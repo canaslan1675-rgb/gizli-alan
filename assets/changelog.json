@@ -1,0 +1,21 @@
+{
+  "45": {
+    "version": "0.6.2",
+    "tr": [
+      "Joi asistan: Gemini Nano olmayan telefonlarda izinle çevrimiçi genel sorular",
+      "Joi fotoğraf indirir (Wikimedia Commons, serbest lisanslı) ve not defterine not yazar",
+      "Joi ile sesli sohbet: mikrofonla sor, yanıtları sesli dinle",
+      "Joi sohbet geçmişi kasada şifreli saklanır",
+      "Not hatırlatıcıları ve notlarda arama",
+      "İsteğe bağlı: çıkınca bıraktığın yerden devam et"
+    ],
+    "en": [
+      "Joi assistant: opt-in online general questions on phones without Gemini Nano",
+      "Joi downloads photos (Wikimedia Commons, freely licensed) and writes notes",
+      "Voice chat with Joi: ask with the mic, hear answers aloud",
+      "Joi chat history stored encrypted in the vault",
+      "Note reminders and note search",
+      "Optional: continue where you left off"
+    ]
+  }
+}

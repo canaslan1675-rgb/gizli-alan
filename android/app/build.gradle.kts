@@ -157,4 +157,7 @@ dependencies {
     // Debug provider: used only when built with JOI_APPCHECK_DEBUG_TOKEN
     // (sideloaded test APKs); the token must be registered in the console.
     implementation("com.google.firebase:firebase-appcheck-debug")
+
+    // Google Play In-App Updates (flexible), 0.6.2. No-op on sideloaded APKs.
+    implementation("com.google.android.play:app-update:2.1.0")
 }

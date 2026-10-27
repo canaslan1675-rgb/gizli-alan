@@ -19,6 +19,7 @@ import '../widgets/pro_gate.dart';
 import '../widgets/profile_app_tile.dart';
 import 'notes_list_screen.dart';
 import 'joi_screen.dart';
+import '../services/update_service.dart';
 import '../widgets/joi_avatar.dart';
 import 'note_edit_screen.dart';
 import 'notifications_screen.dart';
@@ -50,6 +51,11 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
     _clock = Timer.periodic(const Duration(seconds: 20), (_) {
       if (mounted) setState(() => _now = DateTime.now());
       _checkReminders();
+    });
+    // Play in-app update / what's new: only here, inside the opened vault
+    // (never on the calculator disguise). Silent on sideloaded builds.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) UpdateService().onVaultOpened(context);
     });
   }
 

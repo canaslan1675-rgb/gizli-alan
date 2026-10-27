@@ -1,3 +1,4 @@
+import 'joi_tools.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -56,6 +57,7 @@ class VaultSession {
     events = VaultEventLog(_files, File(p.join(dir.path, 'events.gae')));
     bookmarks = Bookmarks(_files, File(p.join(dir.path, 'bookmarks.gae')));
     recentApps = RecentApps(_files, File(p.join(dir.path, 'recent_apps.gae')));
+    joiChat = JoiChatStore(_files, File(p.join(dir.path, 'joi_chat.gae')));
     gallery = VaultStorage(
       _files,
       Directory(p.join(dir.path, 'gallery')),
@@ -78,6 +80,9 @@ class VaultSession {
   final EncryptedFiles _files;
 
   late final NotesRepository notes;
+
+  /// Joi chat history (0.6.2), encrypted, this space only.
+  late final JoiChatStore joiChat;
 
   /// Vault-only notification list of this space.
   late final VaultEventLog events;

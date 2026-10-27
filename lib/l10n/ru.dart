@@ -544,4 +544,77 @@ const Map<String, String> ru = {
   "joiModelErr":
       "Онлайн-модель Joi сейчас недоступна. Возможно, нужно обновить приложение.",
   "joiTileHint": "Ваш ассистент — спрашивайте, общайтесь, ищите в заметках",
+  "joiImgNeedsOnline":
+      "To search photos, allow Joi's online features (Settings → Joi online answers).",
+  "joiImgNone":
+      "No freely licensed photos found on Wikimedia Commons for \"{q}\".",
+  "joiImgFound":
+      "Freely licensed photos for \"{q}\" from Wikimedia Commons. Tap one to save:",
+  "joiImgError": "Photo search failed. Try again shortly.",
+  "joiImgSavePictures": "Save to gallery (Pictures/GizliAlan/Joi)",
+  "joiImgSaveVault": "Save to vault",
+  "joiImgSavedPictures": "Saved to the phone gallery (Pictures/GizliAlan/Joi):",
+  "joiImgSavedVault": "Saved to your vault:",
+  "joiImgCredit": "Author/licence",
+  "joiImgSaveFailed": "Couldn't save the photo.",
+  "joiNoteNeedsAi":
+      "Writing notes needs Joi's AI (Gemini Nano on device or online answers). To save your own text: \"write this to my notes: …\"",
+  "joiNoteTitle": "Joi note",
+  "joiNoteFailed": "Couldn't create the note.",
+  "joiNoteCreated": "I added the note \"{title}\" to your notes.",
+  "joiOpenNote": "Open note",
+  "joiMicTitle": "Microphone permission",
+  "joiMicBody":
+      "Joi needs the microphone to hear your question. Speech is turned into text by Android's speech service; GizliAlan doesn't store recordings.",
+  "joiMicContinue": "Continue",
+  "joiMicDenied":
+      "Microphone permission denied. You can allow it in Android settings.",
+  "joiMicError":
+      "Couldn't understand or speech recognition is unavailable. Try again.",
+  "joiMic": "Ask by voice",
+  "joiStopSpeaking": "Stop reading",
+  "joiSpeakToggle": "Read answers aloud",
+  "joiSpeakSetting": "Read Joi's answers aloud",
+  "joiSpeakSettingHint":
+      "When on, Joi reads its answers aloud. Questions asked by voice are always answered aloud.",
+  "joiClear": "Clear chat",
+  "joiClearBody":
+      "Your chat history with Joi will be deleted from this device. Your notes are not affected.",
+  "joiClearOk": "Clear",
+  "joiTry": "Try:",
+  "joiEx1": "Summarize Socrates' life into my notes",
+  "joiEx2": "Download a photo of Galata Tower",
+  "joiEx3": "Write a weekend shopping list to my notes",
+  "joiEx4": "Tell me a motivational quote",
+  "joiEx5": "Suggest 3 easy dinner recipes",
+  "joiEx6": "Find a photo of cats",
+  "joiExNotes": "Find notes that mention passwords",
+  "resumeTitle": "Continue where I left off",
+  "resumeHint":
+      "Off (recommended): leaving the app returns to the calculator. On: when you come back the vault stays open on the same screen (up to the chosen time; a phone restart always locks).",
+  "resumeWarnTitle": "Are you sure?",
+  "resumeWarnBody":
+      "Someone with access to your phone could find the vault open. It still locks after the chosen time in the background (default 5 minutes).",
+  "resumeWarnOk": "Turn on",
+  "resumeMax": "Stay open at most",
+  "resumeMinutes": "{n} min",
+  "updTitle": "New version available",
+  "updBody":
+      "A new version of GizliAlan ({v}) is ready on Google Play. The app restarts after the update is downloaded.",
+  "updUpdate": "Update",
+  "updLater": "Later",
+  "updSeeNotes": "See what's new on Play Store",
+  "updReady": "Update downloaded. Restart to install.",
+  "updRestart": "Restart",
+  "updWhatsNew": "What's new in this version",
+  "updOk": "OK",
+  "joiProTitle": "Joi in Pro",
+  "joiProBody":
+      "In the free version you can chat with Joi (questions and answers). Writing notes, downloading photos, voice chat, note search/summaries and saved chat history come with GizliAlan Pro.",
+  "joiProOnly":
+      "{what} is a GizliAlan Pro feature. In the free version you can chat with me (Q&A).",
+  "joiProPhotos": "Photo download",
+  "joiProWrite": "Writing to notes",
+  "joiProVoice": "Voice chat",
+  "joiProNotes": "Note search and summaries",
 };

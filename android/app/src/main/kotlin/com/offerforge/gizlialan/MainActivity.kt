@@ -26,6 +26,8 @@ class MainActivity : FlutterFragmentActivity() {
     private var browserChannel: MethodChannel? = null
     private var tiktokChannel: MethodChannel? = null
     private var joiChannel: JoiChannel? = null
+    private var voiceChannel: VoiceChannel? = null
+    private var updateChannel: UpdateChannel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(
@@ -42,6 +44,8 @@ class MainActivity : FlutterFragmentActivity() {
         browserChannel = BrowserChannel.attach(flutterEngine)
         tiktokChannel = TikTokChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         joiChannel = JoiChannel.attach(applicationContext, flutterEngine.dartExecutor.binaryMessenger)
+        updateChannel = UpdateChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
+        voiceChannel = VoiceChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         flavorFeature = FlavorFeatures.attach(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
@@ -56,6 +60,10 @@ class MainActivity : FlutterFragmentActivity() {
         tiktokChannel = null
         joiChannel?.dispose()
         joiChannel = null
+        voiceChannel?.dispose()
+        voiceChannel = null
+        updateChannel?.dispose()
+        updateChannel = null
         flavorFeature?.dispose()
         flavorFeature = null
         super.cleanUpFlutterEngine(flutterEngine)
@@ -67,5 +75,14 @@ class MainActivity : FlutterFragmentActivity() {
         if (flavorFeature?.onActivityResult(requestCode, resultCode, data) == true) return
         @Suppress("DEPRECATION")
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        if (voiceChannel?.onPermissionResult(requestCode, grantResults) == true) return
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

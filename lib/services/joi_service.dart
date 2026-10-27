@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'joi_tools.dart';
+
 import '../models/note.dart';
 
 /// Availability of Gemini Nano (AICore) on this device.
@@ -150,7 +152,7 @@ class JoiOnlineBackend implements JoiBackend {
   final JoiOnlineConfig config;
   final bool Function() hasConsent;
 
-  static const int maxQuestionChars = 500;
+  static const int maxQuestionChars = 1000;
 
   /// Error of the last failed [generate] call (null after success).
   JoiOnlineError? lastError;
@@ -191,6 +193,7 @@ class JoiOnlineBackend implements JoiBackend {
     String prompt, {
     String lang = 'tr',
     void Function(String partial)? onPartial,
+    List<Map<String, String>> history = const [],
   }) async {
     lastError = null;
     lastDetail = null;
@@ -223,6 +226,10 @@ class JoiOnlineBackend implements JoiBackend {
         'system': JoiService.onlineSystemPrompt(lang),
         'question': q,
         'id': id,
+        'history': [
+          for (final h in history)
+            if (!(h['text'] ?? '').contains(JoiService.notesMarker)) h,
+        ],
       });
       final s = r?.trim();
       if (s == null || s.isEmpty) {
@@ -352,11 +359,17 @@ class JoiService {
     required String lang,
     List<Note> notes = const [],
     void Function(String partial)? onPartial,
+    List<Map<String, String>> history = const [],
   }) async {
     if (_active == null) await status();
     final a = _active;
     if (a is JoiOnlineBackend) {
-      final r = await a.generate(question, lang: lang, onPartial: onPartial);
+      final r = await a.generate(
+        question,
+        lang: lang,
+        onPartial: onPartial,
+        history: history,
+      );
       return JoiAnswer(
         r,
         online: true,
@@ -367,6 +380,26 @@ class JoiService {
     if (a == null) return const JoiAnswer(null, online: false);
     return JoiAnswer(
       await a.generate(chatPrompt(question, lang: lang, notes: notes)),
+      online: false,
+    );
+  }
+
+  /// Generates the text for a new note ([JoiWriteNote.request]). Only the
+  /// user's request is used — never existing notes. Nano on the device if
+  /// available, otherwise the online backend (consent checked there).
+  Future<JoiAnswer> writeNoteText(
+    JoiWriteNote w, {
+    required String lang,
+    void Function(String partial)? onPartial,
+  }) async {
+    if (_active == null) await status();
+    final a = _active;
+    if (a is JoiOnlineBackend) {
+      return ask(w.prompt(), lang: lang, onPartial: onPartial);
+    }
+    if (a == null) return const JoiAnswer(null, online: false);
+    return JoiAnswer(
+      await a.generate('${systemPrompt(lang)}\n\n${w.prompt()}\nJoi:'),
       online: false,
     );
   }
@@ -384,7 +417,11 @@ class JoiService {
       'GizliAlan\'ın asistanıyım." de. Asla Gemini, Google ya da başka bir '
       'model olduğunu söyleme; insan olduğunu iddia etme. Varsayılan dil '
       '${languageName(lang) == 'Turkish' ? 'Türkçe' : languageName(lang)}; '
-      'kullanıcı başka dilde yazarsa o dilde yanıtla. Bilmiyorsan uydurma.';
+      'kullanıcı başka dilde yazarsa o dilde yanıtla. Bilmiyorsan uydurma. '
+      'Uygulamada şunları yapabilirsin: Wikimedia Commons\'tan serbest '
+      'lisanslı fotoğraf bulup indirmek ("X\'in fotoğrafını indir"), not '
+      'defterine yeni not yazmak ("not defterime ... yaz"), sesli sohbet. '
+      'Bunlar sorulursa kısaca anlat.';
 
   /// On-device (Gemini Nano) prompt.
   static String systemPrompt(String lang) =>
@@ -496,5 +533,117 @@ class JoiNoteSearch {
       }
     }
     return body.length > width ? '${body.substring(0, width)}…' : body;
+  }
+}
+
+/// Joi actions that need the platform (0.6.2): save a picture to the
+/// phone's gallery (MediaStore, Pictures/GizliAlan/Joi, Android 10+).
+class JoiPlatform {
+  const JoiPlatform({MethodChannel? channel})
+    : _ch = channel ?? const MethodChannel('gizlialan/joi');
+  final MethodChannel _ch;
+
+  Future<bool> canSaveToPictures() async {
+    try {
+      return await _ch.invokeMethod<bool>('canSaveToPictures') ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Content URI string, or null on failure.
+  Future<String?> saveToPictures(
+    Uint8List bytes, {
+    required String name,
+    required String mime,
+    required String description,
+  }) async {
+    try {
+      return await _ch.invokeMethod<String>('saveToPictures', {
+        'bytes': bytes,
+        'name': name,
+        'mime': mime,
+        'description': description,
+      });
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+/// Joi voice (0.6.2): system SpeechRecognizer + TextToSpeech
+/// (VoiceChannel.kt). Audio is processed by the system speech service;
+/// GizliAlan never records or stores audio.
+class JoiVoice {
+  JoiVoice({MethodChannel? channel})
+    : _ch = channel ?? const MethodChannel('gizlialan/voice');
+  final MethodChannel _ch;
+  void Function(String partial)? onPartial;
+  bool _hooked = false;
+
+  static String localeFor(String lang) => switch (lang) {
+    'en' => 'en-US',
+    'ru' => 'ru-RU',
+    _ => 'tr-TR',
+  };
+
+  void _hook() {
+    if (_hooked) return;
+    _hooked = true;
+    try {
+      _ch.setMethodCallHandler((c) async {
+        if (c.method == 'partial') {
+          onPartial?.call(((c.arguments as Map)['text'] ?? '').toString());
+        }
+      });
+    } catch (_) {}
+  }
+
+  Future<bool> hasPermission() async {
+    try {
+      return await _ch.invokeMethod<bool>('hasMicPermission') ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> requestPermission() async {
+    try {
+      return await _ch.invokeMethod<bool>('requestMicPermission') ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Recognised text; null = nothing heard. Throws [PlatformException]
+  /// with code offline / unavailable / no_permission / error_*.
+  Future<String?> listen(String lang) async {
+    _hook();
+    return _ch.invokeMethod<String>('listen', {'lang': localeFor(lang)});
+  }
+
+  Future<void> stopListening() async {
+    try {
+      await _ch.invokeMethod('stopListening');
+    } catch (_) {}
+  }
+
+  /// Completes when speaking ends (true = finished normally).
+  Future<bool> speak(String text, String lang) async {
+    try {
+      return await _ch.invokeMethod<bool>('speak', {
+            'text': text,
+            'lang': localeFor(lang),
+          }) ??
+          false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> stopSpeaking() async {
+    try {
+      await _ch.invokeMethod('stopSpeaking');
+    } catch (_) {}
   }
 }

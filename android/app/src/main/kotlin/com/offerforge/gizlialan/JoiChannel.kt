@@ -158,6 +158,7 @@ class JoiChannel private constructor(
     private suspend fun streamAnswer(
         id: Int, models: List<String>, apiKey: String, appId: String,
         projectId: String, system: String, debugToken: String, question: String,
+        history: List<Map<String, String>> = emptyList(),
     ): String {
         var last: Throwable? = null
         val tried = ArrayList<String>()
@@ -174,7 +175,12 @@ class JoiChannel private constructor(
                             delay(FIRST_TOKEN_MS)
                             if (!gotFirst) throw FirstTokenTimeout()
                         }
-                        m.generateContentStream(question).collect { r ->
+                        val contents = history.map { h ->
+                            content(role = if (h["role"] == "model") "model" else "user") {
+                                text(h["text"] ?: "")
+                            }
+                        } + content(role = "user") { text(question) }
+                        m.generateContentStream(contents).collect { r ->
                             val piece = r.text ?: ""
                             if (piece.isNotEmpty()) {
                                 gotFirst = true
@@ -248,6 +254,40 @@ class JoiChannel private constructor(
                         }
                     }
                 }
+                "canSaveToPictures" -> result.success(android.os.Build.VERSION.SDK_INT >= 29)
+                "saveToPictures" -> {
+                    // MediaStore, Pictures/GizliAlan/Joi. Android 10+ only (no
+                    // storage permission needed); older versions: vault only.
+                    val bytes = call.argument<ByteArray>("bytes")
+                    val name = call.argument<String>("name") ?: "joi.jpg"
+                    val mime = call.argument<String>("mime") ?: "image/jpeg"
+                    val desc = call.argument<String>("description") ?: ""
+                    if (android.os.Build.VERSION.SDK_INT < 29 || bytes == null) {
+                        result.error("unsupported", null, null)
+                    } else {
+                        try {
+                            val cr = context.contentResolver
+                            val v = android.content.ContentValues().apply {
+                                put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, name)
+                                put(android.provider.MediaStore.Images.Media.MIME_TYPE, mime)
+                                put(android.provider.MediaStore.Images.Media.DESCRIPTION, desc.take(1000))
+                                put(android.provider.MediaStore.Images.Media.RELATIVE_PATH, "Pictures/GizliAlan/Joi")
+                                put(android.provider.MediaStore.Images.Media.IS_PENDING, 1)
+                            }
+                            val uri = cr.insert(
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v,
+                            ) ?: throw IOException("insert failed")
+                            cr.openOutputStream(uri)?.use { it.write(bytes) }
+                                ?: throw IOException("open failed")
+                            v.clear()
+                            v.put(android.provider.MediaStore.Images.Media.IS_PENDING, 0)
+                            cr.update(uri, v, null, null)
+                            result.success(uri.toString())
+                        } catch (t: Throwable) {
+                            result.error("failed", t.javaClass.simpleName, null)
+                        }
+                    }
+                }
                 "onlineGenerate" -> {
                     val apiKey = call.argument<String>("apiKey") ?: ""
                     val appId = call.argument<String>("appId") ?: ""
@@ -258,7 +298,9 @@ class JoiChannel private constructor(
                     )
                     val debugToken = call.argument<String>("appCheckDebugToken") ?: ""
                     val system = call.argument<String>("system") ?: ""
-                    val question = (call.argument<String>("question") ?: "").take(500)
+                    val question = (call.argument<String>("question") ?: "").take(1000)
+                    val history = (call.argument<List<Map<String, String>>>("history") ?: emptyList())
+                        .takeLast(20)
                     val id = call.argument<Int>("id") ?: 0
                     if (apiKey.isEmpty() || appId.isEmpty() || projectId.isEmpty() || question.isBlank()) {
                         result.error("failed", "not_configured", null)
@@ -266,7 +308,7 @@ class JoiChannel private constructor(
                         scope.launch {
                             try {
                                 result.success(
-                                    streamAnswer(id, models, apiKey, appId, projectId, system, debugToken, question),
+                                    streamAnswer(id, models, apiKey, appId, projectId, system, debugToken, question, history),
                                 )
                             } catch (f: JoiOnlineFailure) {
                                 result.error(f.code, f.detail, null)

@@ -251,7 +251,8 @@ void main() {
     // Only the default wallpaper + Joi's own portrait (0.6.2).
     expect(
       RegExp('assets/').allMatches(pubspec).length -
-          RegExp('assets/joi/').allMatches(pubspec).length,
+          RegExp('assets/joi/').allMatches(pubspec).length -
+          RegExp('assets/changelog').allMatches(pubspec).length,
       1,
     );
     expect(

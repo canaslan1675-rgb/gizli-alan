@@ -598,4 +598,78 @@ const Map<String, String> tr = {
   "joiModelErr":
       "Joi'nin çevrimiçi modeli şu an kullanılamıyor. Uygulama güncellemesi gerekebilir.",
   "joiTileHint": "Asistanın — sor, sohbet et, notlarında ara",
+  "joiImgNeedsOnline":
+      "Fotoğraf aramak için çevrimiçi özelliklere izin vermen gerekiyor (Ayarlar → Joi çevrimiçi yanıtlar).",
+  "joiImgNone":
+      "\"{q}\" için Wikimedia Commons'ta serbest lisanslı fotoğraf bulamadım.",
+  "joiImgFound":
+      "\"{q}\" için Wikimedia Commons'tan serbest lisanslı fotoğraflar. Kaydetmek için birine dokun:",
+  "joiImgError": "Fotoğraf araması şu an yapılamadı. Biraz sonra tekrar dene.",
+  "joiImgSavePictures": "Galeriye kaydet (Resimler/GizliAlan/Joi)",
+  "joiImgSaveVault": "Kasaya kaydet",
+  "joiImgSavedPictures":
+      "Telefonun galerisine kaydedildi (Resimler/GizliAlan/Joi):",
+  "joiImgSavedVault": "Kasana kaydedildi:",
+  "joiImgCredit": "Yazar/lisans",
+  "joiImgSaveFailed": "Fotoğraf kaydedilemedi.",
+  "joiNoteNeedsAi":
+      "Not yazmak için Joi'nin yapay zekâsı gerekiyor (cihazda Gemini Nano veya çevrimiçi yanıtlar). Kendi metnini kaydetmek için: \"not defterime şunu yaz: …\"",
+  "joiNoteTitle": "Joi notu",
+  "joiNoteFailed": "Not oluşturulamadı.",
+  "joiNoteCreated": "Not defterine \"{title}\" notunu ekledim.",
+  "joiOpenNote": "Notu aç",
+  "joiMicTitle": "Mikrofon izni",
+  "joiMicBody":
+      "Joi'ye sesli soru sorabilmen için mikrofon izni gerekiyor. Ses, Android'in konuşma tanıma hizmetinde yazıya çevrilir; GizliAlan ses kaydı saklamaz.",
+  "joiMicContinue": "Devam",
+  "joiMicDenied":
+      "Mikrofon izni verilmedi. Sesli soru için Android ayarlarından izin verebilirsin.",
+  "joiMicError":
+      "Ses anlaşılamadı ya da konuşma tanıma kullanılamıyor. Tekrar dene.",
+  "joiMic": "Sesli sor",
+  "joiStopSpeaking": "Okumayı durdur",
+  "joiSpeakToggle": "Yanıtları sesli oku",
+  "joiSpeakSetting": "Joi yanıtlarını sesli oku",
+  "joiSpeakSettingHint":
+      "Açıkken Joi yanıtlarını Türkçe okur. Sesli sorduğun sorular her zaman sesli yanıtlanır.",
+  "joiClear": "Sohbeti temizle",
+  "joiClearBody":
+      "Joi ile olan sohbet geçmişi bu cihazdan silinecek. Notların etkilenmez.",
+  "joiClearOk": "Temizle",
+  "joiTry": "Şunları deneyebilirsin:",
+  "joiEx1": "Sokrates'in hayatını not defterime özetle",
+  "joiEx2": "Galata Kulesi'nin fotoğrafını indir",
+  "joiEx3": "Not defterime hafta sonu için market listesi yaz",
+  "joiEx4": "Bana bir motivasyon sözü söyle",
+  "joiEx5": "Akşam yemeği için 3 kolay tarif öner",
+  "joiEx6": "Kedilerin fotoğrafını bul",
+  "joiExNotes": "Notlarımda şifre geçenleri bul",
+  "resumeTitle": "Çıkınca bıraktığım yerden devam et",
+  "resumeHint":
+      "Kapalı (önerilen): uygulamadan çıkınca hesap makinesine döner. Açık: geri geldiğinde kasa aynı ekranda açık kalır (en fazla seçilen süre kadar; telefon yeniden başlarsa yine kilitlenir).",
+  "resumeWarnTitle": "Emin misin?",
+  "resumeWarnBody":
+      "Telefonuna erişen biri kasayı açık bulabilir. Kasa, arka planda seçtiğin süreden (varsayılan 5 dakika) uzun kalınca yine kilitlenir.",
+  "resumeWarnOk": "Aç",
+  "resumeMax": "En fazla açık kalma süresi",
+  "resumeMinutes": "{n} dk",
+  "updTitle": "Yeni sürüm mevcut",
+  "updBody":
+      "GizliAlan'ın yeni bir sürümü ({v}) Google Play'de hazır. Güncelleme indirildikten sonra uygulama yeniden başlar.",
+  "updUpdate": "Güncelle",
+  "updLater": "Daha sonra",
+  "updSeeNotes": "Play Store'da yenilikleri gör",
+  "updReady": "Güncelleme indirildi. Yüklemek için yeniden başlat.",
+  "updRestart": "Yeniden başlat",
+  "updWhatsNew": "Bu sürümde yenilikler",
+  "updOk": "Tamam",
+  "joiProTitle": "Joi Pro'da",
+  "joiProBody":
+      "Ücretsiz sürümde Joi ile soru-cevap sohbeti yapabilirsin. Not yazma, fotoğraf indirme, sesli sohbet, notlarında arama/özet ve kalıcı sohbet geçmişi GizliAlan Pro ile açılır.",
+  "joiProOnly":
+      "{what} GizliAlan Pro'ya özel. Ücretsiz sürümde benimle soru-cevap sohbeti yapabilirsin.",
+  "joiProPhotos": "Fotoğraf indirme",
+  "joiProWrite": "Not defterine yazma",
+  "joiProVoice": "Sesli sohbet",
+  "joiProNotes": "Notlarında arama ve özet",
 };
