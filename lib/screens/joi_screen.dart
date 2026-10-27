@@ -29,6 +29,7 @@ class _Msg {
     this.images = const [],
     this.saveFirst = false,
     this.memory = false,
+    this.voiceHelp = false,
   });
 
   factory _Msg.fromChat(JoiChatMsg c) => _Msg(
@@ -56,6 +57,9 @@ class _Msg {
 
   /// Wikimedia Commons results (not persisted).
   final List<CommonsImage> images;
+
+  /// Show buttons to install Google speech services (Play).
+  final bool voiceHelp;
 
   /// "Joi bunu hatırladı" chip (text = the saved facts).
   final bool memory;
@@ -897,7 +901,14 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
       heard = await _voice.listen(L10n.lang);
     } on PlatformException catch (e) {
       if (mounted) {
-        _add(_Msg(false, voiceErrorText(t, e.code), debug: 'voice:${e.code}'));
+        _add(
+          _Msg(
+            false,
+            voiceErrorText(t, e.code),
+            debug: 'voice: ${e.message ?? e.code}',
+            voiceHelp: e.code == 'no_service' || e.code == 'unavailable',
+          ),
+        );
       }
     } catch (_) {}
     if (!mounted) return;
@@ -1139,6 +1150,26 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
                 label: Text(t('joiOpenNote')),
                 onPressed: () => _openNote(m.noteId!),
               ),
+            ),
+          if (m.voiceHelp)
+            Wrap(
+              spacing: 8,
+              children: [
+                TextButton.icon(
+                  key: const ValueKey('joi_voice_open_google'),
+                  icon: const Icon(Icons.shop_outlined, size: 18),
+                  label: Text(t('joiVoiceOpenGoogle')),
+                  onPressed: () => _voice.openStore(
+                    'com.google.android.googlequicksearchbox',
+                  ),
+                ),
+                TextButton.icon(
+                  key: const ValueKey('joi_voice_open_speech'),
+                  icon: const Icon(Icons.shop_outlined, size: 18),
+                  label: Text(t('joiVoiceOpenSpeech')),
+                  onPressed: () => _voice.openStore('com.google.android.tts'),
+                ),
+              ],
             ),
           if (m.saveFirst && m.images.isNotEmpty)
             Padding(
@@ -1511,12 +1542,23 @@ class _ProBadge extends StatelessWidget {
 }
 
 /// Turkish/EN message per speech-recognition error code (VoiceChannel.kt).
-String voiceErrorText(L10n t, String code) => switch (code) {
-  'no_match' => t('joiVoiceNoMatch'),
-  'offline' => t('joiVoiceOffline'),
-  'no_permission' => t('joiMicDenied'),
-  'busy' => t('joiVoiceBusy'),
-  'language' => t('joiVoiceLanguage'),
-  'unavailable' => t('joiVoiceUnavailable'),
-  _ => t('joiMicError'),
-};
+/// Turkish message for a voice error; numeric recogniser errors ("e7")
+/// get a distinct text plus "(kod 7)" so bug reports show the cause.
+String voiceErrorText(L10n t, String code) {
+  final m = RegExp(r'^e(\d+)$').firstMatch(code);
+  if (m != null) {
+    final n = int.parse(m.group(1)!);
+    final key = (n >= 1 && n <= 13) ? 'joiVoiceE$n' : 'joiVoiceEOther';
+    return '${t(key)} (${t('joiVoiceCode')} $n)';
+  }
+  return switch (code) {
+    'no_match' => t('joiVoiceNoMatch'),
+    'offline' => t('joiVoiceOffline'),
+    'no_permission' => t('joiMicDenied'),
+    'busy' => t('joiVoiceBusy'),
+    'language' => t('joiVoiceLanguage'),
+    'unavailable' || 'no_service' => t('joiVoiceNoService'),
+    'dialog_cancel' => t('joiVoiceDialogCancel'),
+    _ => '${t('joiMicError')} (${t('joiVoiceCode')} $code)',
+  };
+}

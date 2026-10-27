@@ -72,6 +72,7 @@ class MainActivity : FlutterFragmentActivity() {
     @Deprecated("Needed to receive provisioning / cross-profile results")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (ImportChannel.onActivityResult(this, requestCode, resultCode, data)) return
+        if (voiceChannel?.onActivityResult(requestCode, resultCode, data) == true) return
         if (flavorFeature?.onActivityResult(requestCode, resultCode, data) == true) return
         @Suppress("DEPRECATION")
         super.onActivityResult(requestCode, resultCode, data)

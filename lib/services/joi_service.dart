@@ -774,6 +774,17 @@ class JoiVoice {
     } catch (_) {}
   }
 
+  /// Opens the Play page of a speech package (Google app / Speech
+  /// Recognition & Synthesis).
+  Future<bool> openStore(String package) async {
+    try {
+      return await _ch.invokeMethod<bool>('openStore', {'package': package}) ??
+          false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Completes when speaking ends (true = finished normally).
   Future<bool> speak(String text, String lang) async {
     try {

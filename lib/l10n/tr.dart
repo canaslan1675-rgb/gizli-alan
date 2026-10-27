@@ -716,4 +716,31 @@ const Map<String, String> tr = {
   "joiMemoryCat_event": "Olaylar",
   "joiMemoryCat_other": "Diğer",
   "joiMemoryDelete": "Sil",
+  "joiVoiceE1":
+      "Konuşma tanıma sunucusuna ulaşılamadı (zaman aşımı). İnternetini kontrol et.",
+  "joiVoiceE2":
+      "Konuşma tanıma için internet bağlantısı gerekiyor. Bağlantını kontrol et.",
+  "joiVoiceE3":
+      "Mikrofondan ses alınamadı. Başka bir uygulama mikrofonu kullanıyor olabilir.",
+  "joiVoiceE4": "Konuşma tanıma sunucusu hata verdi. Biraz sonra tekrar dene.",
+  "joiVoiceE5": "Konuşma tanıma hizmeti başlatılamadı (istemci hatası).",
+  "joiVoiceE6":
+      "Hiç konuşma duyulmadı. Mikrofona dokunduktan sonra hemen konuş.",
+  "joiVoiceE7":
+      "Ses anlaşılamadı. Biraz daha yakın ve net konuşup tekrar dene.",
+  "joiVoiceE8": "Konuşma tanıma meşgul. Bir saniye sonra tekrar dene.",
+  "joiVoiceE9":
+      "Konuşma tanıma uygulamasının (Google) mikrofon izni yok. Ayarlar → Uygulamalar → Google → İzinler → Mikrofon'u aç.",
+  "joiVoiceE10": "Çok fazla istek gönderildi. Biraz bekleyip tekrar dene.",
+  "joiVoiceE11": "Konuşma tanıma hizmetiyle bağlantı koptu. Tekrar dene.",
+  "joiVoiceE12": "Türkçe bu konuşma tanıma hizmetinde desteklenmiyor.",
+  "joiVoiceE13":
+      "Türkçe ses paketi şu an kullanılamıyor. Google uygulamasında Türkçe konuşma tanımayı indir.",
+  "joiVoiceEOther": "Konuşma tanıma hata verdi.",
+  "joiVoiceCode": "kod",
+  "joiVoiceNoService":
+      "Bu telefonda konuşma tanıma bulunamadı. 'Google' uygulaması veya 'Speech Recognition & Synthesis' (Google Konuşma Hizmetleri) gerekiyor.",
+  "joiVoiceOpenGoogle": "Google uygulamasını aç (Play)",
+  "joiVoiceOpenSpeech": "Konuşma Hizmetleri'ni aç (Play)",
+  "joiVoiceDialogCancel": "Sesli giriş iptal edildi.",
 };

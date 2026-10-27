@@ -2,11 +2,17 @@ package com.offerforge.gizlialan
 
 import android.Manifest
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.provider.Settings
 import android.speech.RecognitionListener
+import android.speech.RecognitionService
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
@@ -37,7 +43,6 @@ class VoiceChannel private constructor(
     private var recognizer: SpeechRecognizer? = null
     private var listenResult: MethodChannel.Result? = null
     private var lastPartial: String? = null
-    private var triedFallback = false
     private var permResult: MethodChannel.Result? = null
     private var tts: TextToSpeech? = null
     private var ttsReady = false
@@ -60,13 +65,15 @@ class VoiceChannel private constructor(
                 }
                 "isRecognitionAvailable" ->
                     result.success(SpeechRecognizer.isRecognitionAvailable(activity))
-                "listen" -> {
-                    triedFallback = false
-                    listen(call.argument<String>("lang") ?: "tr-TR", result, onDevice = false)
-                }
+                "listen" -> startSession(call.argument<String>("lang") ?: "tr-TR", result)
                 "stopListening" -> {
+                    userStopped = true
                     try { recognizer?.stopListening() } catch (_: Throwable) {}
                     result.success(null)
+                }
+                "openStore" -> {
+                    val pkg = call.argument<String>("package") ?: "com.google.android.googlequicksearchbox"
+                    result.success(openStore(pkg))
                 }
                 "speak" -> speak(
                     call.argument<String>("text") ?: "",
@@ -95,36 +102,110 @@ class VoiceChannel private constructor(
         return true
     }
 
-    private fun listen(lang: String, result: MethodChannel.Result, onDevice: Boolean) {
+    // ------------------------------------------------------------ listening
+    private var attempts: List<VoicePlan.Attempt> = emptyList()
+    private var attemptIdx = 0
+    private var lang = "tr-TR"
+    private var trail = mutableListOf<String>()
+    private var startedAt = 0L
+    private var speechBegan = false
+    private var userStopped = false
+    private var session = 0
+    private val main = Handler(Looper.getMainLooper())
+
+    private fun googleComponent(): ComponentName? = try {
+        val def = Settings.Secure.getString(activity.contentResolver, "voice_recognition_service")
+            ?.let { ComponentName.unflattenFromString(it) }
+        @Suppress("DEPRECATION")
+        val services = activity.packageManager.queryIntentServices(
+            Intent(RecognitionService.SERVICE_INTERFACE), 0,
+        )
+        services.map { ComponentName(it.serviceInfo.packageName, it.serviceInfo.name) }
+            .filter { it.packageName in GOOGLE_PACKAGES && it != def }
+            .sortedBy { GOOGLE_PACKAGES.indexOf(it.packageName) }
+            .firstOrNull()
+    } catch (_: Throwable) { null }
+
+    private fun dialogIntent(lang: String) = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang)
+        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+        putExtra(RecognizerIntent.EXTRA_PROMPT, "Joi")
+    }
+
+    private fun hasDialog() = try {
+        dialogIntent(lang).resolveActivity(activity.packageManager) != null
+    } catch (_: Throwable) { false }
+
+    /** Starts a voice session: tries the recognisers in [VoicePlan] order. */
+    private fun startSession(lang: String, result: MethodChannel.Result) {
         if (!hasMic()) { result.error("no_permission", null, null); return }
-        val anyRecognizer = SpeechRecognizer.isRecognitionAvailable(activity) ||
-            (Build.VERSION.SDK_INT >= 31 && SpeechRecognizer.isOnDeviceRecognitionAvailable(activity))
-        if (!anyRecognizer) {
-            result.error("unavailable", null, null); return
-        }
-        // No default recogniser but an on-device one: use that directly.
-        val useOnDevice = onDevice || !SpeechRecognizer.isRecognitionAvailable(activity)
+        // TTS holds audio focus: stop it before listening.
+        try { tts?.stop() } catch (_: Throwable) {}
+        finishSpeak(false)
         if (listenResult !== result) listenResult?.success(null)
         listenResult = result
+        this.lang = lang
+        session++
+        trail = mutableListOf()
+        val hasDefault = SpeechRecognizer.isRecognitionAvailable(activity)
+        val onDevice = Build.VERSION.SDK_INT >= 31 &&
+            try { SpeechRecognizer.isOnDeviceRecognitionAvailable(activity) } catch (_: Throwable) { false }
+        val google = googleComponent()
+        attempts = VoicePlan.attempts(google != null, onDevice, hasDialog())
+            .filter { hasDefault || it == VoicePlan.Attempt.GOOGLE || it == VoicePlan.Attempt.ON_DEVICE || it == VoicePlan.Attempt.DIALOG }
+        attemptIdx = 0
+        if (attempts.isEmpty()) {
+            listenResult = null
+            result.error("no_service", "no recogniser, no dialog", null)
+            return
+        }
+        runAttempt(google)
+    }
+
+    private fun nextAttempt(google: ComponentName?, why: String) {
+        trail.add(why)
+        attemptIdx++
+        val my = session
+        try { recognizer?.destroy() } catch (_: Throwable) {}
+        recognizer = null
+        if (attemptIdx >= attempts.size) {
+            val last = why.substringAfter(':')
+            finishListenError(if (last.startsWith("e")) last else "error", trail.joinToString(" > "))
+            return
+        }
+        // Give the speech service a moment after destroy() before recreating.
+        main.postDelayed({ if (my == session && listenResult != null) runAttempt(google) }, 250)
+    }
+
+    private fun runAttempt(google: ComponentName?) {
+        val a = attempts[attemptIdx]
+        val tag = a.name.lowercase()
+        if (a == VoicePlan.Attempt.DIALOG) {
+            try {
+                @Suppress("DEPRECATION")
+                activity.startActivityForResult(dialogIntent(lang), REQ_DIALOG)
+                trail.add("dialog")
+            } catch (_: Throwable) {
+                trail.add("dialog:none")
+                finishListenError("no_service", trail.joinToString(" > "))
+            }
+            return
+        }
+        speechBegan = false
+        userStopped = false
         lastPartial = null
         try {
-            recognizer?.destroy()
-            // test6 used the on-device recogniser first; on phones without
-            // the Turkish offline model it fails (language unavailable /
-            // no match). Now: the system default recogniser (Google speech
-            // services, which itself uses offline models when installed);
-            // on-device only as a fallback when the default is unavailable.
-            val r = if (useOnDevice && Build.VERSION.SDK_INT >= 31 &&
-                SpeechRecognizer.isOnDeviceRecognitionAvailable(activity)
-            ) {
-                SpeechRecognizer.createOnDeviceSpeechRecognizer(activity)
-            } else {
-                SpeechRecognizer.createSpeechRecognizer(activity)
+            try { recognizer?.destroy() } catch (_: Throwable) {}
+            val r = when (a) {
+                VoicePlan.Attempt.GOOGLE -> SpeechRecognizer.createSpeechRecognizer(activity, google)
+                VoicePlan.Attempt.ON_DEVICE -> SpeechRecognizer.createOnDeviceSpeechRecognizer(activity)
+                else -> SpeechRecognizer.createSpeechRecognizer(activity)
             }
             recognizer = r
             r.setRecognitionListener(object : RecognitionListener {
                 override fun onReadyForSpeech(p: Bundle?) {}
-                override fun onBeginningOfSpeech() {}
+                override fun onBeginningOfSpeech() { speechBegan = true }
                 override fun onRmsChanged(v: Float) {}
                 override fun onBufferReceived(b: ByteArray?) {}
                 override fun onEndOfSpeech() {}
@@ -133,65 +214,83 @@ class VoiceChannel private constructor(
                     val s = p?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
                     if (!s.isNullOrBlank()) {
                         lastPartial = s
+                        speechBegan = true
                         channel.invokeMethod("partial", mapOf("text" to s))
                     }
                 }
                 override fun onResults(p: Bundle?) {
+                    if (recognizer !== r) return
                     val s = p?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
                     finishListen(if (s.isNullOrBlank()) lastPartial else s)
                 }
                 override fun onError(error: Int) {
-                    // Whatever was heard so far wins over an error at the end
-                    // (e.g. released the button → NO_MATCH after partials).
+                    if (recognizer !== r) return
                     val heard = lastPartial
                     if (!heard.isNullOrBlank()) { finishListen(heard); return }
-                    val langErr = error == 12 || error == 13 // LANGUAGE_NOT_SUPPORTED / UNAVAILABLE
-                    if (!triedFallback && (langErr || error == SpeechRecognizer.ERROR_CLIENT ||
-                            error == SpeechRecognizer.ERROR_SERVER || error == 11 /* SERVER_DISCONNECTED */)
-                    ) {
-                        // Retry once with the other recogniser.
-                        triedFallback = true
-                        val res = listenResult ?: return
-                        activity.runOnUiThread { listen(lang, res, onDevice = !useOnDevice) }
+                    val elapsed = System.currentTimeMillis() - startedAt
+                    if (userStopped) {
+                        // Released / tapped again before anything was heard.
+                        finishListenError(VoicePlan.code(error), (trail + "$tag:${VoicePlan.code(error)}").joinToString(" > "))
                         return
                     }
-                    when (error) {
-                        SpeechRecognizer.ERROR_NO_MATCH,
-                        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> finishListenError("no_match")
-                        SpeechRecognizer.ERROR_NETWORK,
-                        SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> finishListenError("offline")
-                        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> finishListenError("no_permission")
-                        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> finishListenError("busy")
-                        12, 13 -> finishListenError("language")
-                        else -> finishListenError("error_$error")
+                    if (VoicePlan.shouldFallback(error, speechBegan, elapsed)) {
+                        nextAttempt(google, "$tag:${VoicePlan.code(error)}")
+                    } else {
+                        trail.add("$tag:${VoicePlan.code(error)}")
+                        finishListenError(VoicePlan.code(error), trail.joinToString(" > "))
                     }
                 }
             })
             val i = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang)
+                if (a != VoicePlan.Attempt.NO_LANG) {
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang)
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, lang)
+                }
                 putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, lang)
                 putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-                // Hold-to-talk: don't cut off after short pauses.
-                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2500L)
-                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2000L)
-                putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 1500L)
+                putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity.packageName)
+                // No EXTRA_PREFER_OFFLINE and no silence-length extras: some
+                // recognisers reject them and fail instantly.
             }
+            startedAt = System.currentTimeMillis()
             r.startListening(i)
         } catch (t: Throwable) {
-            finishListenError("error")
+            nextAttempt(google, "$tag:x_${t.javaClass.simpleName}")
         }
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        if (requestCode != REQ_DIALOG) return false
+        val s = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+        if (resultCode == Activity.RESULT_OK && !s.isNullOrBlank()) {
+            finishListen(s)
+        } else {
+            finishListenError("dialog_cancel", trail.joinToString(" > "))
+        }
+        return true
     }
 
     private fun finishListen(s: String?) {
         listenResult?.success(s)
         listenResult = null
+        session++
     }
 
-    private fun finishListenError(code: String) {
-        listenResult?.error(code, null, null)
+    private fun finishListenError(code: String, detail: String? = null) {
+        listenResult?.error(code, detail, null)
         listenResult = null
+        session++
+    }
+
+    private fun openStore(pkg: String): Boolean {
+        for (u in listOf("market://details?id=$pkg", "https://play.google.com/store/apps/details?id=$pkg")) {
+            try {
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(u)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                return true
+            } catch (_: Throwable) {}
+        }
+        return false
     }
 
     private fun speak(text: String, lang: String, result: MethodChannel.Result) {
@@ -235,6 +334,8 @@ class VoiceChannel private constructor(
 
     fun dispose() {
         channel.setMethodCallHandler(null)
+        session++
+        main.removeCallbacksAndMessages(null)
         try { recognizer?.destroy() } catch (_: Throwable) {}
         recognizer = null
         try { tts?.shutdown() } catch (_: Throwable) {}
@@ -248,6 +349,13 @@ class VoiceChannel private constructor(
     companion object {
         const val NAME = "gizlialan/voice"
         private const val REQ_MIC = 7311
+        private const val REQ_DIALOG = 7312
+        /** Google's recognition services, preferred order. */
+        private val GOOGLE_PACKAGES = listOf(
+            "com.google.android.googlequicksearchbox",
+            "com.google.android.tts",
+            "com.google.android.as",
+        )
         fun attach(activity: Activity, messenger: BinaryMessenger) = VoiceChannel(activity, messenger)
     }
 }

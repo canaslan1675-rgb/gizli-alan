@@ -661,4 +661,27 @@ const Map<String, String> ru = {
   "joiMemoryCat_event": "Events",
   "joiMemoryCat_other": "Other",
   "joiMemoryDelete": "Delete",
+  "joiVoiceE1":
+      "Could not reach the speech server (timeout). Check your internet.",
+  "joiVoiceE2": "Speech recognition needs an internet connection.",
+  "joiVoiceE3": "No audio from the microphone. Another app may be using it.",
+  "joiVoiceE4": "The speech server returned an error. Try again later.",
+  "joiVoiceE5": "Speech recognition could not start (client error).",
+  "joiVoiceE6": "No speech heard. Speak right after tapping the mic.",
+  "joiVoiceE7": "Didn't catch that. Speak a bit closer and clearer.",
+  "joiVoiceE8": "Speech recognition is busy. Try again in a second.",
+  "joiVoiceE9":
+      "The speech app (Google) has no microphone permission. Settings → Apps → Google → Permissions → Microphone.",
+  "joiVoiceE10": "Too many requests. Wait a bit and try again.",
+  "joiVoiceE11": "Lost the connection to the speech service. Try again.",
+  "joiVoiceE12": "This language is not supported by the speech service.",
+  "joiVoiceE13":
+      "The language pack is not available right now. Download it in the Google app.",
+  "joiVoiceEOther": "Speech recognition failed.",
+  "joiVoiceCode": "code",
+  "joiVoiceNoService":
+      "No speech recognition on this phone. The 'Google' app or 'Speech Recognition & Synthesis' is needed.",
+  "joiVoiceOpenGoogle": "Open the Google app (Play)",
+  "joiVoiceOpenSpeech": "Open Speech Services (Play)",
+  "joiVoiceDialogCancel": "Voice input cancelled.",
 };
