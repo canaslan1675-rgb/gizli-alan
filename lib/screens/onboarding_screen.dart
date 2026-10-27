@@ -77,15 +77,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final app = GizliAlanApp.of(context);
     return Align(
       alignment: Alignment.centerRight,
-      child: SegmentedButton<String>(
-        segments: const [
-          ButtonSegment(value: 'tr', label: Text('TR')),
-          ButtonSegment(value: 'en', label: Text('EN')),
+      child: DropdownButton<String>(
+        key: const ValueKey('lang_dropdown'),
+        value: L10n.lang,
+        underline: const SizedBox.shrink(),
+        items: [
+          for (final c in L10n.supported)
+            DropdownMenuItem(value: c, child: Text(L10n.labels[c]!)),
         ],
-        selected: {L10n.lang},
-        showSelectedIcon: false,
-        onSelectionChanged: (s) async {
-          await app.settings.setLanguage(s.first);
+        onChanged: (v) async {
+          if (v == null) return;
+          await app.settings.setLanguage(v);
           app.refresh();
         },
       ),

@@ -477,6 +477,12 @@ class JoiService {
   static String languageName(String lang) => switch (lang) {
     'en' => 'English',
     'ru' => 'Russian',
+    'fr' => 'French',
+    'de' => 'German',
+    'zh' => 'Simplified Chinese',
+    'es' => 'Spanish',
+    'it' => 'Italian',
+    'nl' => 'Dutch',
     _ => 'Turkish',
   };
 
@@ -735,6 +741,12 @@ class JoiVoice {
   static String localeFor(String lang) => switch (lang) {
     'en' => 'en-US',
     'ru' => 'ru-RU',
+    'fr' => 'fr-FR',
+    'de' => 'de-DE',
+    'zh' => 'zh-CN',
+    'es' => 'es-ES',
+    'it' => 'it-IT',
+    'nl' => 'nl-NL',
     _ => 'tr-TR',
   };
 

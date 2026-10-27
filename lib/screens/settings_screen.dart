@@ -648,16 +648,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ListTile(
         leading: const Icon(Icons.language),
         title: Text(t('language')),
-        trailing: SegmentedButton<String>(
-          segments: const [
-            ButtonSegment(value: 'tr', label: Text('TR')),
-            ButtonSegment(value: 'en', label: Text('EN')),
-            ButtonSegment(value: 'ru', label: Text('RU')),
+        trailing: DropdownButton<String>(
+          key: const ValueKey('lang_dropdown'),
+          value: s.language,
+          underline: const SizedBox.shrink(),
+          items: [
+            for (final c in L10n.supported)
+              DropdownMenuItem(value: c, child: Text(L10n.labels[c]!)),
           ],
-          selected: {s.language},
-          showSelectedIcon: false,
-          onSelectionChanged: (v) async {
-            await s.setLanguage(v.first);
+          onChanged: (v) async {
+            if (v == null) return;
+            await s.setLanguage(v);
             app.refresh();
           },
         ),

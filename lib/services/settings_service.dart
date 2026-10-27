@@ -1,3 +1,4 @@
+import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/material.dart' show ThemeMode;
 
 import 'joi_quota.dart';
@@ -275,7 +276,9 @@ class SettingsService {
 
   Future<void> setJoiOnlineConsent(bool v) => _prefs.setBool(_kJoiOnline, v);
 
-  String get language => _prefs.getString(_kLang) ?? 'tr';
+  String get language =>
+      _prefs.getString(_kLang) ??
+      L10n.fromLocales(PlatformDispatcher.instance.locales);
 
   Future<void> setLanguage(String code) async {
     await _prefs.setString(_kLang, L10n.supported.contains(code) ? code : 'tr');

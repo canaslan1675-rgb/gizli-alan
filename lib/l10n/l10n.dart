@@ -1,9 +1,15 @@
 import 'package:flutter/widgets.dart';
 
 import '../flavor.dart';
+import 'de.dart';
 import 'en.dart';
+import 'es.dart';
+import 'fr.dart';
+import 'it.dart';
+import 'nl.dart';
 import 'ru.dart';
 import 'tr.dart';
+import 'zh.dart';
 
 /// Tiny map-based l10n (TR default, EN, RU). Keys missing in a map fall back to
 /// the other language, then to the key itself.
@@ -16,7 +22,39 @@ class L10n {
 
   static String get lang => _lang;
 
-  static const supported = ['tr', 'en', 'ru'];
+  static const supported = [
+    'tr',
+    'en',
+    'ru',
+    'fr',
+    'de',
+    'zh',
+    'es',
+    'it',
+    'nl',
+  ];
+
+  /// Display labels for the language pickers.
+  static const labels = {
+    'tr': 'Türkçe',
+    'en': 'English',
+    'ru': 'Русский',
+    'fr': 'Français',
+    'de': 'Deutsch',
+    'zh': '中文',
+    'es': 'Español',
+    'it': 'Italiano',
+    'nl': 'Nederlands',
+  };
+
+  /// Language to use when the user has not chosen one yet: the first device
+  /// locale we support; English for anything else.
+  static String fromLocales(Iterable<Locale> locales) {
+    for (final l in locales) {
+      if (supported.contains(l.languageCode)) return l.languageCode;
+    }
+    return 'en';
+  }
 
   static void setLang(String code) {
     _lang = supported.contains(code) ? code : 'tr';
@@ -25,6 +63,12 @@ class L10n {
   static L10n get current => switch (_lang) {
     'en' => L10n._(en, tr),
     'ru' => L10n._(ru, en),
+    'fr' => L10n._(fr, en),
+    'de' => L10n._(de, en),
+    'zh' => L10n._(zh, en),
+    'es' => L10n._(es, en),
+    'it' => L10n._(it, en),
+    'nl' => L10n._(nl, en),
     _ => L10n._(tr, en),
   };
 
