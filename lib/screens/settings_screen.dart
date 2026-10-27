@@ -1,3 +1,4 @@
+import 'joi_memory_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -589,19 +590,75 @@ class _SettingsScreenState extends State<SettingsScreen> {
           },
         ),
       ),
+      SwitchListTile(
+        key: const ValueKey('settings_resume'),
+        secondary: const Icon(Icons.restore_page_outlined),
+        title: Text(t('resumeTitle')),
+        subtitle: Text(t('resumeHint')),
+        value: s.resumeWhereLeft,
+        onChanged: (v) async {
+          if (v) {
+            final ok = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                key: const ValueKey('resume_warning'),
+                title: Text(t('resumeWarnTitle')),
+                content: Text(t('resumeWarnBody')),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: Text(t('cancel')),
+                  ),
+                  FilledButton(
+                    key: const ValueKey('resume_warning_ok'),
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: Text(t('resumeWarnOk')),
+                  ),
+                ],
+              ),
+            );
+            if (ok != true) return;
+          }
+          await s.setResumeWhereLeft(v);
+          setState(() {});
+        },
+      ),
+      if (s.resumeWhereLeft)
+        ListTile(
+          key: const ValueKey('settings_resume_max'),
+          leading: const SizedBox(width: 24),
+          title: Text(t('resumeMax')),
+          trailing: DropdownButton<int>(
+            value: s.resumeMaxMin,
+            underline: const SizedBox(),
+            items: SettingsService.resumeMaxChoices
+                .map(
+                  (v) => DropdownMenuItem(
+                    value: v,
+                    child: Text(t('resumeMinutes').replaceAll('{n}', '$v')),
+                  ),
+                )
+                .toList(),
+            onChanged: (v) async {
+              await s.setResumeMaxMin(v ?? 5);
+              setState(() {});
+            },
+          ),
+        ),
       ListTile(
         leading: const Icon(Icons.language),
         title: Text(t('language')),
-        trailing: SegmentedButton<String>(
-          segments: const [
-            ButtonSegment(value: 'tr', label: Text('TR')),
-            ButtonSegment(value: 'en', label: Text('EN')),
-            ButtonSegment(value: 'ru', label: Text('RU')),
+        trailing: DropdownButton<String>(
+          key: const ValueKey('lang_dropdown'),
+          value: s.language,
+          underline: const SizedBox.shrink(),
+          items: [
+            for (final c in L10n.supported)
+              DropdownMenuItem(value: c, child: Text(L10n.labels[c]!)),
           ],
-          selected: {s.language},
-          showSelectedIcon: false,
-          onSelectionChanged: (v) async {
-            await s.setLanguage(v.first);
+          onChanged: (v) async {
+            if (v == null) return;
+            await s.setLanguage(v);
             app.refresh();
           },
         ),
@@ -625,6 +682,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
           t('analyticsPrivacyNotice'),
           style: Theme.of(context).textTheme.bodySmall,
         ),
+      ),
+      SwitchListTile(
+        key: const ValueKey('settings_joi_speak'),
+        secondary: const Icon(Icons.record_voice_over_outlined),
+        title: Text(t('joiSpeakSetting')),
+        subtitle: Text(t('joiSpeakSettingHint')),
+        value: s.joiSpeak,
+        onChanged: (v) async {
+          await s.setJoiSpeak(v);
+          setState(() {});
+        },
+      ),
+      ListTile(
+        key: const ValueKey('settings_joi_memory'),
+        leading: const Icon(Icons.psychology_outlined),
+        title: Text(t('joiMemoryTitle')),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const JoiMemoryScreen())),
+      ),
+      SwitchListTile(
+        key: const ValueKey('settings_joi_online'),
+        secondary: const Icon(Icons.cloud_outlined),
+        title: Text(t('joiOnlineToggle')),
+        subtitle: Text(t('joiOnlineToggleHint')),
+        value: s.joiOnlineConsent,
+        onChanged: (v) async {
+          await s.setJoiOnlineConsent(v);
+          setState(() {});
+        },
       ),
       ListTile(
         key: const ValueKey('settings_theme'),

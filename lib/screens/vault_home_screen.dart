@@ -18,6 +18,10 @@ import '../services/second_phone_service.dart';
 import '../widgets/pro_gate.dart';
 import '../widgets/profile_app_tile.dart';
 import 'notes_list_screen.dart';
+import 'joi_screen.dart';
+import '../services/update_service.dart';
+import '../widgets/joi_avatar.dart';
+import 'note_edit_screen.dart';
 import 'notifications_screen.dart';
 import 'second_phone_screen.dart';
 import 'settings_screen.dart';
@@ -46,6 +50,12 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
     super.initState();
     _clock = Timer.periodic(const Duration(seconds: 20), (_) {
       if (mounted) setState(() => _now = DateTime.now());
+      _checkReminders();
+    });
+    // Play in-app update / what's new: only here, inside the opened vault
+    // (never on the calculator disguise). Silent on sideloaded builds.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) UpdateService().onVaultOpened(context);
     });
   }
 
@@ -59,6 +69,63 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       _loadUnread();
       _loadBackground();
       _loadCount();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkReminders());
+    }
+  }
+
+  bool _remindersOpen = false;
+
+  /// "Şu tarihte göster" (0.6.2): shows due note reminders, one after the
+  /// other, while the vault is unlocked. Only when this home is the current
+  /// route (not over another screen). Each shown reminder is cleared.
+  Future<void> _checkReminders() async {
+    if (_remindersOpen || !mounted) return;
+    final route = ModalRoute.of(context);
+    if (route != null && !route.isCurrent) return;
+    final repo = GizliAlanApp.of(context).session?.notes;
+    if (repo == null) return;
+    _remindersOpen = true;
+    try {
+      final due = await repo.dueReminders();
+      for (final n in due) {
+        if (!mounted) return;
+        await repo.setReminder(n.id, null);
+        if (!mounted) return;
+        final open = await showDialog<bool>(
+          context: context,
+          builder: (ctx) {
+            final t = L10n.of(ctx);
+            return AlertDialog(
+              key: ValueKey('reminder_dialog_${n.id}'),
+              icon: const Icon(Icons.alarm_on),
+              title: Text(n.title.isEmpty ? t('untitled') : n.title),
+              content: Text(
+                n.body.length > 300 ? '${n.body.substring(0, 300)}…' : n.body,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(t('remindDismiss')),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(t('remindOpenNote')),
+                ),
+              ],
+            );
+          },
+        );
+        if (open == true && mounted) {
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) =>
+                  NoteEditScreen(repo: repo, note: n..remindAt = null),
+            ),
+          );
+        }
+      }
+    } finally {
+      _remindersOpen = false;
     }
   }
 
@@ -217,6 +284,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       _loadUnread();
       _loadBackground();
       _loadCount();
+      _checkReminders();
     });
   }
 
@@ -481,6 +549,13 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
                     Expanded(
                       child: CustomScrollView(
                         slivers: [
+                          // Joi first: highlighted full-width tile (0.6.2).
+                          SliverToBoxAdapter(
+                            child: _JoiTile(
+                              subtitle: t('joiTileHint'),
+                              onTap: () => _open(const JoiScreen()),
+                            ),
+                          ),
                           if (_showFreeBanner(app))
                             SliverToBoxAdapter(child: _freeBanner(app, t)),
                           _grid(
@@ -707,3 +782,72 @@ class _DockButton extends StatelessWidget {
 const List<Shadow> _homeTextShadow = [
   Shadow(color: Color(0x99000000), blurRadius: 6, offset: Offset(0, 1)),
 ];
+
+/// Highlighted Joi tile at the top of the vault home (portrait + name).
+class _JoiTile extends StatelessWidget {
+  const _JoiTile({required this.subtitle, required this.onTap});
+  final String subtitle;
+  final VoidCallback onTap;
+
+  static const _pink = Color(0xFFFF8FD8);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          key: const ValueKey('tile_joi'),
+          borderRadius: BorderRadius.circular(22),
+          onTap: onTap,
+          child: Ink(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Color.alphaBlend(
+                _pink.withValues(alpha: 0.16),
+                Colors.black.withValues(alpha: 0.34),
+              ),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: _pink.withValues(alpha: 0.55)),
+            ),
+            child: Row(
+              children: [
+                const JoiAvatar(size: 56),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Joi',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: GizliTheme.textPrimary,
+                          shadows: _homeTextShadow,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          color: GizliTheme.textPrimary,
+                          shadows: _homeTextShadow,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: _pink),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

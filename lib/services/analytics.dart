@@ -31,7 +31,7 @@ class Analytics {
   );
 
   /// Pro lifetime list price reported with the purchase event.
-  static const proPriceTry = 499.0;
+  static const proPriceTry = 200.0;
   static const proCurrency = 'TRY';
 
   static const MethodChannel _tiktok = MethodChannel('gizlialan/tiktok');

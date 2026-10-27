@@ -346,7 +346,7 @@ const Map<String, String> tr = {
   'secondPhone': 'İkinci telefon',
   'secondPhoneApps': 'İkinci telefon uygulamaları',
   'spIntro':
-      'İkinci telefon, Android\'in kendi "iş profili" özelliğiyle bu cihazda ayrı bir alan oluşturur (Shelter/Island ile aynı yöntem). İçinde kendi Play Store\'u vardır; oraya ayrı bir Google hesabı ekleyip uygulama kurabilirsin. Uygulamalar, hesaplar ve dosyalar ana telefonundan ayrı tutulur.',
+      'İkinci telefon, Android\'in kendi "iş profili" özelliğiyle bu cihazda ayrı bir alan oluşturur. İçinde kendi Play Store\'u vardır; oraya ayrı bir Google hesabı ekleyip uygulama kurabilirsin. Uygulamalar, hesaplar ve dosyalar ana telefonundan ayrı tutulur.',
   'spDisclosure':
       'Nasıl çalışır: GizliAlan yalnızca kendi oluşturduğu bu iş profilinin "profil sahibi" olur. Ana profilin veya cihazın yöneticisi olmaz; hiçbir şeyi izlemez, başka uygulamaların verisini okumaz, hiçbir yere bir şey göndermez. Android kurulumda kendi bilgilendirmesini gösterir. Profildeki uygulamalar çanta rozetiyle, telefonun uygulama listesindeki "İş" sekmesinde de görünür. Kurulum ve yönetim yalnızca kasa açıkken yapılabilir.',
   'spSetUp': 'İkinci telefonu kur',
@@ -442,7 +442,7 @@ const Map<String, String> tr = {
   'proUsage': 'Kullanım: {n} / {max} öğe',
   'proCurrent': 'Mevcut',
   'proLifetime': 'Pro — tek seferlik',
-  'proLifetimePrice': '499 TL',
+  'proLifetimePrice': '200 TL',
   'proF1': 'İkinci telefon',
   'proF2': 'Sınırsız öğe',
   'proF3': 'ⓘ simgesini gizleme',
@@ -544,4 +544,222 @@ const Map<String, String> tr = {
   'feedbackBodySkip': 'Atla',
   'feedbackFailed':
       'E-posta uygulaması bulunamadı. Bunun yerine adres kopyalandı.',
+  // 0.6.2: note reminders + Joi
+  "remindShowAt": "Şu tarihte göster",
+  "remindNone": "Hatırlatma yok — kasa açıkken uygulama içinde gösterilir",
+  "remindClear": "Hatırlatmayı kaldır",
+  "remindDismiss": "Kapat",
+  "remindOpenNote": "Notu aç",
+  "joiIntro":
+      "Merhaba, ben Joi — GizliAlan'ın cihaz içi asistanı. Bana her şeyi sorabilirsin (ör. \"Aristoteles kim?\"), notlarını özetleyebilir ve notlarınla ilgili soruları yanıtlayabilirim. Hiçbir şey cihazından çıkmaz.",
+  "joiIntroSearch":
+      "Joi bu cihazda notlarında anahtar kelimeyle arama yapabilir. Aramak istediğin kelimeyi yaz.",
+  "joiNoMatch": "Notlarında bununla eşleşen bir şey bulamadım.",
+  "joiFoundNotes": "Notlarında bunları buldum:",
+  "joiError": "Şu an yanıt veremedim. Biraz sonra tekrar dene.",
+  "joiSummarizeAsk": "\"{title}\" notunu özetle",
+  "joiSummarize": "Notu özetle",
+  "joiAskNotes": "Notlarıma sor",
+  "joiHint": "Joi'ye yaz…",
+  "joiHintSearch": "Notlarında ara…",
+  "joiSend": "Gönder",
+  "joiDownloadable":
+      "Joi'nin cihaz içi modeli (Gemini Nano) bu telefonda kullanılabilir ama henüz indirilmemiş. İndirmeyi Android sistemi (AICore) yapar; notların ve soruların gönderilmez.",
+  "joiDownloading":
+      "Gemini Nano Android sistemi tarafından indiriliyor. Bu sırada notlarında arama yapabilirsin.",
+  "joiDownload": "Modeli indir",
+  "joiUnavailable":
+      "Joi'nin cihaz içi yapay zekâsı (Gemini Nano) bu cihazda desteklenmiyor. Burada notlarında sadece anahtar kelime araması yapabilir.",
+  "joiOnlineNote":
+      "Bu telefonda genel soruların (ör. \"Aristoteles kim?\") onayınla internet üzerinden Google Gemini'ye gönderilerek yanıtlanır. Not özetleme ve \"Notlarıma sor\" yalnızca cihaz içinde çalışır; notların asla gönderilmez — burada notlarında anahtar kelimeyle arama yapılır.",
+  "joiIntroOnline":
+      "Merhaba, ben Joi. Bana genel sorular sorabilirsin (ör. \"Aristoteles kim?\"); yanıtlar çevrimiçi olarak Google Gemini'den gelir. Notların asla gönderilmez; notlarında aramak için \"Notlarımda ara\"yı seç.",
+  "joiSearchNotes": "Notlarımda ara",
+  "joiConsentTitle": "Joi çevrimiçi yanıt versin mi?",
+  "joiConsentBody":
+      "Bu telefonda Joi'nin cihaz içi modeli yok. İzin verirsen yazdığın genel sorular internet üzerinden Google'a (Gemini, Firebase AI Logic) gönderilir ve yanıt oradan gelir.\n\n• Notların, dosyaların ve kasa içeriğin asla gönderilmez.\n• Sorularını biz saklamayız.\n• Bu izni istediğin zaman Ayarlar'dan geri alabilirsin.",
+  "joiConsentAllow": "İzin ver",
+  "joiConsentDeny": "Vazgeç",
+  "joiNoConsent":
+      "Çevrimiçi yanıt için izin verilmedi. Notlarında anahtar kelimeyle arama yapabilirsin; izni Ayarlar'dan açabilirsin.",
+  "joiBusy": "Joi şu an yoğun (kota doldu). Biraz sonra tekrar dene.",
+  "joiOffline":
+      "İnternet yok gibi görünüyor. Bağlantını kontrol edip tekrar dene.",
+  "joiBadgeOnline": "çevrimiçi",
+  "joiBadgeDevice": "cihazda",
+  "joiOnlineToggle": "Joi çevrimiçi yanıtlar",
+  "joiOnlineToggleHint":
+      "Gemini Nano olmayan telefonlarda genel sorular Google Gemini'ye gönderilir. Notlar asla gönderilmez.",
+  "joiTimeout": "Joi zamanında yanıt alamadı. Tekrar dene.",
+  "joiServer":
+      "Google tarafında geçici bir sorun var. Biraz sonra tekrar dene.",
+  "joiAuth":
+      "Joi'nin çevrimiçi hizmetine erişim reddedildi (uygulama doğrulaması). Bu sürümde çevrimiçi yanıt kullanılamıyor.",
+  "joiModelErr":
+      "Joi'nin çevrimiçi modeli şu an kullanılamıyor. Uygulama güncellemesi gerekebilir.",
+  "joiTileHint": "Asistanın — sor, sohbet et, notlarında ara",
+  "joiImgNeedsOnline":
+      "Fotoğraf aramak için çevrimiçi özelliklere izin vermen gerekiyor (Ayarlar → Joi çevrimiçi yanıtlar).",
+  "joiImgNone":
+      "\"{q}\" için Wikimedia Commons'ta serbest lisanslı fotoğraf bulamadım.",
+  "joiImgFound":
+      "\"{q}\" için Wikimedia Commons fotoğrafları. Kaydetmek için birine dokun:",
+  "joiImgError": "Fotoğraf araması şu an yapılamadı. Biraz sonra tekrar dene.",
+  "joiImgSavePictures": "Galeriye kaydet (Resimler/GizliAlan/Joi)",
+  "joiImgSaveVault": "Kasaya kaydet",
+  "joiImgSavedPictures": "Galeriye kaydedildi ✓ (Pictures/GizliAlan/Joi)",
+  "joiImgSavedVault": "Kasana kaydedildi:",
+  "joiImgCredit": "Yazar/lisans",
+  "joiImgSaveFailed": "Fotoğraf kaydedilemedi.",
+  "joiNoteNeedsAi":
+      "Not yazmak için Joi'nin yapay zekâsı gerekiyor (cihazda Gemini Nano veya çevrimiçi yanıtlar). Kendi metnini kaydetmek için: \"not defterime şunu yaz: …\"",
+  "joiNoteTitle": "Joi notu",
+  "joiNoteFailed": "Not oluşturulamadı.",
+  "joiNoteCreated": "Not defterine \"{title}\" notunu ekledim.",
+  "joiOpenNote": "Notu aç",
+  "joiMicTitle": "Mikrofon izni",
+  "joiMicBody":
+      "Joi'ye sesli soru sorabilmen için mikrofon izni gerekiyor. Ses, Android'in konuşma tanıma hizmetinde yazıya çevrilir; GizliAlan ses kaydı saklamaz.",
+  "joiMicContinue": "Devam",
+  "joiMicDenied":
+      "Mikrofon izni verilmedi. Sesli soru için Android ayarlarından izin verebilirsin.",
+  "joiMicError":
+      "Ses anlaşılamadı ya da konuşma tanıma kullanılamıyor. Tekrar dene.",
+  "joiMic": "Sesli sor",
+  "joiStopSpeaking": "Okumayı durdur",
+  "joiSpeakToggle": "Yanıtları sesli oku",
+  "joiSpeakSetting": "Joi yanıtlarını sesli oku",
+  "joiSpeakSettingHint":
+      "Açıkken Joi yanıtlarını Türkçe okur. Sesli sorduğun sorular her zaman sesli yanıtlanır.",
+  "joiClear": "Sohbeti temizle",
+  "joiClearBody":
+      "Joi ile olan sohbet geçmişi bu cihazdan silinecek. Notların etkilenmez.",
+  "joiClearOk": "Temizle",
+  "joiTry": "Şunları deneyebilirsin:",
+  "joiEx1": "Sokrates'in hayatını not defterime özetle",
+  "joiEx2": "Galata Kulesi'nin fotoğrafını indir",
+  "joiEx3": "Not defterime hafta sonu için market listesi yaz",
+  "joiEx4": "Bana bir motivasyon sözü söyle",
+  "joiEx5": "Akşam yemeği için 3 kolay tarif öner",
+  "joiEx6": "Kedilerin fotoğrafını bul",
+  "joiExNotes": "Notlarımda şifre geçenleri bul",
+  "resumeTitle": "Çıkınca bıraktığım yerden devam et",
+  "resumeHint":
+      "Kapalı (önerilen): uygulamadan çıkınca hesap makinesine döner. Açık: geri geldiğinde kasa aynı ekranda açık kalır (en fazla seçilen süre kadar; telefon yeniden başlarsa yine kilitlenir).",
+  "resumeWarnTitle": "Emin misin?",
+  "resumeWarnBody":
+      "Telefonuna erişen biri kasayı açık bulabilir. Kasa, arka planda seçtiğin süreden (varsayılan 5 dakika) uzun kalınca yine kilitlenir.",
+  "resumeWarnOk": "Aç",
+  "resumeMax": "En fazla açık kalma süresi",
+  "resumeMinutes": "{n} dk",
+  "updTitle": "Yeni sürüm mevcut",
+  "updBody":
+      "GizliAlan'ın yeni bir sürümü ({v}) Google Play'de hazır. Güncelleme indirildikten sonra uygulama yeniden başlar.",
+  "updUpdate": "Güncelle",
+  "updLater": "Daha sonra",
+  "updSeeNotes": "Play Store'da yenilikleri gör",
+  "updReady": "Güncelleme indirildi. Yüklemek için yeniden başlat.",
+  "updRestart": "Yeniden başlat",
+  "updWhatsNew": "Bu sürümde yenilikler",
+  "updOk": "Tamam",
+  "joiQuotaToday": "Bugün {n}",
+  "joiGoPro": "Pro'ya geç",
+  "joiDailyLimitTitle": "Bugünlük mesaj hakkın doldu",
+  "joiDailyLimitBody":
+      "Ücretsiz sürümde Joi ile günde 10 mesaj yazışabilirsin; hakkın gece yarısı yenilenir. GizliAlan Pro ile Joi sınırsız.",
+  "joiDailyLimitReached":
+      "Bugünkü 10 mesajlık hakkımız doldu. Gece yarısından sonra yine buradayım ya da Pro ile sınırsız konuşabiliriz.",
+  "joiReport": "Bildir",
+  "joiReportTitle": "Bu yanıtı bildir",
+  "joiReportInfo":
+      "Joi bir yapay zekadır ve hata yapabilir. Bildirimin e-posta uygulamanda açılır; yalnızca bu yanıt eklenir.",
+  "joiReportHarmful": "Zararlı veya saldırgan",
+  "joiReportSexual": "Cinsel veya uygunsuz içerik",
+  "joiReportWrong": "Yanlış ya da yanıltıcı bilgi",
+  "joiReportOther": "Diğer",
+  "joiReportMailIntro": "Bildirilen Joi yanıtı:",
+  "joiReportThanks": "Teşekkürler, bildirimin için e-posta uygulaman açıldı.",
+  "joiReportFailed": "E-posta uygulaması açılamadı.",
+  "joiProTitle": "Joi Pro'da",
+  "joiProBody":
+      "Ücretsiz sürümde Joi ile günde 10 mesaj soru-cevap sohbeti yapabilirsin. Not yazma, fotoğraf indirme, sesli sohbet, notlarında arama/özet ve kalıcı sohbet geçmişi GizliAlan Pro ile açılır.",
+  "joiProOnly":
+      "{what} GizliAlan Pro'ya özel. Ücretsiz sürümde benimle soru-cevap sohbeti yapabilirsin.",
+  "joiProPhotos": "Fotoğraf indirme",
+  "joiProWrite": "Not defterine yazma",
+  "joiProVoice": "Sesli sohbet",
+  "joiProNotes": "Notlarında arama ve özet",
+  "joiListening": "Dinliyorum… (bitince bırak ya da tekrar dokun)",
+  "joiVoiceNoMatch":
+      "Ses algılanmadı. Mikrofona biraz daha yakın ve net konuşup tekrar dene.",
+  "joiVoiceOffline":
+      "Konuşma tanıma için internet gerekiyor (cihazda Türkçe ses modeli yüklü değil). Bağlantını kontrol et.",
+  "joiVoiceBusy": "Konuşma tanıma meşgul. Bir saniye sonra tekrar dene.",
+  "joiVoiceLanguage":
+      "Türkçe konuşma tanıma bu cihazda yok. Google uygulamasında / Ayarlar → Sistem → Diller → Konuşma tanıma'da Türkçe'yi indir.",
+  "joiVoiceUnavailable":
+      "Bu cihazda konuşma tanıma hizmeti bulunamadı. Google uygulamasını veya 'Google Konuşma Hizmetleri'ni yükleyip etkinleştir.",
+  "joiImgSearching": "Wikimedia Commons'ta \"{q}\" fotoğraflarını arıyorum…",
+  "joiImgNothing":
+      "Wikimedia Commons'ta \"{q}\" için fotoğraf bulamadım. Farklı bir yazımla dene.",
+  "joiImgOffline":
+      "Fotoğraf araması için internete bağlanılamadı ya da Wikimedia yanıt vermedi. Tekrar dene.",
+  "joiImgWhich": "Neyin fotoğrafını indireyim? Örneğin \"Galata Kulesi\" yaz.",
+  "joiNoFakeAction":
+      "Ben kendim bir şey indiremem ya da kaydedemem; bunu uygulama yapar. Fotoğraf için örneğin \"Galata Kulesi'nin fotoğrafını indir\" yaz, sonuçları burada gösteririm, dokununca galerine kaydedilir.",
+  "joiImgSaveFirst": "İlkini galeriye kaydet",
+  "joiMemoryTitle": "Joi'nin hatırladıkları",
+  "joiMemorySaved": "Joi bunu hatırladı",
+  "joiMemoryEdit": "Bilgiyi düzenle",
+  "joiMemoryForgetAll": "Tümünü unut",
+  "joiMemoryForgetAllBody":
+      "Joi'nin hatırladığı tüm bilgiler ve sohbet özetleri bu cihazdan silinecek. Sohbet geçmişin silinmez.",
+  "joiMemoryForgetAllOk": "Unut",
+  "joiMemoryToggle": "Hafıza",
+  "joiMemoryToggleHint":
+      "Joi sohbetlerden seninle ilgili kısa bilgileri hatırlasın",
+  "joiMemoryEmpty":
+      "Joi henüz bir şey hatırlamıyor. Sohbet ettikçe adın, sevdiklerin gibi kısa bilgileri burada görürsün.",
+  "joiMemorySummaries": "Önceki sohbet özetleri",
+  "joiMemoryPrivacy":
+      "Hatırlananlar yalnızca bu cihazda, kasanın içinde şifreli saklanır. Sağlık, para, şifre, adres ve kimlik bilgileri kaydedilmez. Hafıza açıkken Joi, ilgili birkaç bilgiyi çevrimiçi yanıt için soruyla birlikte gönderir; notların asla gönderilmez.",
+  "joiMemoryProBody":
+      "Joi'nin seni hatırlaması (uzun süreli hafıza) Pro özelliğidir.",
+  "joiMemoryCat_identity": "Kimlik",
+  "joiMemoryCat_people": "Kişiler",
+  "joiMemoryCat_pets": "Evcil hayvanlar",
+  "joiMemoryCat_preference": "Tercihler",
+  "joiMemoryCat_interest": "İlgi alanları",
+  "joiMemoryCat_goal": "Hedefler",
+  "joiMemoryCat_event": "Olaylar",
+  "joiMemoryCat_other": "Diğer",
+  "joiMemoryDelete": "Sil",
+  "joiVoiceE1":
+      "Konuşma tanıma sunucusuna ulaşılamadı (zaman aşımı). İnternetini kontrol et.",
+  "joiVoiceE2":
+      "Konuşma tanıma için internet bağlantısı gerekiyor. Bağlantını kontrol et.",
+  "joiVoiceE3":
+      "Mikrofondan ses alınamadı. Başka bir uygulama mikrofonu kullanıyor olabilir.",
+  "joiVoiceE4": "Konuşma tanıma sunucusu hata verdi. Biraz sonra tekrar dene.",
+  "joiVoiceE5": "Konuşma tanıma hizmeti başlatılamadı (istemci hatası).",
+  "joiVoiceE6":
+      "Hiç konuşma duyulmadı. Mikrofona dokunduktan sonra hemen konuş.",
+  "joiVoiceE7":
+      "Ses anlaşılamadı. Biraz daha yakın ve net konuşup tekrar dene.",
+  "joiVoiceE8": "Konuşma tanıma meşgul. Bir saniye sonra tekrar dene.",
+  "joiVoiceE9":
+      "Konuşma tanıma uygulamasının (Google) mikrofon izni yok. Ayarlar → Uygulamalar → Google → İzinler → Mikrofon'u aç.",
+  "joiVoiceE10": "Çok fazla istek gönderildi. Biraz bekleyip tekrar dene.",
+  "joiVoiceE11": "Konuşma tanıma hizmetiyle bağlantı koptu. Tekrar dene.",
+  "joiVoiceE12": "Türkçe bu konuşma tanıma hizmetinde desteklenmiyor.",
+  "joiVoiceE13":
+      "Türkçe ses paketi şu an kullanılamıyor. Google uygulamasında Türkçe konuşma tanımayı indir.",
+  "joiVoiceEOther": "Konuşma tanıma hata verdi.",
+  "joiVoiceCode": "kod",
+  "joiVoiceNoService":
+      "Bu telefonda konuşma tanıma bulunamadı. 'Google' uygulaması veya 'Speech Recognition & Synthesis' (Google Konuşma Hizmetleri) gerekiyor.",
+  "joiVoiceOpenGoogle": "Google uygulamasını aç (Play)",
+  "joiVoiceOpenSpeech": "Konuşma Hizmetleri'ni aç (Play)",
+  "joiVoiceDialogCancel": "Sesli giriş iptal edildi.",
+  "joiVoiceException": "Konuşma tanıma başlatılırken bir hata oluştu.",
 };

@@ -31,7 +31,7 @@ class FakeBilling implements BillingBackend {
     return const [
       ProPlan(basePlanId: kPlanMonthly, price: '₺150,00', hasTrial: true),
       ProPlan(basePlanId: kPlanYearly, price: '₺999,00'),
-      ProPlan(basePlanId: kPlanLifetime, price: '₺499,00'),
+      ProPlan(basePlanId: kPlanLifetime, price: '₺200,00'),
     ];
   }
 
@@ -245,7 +245,7 @@ void main() {
   group('one-time Pro (0.5.8)', () {
     test('lifetime purchase grants Pro and is acknowledged', () async {
       await billing.start();
-      expect(billing.plan(kPlanLifetime)!.price, '₺499,00');
+      expect(billing.plan(kPlanLifetime)!.price, '₺200,00');
       final done = billing.buy(billing.plan(kPlanLifetime)!);
       await tick();
       expect(fake.bought, [kPlanLifetime]);
@@ -279,7 +279,7 @@ void main() {
       expect(isProProduct('other'), isFalse);
       expect(isProProduct(kProLifetimeId), isTrue);
       expect(kProLifetimeId, 'gizlialan_pro_lifetime');
-      expect(kProFallbackPrice, '499 TL');
+      expect(kProFallbackPrice, '200 TL');
     });
 
     test(

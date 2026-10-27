@@ -313,7 +313,7 @@ const Map<String, String> ru = {
   'secondPhone': "Второй телефон",
   'secondPhoneApps': "Приложения второго телефона",
   'spIntro':
-      "«Второй телефон» создаёт отдельное пространство на этом устройстве с помощью встроенной функции Android «рабочий профиль» (тот же способ, что у Shelter/Island). В нём есть свой Play Маркет, где можно добавить отдельный аккаунт Google и устанавливать приложения. Приложения, аккаунты и файлы остаются отдельно от основного телефона.",
+      "«Второй телефон» создаёт отдельное пространство на этом устройстве с помощью встроенной функции Android «рабочий профиль». В нём есть свой Play Маркет, где можно добавить отдельный аккаунт Google и устанавливать приложения. Приложения, аккаунты и файлы остаются отдельно от основного телефона.",
   'spDisclosure':
       "Как это работает: GizliAlan становится «владельцем профиля» только для создаваемого им рабочего профиля. Он не является администратором основного профиля или устройства; ничего не отслеживает, не читает данные других приложений и никуда ничего не отправляет. Во время настройки Android показывает собственное уведомление. Приложения профиля отмечены значком портфеля и также видны на вкладке «Рабочие» в списке приложений. Настройка и управление возможны только при разблокированном сейфе.",
   'spSetUp': "Настроить второй телефон",
@@ -409,7 +409,7 @@ const Map<String, String> ru = {
   'proUsage': "Использовано: {n} / {max} объектов",
   'proCurrent': "Текущий",
   'proLifetime': "Pro — разовая покупка",
-  'proLifetimePrice': "499 TL",
+  'proLifetimePrice': "200 TL",
   'proF1': "Второй телефон",
   'proF2': "Неограниченное число объектов",
   'proF3': "Скрыть значок ⓘ",
@@ -491,4 +491,216 @@ const Map<String, String> ru = {
   'feedbackBodySkip': "Пропустить",
   'feedbackFailed':
       "Почтовое приложение не найдено. Вместо этого адрес скопирован.",
+  // 0.6.2: note reminders + Joi
+  "remindShowAt": "Показать в дату",
+  "remindNone":
+      "Нет напоминания — показывается в приложении, когда сейф открыт",
+  "remindClear": "Убрать напоминание",
+  "remindDismiss": "Закрыть",
+  "remindOpenNote": "Открыть заметку",
+  "joiIntro":
+      "Привет, я Joi — встроенный ассистент GizliAlan, работающий на устройстве. Спросите что угодно (например, «Кто такой Аристотель?»), я могу кратко пересказать заметки и ответить на вопросы по ним. Ничего не покидает устройство.",
+  "joiIntroSearch":
+      "На этом устройстве Joi может искать по заметкам по ключевым словам. Введите слово для поиска.",
+  "joiNoMatch": "В заметках ничего не найдено.",
+  "joiFoundNotes": "Вот что нашлось в заметках:",
+  "joiError": "Не удалось ответить. Попробуйте чуть позже.",
+  "joiSummarizeAsk": "Кратко перескажи заметку «{title}»",
+  "joiSummarize": "Пересказать заметку",
+  "joiAskNotes": "Спросить заметки",
+  "joiHint": "Напишите Joi…",
+  "joiHintSearch": "Поиск по заметкам…",
+  "joiSend": "Отправить",
+  "joiDownloadable":
+      "Модель Joi (Gemini Nano) поддерживается, но ещё не загружена. Загрузку выполняет Android (AICore); заметки и вопросы не отправляются.",
+  "joiDownloading":
+      "Android загружает Gemini Nano. Пока можно искать по заметкам.",
+  "joiDownload": "Загрузить модель",
+  "joiUnavailable":
+      "Встроенный ИИ Joi (Gemini Nano) не поддерживается на этом устройстве. Здесь Joi может только искать по ключевым словам в заметках.",
+  "joiOnlineNote":
+      "На этом телефоне общие вопросы (напр. «Кто такой Аристотель?») с вашего согласия отправляются в Google Gemini через интернет. Сводки и «Спросить заметки» работают только на устройстве; заметки никогда не отправляются — здесь доступен поиск по ключевым словам.",
+  "joiIntroOnline":
+      "Привет, я Joi. Задавайте общие вопросы; ответы приходят онлайн от Google Gemini. Заметки никогда не отправляются; для поиска выберите «Искать в заметках».",
+  "joiSearchNotes": "Искать в заметках",
+  "joiConsentTitle": "Разрешить Joi отвечать онлайн?",
+  "joiConsentBody":
+      "На этом телефоне нет встроенной модели Joi. Если разрешите, ваши общие вопросы будут отправляться через интернет в Google (Gemini, Firebase AI Logic).\n\n• Заметки, файлы и содержимое хранилища никогда не отправляются.\n• Мы не храним ваши вопросы.\n• Разрешение можно отозвать в Настройках.",
+  "joiConsentAllow": "Разрешить",
+  "joiConsentDeny": "Отмена",
+  "joiNoConsent":
+      "Онлайн-ответы не разрешены. Можно искать в заметках; включите в Настройках.",
+  "joiBusy": "Joi сейчас занят (лимит исчерпан). Попробуйте чуть позже.",
+  "joiOffline": "Нет подключения к интернету. Проверьте соединение.",
+  "joiBadgeOnline": "онлайн",
+  "joiBadgeDevice": "на устройстве",
+  "joiOnlineToggle": "Онлайн-ответы Joi",
+  "joiOnlineToggleHint":
+      "На телефонах без Gemini Nano общие вопросы отправляются в Google Gemini. Заметки не отправляются.",
+  "joiTimeout": "Joi не получил ответ вовремя. Попробуйте ещё раз.",
+  "joiServer": "Временная проблема на стороне Google. Попробуйте позже.",
+  "joiAuth":
+      "Доступ к онлайн-сервису Joi отклонён (проверка приложения). В этой сборке онлайн-ответы недоступны.",
+  "joiModelErr":
+      "Онлайн-модель Joi сейчас недоступна. Возможно, нужно обновить приложение.",
+  "joiTileHint": "Ваш ассистент — спрашивайте, общайтесь, ищите в заметках",
+  "joiImgNeedsOnline":
+      "To search photos, allow Joi's online features (Settings → Joi online answers).",
+  "joiImgNone":
+      "No freely licensed photos found on Wikimedia Commons for \"{q}\".",
+  "joiImgFound":
+      "Freely licensed photos for \"{q}\" from Wikimedia Commons. Tap one to save:",
+  "joiImgError": "Photo search failed. Try again shortly.",
+  "joiImgSavePictures": "Save to gallery (Pictures/GizliAlan/Joi)",
+  "joiImgSaveVault": "Save to vault",
+  "joiImgSavedPictures": "Saved to the phone gallery (Pictures/GizliAlan/Joi):",
+  "joiImgSavedVault": "Saved to your vault:",
+  "joiImgCredit": "Author/licence",
+  "joiImgSaveFailed": "Couldn't save the photo.",
+  "joiNoteNeedsAi":
+      "Writing notes needs Joi's AI (Gemini Nano on device or online answers). To save your own text: \"write this to my notes: …\"",
+  "joiNoteTitle": "Joi note",
+  "joiNoteFailed": "Couldn't create the note.",
+  "joiNoteCreated": "I added the note \"{title}\" to your notes.",
+  "joiOpenNote": "Open note",
+  "joiMicTitle": "Microphone permission",
+  "joiMicBody":
+      "Joi needs the microphone to hear your question. Speech is turned into text by Android's speech service; GizliAlan doesn't store recordings.",
+  "joiMicContinue": "Continue",
+  "joiMicDenied":
+      "Microphone permission denied. You can allow it in Android settings.",
+  "joiMicError":
+      "Couldn't understand or speech recognition is unavailable. Try again.",
+  "joiMic": "Ask by voice",
+  "joiStopSpeaking": "Stop reading",
+  "joiSpeakToggle": "Read answers aloud",
+  "joiSpeakSetting": "Read Joi's answers aloud",
+  "joiSpeakSettingHint":
+      "When on, Joi reads its answers aloud. Questions asked by voice are always answered aloud.",
+  "joiClear": "Clear chat",
+  "joiClearBody":
+      "Your chat history with Joi will be deleted from this device. Your notes are not affected.",
+  "joiClearOk": "Clear",
+  "joiTry": "Try:",
+  "joiEx1": "Summarize Socrates' life into my notes",
+  "joiEx2": "Download a photo of Galata Tower",
+  "joiEx3": "Write a weekend shopping list to my notes",
+  "joiEx4": "Tell me a motivational quote",
+  "joiEx5": "Suggest 3 easy dinner recipes",
+  "joiEx6": "Find a photo of cats",
+  "joiExNotes": "Find notes that mention passwords",
+  "resumeTitle": "Continue where I left off",
+  "resumeHint":
+      "Off (recommended): leaving the app returns to the calculator. On: when you come back the vault stays open on the same screen (up to the chosen time; a phone restart always locks).",
+  "resumeWarnTitle": "Are you sure?",
+  "resumeWarnBody":
+      "Someone with access to your phone could find the vault open. It still locks after the chosen time in the background (default 5 minutes).",
+  "resumeWarnOk": "Turn on",
+  "resumeMax": "Stay open at most",
+  "resumeMinutes": "{n} min",
+  "updTitle": "New version available",
+  "updBody":
+      "A new version of GizliAlan ({v}) is ready on Google Play. The app restarts after the update is downloaded.",
+  "updUpdate": "Update",
+  "updLater": "Later",
+  "updSeeNotes": "See what's new on Play Store",
+  "updReady": "Update downloaded. Restart to install.",
+  "updRestart": "Restart",
+  "updWhatsNew": "What's new in this version",
+  "updOk": "OK",
+  "joiQuotaToday": "Today {n}",
+  "joiGoPro": "Go Pro",
+  "joiDailyLimitTitle": "Today's messages are used up",
+  "joiDailyLimitBody":
+      "The free version includes 10 Joi messages per day; they renew at midnight. With GizliAlan Pro, Joi is unlimited.",
+  "joiDailyLimitReached":
+      "We've used today's 10 messages. I'll be back after midnight, or we can talk without limits with Pro.",
+  "joiReport": "Report",
+  "joiReportTitle": "Report this answer",
+  "joiReportInfo":
+      "Joi is an AI and can make mistakes. Your report opens in your mail app; only this answer is included.",
+  "joiReportHarmful": "Harmful or offensive",
+  "joiReportSexual": "Sexual or inappropriate",
+  "joiReportWrong": "Wrong or misleading",
+  "joiReportOther": "Other",
+  "joiReportMailIntro": "Reported Joi answer:",
+  "joiReportThanks": "Thanks, your mail app was opened for the report.",
+  "joiReportFailed": "Couldn't open a mail app.",
+  "joiProTitle": "Joi in Pro",
+  "joiProBody":
+      "In the free version you can chat with Joi (questions and answers, 10 messages a day). Writing notes, downloading photos, voice chat, note search/summaries and saved chat history come with GizliAlan Pro.",
+  "joiProOnly":
+      "{what} is a GizliAlan Pro feature. In the free version you can chat with me (Q&A).",
+  "joiProPhotos": "Photo download",
+  "joiProWrite": "Writing to notes",
+  "joiProVoice": "Voice chat",
+  "joiProNotes": "Note search and summaries",
+  "joiListening": "Listening… (release or tap again when done)",
+  "joiVoiceNoMatch":
+      "No speech detected. Speak clearly near the mic and try again.",
+  "joiVoiceOffline":
+      "Speech recognition needs internet (no offline model for this language). Check your connection.",
+  "joiVoiceBusy": "Speech recognition is busy. Try again in a second.",
+  "joiVoiceLanguage":
+      "Speech recognition for this language isn't available. Download it in the Google app / Settings → System → Languages → Speech recognition.",
+  "joiVoiceUnavailable":
+      "No speech recognition service on this device. Install/enable the Google app or 'Speech Services by Google'.",
+  "joiImgSearching": "Searching Wikimedia Commons for \"{q}\"…",
+  "joiImgNothing":
+      "No photos found on Wikimedia Commons for \"{q}\". Try a different spelling.",
+  "joiImgOffline":
+      "Couldn't reach Wikimedia (no internet or no response). Try again.",
+  "joiImgWhich": "Какое фото скачать? Например, напишите «Галатская башня».",
+  "joiNoFakeAction":
+      "Сама я ничего не скачиваю и не сохраняю — это делает приложение. Для фото напишите, например, «скачай фото Галатской башни», и я покажу результаты здесь; нажмите на фото, чтобы сохранить.",
+  "joiImgSaveFirst": "Save the first to gallery",
+  "joiMemoryTitle": "What Joi remembers",
+  "joiMemorySaved": "Joi remembered this",
+  "joiMemoryEdit": "Edit",
+  "joiMemoryForgetAll": "Forget everything",
+  "joiMemoryForgetAllBody":
+      "All facts Joi remembers and chat summaries will be deleted from this device. Your chat history is kept.",
+  "joiMemoryForgetAllOk": "Forget",
+  "joiMemoryToggle": "Memory",
+  "joiMemoryToggleHint": "Let Joi remember short facts about you from chats",
+  "joiMemoryEmpty":
+      "Joi doesn't remember anything yet. As you chat, short facts like your name or favourites appear here.",
+  "joiMemorySummaries": "Earlier chat summaries",
+  "joiMemoryPrivacy":
+      "Memories are stored only on this device, encrypted inside your vault. Health, money, passwords, addresses and ID numbers are not saved. With memory on, Joi sends a few relevant facts with your question for online answers; your notes are never sent.",
+  "joiMemoryProBody":
+      "Joi remembering you (long-term memory) is a Pro feature.",
+  "joiMemoryCat_identity": "Identity",
+  "joiMemoryCat_people": "People",
+  "joiMemoryCat_pets": "Pets",
+  "joiMemoryCat_preference": "Preferences",
+  "joiMemoryCat_interest": "Interests",
+  "joiMemoryCat_goal": "Goals",
+  "joiMemoryCat_event": "Events",
+  "joiMemoryCat_other": "Other",
+  "joiMemoryDelete": "Delete",
+  "joiVoiceE1":
+      "Could not reach the speech server (timeout). Check your internet.",
+  "joiVoiceE2": "Speech recognition needs an internet connection.",
+  "joiVoiceE3": "No audio from the microphone. Another app may be using it.",
+  "joiVoiceE4": "The speech server returned an error. Try again later.",
+  "joiVoiceE5": "Speech recognition could not start (client error).",
+  "joiVoiceE6": "No speech heard. Speak right after tapping the mic.",
+  "joiVoiceE7": "Didn't catch that. Speak a bit closer and clearer.",
+  "joiVoiceE8": "Speech recognition is busy. Try again in a second.",
+  "joiVoiceE9":
+      "The speech app (Google) has no microphone permission. Settings → Apps → Google → Permissions → Microphone.",
+  "joiVoiceE10": "Too many requests. Wait a bit and try again.",
+  "joiVoiceE11": "Lost the connection to the speech service. Try again.",
+  "joiVoiceE12": "This language is not supported by the speech service.",
+  "joiVoiceE13":
+      "The language pack is not available right now. Download it in the Google app.",
+  "joiVoiceEOther": "Speech recognition failed.",
+  "joiVoiceCode": "code",
+  "joiVoiceNoService":
+      "No speech recognition on this phone. The 'Google' app or 'Speech Recognition & Synthesis' is needed.",
+  "joiVoiceOpenGoogle": "Open the Google app (Play)",
+  "joiVoiceOpenSpeech": "Open Speech Services (Play)",
+  "joiVoiceDialogCancel": "Voice input cancelled.",
+  "joiVoiceException": "Speech recognition failed to start.",
 };

@@ -16,7 +16,7 @@ const String kProLifetimeId = 'gizlialan_pro_lifetime';
 const String kPlanLifetime = 'lifetime';
 
 /// Shown only when Play's formatted price could not be loaded.
-const String kProFallbackPrice = '499 TL';
+const String kProFallbackPrice = '200 TL';
 
 /// Products that grant Pro: the one-time purchase and the legacy
 /// subscription (existing subscribers keep Pro).

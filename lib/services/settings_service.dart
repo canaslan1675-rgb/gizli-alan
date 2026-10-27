@@ -1,5 +1,7 @@
+import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/material.dart' show ThemeMode;
 
+import 'joi_quota.dart';
 import '../theme.dart' show AccentPreset;
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,6 +39,13 @@ class SettingsService {
   static const _kThemeMode = 'theme_mode';
   static const _kAccent = 'accent_color';
   static const _kAnalytics = 'analytics_enabled';
+  static const _kJoiOnline = 'joi_online_consent';
+  static const _kJoiSpeak = 'joi_speak';
+  static const _kJoiMemory = 'joi_memory';
+  static const _kResume = 'resume_where_left';
+  static const _kJoiQuotaDay = 'joi_quota_day';
+  static const _kJoiQuotaCount = 'joi_quota_count';
+  static const _kResumeMax = 'resume_max_min';
 
   /// Seconds before auto-lock after leaving the app or the screen turning
   /// off. 0 = immediately. Legacy values (15 s, 5 min) snap onto these.
@@ -68,6 +77,16 @@ class SettingsService {
   bool get proStubActive => _prefs.getBool(_kProStub) ?? false;
 
   Future<void> setProStubActive(bool v) => _prefs.setBool(_kProStub, v);
+
+  /// Free Joi daily message quota (see [JoiDailyQuota]).
+  JoiDailyQuota get joiQuota => JoiDailyQuota(
+    readDay: () => _prefs.getString(_kJoiQuotaDay),
+    readCount: () => _prefs.getInt(_kJoiQuotaCount) ?? 0,
+    write: (day, count) async {
+      await _prefs.setString(_kJoiQuotaDay, day);
+      await _prefs.setInt(_kJoiQuotaCount, count);
+    },
+  );
 
   /// `play`: cached Google Play Pro purchase state (ProBilling). Re-checked
   /// against Play on every start; read through [ProEntitlement].
@@ -117,6 +136,41 @@ class SettingsService {
 
   Future<void> setLockTimeoutSec(int sec) =>
       _prefs.setInt(_kLockTimeout, normalizeLockTimeout(sec));
+
+  /// "Çıkınca bıraktığım yerden devam et" (0.6.2). Off (default): leaving
+  /// the app follows [lockTimeoutSec] (back to the calculator). On: the vault
+  /// stays open on the same screen, but still locks after [resumeMaxMin]
+  /// minutes in the background; a process death / reboot always locks
+  /// (the session key lives only in memory).
+  bool get resumeWhereLeft => _prefs.getBool(_kResume) ?? false;
+
+  Future<void> setResumeWhereLeft(bool v) => _prefs.setBool(_kResume, v);
+
+  static const resumeMaxChoices = [1, 5, 15];
+
+  int get resumeMaxMin {
+    final v = _prefs.getInt(_kResumeMax) ?? 5;
+    return resumeMaxChoices.contains(v) ? v : 5;
+  }
+
+  Future<void> setResumeMaxMin(int v) =>
+      _prefs.setInt(_kResumeMax, resumeMaxChoices.contains(v) ? v : 5);
+
+  /// Background seconds before auto-lock, taking [resumeWhereLeft] into
+  /// account (used by the app lifecycle).
+  int get effectiveLockTimeoutSec =>
+      resumeWhereLeft ? resumeMaxMin * 60 : lockTimeoutSec;
+
+  /// Joi reads its answers aloud (0.6.2). Default off; voice questions are
+  /// always answered aloud.
+  bool get joiSpeak => _prefs.getBool(_kJoiSpeak) ?? false;
+
+  Future<void> setJoiSpeak(bool v) => _prefs.setBool(_kJoiSpeak, v);
+
+  /// Joi long-term memory (Pro). Default on; facts stay on the device.
+  bool get joiMemory => _prefs.getBool(_kJoiMemory) ?? true;
+
+  Future<void> setJoiMemory(bool v) => _prefs.setBool(_kJoiMemory, v);
 
   /// Index into GizliTheme.wallpapers for the vault home screen.
   int get wallpaper => _prefs.getInt(_kWallpaper) ?? 0;
@@ -215,7 +269,16 @@ class SettingsService {
 
   Future<void> setAnalyticsEnabled(bool v) => _prefs.setBool(_kAnalytics, v);
 
-  String get language => _prefs.getString(_kLang) ?? 'tr';
+  /// Joi online answers (0.6.2): user consented to sending general
+  /// questions (never notes) to Google Gemini. Default off; revocable in
+  /// Settings. Without it Joi makes no network call.
+  bool get joiOnlineConsent => _prefs.getBool(_kJoiOnline) ?? false;
+
+  Future<void> setJoiOnlineConsent(bool v) => _prefs.setBool(_kJoiOnline, v);
+
+  String get language =>
+      _prefs.getString(_kLang) ??
+      L10n.fromLocales(PlatformDispatcher.instance.locales);
 
   Future<void> setLanguage(String code) async {
     await _prefs.setString(_kLang, L10n.supported.contains(code) ? code : 'tr');

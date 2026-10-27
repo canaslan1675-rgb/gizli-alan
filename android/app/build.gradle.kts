@@ -140,4 +140,24 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:2.8.7")
     implementation("androidx.lifecycle:lifecycle-common-java8:2.8.7")
     implementation("com.android.installreferrer:installreferrer:2.2")
+
+    // Joi (0.6.2): Gemini Nano on-device via ML Kit GenAI Prompt API (AICore).
+    // Inference runs on the device only (JoiChannel.kt).
+    implementation("com.google.mlkit:genai-prompt:1.0.0-beta4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+
+    // Joi online fallback (0.6.2): Firebase AI Logic (Gemini Developer API)
+    // for GENERAL questions only, opt-in with consent; never note content.
+    // Firebase is initialised at runtime from --dart-define values (no
+    // google-services.json / gms plugin); without them it is never touched.
+    // App Check (Play Integrity) is installed on that app for abuse protection.
+    implementation(platform("com.google.firebase:firebase-bom:35.1.0"))
+    implementation("com.google.firebase:firebase-ai")
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    // Debug provider: used only when built with JOI_APPCHECK_DEBUG_TOKEN
+    // (sideloaded test APKs); the token must be registered in the console.
+    implementation("com.google.firebase:firebase-appcheck-debug")
+
+    // Google Play In-App Updates (flexible), 0.6.2. No-op on sideloaded APKs.
+    implementation("com.google.android.play:app-update:2.1.0")
 }
