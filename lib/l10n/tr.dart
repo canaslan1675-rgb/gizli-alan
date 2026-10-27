@@ -442,7 +442,7 @@ const Map<String, String> tr = {
   'proUsage': 'Kullanım: {n} / {max} öğe',
   'proCurrent': 'Mevcut',
   'proLifetime': 'Pro — tek seferlik',
-  'proLifetimePrice': '499 TL',
+  'proLifetimePrice': '200 TL',
   'proF1': 'İkinci telefon',
   'proF2': 'Sınırsız öğe',
   'proF3': 'ⓘ simgesini gizleme',

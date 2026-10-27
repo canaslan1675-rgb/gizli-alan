@@ -409,7 +409,7 @@ const Map<String, String> ru = {
   'proUsage': "Использовано: {n} / {max} объектов",
   'proCurrent': "Текущий",
   'proLifetime': "Pro — разовая покупка",
-  'proLifetimePrice': "499 TL",
+  'proLifetimePrice': "200 TL",
   'proF1': "Второй телефон",
   'proF2': "Неограниченное число объектов",
   'proF3': "Скрыть значок ⓘ",

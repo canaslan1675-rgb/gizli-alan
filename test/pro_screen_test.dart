@@ -114,7 +114,7 @@ void main() {
         expect(find.text('Up to 10 items'), findsOneWidget);
         expect(find.text('Usage: 1 / 10 items'), findsOneWidget);
         // Static TL price is only shown in Turkish (no TL to foreign users).
-        expect(find.text('499 TL'), findsNothing);
+        expect(find.text('200 TL'), findsNothing);
         await tester.scrollUntilVisible(
           find.text('Pro — one-time'),
           200,
@@ -218,7 +218,7 @@ void main() {
           find.textContaining('limited free version (up to 10 items)'),
           findsOneWidget,
         );
-        expect(find.textContaining('499 TL'), findsOneWidget);
+        expect(find.textContaining('200 TL'), findsOneWidget);
         expect(
           find.textContaining('Second phone'),
           f == AppFlavor.full ? findsWidgets : findsNothing,
@@ -231,7 +231,7 @@ void main() {
         );
         if (f == AppFlavor.play) {
           expect(find.byKey(const ValueKey('pay_price')), findsOneWidget);
-          expect(find.text('499 TL'), findsOneWidget);
+          expect(find.text('200 TL'), findsOneWidget);
           expect(find.textContaining('free trial'), findsNothing);
           expect(find.textContaining('/ month'), findsNothing);
         }

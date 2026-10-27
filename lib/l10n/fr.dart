@@ -412,7 +412,7 @@ const Map<String, String> fr = {
   "proUsage": "Utilisation : {n} / {max} éléments",
   "proCurrent": "Actuel",
   "proLifetime": "Pro — achat unique",
-  "proLifetimePrice": "499 TL",
+  "proLifetimePrice": "200 TL",
   "proF1": "Second téléphone",
   "proF2": "Éléments illimités",
   "proF3": "Masquer l'icône ⓘ",

@@ -443,7 +443,7 @@ const Map<String, String> en = {
   'proUsage': 'Usage: {n} / {max} items',
   'proCurrent': 'Current',
   'proLifetime': 'Pro — one-time',
-  'proLifetimePrice': '499 TL',
+  'proLifetimePrice': '200 TL',
   'proF1': 'Second phone',
   'proF2': 'Unlimited items',
   'proF3': 'Hide the ⓘ icon',

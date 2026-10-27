@@ -410,7 +410,7 @@ const Map<String, String> nl = {
   "proUsage": "Gebruik: {n} / {max} items",
   "proCurrent": "Huidig",
   "proLifetime": "Pro – eenmalig",
-  "proLifetimePrice": "499 TL",
+  "proLifetimePrice": "200 TL",
   "proF1": "Tweede telefoon",
   "proF2": "Onbeperkt items",
   "proF3": "Het ⓘ-icoon verbergen",

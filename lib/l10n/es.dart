@@ -411,7 +411,7 @@ const Map<String, String> es = {
   "proUsage": "Uso: {n} / {max} elementos",
   "proCurrent": "Actual",
   "proLifetime": "Pro — pago único",
-  "proLifetimePrice": "499 TL",
+  "proLifetimePrice": "200 TL",
   "proF1": "Segundo teléfono",
   "proF2": "Elementos ilimitados",
   "proF3": "Ocultar el icono ⓘ",

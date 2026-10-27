@@ -350,7 +350,7 @@ const Map<String, String> zh = {
   "proUsage": "已用：{n} / {max} 个项目",
   "proCurrent": "当前",
   "proLifetime": "Pro — 一次性购买",
-  "proLifetimePrice": "499 TL",
+  "proLifetimePrice": "200 TL",
   "proF1": "第二部手机",
   "proF2": "无限项目",
   "proF3": "隐藏 ⓘ 图标",
