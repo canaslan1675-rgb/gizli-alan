@@ -190,24 +190,32 @@ void main() {
     }
   });
 
-  test('online errors map to busy/offline, never throw', () async {
-    for (final (code, err) in [
-      ('busy', JoiOnlineError.busy),
-      ('offline', JoiOnlineError.offline),
-      ('zzz', JoiOnlineError.failed),
-    ]) {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(ch, (c) async {
-            if (c.method == 'status') return 'unavailable';
-            throw PlatformException(code: code);
-          });
-      final j = JoiService(onlineConfig: cfg, hasOnlineConsent: () => true);
-      await j.status();
-      final a = await j.ask('soru', lang: 'tr');
-      expect(a.text, isNull);
-      expect(a.error, err);
-    }
-  });
+  test(
+    'online errors map to distinct classes with debug detail, never throw',
+    () async {
+      for (final (code, err) in [
+        ('quota', JoiOnlineError.quota),
+        ('timeout', JoiOnlineError.timeout),
+        ('auth', JoiOnlineError.auth),
+        ('model', JoiOnlineError.model),
+        ('server', JoiOnlineError.server),
+        ('offline', JoiOnlineError.offline),
+        ('zzz', JoiOnlineError.failed),
+      ]) {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(ch, (c) async {
+              if (c.method == 'status') return 'unavailable';
+              throw PlatformException(code: code);
+            });
+        final j = JoiService(onlineConfig: cfg, hasOnlineConsent: () => true);
+        await j.status();
+        final a = await j.ask('soru', lang: 'tr');
+        expect(a.text, isNull);
+        expect(a.error, err);
+        expect(a.detail, startsWith(code));
+      }
+    },
+  );
 
   testWidgets('online: consent dialog, badge, no summarize chip', (
     tester,

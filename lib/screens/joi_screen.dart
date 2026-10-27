@@ -15,7 +15,11 @@ class _Msg {
     this.notes = const [],
     this.query = '',
     this.online,
+    this.debug,
   });
+
+  /// Small grey debug line (error class / detail).
+  final String? debug;
   final bool fromUser;
 
   /// AI answers: true = online (Gemini over internet), false = on device.
@@ -188,20 +192,32 @@ class _JoiScreenState extends State<JoiScreen> {
       }
       if (_online) {
         // ONLY the question goes out — never notes (JoiService.ask).
-        final a = await _joi.ask(q, lang: L10n.lang);
-        if (!mounted) return;
-        _add(
-          _Msg(
-            false,
-            a.text ??
-                switch (a.error) {
-                  JoiOnlineError.busy => t('joiBusy'),
+        // Streaming: one bubble updated as words arrive.
+        final idx = _msgs.length;
+        _add(_Msg(false, '…', online: true));
+        final a = await _joi.ask(
+          q,
+          lang: L10n.lang,
+          onPartial: (p) {
+            if (mounted && idx < _msgs.length) {
+              setState(() => _msgs[idx] = _Msg(false, p, online: true));
+            }
+          },
+        );
+        if (!mounted || idx >= _msgs.length) return;
+        setState(
+          () => _msgs[idx] = a.text != null
+              ? _Msg(false, a.text!, online: true)
+              : _Msg(false, switch (a.error) {
+                  JoiOnlineError.timeout => t('joiTimeout'),
+                  JoiOnlineError.quota => t('joiBusy'),
+                  JoiOnlineError.server => t('joiServer'),
+                  JoiOnlineError.auth => t('joiAuth'),
+                  JoiOnlineError.model => t('joiModelErr'),
                   JoiOnlineError.offline => t('joiOffline'),
                   JoiOnlineError.noConsent => t('joiNoConsent'),
                   _ => t('joiError'),
-                },
-            online: a.text == null ? null : true,
-          ),
+                }, debug: a.detail ?? a.error?.name),
         );
         return;
       }
@@ -345,6 +361,17 @@ class _JoiScreenState extends State<JoiScreen> {
                 ),
               ),
             SelectableText(m.text),
+            if (m.debug != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  m.debug!,
+                  key: const ValueKey('joi_debug'),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 10, color: gc.textSecondary),
+                ),
+              ),
             for (final n in m.notes)
               ListTile(
                 dense: true,

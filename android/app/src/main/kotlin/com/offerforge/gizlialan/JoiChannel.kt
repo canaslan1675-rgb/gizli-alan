@@ -17,7 +17,6 @@ import com.google.firebase.ai.type.QuotaExceededException
 import com.google.firebase.ai.type.ServerException
 import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
-import com.google.firebase.ai.type.thinkingConfig
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
@@ -28,6 +27,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.TimeoutCancellationException
@@ -44,7 +45,8 @@ import kotlinx.coroutines.TimeoutCancellationException
  * after the user's consent and never with note content (joi_service.dart).
  * Firebase is initialised lazily here from build-time values (no
  * google-services.json), as a named app, with App Check (Play Integrity).
- * Errors: "busy" (quota/429/5xx), "offline" (network), "failed".
+ * Streams partial text on `gizlialan/joi_stream`; primary + fallback model.
+ * Errors: see [errorCode]; PlatformException.message = debug detail.
  */
 class JoiChannel private constructor(
     private val context: Context,
@@ -54,12 +56,12 @@ class JoiChannel private constructor(
     private var model: GenerativeModel? = null
     val channel = MethodChannel(messenger, NAME)
 
-    private var online: OnlineModel? = null
-    private var onlineKey: String? = null
+    private val online = HashMap<String, OnlineModel>()
+    private val stream = MethodChannel(messenger, STREAM_NAME)
 
     private fun onlineModel(apiKey: String, appId: String, projectId: String, name: String, system: String, debugToken: String): OnlineModel {
         val key = "$appId|$name|${system.hashCode()}"
-        online?.let { if (onlineKey == key) return it }
+        online[key]?.let { return it }
         val app = FirebaseApp.getApps(context).firstOrNull { it.name == APP_NAME }
             ?: FirebaseApp.initializeApp(
                 context,
@@ -100,35 +102,104 @@ class JoiChannel private constructor(
             modelName = name,
             generationConfig = generationConfig {
                 temperature = 0.4f
-                maxOutputTokens = 400
-                // No "thinking": keeps latency/tokens low for short answers.
-                thinkingConfig = thinkingConfig { thinkingBudget = 0 }
+                maxOutputTokens = 300
+                // flash-lite models don't think by default; an explicit
+                // thinkingBudget=0 is rejected (400) by them, so none is set.
             },
             systemInstruction = content { text(system) },
         )
-        online = m
-        onlineKey = key
+        online[key] = m
         return m
     }
 
+    /**
+     * Error class for Dart (distinct Turkish message per class):
+     * timeout | quota (429) | auth (401/403: App Check, API key restriction,
+     * missing SHA, AI Logic API disabled) | model (400/404: model name or
+     * config) | server (5xx) | offline | failed.
+     */
     private fun errorCode(t: Throwable): String {
         var c: Throwable? = t
         while (c != null) {
-            if (c is TimeoutCancellationException) return "busy"
-            if (c is QuotaExceededException) return "busy"
-            if (c is ServerException) return "busy"
+            if (c is TimeoutCancellationException || c is FirstTokenTimeout) return "timeout"
+            if (c is QuotaExceededException) return "quota"
             if (c is IOException) return "offline"
-            val msg = c.message ?: ""
-            if (msg.contains("429") || msg.contains("RESOURCE_EXHAUSTED")) return "busy"
-            // App Check rejected / key or API not allowed → treat as busy.
+            val msg = (c.javaClass.simpleName + " " + (c.message ?: ""))
+            if (msg.contains("429") || msg.contains("RESOURCE_EXHAUSTED") || msg.contains("Quota")) return "quota"
             if (msg.contains("403") || msg.contains("401") ||
                 msg.contains("PERMISSION_DENIED") || msg.contains("UNAUTHENTICATED") ||
-                msg.contains("App Check", ignoreCase = true)
-            ) return "busy"
-            if (msg.contains("UnknownHost") || msg.contains("Unable to resolve host")) return "offline"
+                msg.contains("App Check", ignoreCase = true) || msg.contains("AppCheck") ||
+                msg.contains("InvalidAPIKey") || msg.contains("ServiceDisabled") ||
+                msg.contains("API_KEY")
+            ) return "auth"
+            if (msg.contains("404") || msg.contains("NOT_FOUND") || msg.contains("400") ||
+                msg.contains("INVALID_ARGUMENT")
+            ) return "model"
+            if (msg.contains("UnknownHost") || msg.contains("Unable to resolve host") ||
+                msg.contains("ConnectException") || msg.contains("SocketTimeout")
+            ) return "offline"
+            if (c is ServerException) return "server"
             c = c.cause
         }
         return "failed"
+    }
+
+    private fun detail(t: Throwable): String {
+        val root = generateSequence(t) { it.cause }.last()
+        return (t.javaClass.simpleName + ": " + (t.message ?: root.message ?: ""))
+            .replace(Regex("AIza[0-9A-Za-z_-]+"), "AIza…").take(160)
+    }
+
+    /**
+     * Streams one answer: primary model, then the fallback model if the
+     * first fails or gives no first token within [FIRST_TOKEN_MS]. Partial
+     * text goes to Dart over [STREAM_NAME] ("chunk" {id, text}).
+     */
+    private suspend fun streamAnswer(
+        id: Int, models: List<String>, apiKey: String, appId: String,
+        projectId: String, system: String, debugToken: String, question: String,
+    ): String {
+        var last: Throwable? = null
+        val tried = ArrayList<String>()
+        for (name in models.filter { it.isNotBlank() }.distinct()) {
+            val sb = StringBuilder()
+            try {
+                val m = onlineModel(apiKey, appId, projectId, name, system, debugToken)
+                withTimeout(TOTAL_MS) {
+                    coroutineScope {
+                        var gotFirst = false
+                        // A non-cancellation exception here fails the scope
+                        // and so stops the stream.
+                        val guard = launch {
+                            delay(FIRST_TOKEN_MS)
+                            if (!gotFirst) throw FirstTokenTimeout()
+                        }
+                        m.generateContentStream(question).collect { r ->
+                            val piece = r.text ?: ""
+                            if (piece.isNotEmpty()) {
+                                gotFirst = true
+                                guard.cancel()
+                                sb.append(piece)
+                                stream.invokeMethod(
+                                    "chunk",
+                                    mapOf("id" to id, "text" to sb.toString(), "model" to name),
+                                )
+                            }
+                        }
+                        guard.cancel()
+                    }
+                }
+                if (sb.isNotBlank()) return sb.toString()
+                tried.add("$name:empty")
+            } catch (t: Throwable) {
+                // Got part of an answer already: keep it rather than retry.
+                if (sb.isNotBlank()) return sb.toString()
+                last = t
+                tried.add("$name:${errorCode(t)}")
+            }
+        }
+        throw JoiOnlineFailure(last?.let { errorCode(it) } ?: "failed",
+            tried.joinToString(" → ") + (last?.let { " | " + detail(it) } ?: ""))
     }
 
     private fun model(): GenerativeModel = model ?: Generation.getClient().also { model = it }
@@ -181,20 +252,26 @@ class JoiChannel private constructor(
                     val apiKey = call.argument<String>("apiKey") ?: ""
                     val appId = call.argument<String>("appId") ?: ""
                     val projectId = call.argument<String>("projectId") ?: ""
-                    val name = call.argument<String>("model") ?: "gemini-3.8-flash"
+                    val models = listOf(
+                        call.argument<String>("model") ?: "gemini-3.5-flash-lite",
+                        call.argument<String>("fallbackModel") ?: "gemini-flash-lite-latest",
+                    )
                     val debugToken = call.argument<String>("appCheckDebugToken") ?: ""
                     val system = call.argument<String>("system") ?: ""
                     val question = (call.argument<String>("question") ?: "").take(500)
+                    val id = call.argument<Int>("id") ?: 0
                     if (apiKey.isEmpty() || appId.isEmpty() || projectId.isEmpty() || question.isBlank()) {
                         result.error("failed", "not_configured", null)
                     } else {
                         scope.launch {
                             try {
-                                val m = onlineModel(apiKey, appId, projectId, name, system, debugToken)
-                                val text = withTimeout(45_000) { m.generateContent(question).text }
-                                result.success(text ?: "")
+                                result.success(
+                                    streamAnswer(id, models, apiKey, appId, projectId, system, debugToken, question),
+                                )
+                            } catch (f: JoiOnlineFailure) {
+                                result.error(f.code, f.detail, null)
                             } catch (t: Throwable) {
-                                result.error(errorCode(t), t.javaClass.simpleName, null)
+                                result.error(errorCode(t), detail(t), null)
                             }
                         }
                     }
@@ -208,13 +285,21 @@ class JoiChannel private constructor(
         channel.setMethodCallHandler(null)
         try { model?.close() } catch (_: Throwable) {}
         model = null
-        online = null
+        online.clear()
         scope.cancel()
     }
 
     companion object {
         const val NAME = "gizlialan/joi"
+        const val STREAM_NAME = "gizlialan/joi_stream"
         private const val APP_NAME = "joi"
+        private const val FIRST_TOKEN_MS = 12_000L
+        private const val TOTAL_MS = 30_000L
         fun attach(context: Context, messenger: BinaryMessenger) = JoiChannel(context, messenger)
     }
 }
+
+private class JoiOnlineFailure(val code: String, val detail: String) : Exception(detail)
+
+/** No first token within FIRST_TOKEN_MS (fails the stream scope). */
+private class FirstTokenTimeout : Exception("first_token_timeout")

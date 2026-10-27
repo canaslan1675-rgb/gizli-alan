@@ -582,7 +582,7 @@ const Map<String, String> tr = {
   "joiConsentDeny": "Vazgeç",
   "joiNoConsent":
       "Çevrimiçi yanıt için izin verilmedi. Notlarında anahtar kelimeyle arama yapabilirsin; izni Ayarlar'dan açabilirsin.",
-  "joiBusy": "Joi şu an yoğun. Biraz sonra tekrar dene.",
+  "joiBusy": "Joi şu an yoğun (kota doldu). Biraz sonra tekrar dene.",
   "joiOffline":
       "İnternet yok gibi görünüyor. Bağlantını kontrol edip tekrar dene.",
   "joiBadgeOnline": "çevrimiçi",
@@ -590,4 +590,11 @@ const Map<String, String> tr = {
   "joiOnlineToggle": "Joi çevrimiçi yanıtlar",
   "joiOnlineToggleHint":
       "Gemini Nano olmayan telefonlarda genel sorular Google Gemini'ye gönderilir. Notlar asla gönderilmez.",
+  "joiTimeout": "Joi zamanında yanıt alamadı. Tekrar dene.",
+  "joiServer":
+      "Google tarafında geçici bir sorun var. Biraz sonra tekrar dene.",
+  "joiAuth":
+      "Joi'nin çevrimiçi hizmetine erişim reddedildi (uygulama doğrulaması). Bu sürümde çevrimiçi yanıt kullanılamıyor.",
+  "joiModelErr":
+      "Joi'nin çevrimiçi modeli şu an kullanılamıyor. Uygulama güncellemesi gerekebilir.",
 };

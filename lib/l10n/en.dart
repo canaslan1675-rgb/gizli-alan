@@ -583,11 +583,17 @@ const Map<String, String> en = {
   "joiConsentDeny": "Cancel",
   "joiNoConsent":
       "Online answers not allowed. You can search your notes by keyword; enable it in Settings.",
-  "joiBusy": "Joi is busy right now. Try again shortly.",
+  "joiBusy": "Joi is busy right now (quota reached). Try again shortly.",
   "joiOffline": "No internet connection. Check your connection and try again.",
   "joiBadgeOnline": "online",
   "joiBadgeDevice": "on device",
   "joiOnlineToggle": "Joi online answers",
   "joiOnlineToggleHint":
       "On phones without Gemini Nano, general questions are sent to Google Gemini. Notes are never sent.",
+  "joiTimeout": "Joi didn't get an answer in time. Try again.",
+  "joiServer": "Temporary problem on Google's side. Try again shortly.",
+  "joiAuth":
+      "Access to Joi's online service was denied (app verification). Online answers aren't available in this build.",
+  "joiModelErr":
+      "Joi's online model is unavailable right now. An app update may be needed.",
 };

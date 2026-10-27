@@ -75,8 +75,9 @@ class NanoBackend implements JoiBackend {
 /// Build-time config for the opt-in online backend (Firebase AI Logic,
 /// Gemini Developer API). Injected with `--dart-define`, never in git:
 /// FIREBASE_API_KEY, FIREBASE_APP_ID (1:…:android:…), FIREBASE_PROJECT_ID,
-/// optional JOI_ONLINE_MODEL (default gemini-3.8-flash — 2.5-flash is closed
-/// to new projects), optional JOI_APPCHECK_DEBUG_TOKEN (test builds only). Empty => the online
+/// optional JOI_ONLINE_MODEL / JOI_ONLINE_FALLBACK_MODEL (default
+/// gemini-3.5-flash-lite → gemini-flash-lite-latest: ~0.7 s to first token
+/// measured 2026-10-27; gemini-3.8-flash timed out / 429 on the free tier), optional JOI_APPCHECK_DEBUG_TOKEN (test builds only). Empty => the online
 /// backend is compiled in but always unavailable (graceful fallback).
 class JoiOnlineConfig {
   const JoiOnlineConfig({
@@ -85,7 +86,11 @@ class JoiOnlineConfig {
     this.projectId = const String.fromEnvironment('FIREBASE_PROJECT_ID'),
     this.model = const String.fromEnvironment(
       'JOI_ONLINE_MODEL',
-      defaultValue: 'gemini-3.8-flash',
+      defaultValue: 'gemini-3.5-flash-lite',
+    ),
+    this.fallbackModel = const String.fromEnvironment(
+      'JOI_ONLINE_FALLBACK_MODEL',
+      defaultValue: 'gemini-flash-lite-latest',
     ),
     this.appCheckDebugToken = const String.fromEnvironment(
       'JOI_APPCHECK_DEBUG_TOKEN',
@@ -96,6 +101,7 @@ class JoiOnlineConfig {
   final String appId;
   final String projectId;
   final String model;
+  final String fallbackModel;
   final String appCheckDebugToken;
 
   bool get configured =>
@@ -106,12 +112,22 @@ class JoiOnlineConfig {
     'appId': appId,
     'projectId': projectId,
     'model': model,
+    'fallbackModel': fallbackModel,
     'appCheckDebugToken': appCheckDebugToken,
   };
 }
 
 /// Why an online answer failed (shown as a Turkish/EN/RU message).
-enum JoiOnlineError { busy, offline, failed, noConsent }
+enum JoiOnlineError {
+  timeout,
+  quota,
+  auth,
+  model,
+  server,
+  offline,
+  failed,
+  noConsent,
+}
 
 /// Opt-in ONLINE backend (0.6.2, owner decision): Gemini via Firebase AI
 /// Logic (Gemini Developer API) — only for GENERAL questions on phones
@@ -139,6 +155,24 @@ class JoiOnlineBackend implements JoiBackend {
   /// Error of the last failed [generate] call (null after success).
   JoiOnlineError? lastError;
 
+  /// Native debug detail of the last error (model chain, exception).
+  String? lastDetail;
+
+  static const _stream = MethodChannel('gizlialan/joi_stream');
+  static int _seq = 0;
+  static final _partials = <int, void Function(String)>{};
+  static bool _streamHooked = false;
+
+  static void _hookStream() {
+    if (_streamHooked) return;
+    _streamHooked = true;
+    _stream.setMethodCallHandler((c) async {
+      if (c.method != 'chunk') return;
+      final a = c.arguments as Map;
+      _partials[a['id'] as int]?.call(a['text'] as String);
+    });
+  }
+
   @override
   String get id => 'gemini_online';
 
@@ -153,8 +187,13 @@ class JoiOnlineBackend implements JoiBackend {
 
   /// [prompt] must be the bare user question (see [JoiService.ask]).
   @override
-  Future<String?> generate(String prompt, {String lang = 'tr'}) async {
+  Future<String?> generate(
+    String prompt, {
+    String lang = 'tr',
+    void Function(String partial)? onPartial,
+  }) async {
     lastError = null;
+    lastDetail = null;
     if (!config.configured) {
       lastError = JoiOnlineError.failed;
       return null;
@@ -171,11 +210,19 @@ class JoiOnlineBackend implements JoiBackend {
     var q = prompt.trim();
     if (q.isEmpty) return null;
     if (q.length > maxQuestionChars) q = q.substring(0, maxQuestionChars);
+    final id = ++_seq;
+    if (onPartial != null) {
+      try {
+        _hookStream();
+        _partials[id] = onPartial;
+      } catch (_) {}
+    }
     try {
       final r = await _ch.invokeMethod<String>('onlineGenerate', {
         ...config.toMap(),
         'system': JoiService.onlineSystemPrompt(lang),
         'question': q,
+        'id': id,
       });
       final s = r?.trim();
       if (s == null || s.isEmpty) {
@@ -184,27 +231,34 @@ class JoiOnlineBackend implements JoiBackend {
       }
       return s;
     } on PlatformException catch (e) {
-      lastError = switch (e.code) {
-        'busy' => JoiOnlineError.busy,
-        'offline' => JoiOnlineError.offline,
-        _ => JoiOnlineError.failed,
-      };
+      lastError =
+          JoiOnlineError.values
+              .where((v) => v.name == e.code && v != JoiOnlineError.noConsent)
+              .firstOrNull ??
+          JoiOnlineError.failed;
+      lastDetail = '${e.code}: ${e.message ?? ''}';
       return null;
-    } catch (_) {
+    } catch (e) {
       lastError = JoiOnlineError.failed;
+      lastDetail = e.runtimeType.toString();
       return null;
+    } finally {
+      _partials.remove(id);
     }
   }
 }
 
 /// Result of [JoiService.ask].
 class JoiAnswer {
-  const JoiAnswer(this.text, {required this.online, this.error});
+  const JoiAnswer(this.text, {required this.online, this.error, this.detail});
   final String? text;
 
   /// true = answered by the online (Gemini over the internet) backend.
   final bool online;
   final JoiOnlineError? error;
+
+  /// Short debug detail (error class / model chain) for a grey line.
+  final String? detail;
 }
 
 /// "Joi" — GizliAlan's assistant (0.6.2).
@@ -297,12 +351,18 @@ class JoiService {
     String question, {
     required String lang,
     List<Note> notes = const [],
+    void Function(String partial)? onPartial,
   }) async {
     if (_active == null) await status();
     final a = _active;
     if (a is JoiOnlineBackend) {
-      final r = await a.generate(question, lang: lang);
-      return JoiAnswer(r, online: true, error: r == null ? a.lastError : null);
+      final r = await a.generate(question, lang: lang, onPartial: onPartial);
+      return JoiAnswer(
+        r,
+        online: true,
+        error: r == null ? a.lastError : null,
+        detail: r == null ? a.lastDetail : null,
+      );
     }
     if (a == null) return const JoiAnswer(null, online: false);
     return JoiAnswer(
@@ -328,13 +388,10 @@ class JoiService {
 
   /// System prompt for the online backend (no on-device claim, no notes).
   static String onlineSystemPrompt(String lang) =>
-      'You are Joi, GizliAlan uygulamasının asistanı (the assistant of the '
-      'GizliAlan app). This answer is produced online by Google Gemini; you '
-      'have NO access to the user\'s notes or files. Be a helpful, accurate '
-      'general assistant: answer general-knowledge questions clearly and '
-      'briefly (at most a few short paragraphs). Answer in the same language '
-      'as the user\'s message; if unclear, answer in ${languageName(lang)}. '
-      'If you do not know something, say so instead of inventing it.';
+      'Sen Joi\'sin, GizliAlan uygulamasının asistanı. Kullanıcının notlarına '
+      'erişimin yok. Genel sorulara kısa ve doğru yanıt ver (en fazla birkaç '
+      'cümle). Kullanıcının dilinde yanıtla; belirsizse ${languageName(lang)}. '
+      'Bilmiyorsan uydurma.';
 
   /// Prompt for a free question. [notes] (optional) are added as context.
   static String chatPrompt(
