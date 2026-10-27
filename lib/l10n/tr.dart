@@ -690,4 +690,30 @@ const Map<String, String> tr = {
   "joiNoFakeAction":
       "Ben kendim bir şey indiremem ya da kaydedemem; bunu uygulama yapar. Fotoğraf için örneğin \"Hadise'nin fotoğrafını indir\" yaz, sonuçları burada gösteririm, dokununca galerine kaydedilir.",
   "joiImgSaveFirst": "İlkini galeriye kaydet",
+  "joiMemoryTitle": "Joi'nin hatırladıkları",
+  "joiMemorySaved": "Joi bunu hatırladı",
+  "joiMemoryEdit": "Bilgiyi düzenle",
+  "joiMemoryForgetAll": "Tümünü unut",
+  "joiMemoryForgetAllBody":
+      "Joi'nin hatırladığı tüm bilgiler ve sohbet özetleri bu cihazdan silinecek. Sohbet geçmişin silinmez.",
+  "joiMemoryForgetAllOk": "Unut",
+  "joiMemoryToggle": "Hafıza",
+  "joiMemoryToggleHint":
+      "Joi sohbetlerden seninle ilgili kısa bilgileri hatırlasın",
+  "joiMemoryEmpty":
+      "Joi henüz bir şey hatırlamıyor. Sohbet ettikçe adın, sevdiklerin gibi kısa bilgileri burada görürsün.",
+  "joiMemorySummaries": "Önceki sohbet özetleri",
+  "joiMemoryPrivacy":
+      "Hatırlananlar yalnızca bu cihazda, kasanın içinde şifreli saklanır. Sağlık, para, şifre, adres ve kimlik bilgileri kaydedilmez. Hafıza açıkken Joi, ilgili birkaç bilgiyi çevrimiçi yanıt için soruyla birlikte gönderir; notların asla gönderilmez.",
+  "joiMemoryProBody":
+      "Joi'nin seni hatırlaması (uzun süreli hafıza) Pro özelliğidir.",
+  "joiMemoryCat_identity": "Kimlik",
+  "joiMemoryCat_people": "Kişiler",
+  "joiMemoryCat_pets": "Evcil hayvanlar",
+  "joiMemoryCat_preference": "Tercihler",
+  "joiMemoryCat_interest": "İlgi alanları",
+  "joiMemoryCat_goal": "Hedefler",
+  "joiMemoryCat_event": "Olaylar",
+  "joiMemoryCat_other": "Diğer",
+  "joiMemoryDelete": "Sil",
 };

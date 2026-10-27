@@ -689,4 +689,29 @@ const Map<String, String> en = {
   "joiNoFakeAction":
       "I can't download or save anything myself; the app does that. For a photo, type e.g. \"download a photo of Hadise\" and I'll show results here; tap one to save it.",
   "joiImgSaveFirst": "Save the first to gallery",
+  "joiMemoryTitle": "What Joi remembers",
+  "joiMemorySaved": "Joi remembered this",
+  "joiMemoryEdit": "Edit",
+  "joiMemoryForgetAll": "Forget everything",
+  "joiMemoryForgetAllBody":
+      "All facts Joi remembers and chat summaries will be deleted from this device. Your chat history is kept.",
+  "joiMemoryForgetAllOk": "Forget",
+  "joiMemoryToggle": "Memory",
+  "joiMemoryToggleHint": "Let Joi remember short facts about you from chats",
+  "joiMemoryEmpty":
+      "Joi doesn't remember anything yet. As you chat, short facts like your name or favourites appear here.",
+  "joiMemorySummaries": "Earlier chat summaries",
+  "joiMemoryPrivacy":
+      "Memories are stored only on this device, encrypted inside your vault. Health, money, passwords, addresses and ID numbers are not saved. With memory on, Joi sends a few relevant facts with your question for online answers; your notes are never sent.",
+  "joiMemoryProBody":
+      "Joi remembering you (long-term memory) is a Pro feature.",
+  "joiMemoryCat_identity": "Identity",
+  "joiMemoryCat_people": "People",
+  "joiMemoryCat_pets": "Pets",
+  "joiMemoryCat_preference": "Preferences",
+  "joiMemoryCat_interest": "Interests",
+  "joiMemoryCat_goal": "Goals",
+  "joiMemoryCat_event": "Events",
+  "joiMemoryCat_other": "Other",
+  "joiMemoryDelete": "Delete",
 };

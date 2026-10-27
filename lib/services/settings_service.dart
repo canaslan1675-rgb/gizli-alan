@@ -39,6 +39,7 @@ class SettingsService {
   static const _kAnalytics = 'analytics_enabled';
   static const _kJoiOnline = 'joi_online_consent';
   static const _kJoiSpeak = 'joi_speak';
+  static const _kJoiMemory = 'joi_memory';
   static const _kResume = 'resume_where_left';
   static const _kResumeMax = 'resume_max_min';
 
@@ -151,6 +152,11 @@ class SettingsService {
   bool get joiSpeak => _prefs.getBool(_kJoiSpeak) ?? false;
 
   Future<void> setJoiSpeak(bool v) => _prefs.setBool(_kJoiSpeak, v);
+
+  /// Joi long-term memory (Pro). Default on; facts stay on the device.
+  bool get joiMemory => _prefs.getBool(_kJoiMemory) ?? true;
+
+  Future<void> setJoiMemory(bool v) => _prefs.setBool(_kJoiMemory, v);
 
   /// Index into GizliTheme.wallpapers for the vault home screen.
   int get wallpaper => _prefs.getInt(_kWallpaper) ?? 0;

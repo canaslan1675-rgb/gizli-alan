@@ -9,6 +9,8 @@ import '../services/joi_tools.dart';
 import '../services/pro_entitlement.dart';
 import '../widgets/pro_gate.dart';
 import '../theme.dart';
+import '../services/joi_memory.dart';
+import 'joi_memory_screen.dart';
 import '../widgets/joi_avatar.dart';
 import '../widgets/joi_markdown.dart';
 import '../widgets/quick_lock.dart';
@@ -26,6 +28,7 @@ class _Msg {
     this.noteId,
     this.images = const [],
     this.saveFirst = false,
+    this.memory = false,
   });
 
   factory _Msg.fromChat(JoiChatMsg c) => _Msg(
@@ -53,6 +56,9 @@ class _Msg {
 
   /// Wikimedia Commons results (not persisted).
   final List<CommonsImage> images;
+
+  /// "Joi bunu hatırladı" chip (text = the saved facts).
+  final bool memory;
 
   /// Explicit "indir": show the "İlkini galeriye kaydet" button.
   final bool saveFirst;
@@ -83,6 +89,8 @@ class JoiScreen extends StatefulWidget {
     this.platform,
     this.createNote,
     this.isPro,
+    this.memoryStore,
+    this.memoryEnabled,
   });
 
   /// Test hook for the Pro entitlement (default: [ProEntitlement]).
@@ -90,6 +98,8 @@ class JoiScreen extends StatefulWidget {
 
   /// Test hooks (defaults: the vault session / platform channels).
   final JoiChatStore? chatStore;
+  final JoiMemoryStore? memoryStore;
+  final bool Function()? memoryEnabled;
   final JoiVoice? voice;
   final CommonsSearch? commons;
   final JoiPlatform? platform;
@@ -108,7 +118,7 @@ class JoiScreen extends StatefulWidget {
   State<JoiScreen> createState() => _JoiScreenState();
 }
 
-class _JoiScreenState extends State<JoiScreen> {
+class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
   // The Joi screen is always dark (portrait wallpaper), in every theme mode.
   GizliColors get gc => GizliColors.dark;
   late final JoiService _joi =
@@ -143,6 +153,67 @@ class _JoiScreenState extends State<JoiScreen> {
 
   bool get _speakOn => _pro && (_app?.settings.joiSpeak ?? false);
 
+  // ------------------------------------------------------------ memory
+  JoiMemoryStore? get _memStore =>
+      widget.memoryStore ?? _app?.session?.joiMemory;
+
+  bool get _memOn =>
+      _pro &&
+      _memStore != null &&
+      (widget.memoryEnabled?.call() ?? _app?.settings.joiMemory ?? false);
+
+  JoiMemoryEngine? _engineCache;
+  JoiMemoryEngine? get _engine {
+    final st = _memStore;
+    if (st == null) return null;
+    return _engineCache ??= JoiMemoryEngine(st, _joi);
+  }
+
+  List<JoiChatMsg> _chatList() => [
+    for (final m in _msgs)
+      if (m.text != '…' && !m.memory) m.toChat(),
+  ];
+
+  /// Extraction/summaries after an exchange or on pause/exit ([force]).
+  Future<void> _memorize({bool force = false}) async {
+    if (!_memOn) return;
+    final e = _engine;
+    if (e == null) return;
+    final added = await e.process(_chatList(), force: force);
+    if (added.isEmpty || !mounted) return;
+    _add(_Msg(false, added.map((f) => f.text).join(' · '), memory: true));
+    _persist();
+  }
+
+  Future<String> _memoryBlock(String q) async {
+    if (!_memOn) return '';
+    try {
+      return await _engine!.block(q);
+    } catch (_) {
+      return '';
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState s) {
+    if (s == AppLifecycleState.paused || s == AppLifecycleState.hidden) {
+      _memorize(force: true);
+    }
+  }
+
+  Future<void> _openMemory() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => JoiMemoryScreen(
+          store: _memStore,
+          isPro: widget.isPro,
+          enabled: widget.memoryEnabled,
+        ),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
   /// Shows the Pro upsell (and a short chat line) for a Pro-only action.
   Future<void> _upsell(String what) async {
     final t = L10n.current;
@@ -171,7 +242,7 @@ class _JoiScreenState extends State<JoiScreen> {
     try {
       await st.save([
         for (final m in _msgs)
-          if (m.text != '…') m.toChat(),
+          if (m.text != '…' && !m.memory) m.toChat(),
       ]);
     } catch (_) {}
   }
@@ -214,7 +285,10 @@ class _JoiScreenState extends State<JoiScreen> {
       ),
     );
     if (ok != true) return;
+    // Memories are separate: clearing the chat keeps them.
+    await _memorize(force: true);
     await _store?.clear();
+    await _memStore?.chatCleared();
     if (mounted) setState(_msgs.clear);
   }
 
@@ -268,6 +342,7 @@ class _JoiScreenState extends State<JoiScreen> {
   void initState() {
     super.initState();
     _checkStatus();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadHistory());
   }
 
@@ -282,7 +357,16 @@ class _JoiScreenState extends State<JoiScreen> {
   }
 
   @override
+  void deactivate() {
+    // Conversation exit: extract facts from what is left (async; the
+    // store/engine are resolved now, while ancestors are still reachable).
+    _memorize(force: true);
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _input.dispose();
     _scroll.dispose();
     if (_speaking) _voice.stopSpeaking();
@@ -461,10 +545,12 @@ class _JoiScreenState extends State<JoiScreen> {
         // Streaming: one bubble updated as words arrive.
         final idx = _msgs.length;
         _add(_Msg(false, '…', online: true));
+        final memory = await _memoryBlock(q);
         final a = await _joi.ask(
           q,
           lang: L10n.lang,
           history: history,
+          memory: memory,
           onPartial: (p) {
             if (mounted && idx < _msgs.length) {
               setState(() => _msgs[idx] = _Msg(false, p, online: true));
@@ -502,6 +588,7 @@ class _JoiScreenState extends State<JoiScreen> {
                 ),
         );
         spoken = a.text ?? _msgs[idx].text;
+        if (a.text != null) _persist().then((_) => _memorize());
         return;
       }
       final ctx = _notesMode
@@ -975,6 +1062,24 @@ class _JoiScreenState extends State<JoiScreen> {
   }
 
   Widget _bubble(_Msg m, L10n t) {
+    if (m.memory) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: ActionChip(
+            key: const ValueKey('joi_memory_chip'),
+            avatar: const Icon(Icons.psychology_outlined, size: 18),
+            label: Text(
+              '${t('joiMemorySaved')}: ${m.text}',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onPressed: _openMemory,
+          ),
+        ),
+      );
+    }
     final bg = m.fromUser
         ? Theme.of(context).colorScheme.primaryContainer
         : Theme.of(context).colorScheme.surfaceContainerHighest;
@@ -1229,8 +1334,14 @@ class _JoiScreenState extends State<JoiScreen> {
             key: const ValueKey('joi_menu'),
             onSelected: (v) {
               if (v == 'clear') _clearChat();
+              if (v == 'memory') _openMemory();
             },
             itemBuilder: (_) => [
+              PopupMenuItem(
+                key: const ValueKey('joi_menu_memory'),
+                value: 'memory',
+                child: Text(t('joiMemoryTitle')),
+              ),
               PopupMenuItem(
                 key: const ValueKey('joi_menu_clear'),
                 value: 'clear',

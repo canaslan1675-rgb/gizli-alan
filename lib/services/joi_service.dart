@@ -195,6 +195,7 @@ class JoiOnlineBackend implements JoiBackend {
     void Function(String partial)? onPartial,
     List<Map<String, String>> history = const [],
     String? system,
+    int maxChars = maxQuestionChars,
   }) async {
     lastError = null;
     lastDetail = null;
@@ -213,7 +214,7 @@ class JoiOnlineBackend implements JoiBackend {
     }
     var q = prompt.trim();
     if (q.isEmpty) return null;
-    if (q.length > maxQuestionChars) q = q.substring(0, maxQuestionChars);
+    if (q.length > maxChars) q = q.substring(0, maxChars);
     final id = ++_seq;
     if (onPartial != null) {
       try {
@@ -226,6 +227,7 @@ class JoiOnlineBackend implements JoiBackend {
         ...config.toMap(),
         'system': system ?? JoiService.onlineSystemPrompt(lang),
         'question': q,
+        'maxChars': maxChars,
         'id': id,
         'history': [
           for (final h in history)
@@ -361,6 +363,7 @@ class JoiService {
     List<Note> notes = const [],
     void Function(String partial)? onPartial,
     List<Map<String, String>> history = const [],
+    String memory = '',
   }) async {
     if (_active == null) await status();
     final a = _active;
@@ -370,6 +373,9 @@ class JoiService {
         lang: lang,
         onPartial: onPartial,
         history: history,
+        system: memory.isEmpty
+            ? null
+            : onlineSystemPrompt(lang, memory: memory),
       );
       return JoiAnswer(
         r,
@@ -426,6 +432,23 @@ class JoiService {
       'person/thing being talked about). Reply ONLY with JSON: '
       '{"is_image_request": true|false, "query": "<subject or null>"}';
 
+  /// One structured call for memory (fact extraction / summaries). Uses
+  /// Gemini Nano when it is the active backend, else the online model
+  /// (consent required). [input] is built from chat turns only.
+  Future<String?> memoryCall(String system, String input) async {
+    if (_active == null) await status();
+    final a = _active;
+    if (a != null && a is! JoiOnlineBackend) {
+      return a.generate('$system\n\n$input\n\nJSON/Answer:');
+    }
+    final online = backends.whereType<JoiOnlineBackend>().firstOrNull;
+    if (online == null || !online.config.configured || !online.hasConsent()) {
+      return null;
+    }
+    if (input.contains(notesMarker)) return null;
+    return online.generate(input, system: system, maxChars: 6000);
+  }
+
   /// Generates the text for a new note ([JoiWriteNote.request]). Only the
   /// user's request is used — never existing notes. Nano on the device if
   /// available, otherwise the online backend (consent checked there).
@@ -476,8 +499,13 @@ class JoiService {
       'ver; notlar verilirse onlarla yardım et.';
 
   /// Online prompt: persona + style rules + date + few-shot. No notes.
-  static String onlineSystemPrompt(String lang, {DateTime? now}) =>
+  static String onlineSystemPrompt(
+    String lang, {
+    DateTime? now,
+    String memory = '',
+  }) =>
       '${identity(lang)}\n\n${styleRules(now ?? DateTime.now())}\n\n'
+      '${memory.isEmpty ? '' : '$memory\n\n'}'
       'Kullanıcının notlarına erişimin yok; notlar sorulursa "Notların '
       'cihazında kalıyor, onlara buradan bakamıyorum" de.\n\n$fewShot';
 

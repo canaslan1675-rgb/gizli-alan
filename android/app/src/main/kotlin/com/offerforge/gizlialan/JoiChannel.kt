@@ -300,7 +300,8 @@ class JoiChannel private constructor(
                     )
                     val debugToken = call.argument<String>("appCheckDebugToken") ?: ""
                     val system = call.argument<String>("system") ?: ""
-                    val question = (call.argument<String>("question") ?: "").take(1000)
+                    val question = (call.argument<String>("question") ?: "")
+                        .take((call.argument<Int>("maxChars") ?: 1000).coerceIn(1, 6000))
                     val history = (call.argument<List<Map<String, String>>>("history") ?: emptyList())
                         .takeLast(20)
                     val id = call.argument<Int>("id") ?: 0
