@@ -662,9 +662,27 @@ const Map<String, String> tr = {
   "updRestart": "Yeniden başlat",
   "updWhatsNew": "Bu sürümde yenilikler",
   "updOk": "Tamam",
+  "joiQuotaToday": "Bugün {n}",
+  "joiGoPro": "Pro'ya geç",
+  "joiDailyLimitTitle": "Bugünlük mesaj hakkın doldu",
+  "joiDailyLimitBody":
+      "Ücretsiz sürümde Joi ile günde 10 mesaj yazışabilirsin; hakkın gece yarısı yenilenir. GizliAlan Pro ile Joi sınırsız.",
+  "joiDailyLimitReached":
+      "Bugünkü 10 mesajlık hakkımız doldu. Gece yarısından sonra yine buradayım ya da Pro ile sınırsız konuşabiliriz.",
+  "joiReport": "Bildir",
+  "joiReportTitle": "Bu yanıtı bildir",
+  "joiReportInfo":
+      "Joi bir yapay zekadır ve hata yapabilir. Bildirimin e-posta uygulamanda açılır; yalnızca bu yanıt eklenir.",
+  "joiReportHarmful": "Zararlı veya saldırgan",
+  "joiReportSexual": "Cinsel veya uygunsuz içerik",
+  "joiReportWrong": "Yanlış ya da yanıltıcı bilgi",
+  "joiReportOther": "Diğer",
+  "joiReportMailIntro": "Bildirilen Joi yanıtı:",
+  "joiReportThanks": "Teşekkürler, bildirimin için e-posta uygulaman açıldı.",
+  "joiReportFailed": "E-posta uygulaması açılamadı.",
   "joiProTitle": "Joi Pro'da",
   "joiProBody":
-      "Ücretsiz sürümde Joi ile soru-cevap sohbeti yapabilirsin. Not yazma, fotoğraf indirme, sesli sohbet, notlarında arama/özet ve kalıcı sohbet geçmişi GizliAlan Pro ile açılır.",
+      "Ücretsiz sürümde Joi ile günde 10 mesaj soru-cevap sohbeti yapabilirsin. Not yazma, fotoğraf indirme, sesli sohbet, notlarında arama/özet ve kalıcı sohbet geçmişi GizliAlan Pro ile açılır.",
   "joiProOnly":
       "{what} GizliAlan Pro'ya özel. Ücretsiz sürümde benimle soru-cevap sohbeti yapabilirsin.",
   "joiProPhotos": "Fotoğraf indirme",

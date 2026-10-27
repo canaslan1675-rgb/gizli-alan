@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' show ThemeMode;
 
+import 'joi_quota.dart';
 import '../theme.dart' show AccentPreset;
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +42,8 @@ class SettingsService {
   static const _kJoiSpeak = 'joi_speak';
   static const _kJoiMemory = 'joi_memory';
   static const _kResume = 'resume_where_left';
+  static const _kJoiQuotaDay = 'joi_quota_day';
+  static const _kJoiQuotaCount = 'joi_quota_count';
   static const _kResumeMax = 'resume_max_min';
 
   /// Seconds before auto-lock after leaving the app or the screen turning
@@ -73,6 +76,16 @@ class SettingsService {
   bool get proStubActive => _prefs.getBool(_kProStub) ?? false;
 
   Future<void> setProStubActive(bool v) => _prefs.setBool(_kProStub, v);
+
+  /// Free Joi daily message quota (see [JoiDailyQuota]).
+  JoiDailyQuota get joiQuota => JoiDailyQuota(
+    readDay: () => _prefs.getString(_kJoiQuotaDay),
+    readCount: () => _prefs.getInt(_kJoiQuotaCount) ?? 0,
+    write: (day, count) async {
+      await _prefs.setString(_kJoiQuotaDay, day);
+      await _prefs.setInt(_kJoiQuotaCount, count);
+    },
+  );
 
   /// `play`: cached Google Play Pro purchase state (ProBilling). Re-checked
   /// against Play on every start; read through [ProEntitlement].

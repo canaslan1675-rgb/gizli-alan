@@ -10,6 +10,8 @@ import '../services/pro_entitlement.dart';
 import '../widgets/pro_gate.dart';
 import '../theme.dart';
 import '../services/joi_memory.dart';
+import '../services/joi_quota.dart';
+import '../services/app_actions.dart';
 import 'joi_memory_screen.dart';
 import '../widgets/joi_avatar.dart';
 import '../widgets/joi_markdown.dart';
@@ -95,7 +97,11 @@ class JoiScreen extends StatefulWidget {
     this.isPro,
     this.memoryStore,
     this.memoryEnabled,
+    this.quota,
   });
+
+  /// Test hook for the free daily quota (default: SettingsService).
+  final JoiDailyQuota? quota;
 
   /// Test hook for the Pro entitlement (default: [ProEntitlement]).
   final bool Function()? isPro;
@@ -154,6 +160,10 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
     final a = _app;
     return a != null && ProEntitlement.isActive(a.settings);
   }
+
+  /// Free tier: 10 online messages per day (null = unlimited / Pro).
+  JoiDailyQuota? get _quota =>
+      _pro ? null : (widget.quota ?? _app?.settings.joiQuota);
 
   bool get _speakOn => _pro && (_app?.settings.joiSpeak ?? false);
 
@@ -544,6 +554,17 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
         );
         return;
       }
+      final quota = _quota;
+      if (_online && quota != null && quota.exhausted) {
+        _add(_Msg(false, t('joiDailyLimitReached')));
+        if (!mounted) return;
+        await showProRequired(
+          context,
+          title: t('joiDailyLimitTitle'),
+          body: t('joiDailyLimitBody'),
+        );
+        return;
+      }
       if (_online) {
         // ONLY the question goes out — never notes (JoiService.ask).
         // Streaming: one bubble updated as words arrive.
@@ -592,6 +613,7 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
                 ),
         );
         spoken = a.text ?? _msgs[idx].text;
+        if (a.text != null && quota != null) await quota.consume();
         if (a.text != null) _persist().then((_) => _memorize());
         return;
       }
@@ -1083,6 +1105,55 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
     );
   }
 
+  /// Play AI-Generated Content policy: users can flag any Joi answer.
+  /// Opens the user's mail app to our support address with the reason and
+  /// ONLY the reported Joi answer (no notes, no logs, no device data). The
+  /// user sees and sends the mail themselves.
+  Future<void> _report(_Msg m) async {
+    final t = L10n.current;
+    final reason = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          key: const ValueKey('joi_report_sheet'),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                t('joiReportTitle'),
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(t('joiReportInfo')),
+            ),
+            for (final k in const [
+              'joiReportHarmful',
+              'joiReportSexual',
+              'joiReportWrong',
+              'joiReportOther',
+            ])
+              ListTile(
+                key: ValueKey('joi_report_$k'),
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(t(k)),
+                onTap: () => Navigator.pop(ctx, t(k)),
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (reason == null || !mounted) return;
+    final ok = await AppActions.sendFeedback(
+      'GizliAlan Joi bildirimi: $reason',
+      body: '${t('joiReportMailIntro')}\n\n"${m.text}"',
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(t(ok ? 'joiReportThanks' : 'joiReportFailed'))),
+    );
+  }
+
   Widget _bubble(_Msg m, L10n t) {
     if (m.memory) {
       return Padding(
@@ -1141,6 +1212,23 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
               ),
             ),
           if (m.fromUser) SelectableText(m.text) else JoiMarkdown(m.text),
+          if (!m.fromUser && m.online != null && m.text != '…')
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                key: const ValueKey('joi_report'),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  foregroundColor: gc.textSecondary,
+                ),
+                icon: const Icon(Icons.flag_outlined, size: 16),
+                label: Text(
+                  t('joiReport'),
+                  style: const TextStyle(fontSize: 12),
+                ),
+                onPressed: () => _report(m),
+              ),
+            ),
           if (m.debug != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -1336,6 +1424,33 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
     );
   }
 
+  /// "Bugün 7/10" + "Pro'ya geç" (free tier only).
+  Widget _quotaBar(L10n t, JoiDailyQuota q) => Padding(
+    key: const ValueKey('joi_quota_bar'),
+    padding: const EdgeInsets.fromLTRB(12, 4, 6, 0),
+    child: Row(
+      children: [
+        Icon(Icons.chat_bubble_outline, size: 16, color: gc.textSecondary),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            t('joiQuotaToday').replaceAll('{n}', q.label),
+            key: const ValueKey('joi_quota_label'),
+            style: TextStyle(
+              fontSize: 13,
+              color: q.exhausted ? const Color(0xFFFF8FD8) : gc.textSecondary,
+            ),
+          ),
+        ),
+        TextButton(
+          key: const ValueKey('joi_quota_pro'),
+          onPressed: () => openPro(context),
+          child: Text(t('joiGoPro')),
+        ),
+      ],
+    ),
+  );
+
   Widget _scaffold(L10n t) {
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -1397,6 +1512,7 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
       body: Column(
         children: [
           _statusCard(t),
+          if (_quota != null && _online) _quotaBar(t, _quota!),
           Expanded(
             child: _msgs.isEmpty
                 ? _empty(t)

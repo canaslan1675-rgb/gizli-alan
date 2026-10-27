@@ -10,6 +10,7 @@ import 'package:gizlialan/screens/joi_screen.dart';
 import 'package:gizlialan/services/crypto_service.dart';
 import 'package:gizlialan/services/joi_service.dart';
 import 'package:gizlialan/services/joi_tools.dart';
+import 'package:gizlialan/services/joi_quota.dart';
 import 'package:gizlialan/services/settings_service.dart';
 import 'package:gizlialan/services/update_service.dart';
 import 'package:gizlialan/services/vault_session.dart';
@@ -403,6 +404,42 @@ void main() {
     expect(find.byKey(const ValueKey('pro_required')), findsOneWidget);
     expect(commons.calls, 0);
     expect(notes, 0);
+  });
+
+  testWidgets('free user: daily limit 10 shows counter and blocks', (
+    tester,
+  ) async {
+    L10n.setLang('tr');
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          ch,
+          (c) async => c.method == 'status' ? 'unavailable' : 'x',
+        );
+    final q = JoiDailyQuota.memory();
+    for (var i = 0; i < 10; i++) {
+      await q.consume();
+    }
+    await tester.pumpWidget(
+      app(
+        JoiScreen(
+          service: JoiService(onlineConfig: cfg, hasOnlineConsent: () => true),
+          consent: () => true,
+          isPro: () => false,
+          quota: q,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Bugün 10/10'), findsOneWidget);
+    expect(find.byKey(const ValueKey('joi_quota_pro')), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const ValueKey('joi_input')),
+      'Sokrates kimdir?',
+    );
+    await tester.tap(find.byKey(const ValueKey('joi_send')));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byKey(const ValueKey('pro_required')), findsOneWidget);
+    expect(q.used, 10);
   });
 
   testWidgets('pro user: writes a note and offers to open it', (tester) async {

@@ -661,9 +661,27 @@ const Map<String, String> en = {
   "updRestart": "Restart",
   "updWhatsNew": "What's new in this version",
   "updOk": "OK",
+  "joiQuotaToday": "Today {n}",
+  "joiGoPro": "Go Pro",
+  "joiDailyLimitTitle": "Today's messages are used up",
+  "joiDailyLimitBody":
+      "The free version includes 10 Joi messages per day; they renew at midnight. With GizliAlan Pro, Joi is unlimited.",
+  "joiDailyLimitReached":
+      "We've used today's 10 messages. I'll be back after midnight, or we can talk without limits with Pro.",
+  "joiReport": "Report",
+  "joiReportTitle": "Report this answer",
+  "joiReportInfo":
+      "Joi is an AI and can make mistakes. Your report opens in your mail app; only this answer is included.",
+  "joiReportHarmful": "Harmful or offensive",
+  "joiReportSexual": "Sexual or inappropriate",
+  "joiReportWrong": "Wrong or misleading",
+  "joiReportOther": "Other",
+  "joiReportMailIntro": "Reported Joi answer:",
+  "joiReportThanks": "Thanks, your mail app was opened for the report.",
+  "joiReportFailed": "Couldn't open a mail app.",
   "joiProTitle": "Joi in Pro",
   "joiProBody":
-      "In the free version you can chat with Joi (questions and answers). Writing notes, downloading photos, voice chat, note search/summaries and saved chat history come with GizliAlan Pro.",
+      "In the free version you can chat with Joi (questions and answers, 10 messages a day). Writing notes, downloading photos, voice chat, note search/summaries and saved chat history come with GizliAlan Pro.",
   "joiProOnly":
       "{what} is a GizliAlan Pro feature. In the free version you can chat with me (Q&A).",
   "joiProPhotos": "Photo download",
