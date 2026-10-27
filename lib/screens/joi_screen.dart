@@ -128,6 +128,11 @@ class JoiScreen extends StatefulWidget {
   State<JoiScreen> createState() => _JoiScreenState();
 }
 
+/// User bubble: calm, desaturated teal with near-white text (WCAG AA:
+/// ~9:1). Was the bright accent primaryContainer (#7CFFB2) with light text.
+const Color _userBubble = Color(0xFF24493F);
+const Color _userText = Color(0xFFF1F5F9);
+
 class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
   // The Joi screen is always dark (portrait wallpaper), in every theme mode.
   GizliColors get gc => GizliColors.dark;
@@ -1090,7 +1095,46 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(text, style: TextStyle(color: gc.textSecondary)),
+            // Once the chat has messages the note collapses to one line so
+            // it never covers the conversation (tap to read it all).
+            _msgs.isEmpty || s == JoiStatus.downloadable
+                ? Text(text, style: TextStyle(color: gc.textSecondary))
+                : InkWell(
+                    key: const ValueKey('joi_status_compact'),
+                    onTap: () => showDialog<void>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        content: Text(text),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: Text(t('updOk')),
+                          ),
+                        ],
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 16,
+                          color: gc.textSecondary,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            text,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: gc.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
             if (s == JoiStatus.downloadable)
               Align(
                 alignment: Alignment.centerRight,
@@ -1174,7 +1218,7 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
       );
     }
     final bg = m.fromUser
-        ? Theme.of(context).colorScheme.primaryContainer
+        ? _userBubble
         : Theme.of(context).colorScheme.surfaceContainerHighest;
     final bubble = Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
@@ -1211,7 +1255,10 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
                 ],
               ),
             ),
-          if (m.fromUser) SelectableText(m.text) else JoiMarkdown(m.text),
+          if (m.fromUser)
+            SelectableText(m.text, style: const TextStyle(color: _userText))
+          else
+            JoiMarkdown(m.text),
           if (!m.fromUser && m.online != null && m.text != '…')
             Align(
               alignment: Alignment.centerRight,

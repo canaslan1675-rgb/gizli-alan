@@ -53,22 +53,6 @@ class _DemoBiometrics extends BiometricService {
   Future<bool> authenticate(String reason) async => false;
 }
 
-/// Neutral fake notes (no personal data).
-const _notes = {
-  'tr': [
-    ('Alışveriş listesi', 'Süt, ekmek, domates, zeytinyağı'),
-    ('Kitap önerileri', 'Bilim kurgu ve tarih kitapları'),
-    ('Tatil planı', 'Rota, otel ve müze saatleri'),
-    ('Spor programı', 'Pazartesi koşu, çarşamba yüzme'),
-  ],
-  'en': [
-    ('Shopping list', 'Milk, bread, tomatoes, olive oil'),
-    ('Book ideas', 'Science fiction and history'),
-    ('Trip plan', 'Route, hotel and museum hours'),
-    ('Workout plan', 'Monday run, Wednesday swim'),
-  ],
-};
-
 void main() {
   late Directory tmp;
   final outRoot = Directory('/workspace/gizlialan-store-0.6.2/raw');
@@ -213,21 +197,21 @@ void main() {
         await openVault(tester, app);
         final chats = <String, List<JoiChatMsg>>{
           'tr': [
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: true,
               text: "Bugün biraz yorgunum, akşam ne yapsam?",
             ),
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: false,
               text:
-                  "Yorgunluğa iyi gelecek üç fikrim var:\n\n1. **20 dakikalık yürüyüş** — hava alırsın, kafan boşalır.\n2. Sıcak bir duş ve sevdiğin bir dizi.\n3. Telefonu kenara bırakıp kitaba dönmek.\n\nİstersen sana kısa bir akşam planı da yazarım.",
+                  "Yorgunluğa iyi gelecek iki fikrim var:\n\n1. **20 dakikalık yürüyüş** — hava alırsın, kafan boşalır.\n2. Sıcak bir duş ve sevdiğin bir dizi.",
               online: true,
             ),
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: true,
               text: "Not defterime yarınki toplantı için 3 madde yaz",
             ),
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: false,
               text:
                   "Yazdım: **Yarınki toplantı** notu kasanda şifreli duruyor.",
@@ -236,21 +220,21 @@ void main() {
             ),
           ],
           'en': [
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: true,
               text: "I'm a bit tired today, what should I do tonight?",
             ),
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: false,
               text:
-                  "Three ideas that help when you're tired:\n\n1. **A 20-minute walk** — fresh air clears your head.\n2. A warm shower and a show you love.\n3. Put the phone down and pick up a book.\n\nWant me to write you a short evening plan?",
+                  "Two ideas that help when you're tired:\n\n1. **A 20-minute walk** — fresh air clears your head.\n2. A warm shower and a show you love.",
               online: true,
             ),
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: true,
               text: "Write 3 points for tomorrow's meeting in my notes",
             ),
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: false,
               text:
                   "Done: the **Tomorrow's meeting** note is saved encrypted in your vault.",
@@ -296,11 +280,11 @@ void main() {
         );
         final free = <String, List<JoiChatMsg>>{
           'tr': [
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: true,
               text: "Kahve mi çay mı daha az kafein içerir?",
             ),
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: false,
               text:
                   "Genelde **çay**: bir fincan siyah çayda yaklaşık 40–50 mg, filtre kahvede ise 80–100 mg kafein olur. Yeşil çay daha da azdır.",
@@ -308,11 +292,11 @@ void main() {
             ),
           ],
           'en': [
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: true,
               text: "Which has less caffeine, coffee or tea?",
             ),
-            JoiChatMsg(
+            const JoiChatMsg(
               fromUser: false,
               text:
                   "Usually **tea**: a cup of black tea has about 40–50 mg, filter coffee about 80–100 mg. Green tea has even less.",
