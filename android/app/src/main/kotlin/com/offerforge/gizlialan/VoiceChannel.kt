@@ -2,6 +2,7 @@ package com.offerforge.gizlialan
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
@@ -11,6 +12,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.speech.RecognitionListener
 import android.speech.RecognitionService
 import android.speech.RecognizerIntent
@@ -95,6 +97,13 @@ class VoiceChannel private constructor(
     ) == PackageManager.PERMISSION_GRANTED
 
     fun onPermissionResult(requestCode: Int, grantResults: IntArray): Boolean {
+        if (requestCode == REQ_MIC_NATIVE) {
+            val ok = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+            val then = pendingAfterPermission
+            pendingAfterPermission = null
+            if (ok) then?.invoke() else finishListenError("no_permission", (trail + "mic:denied").joinToString(" > "))
+            return true
+        }
         if (requestCode != REQ_MIC) return false
         val ok = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
         permResult?.success(ok)
@@ -121,7 +130,7 @@ class VoiceChannel private constructor(
             Intent(RecognitionService.SERVICE_INTERFACE), 0,
         )
         services.map { ComponentName(it.serviceInfo.packageName, it.serviceInfo.name) }
-            .filter { it.packageName in GOOGLE_PACKAGES && it != def }
+            .filter { it.packageName in GOOGLE_PACKAGES }
             .sortedBy { GOOGLE_PACKAGES.indexOf(it.packageName) }
             .firstOrNull()
     } catch (_: Throwable) { null }
@@ -137,9 +146,43 @@ class VoiceChannel private constructor(
         dialogIntent(lang).resolveActivity(activity.packageManager) != null
     } catch (_: Throwable) { false }
 
+    /** Context for bug reports: profile type, default service, Google service. */
+    private fun environmentTrail(google: ComponentName?) {
+        try {
+            val um = activity.getSystemService(android.content.Context.USER_SERVICE) as android.os.UserManager
+            if (Build.VERSION.SDK_INT >= 30 && um.isManagedProfile) trail.add("profile:managed")
+        } catch (_: Throwable) {}
+        try {
+            val def = Settings.Secure.getString(activity.contentResolver, "voice_recognition_service")
+            trail.add("svc:" + (def?.substringBefore('/')?.substringAfterLast('.') ?: "none"))
+        } catch (_: Throwable) {}
+        trail.add("g:" + (google?.packageName?.substringAfterLast('.') ?: "none"))
+    }
+
+    /** RECORD_AUDIO re-checked natively right before binding the recogniser. */
+    private var pendingAfterPermission: (() -> Unit)? = null
+
+    private fun withMic(then: () -> Unit) {
+        if (hasMic()) { then(); return }
+        trail.add("mic:recheck")
+        pendingAfterPermission = then
+        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.RECORD_AUDIO), REQ_MIC_NATIVE)
+    }
+
+    /** The speech service rejects background callers: wait until resumed. */
+    private fun whenForeground(tries: Int = 0, then: () -> Unit) {
+        val resumed = (activity as? androidx.lifecycle.LifecycleOwner)?.lifecycle?.currentState
+            ?.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED) ?: true
+        if (resumed || tries >= 10) {
+            if (!resumed) trail.add("bg")
+            then()
+        } else {
+            main.postDelayed({ whenForeground(tries + 1, then) }, 100)
+        }
+    }
+
     /** Starts a voice session: tries the recognisers in [VoicePlan] order. */
     private fun startSession(lang: String, result: MethodChannel.Result) {
-        if (!hasMic()) { result.error("no_permission", null, null); return }
         // TTS holds audio focus: stop it before listening.
         try { tts?.stop() } catch (_: Throwable) {}
         finishSpeak(false)
@@ -152,7 +195,12 @@ class VoiceChannel private constructor(
         val onDevice = Build.VERSION.SDK_INT >= 31 &&
             try { SpeechRecognizer.isOnDeviceRecognitionAvailable(activity) } catch (_: Throwable) { false }
         val google = googleComponent()
-        attempts = VoicePlan.attempts(google != null, onDevice, hasDialog())
+        // The system dialog is ALWAYS the last attempt (even if resolveActivity
+        // says no: package visibility can hide it; launching tells the truth).
+        val dialogResolves = hasDialog()
+        if (!dialogResolves) trail.add("dialog?unresolved")
+        environmentTrail(google)
+        attempts = VoicePlan.attempts(google != null, onDevice, hasDialog = true)
             .filter { hasDefault || it == VoicePlan.Attempt.GOOGLE || it == VoicePlan.Attempt.ON_DEVICE || it == VoicePlan.Attempt.DIALOG }
         attemptIdx = 0
         if (attempts.isEmpty()) {
@@ -160,7 +208,23 @@ class VoiceChannel private constructor(
             result.error("no_service", "no recogniser, no dialog", null)
             return
         }
-        runAttempt(google)
+        val my = session
+        try {
+            whenForeground {
+                withMic {
+                    if (my != session || listenResult == null) return@withMic
+                    try {
+                        runAttempt(google)
+                    } catch (t: Throwable) {
+                        Log.w(TAG, "first attempt crashed", t)
+                        nextAttempt(google, "crash:${VoicePlan.exc(t.javaClass.simpleName, t.message)}")
+                    }
+                }
+            }
+        } catch (t: Throwable) {
+            Log.w(TAG, "first attempt crashed", t)
+            nextAttempt(google, "crash:${VoicePlan.exc(t.javaClass.simpleName, t.message)}")
+        }
     }
 
     private fun nextAttempt(google: ComponentName?, why: String) {
@@ -170,12 +234,20 @@ class VoiceChannel private constructor(
         try { recognizer?.destroy() } catch (_: Throwable) {}
         recognizer = null
         if (attemptIdx >= attempts.size) {
-            val last = why.substringAfter(':')
-            finishListenError(if (last.startsWith("e")) last else "error", trail.joinToString(" > "))
+            finishListenError(VoicePlan.finalCode(why), trail.joinToString(" > "))
             return
         }
         // Give the speech service a moment after destroy() before recreating.
-        main.postDelayed({ if (my == session && listenResult != null) runAttempt(google) }, 250)
+        main.postDelayed({
+            if (my == session && listenResult != null) {
+                try {
+                    runAttempt(google)
+                } catch (t: Throwable) {
+                    Log.w(TAG, "attempt crashed", t)
+                    nextAttempt(google, "crash:${VoicePlan.exc(t.javaClass.simpleName, t.message)}")
+                }
+            }
+        }, 250)
     }
 
     private fun runAttempt(google: ComponentName?) {
@@ -186,10 +258,20 @@ class VoiceChannel private constructor(
                 @Suppress("DEPRECATION")
                 activity.startActivityForResult(dialogIntent(lang), REQ_DIALOG)
                 trail.add("dialog")
-            } catch (_: Throwable) {
-                trail.add("dialog:none")
-                finishListenError("no_service", trail.joinToString(" > "))
+            } catch (t: Throwable) {
+                Log.w(TAG, "speech dialog failed", t)
+                trail.add("dialog:${VoicePlan.exc(t.javaClass.simpleName, t.message)}")
+                finishListenError(
+                    if (t is ActivityNotFoundException) "no_service"
+                    else "x:${t.javaClass.simpleName}",
+                    trail.joinToString(" > "),
+                )
             }
+            return
+        }
+        if (!hasMic()) {
+            // Permission lost between attempts: the dialog does not need it.
+            nextAttempt(google, "$tag:x_NoRecordAudio")
             return
         }
         speechBegan = false
@@ -256,13 +338,24 @@ class VoiceChannel private constructor(
             startedAt = System.currentTimeMillis()
             r.startListening(i)
         } catch (t: Throwable) {
-            nextAttempt(google, "$tag:x_${t.javaClass.simpleName}")
+            // e.g. SecurityException / IllegalArgumentException for an
+            // explicit component, UnsupportedOperationException on-device:
+            // log and continue with the next fallback.
+            Log.w(TAG, "recogniser attempt $tag failed", t)
+            nextAttempt(google, "$tag:${VoicePlan.exc(t.javaClass.simpleName, t.message)}")
         }
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         if (requestCode != REQ_DIALOG) return false
-        val s = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+        val s = try {
+            data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+        } catch (t: Throwable) {
+            Log.w(TAG, "dialog result unreadable", t)
+            trail.add("dialog_result:${t.javaClass.simpleName}")
+            null
+        }
+        trail.add("dialog_result:$resultCode")
         if (resultCode == Activity.RESULT_OK && !s.isNullOrBlank()) {
             finishListen(s)
         } else {
@@ -350,6 +443,8 @@ class VoiceChannel private constructor(
         const val NAME = "gizlialan/voice"
         private const val REQ_MIC = 7311
         private const val REQ_DIALOG = 7312
+        private const val REQ_MIC_NATIVE = 7313
+        private const val TAG = "GizliAlanVoice"
         /** Google's recognition services, preferred order. */
         private val GOOGLE_PACKAGES = listOf(
             "com.google.android.googlequicksearchbox",

@@ -905,12 +905,23 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
           _Msg(
             false,
             voiceErrorText(t, e.code),
-            debug: 'voice: ${e.message ?? e.code}',
+            debug: 'voice [${e.code}]: ${e.message ?? '-'}',
             voiceHelp: e.code == 'no_service' || e.code == 'unavailable',
           ),
         );
       }
-    } catch (_) {}
+    } catch (e) {
+      // MissingPluginException etc.: never silent, show the type.
+      if (mounted) {
+        _add(
+          _Msg(
+            false,
+            '${t('joiVoiceException')} (${t('joiVoiceCode')} ${e.runtimeType})',
+            debug: 'voice: $e',
+          ),
+        );
+      }
+    }
     if (!mounted) return;
     setState(() {
       _listening = false;
@@ -1550,6 +1561,10 @@ String voiceErrorText(L10n t, String code) {
     final n = int.parse(m.group(1)!);
     final key = (n >= 1 && n <= 13) ? 'joiVoiceE$n' : 'joiVoiceEOther';
     return '${t(key)} (${t('joiVoiceCode')} $n)';
+  }
+  if (code.startsWith('x:')) {
+    // Native exception in the recogniser chain: show its type.
+    return '${t('joiVoiceException')} (${t('joiVoiceCode')} ${code.substring(2)})';
   }
   return switch (code) {
     'no_match' => t('joiVoiceNoMatch'),

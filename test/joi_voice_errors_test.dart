@@ -25,6 +25,10 @@ void main() {
     expect(voiceErrorText(t, 'e15'), 'Konuşma tanıma hata verdi. (kod 15)');
     expect(voiceErrorText(t, 'no_service'), contains('Speech Recognition'));
     expect(voiceErrorText(t, 'weird'), contains('(kod weird)'));
+    expect(
+      voiceErrorText(t, 'x:SecurityException'),
+      'Konuşma tanıma başlatılırken bir hata oluştu. (kod SecurityException)',
+    );
   });
 
   testWidgets('no speech service: message + Play buttons', (tester) async {
@@ -65,7 +69,10 @@ void main() {
       find.textContaining('Speech Recognition & Synthesis'),
       findsOneWidget,
     );
-    expect(find.textContaining('default:e7 > no_lang:e7'), findsOneWidget);
+    expect(
+      find.textContaining('[no_service]: default:e7 > no_lang:e7'),
+      findsOneWidget,
+    );
     await tester.tap(find.byKey(const ValueKey('joi_voice_open_speech')));
     await tester.pump();
     final open = calls.lastWhere((c) => c.method == 'openStore');

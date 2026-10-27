@@ -56,4 +56,22 @@ object VoicePlan {
 
     /** Code sent to Dart: "e<N>" (Dart maps it to a Turkish message + "(kod N)"). */
     fun code(error: Int) = "e$error"
+
+    /** Short exception description for the attempts trail: "x_Class(msg)". */
+    fun exc(cls: String, msg: String?): String {
+        val m = msg?.replace(Regex("\\s+"), " ")?.trim()?.take(60)
+        return if (m.isNullOrEmpty()) "x_$cls" else "x_$cls($m)"
+    }
+
+    /**
+     * Final code when every attempt failed, from the last trail entry
+     * ("tag:e7" → "e7", "tag:x_SecurityException(...)" → "x:SecurityException").
+     * Never the bare string "error".
+     */
+    fun finalCode(lastWhy: String): String {
+        val v = lastWhy.substringAfter(':')
+        Regex("^e\\d+$").find(v)?.let { return it.value }
+        Regex("^x_([A-Za-z0-9_$]+)").find(v)?.let { return "x:${it.groupValues[1]}" }
+        return "x:unknown"
+    }
 }

@@ -737,4 +737,5 @@ const Map<String, String> en = {
   "joiVoiceOpenGoogle": "Open the Google app (Play)",
   "joiVoiceOpenSpeech": "Open Speech Services (Play)",
   "joiVoiceDialogCancel": "Voice input cancelled.",
+  "joiVoiceException": "Speech recognition failed to start.",
 };

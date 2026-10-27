@@ -36,4 +36,13 @@ class VoicePlanTest {
         )
         assertEquals("e7", VoicePlan.code(7))
     }
+
+    @Test fun finalCodeNeverBareError() {
+        assertEquals("e7", VoicePlan.finalCode("default:e7"))
+        assertEquals("x:SecurityException",
+            VoicePlan.finalCode("on_device:" + VoicePlan.exc("SecurityException", "not allowed  to bind")))
+        assertEquals("x_IllegalArgumentException(bad component)",
+            VoicePlan.exc("IllegalArgumentException", "bad   component"))
+        assertEquals("x:unknown", VoicePlan.finalCode("weird"))
+    }
 }

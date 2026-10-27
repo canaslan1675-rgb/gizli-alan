@@ -743,4 +743,5 @@ const Map<String, String> tr = {
   "joiVoiceOpenGoogle": "Google uygulamasını aç (Play)",
   "joiVoiceOpenSpeech": "Konuşma Hizmetleri'ni aç (Play)",
   "joiVoiceDialogCancel": "Sesli giriş iptal edildi.",
+  "joiVoiceException": "Konuşma tanıma başlatılırken bir hata oluştu.",
 };
