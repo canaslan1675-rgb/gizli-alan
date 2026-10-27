@@ -17,7 +17,9 @@ import com.google.firebase.ai.type.QuotaExceededException
 import com.google.firebase.ai.type.ServerException
 import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
+import com.google.firebase.ai.type.thinkingConfig
 import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import io.flutter.plugin.common.BinaryMessenger
 import java.io.IOException
@@ -27,6 +29,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.TimeoutCancellationException
 
 /**
  * "Joi" — GizliAlan's on-device assistant (0.6.2).
@@ -53,7 +57,7 @@ class JoiChannel private constructor(
     private var online: OnlineModel? = null
     private var onlineKey: String? = null
 
-    private fun onlineModel(apiKey: String, appId: String, projectId: String, name: String, system: String): OnlineModel {
+    private fun onlineModel(apiKey: String, appId: String, projectId: String, name: String, system: String, debugToken: String): OnlineModel {
         val key = "$appId|$name|${system.hashCode()}"
         online?.let { if (onlineKey == key) return it }
         val app = FirebaseApp.getApps(context).firstOrNull { it.name == APP_NAME }
@@ -66,10 +70,30 @@ class JoiChannel private constructor(
                     .build(),
                 APP_NAME,
             ).also { a ->
+                // App Check: Play Integrity (Play installs). Test builds made
+                // with --dart-define=JOI_APPCHECK_DEBUG_TOKEN=<token registered
+                // in Firebase console → App Check → Manage debug tokens> use
+                // the debug provider instead, so sideloaded APKs pass after
+                // enforcement. If the token can't be obtained the SDK still
+                // sends the request; an enforced backend then rejects it and
+                // Dart shows "Joi şu an yoğun" (no crash).
                 try {
-                    FirebaseAppCheck.getInstance(a).installAppCheckProviderFactory(
-                        PlayIntegrityAppCheckProviderFactory.getInstance(),
-                    )
+                    val ac = FirebaseAppCheck.getInstance(a)
+                    if (debugToken.isNotBlank()) {
+                        context.getSharedPreferences(
+                            "com.google.firebase.appcheck.debug.store." + a.persistenceKey,
+                            Context.MODE_PRIVATE,
+                        ).edit().putString(
+                            "com.google.firebase.appcheck.debug.DEBUG_SECRET",
+                            debugToken,
+                        ).apply()
+                        ac.installAppCheckProviderFactory(DebugAppCheckProviderFactory.getInstance())
+                    } else {
+                        ac.installAppCheckProviderFactory(
+                            PlayIntegrityAppCheckProviderFactory.getInstance(),
+                        )
+                    }
+                    ac.setTokenAutoRefreshEnabled(false)
                 } catch (_: Throwable) {}
             }
         val m = Firebase.ai(app, GenerativeBackend.googleAI()).generativeModel(
@@ -77,6 +101,8 @@ class JoiChannel private constructor(
             generationConfig = generationConfig {
                 temperature = 0.4f
                 maxOutputTokens = 400
+                // No "thinking": keeps latency/tokens low for short answers.
+                thinkingConfig = thinkingConfig { thinkingBudget = 0 }
             },
             systemInstruction = content { text(system) },
         )
@@ -88,11 +114,17 @@ class JoiChannel private constructor(
     private fun errorCode(t: Throwable): String {
         var c: Throwable? = t
         while (c != null) {
+            if (c is TimeoutCancellationException) return "busy"
             if (c is QuotaExceededException) return "busy"
             if (c is ServerException) return "busy"
             if (c is IOException) return "offline"
             val msg = c.message ?: ""
             if (msg.contains("429") || msg.contains("RESOURCE_EXHAUSTED")) return "busy"
+            // App Check rejected / key or API not allowed → treat as busy.
+            if (msg.contains("403") || msg.contains("401") ||
+                msg.contains("PERMISSION_DENIED") || msg.contains("UNAUTHENTICATED") ||
+                msg.contains("App Check", ignoreCase = true)
+            ) return "busy"
             if (msg.contains("UnknownHost") || msg.contains("Unable to resolve host")) return "offline"
             c = c.cause
         }
@@ -149,7 +181,8 @@ class JoiChannel private constructor(
                     val apiKey = call.argument<String>("apiKey") ?: ""
                     val appId = call.argument<String>("appId") ?: ""
                     val projectId = call.argument<String>("projectId") ?: ""
-                    val name = call.argument<String>("model") ?: "gemini-2.5-flash"
+                    val name = call.argument<String>("model") ?: "gemini-3.8-flash"
+                    val debugToken = call.argument<String>("appCheckDebugToken") ?: ""
                     val system = call.argument<String>("system") ?: ""
                     val question = (call.argument<String>("question") ?: "").take(500)
                     if (apiKey.isEmpty() || appId.isEmpty() || projectId.isEmpty() || question.isBlank()) {
@@ -157,8 +190,9 @@ class JoiChannel private constructor(
                     } else {
                         scope.launch {
                             try {
-                                val m = onlineModel(apiKey, appId, projectId, name, system)
-                                result.success(m.generateContent(question).text ?: "")
+                                val m = onlineModel(apiKey, appId, projectId, name, system, debugToken)
+                                val text = withTimeout(45_000) { m.generateContent(question).text }
+                                result.success(text ?: "")
                             } catch (t: Throwable) {
                                 result.error(errorCode(t), t.javaClass.simpleName, null)
                             }

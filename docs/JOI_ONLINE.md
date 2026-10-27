@@ -3,7 +3,7 @@
 ## What it does
 - Priority: Gemini Nano on the device (AVAILABLE / DOWNLOADABLE / DOWNLOADING) →
   otherwise the opt-in online backend (`JoiOnlineBackend`, Firebase AI Logic,
-  Gemini Developer API, model `gemini-2.5-flash`, override `--dart-define=JOI_ONLINE_MODEL=…`).
+  Gemini Developer API, model `gemini-3.8-flash`, override `--dart-define=JOI_ONLINE_MODEL=…`).
 - Online is ONLY for general questions. "Notlarıma sor" and "Notu özetle" are
   Nano-only; on other phones the chip becomes "Notlarımda ara" (local keyword
   search) and the status card says notes stay on the device.

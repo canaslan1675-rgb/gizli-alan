@@ -75,7 +75,8 @@ class NanoBackend implements JoiBackend {
 /// Build-time config for the opt-in online backend (Firebase AI Logic,
 /// Gemini Developer API). Injected with `--dart-define`, never in git:
 /// FIREBASE_API_KEY, FIREBASE_APP_ID (1:…:android:…), FIREBASE_PROJECT_ID,
-/// optional JOI_ONLINE_MODEL (default gemini-2.5-flash). Empty => the online
+/// optional JOI_ONLINE_MODEL (default gemini-3.8-flash — 2.5-flash is closed
+/// to new projects), optional JOI_APPCHECK_DEBUG_TOKEN (test builds only). Empty => the online
 /// backend is compiled in but always unavailable (graceful fallback).
 class JoiOnlineConfig {
   const JoiOnlineConfig({
@@ -84,7 +85,10 @@ class JoiOnlineConfig {
     this.projectId = const String.fromEnvironment('FIREBASE_PROJECT_ID'),
     this.model = const String.fromEnvironment(
       'JOI_ONLINE_MODEL',
-      defaultValue: 'gemini-2.5-flash',
+      defaultValue: 'gemini-3.8-flash',
+    ),
+    this.appCheckDebugToken = const String.fromEnvironment(
+      'JOI_APPCHECK_DEBUG_TOKEN',
     ),
   });
 
@@ -92,6 +96,7 @@ class JoiOnlineConfig {
   final String appId;
   final String projectId;
   final String model;
+  final String appCheckDebugToken;
 
   bool get configured =>
       apiKey.isNotEmpty && appId.isNotEmpty && projectId.isNotEmpty;
@@ -101,6 +106,7 @@ class JoiOnlineConfig {
     'appId': appId,
     'projectId': projectId,
     'model': model,
+    'appCheckDebugToken': appCheckDebugToken,
   };
 }
 

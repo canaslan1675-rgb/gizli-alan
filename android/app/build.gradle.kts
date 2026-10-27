@@ -154,4 +154,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:35.1.0"))
     implementation("com.google.firebase:firebase-ai")
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    // Debug provider: used only when built with JOI_APPCHECK_DEBUG_TOKEN
+    // (sideloaded test APKs); the token must be registered in the console.
+    implementation("com.google.firebase:firebase-appcheck-debug")
 }
