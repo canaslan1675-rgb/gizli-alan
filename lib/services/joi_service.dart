@@ -94,10 +94,15 @@ class JoiOnlineConfig {
       'JOI_ONLINE_FALLBACK_MODEL',
       defaultValue: 'gemini-flash-lite-latest',
     ),
-    this.appCheckDebugToken = const String.fromEnvironment(
-      'JOI_APPCHECK_DEBUG_TOKEN',
-    ),
+    this.appCheckDebugToken = buildDebugToken,
   });
+
+  /// App Check debug token: ONLY in PRO_STUB test builds. Release / Play
+  /// builds (PRO_STUB=false) never send it, so they always use Play
+  /// Integrity (the native side additionally ignores it for Play installs).
+  static const String buildDebugToken = bool.fromEnvironment('PRO_STUB')
+      ? String.fromEnvironment('JOI_APPCHECK_DEBUG_TOKEN')
+      : '';
 
   final String apiKey;
   final String appId;

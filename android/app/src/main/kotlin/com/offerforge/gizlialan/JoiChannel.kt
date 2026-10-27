@@ -7,6 +7,11 @@ import com.google.mlkit.genai.prompt.GenerativeModel
 import com.google.mlkit.genai.prompt.TextPart
 import com.google.mlkit.genai.prompt.generateContentRequest
 import android.content.Context
+import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
+import com.google.android.gms.tasks.Tasks
+import android.util.Log
+import android.os.Build
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
@@ -79,24 +84,7 @@ class JoiChannel private constructor(
                 // enforcement. If the token can't be obtained the SDK still
                 // sends the request; an enforced backend then rejects it and
                 // Dart shows "Joi şu an yoğun" (no crash).
-                try {
-                    val ac = FirebaseAppCheck.getInstance(a)
-                    if (debugToken.isNotBlank()) {
-                        context.getSharedPreferences(
-                            "com.google.firebase.appcheck.debug.store." + a.persistenceKey,
-                            Context.MODE_PRIVATE,
-                        ).edit().putString(
-                            "com.google.firebase.appcheck.debug.DEBUG_SECRET",
-                            debugToken,
-                        ).apply()
-                        ac.installAppCheckProviderFactory(DebugAppCheckProviderFactory.getInstance())
-                    } else {
-                        ac.installAppCheckProviderFactory(
-                            PlayIntegrityAppCheckProviderFactory.getInstance(),
-                        )
-                    }
-                    ac.setTokenAutoRefreshEnabled(false)
-                } catch (_: Throwable) {}
+                appCheckMode = setupAppCheck(a, debugToken)
             }
         val m = Firebase.ai(app, GenerativeBackend.googleAI()).generativeModel(
             modelName = name,
@@ -112,6 +100,72 @@ class JoiChannel private constructor(
         )
         online[key] = m
         return m
+    }
+
+    /** "playintegrity" | "debug" | "none:<Exception>" (shown in debug details). */
+    @Volatile private var appCheckMode = "unset"
+
+    /** Installed from Google Play? Then the debug provider is never used. */
+    private fun fromPlay(): Boolean = try {
+        val pm = context.packageManager
+        val inst = if (Build.VERSION.SDK_INT >= 30) {
+            pm.getInstallSourceInfo(context.packageName).installingPackageName
+        } else {
+            @Suppress("DEPRECATION") pm.getInstallerPackageName(context.packageName)
+        }
+        inst == "com.android.vending"
+    } catch (_: Throwable) { false }
+
+    /**
+     * App Check for Firebase AI Logic:
+     *  - Play Integrity provider for Play / release builds;
+     *  - debug provider ONLY when a debug token was compiled in (Dart passes
+     *    it only in PRO_STUB test builds) AND the app was not installed from
+     *    Play. The token must be registered in Firebase console → App Check
+     *    → Apps → (Android app) → Manage debug tokens.
+     * Not enforced yet (enforcement planned 2 Nov 2026): if a token can't be
+     * obtained the SDK still sends the request; see [appCheckPreflight].
+     */
+    private fun setupAppCheck(app: FirebaseApp, debugToken: String): String = try {
+        val ac = FirebaseAppCheck.getInstance(app)
+        if (debugToken.isNotBlank() && !fromPlay()) {
+            context.getSharedPreferences(
+                "com.google.firebase.appcheck.debug.store." + app.persistenceKey,
+                Context.MODE_PRIVATE,
+            ).edit().putString("com.google.firebase.appcheck.debug.DEBUG_SECRET", debugToken).apply()
+            ac.installAppCheckProviderFactory(DebugAppCheckProviderFactory.getInstance())
+            ac.setTokenAutoRefreshEnabled(true)
+            "debug"
+        } else {
+            ac.installAppCheckProviderFactory(PlayIntegrityAppCheckProviderFactory.getInstance())
+            ac.setTokenAutoRefreshEnabled(true)
+            "playintegrity"
+        }
+    } catch (t: Throwable) {
+        Log.w(TAG, "App Check setup failed", t)
+        "none:${t.javaClass.simpleName}"
+    }
+
+    /**
+     * Gets (or reuses the cached) App Check token before a request. Failure
+     * never blocks the request while App Check is not enforced; it is
+     * logged and reported in the debug details ("appcheck=fail:...").
+     */
+    private suspend fun appCheckPreflight(): String {
+        val app = FirebaseApp.getApps(context).firstOrNull { it.name == APP_NAME } ?: return "noapp"
+        return try {
+            withContext(Dispatchers.IO) {
+                val tok = Tasks.await(
+                    FirebaseAppCheck.getInstance(app).getAppCheckToken(false),
+                    APPCHECK_MS, TimeUnit.MILLISECONDS,
+                )
+                if (tok.token.isNullOrBlank()) "fail:empty" else "ok"
+            }
+        } catch (t: Throwable) {
+            val c = (if (t is java.util.concurrent.ExecutionException) t.cause ?: t else t)
+            Log.w(TAG, "App Check token unavailable ($appCheckMode); sending without", c)
+            "fail:${c.javaClass.simpleName}"
+        }
     }
 
     /**
@@ -164,10 +218,15 @@ class JoiChannel private constructor(
     ): String {
         var last: Throwable? = null
         val tried = ArrayList<String>()
+        var checked = false
         for (name in models.filter { it.isNotBlank() }.distinct()) {
             val sb = StringBuilder()
             try {
                 val m = onlineModel(apiKey, appId, projectId, name, system, debugToken)
+                if (!checked) {
+                    checked = true
+                    tried.add("appcheck=$appCheckMode/${appCheckPreflight()}")
+                }
                 withTimeout(TOTAL_MS) {
                     coroutineScope {
                         var gotFirst = false
@@ -337,7 +396,9 @@ class JoiChannel private constructor(
     companion object {
         const val NAME = "gizlialan/joi"
         const val STREAM_NAME = "gizlialan/joi_stream"
-        private const val APP_NAME = "joi"
+        private const val APPCHECK_MS = 4000L
+        private const val TAG = "GizliAlanJoi"
+        const val APP_NAME = "joi"
         private const val FIRST_TOKEN_MS = 12_000L
         private const val TOTAL_MS = 30_000L
         fun attach(context: Context, messenger: BinaryMessenger) = JoiChannel(context, messenger)
