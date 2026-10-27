@@ -10,6 +10,7 @@ import '../services/pro_entitlement.dart';
 import '../widgets/pro_gate.dart';
 import '../theme.dart';
 import '../widgets/joi_avatar.dart';
+import '../widgets/joi_markdown.dart';
 import '../widgets/quick_lock.dart';
 import 'note_edit_screen.dart';
 
@@ -333,7 +334,7 @@ class _JoiScreenState extends State<JoiScreen> {
       return;
     }
     setState(() => _speaking = true);
-    await _voice.speak(text, L10n.lang);
+    await _voice.speak(JoiMarkdown.plain(text), L10n.lang);
     if (mounted) setState(() => _speaking = false);
   }
 
@@ -1012,7 +1013,7 @@ class _JoiScreenState extends State<JoiScreen> {
                 ],
               ),
             ),
-          SelectableText(m.text),
+          if (m.fromUser) SelectableText(m.text) else JoiMarkdown(m.text),
           if (m.debug != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),

@@ -92,3 +92,10 @@ git like the other keys; add them as GitHub Actions secrets for CI.
 - Hallucination guard: chat replies claiming an action ("indireceğim", "bekliyorum"…) are replaced by an honest message and, if a subject is known, the image flow runs.
 - Explicit "indir" shows "İlkini galeriye kaydet"; nothing is saved without a tap.
 - Wikimedia HTTP 429: waits Retry-After (≤3 s) and retries once.
+
+## Persona & answer quality (test9)
+- Online system prompt = identity + style rules (short by default, longer on request, no robotic phrases, one clarifying question when ambiguous, empathy, light humour, user's language, Markdown lists/bold) + current Istanbul date/time + "live data may be out of date" rule + 4 few-shot examples.
+- Multi-turn history: last 20 non-private messages as user/model contents (unchanged plumbing, verified).
+- Generation: temperature 0.7, topP 0.95, maxOutputTokens 1024 (was 0.4 / 300). No thinkingConfig (lite models reject budget 0).
+- Models: non-lite flash variants (gemini-3.5-flash, gemini-flash-latest, gemini-3.8-flash) return 429/500 on the free tier from the box → kept gemini-3.5-flash-lite + gemini-flash-lite-latest.
+- Bubbles render a safe Markdown subset (JoiMarkdown: bold, italic, code, bullets, numbered, headings→bold); TTS reads the plain text.

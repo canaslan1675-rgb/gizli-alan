@@ -101,8 +101,10 @@ class JoiChannel private constructor(
         val m = Firebase.ai(app, GenerativeBackend.googleAI()).generativeModel(
             modelName = name,
             generationConfig = generationConfig {
-                temperature = 0.4f
-                maxOutputTokens = 300
+                // Natural, less repetitive answers; room for recipes/poems.
+                temperature = 0.7f
+                topP = 0.95f
+                maxOutputTokens = 1024
                 // flash-lite models don't think by default; an explicit
                 // thinkingBudget=0 is rejected (400) by them, so none is set.
             },

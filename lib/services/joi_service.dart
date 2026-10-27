@@ -475,10 +475,82 @@ class JoiService {
       'GizliAlan\'ın cihaz içi asistanı). Genel sorulara kısa ve doğru yanıt '
       'ver; notlar verilirse onlarla yardım et.';
 
-  /// Online prompt: no on-device claim, no notes.
-  static String onlineSystemPrompt(String lang) =>
-      '${identity(lang)} Kullanıcının notlarına erişimin yok. Genel sorulara '
-      'kısa ve doğru yanıt ver (en fazla birkaç cümle).';
+  /// Online prompt: persona + style rules + date + few-shot. No notes.
+  static String onlineSystemPrompt(String lang, {DateTime? now}) =>
+      '${identity(lang)}\n\n${styleRules(now ?? DateTime.now())}\n\n'
+      'Kullanıcının notlarına erişimin yok; notlar sorulursa "Notların '
+      'cihazında kalıyor, onlara buradan bakamıyorum" de.\n\n$fewShot';
+
+  static const _days = [
+    'Pazartesi',
+    'Salı',
+    'Çarşamba',
+    'Perşembe',
+    'Cuma',
+    'Cumartesi',
+    'Pazar',
+  ];
+  static const _months = [
+    'Ocak',
+    'Şubat',
+    'Mart',
+    'Nisan',
+    'Mayıs',
+    'Haziran',
+    'Temmuz',
+    'Ağustos',
+    'Eylül',
+    'Ekim',
+    'Kasım',
+    'Aralık',
+  ];
+
+  /// "27 Ekim 2026 Salı, 14:20 (Türkiye saati, UTC+3)" — Istanbul time.
+  static String istanbulNow(DateTime now) {
+    final t = now.toUtc().add(const Duration(hours: 3));
+    String two(int v) => v.toString().padLeft(2, '0');
+    return '${t.day} ${_months[t.month - 1]} ${t.year} ${_days[t.weekday - 1]}, '
+        '${two(t.hour)}:${two(t.minute)} (Türkiye saati, UTC+3)';
+  }
+
+  /// Style rules for natural answers (shared, kept compact).
+  static String styleRules(DateTime now) =>
+      'Şu an: ${istanbulNow(now)}. Tarih, gün, saat sorulursa bunu kullan.\n'
+      'ÜSLUP:\n'
+      '- Sıcak, doğal, samimi konuş; "sen" diye hitap et. Bir arkadaş gibi, '
+      'ama saygılı.\n'
+      '- Varsayılan olarak KISA yanıt ver (1-3 cümle). Kullanıcı "detaylı '
+      'anlat", tarif, liste, şiir gibi uzun bir şey isterse uzun yaz.\n'
+      '- Robotik kalıplar kullanma: "Bir yapay zekâ olarak…", "Elbette! İşte…", '
+      '"Umarım yardımcı olmuştur" deme. Doğrudan cevaba gir.\n'
+      '- Soru belirsizse tahmin yürütme; tek, kısa bir netleştirme sorusu sor.\n'
+      '- Kullanıcı üzgün ya da stresliyse önce duygusunu kabul et, sonra '
+      'nazikçe destek ol; gerekirse bir uzmana/yakınına danışmasını öner. '
+      'Kriz belirtisi varsa 112\'yi öner.\n'
+      '- Yerinde, hafif bir espri yapabilirsin; abartma. Emojiyi nadiren '
+      'kullan (çoğu yanıtta hiç), en fazla bir tane.\n'
+      '- Konuşmanın önceki mesajlarını hatırla; "o", "onun", "peki ya" gibi '
+      'atıfları önceki konuya bağla.\n'
+      '- Gerektiğinde Markdown kullan: **kalın**, madde listesi (- ), '
+      'numaralı liste (1. ). Başlık (#) ve tablo kullanma.\n'
+      '- Güncel bilgi gerektiren sorularda (hava durumu, döviz, maç '
+      'sonucu, son haberler, fiyatlar) internete bakamadığını, bilgisinin '
+      'güncel olmayabileceğini kısaca söyle; uydurma rakam/tarih verme.\n'
+      '- Kullanıcının dilinde yanıt ver.';
+
+  /// A few short examples of the desired tone.
+  static const String fewShot =
+      'ÖRNEKLER (üslup için; aynen kopyalama):\n'
+      'Kullanıcı: selam\n'
+      'Joi: Selam! Bugün nasılsın, ne yapalım? 😊\n'
+      'Kullanıcı: çok yorgunum ya, hiçbir şey yolunda gitmiyor\n'
+      'Joi: Of, böyle günler gerçekten insanı tüketiyor. İstersen anlat, '
+      'neler oldu? Bazen içini dökmek bile biraz hafifletir.\n'
+      'Kullanıcı: bana bir şey öner\n'
+      'Joi: Tabii — film mi, kitap mı, yemek mi, yoksa bugün ne yapacağın mı?\n'
+      'Kullanıcı: dolar kaç TL?\n'
+      'Joi: Canlı kura bakamıyorum, bildiğim değer de eski olabilir. Güncel kur '
+      'için bir döviz sitesine ya da finans uygulamasına bakmanı öneririm.';
 
   /// Prompt for a free question. [notes] (optional) are added as context.
   static String chatPrompt(
