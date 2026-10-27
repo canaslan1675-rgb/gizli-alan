@@ -12,7 +12,7 @@ import '../widgets/profile_app_tile.dart';
 import '../widgets/work_apps_hide_switches.dart';
 
 /// "Second phone": set up and manage the owner's own Android work profile
-/// (managed profile, Shelter/Island model). Only reachable from the unlocked
+///. Only reachable from the unlocked
 /// real vault. Everything shown here is also described in the store listing.
 class SecondPhoneScreen extends StatefulWidget {
   const SecondPhoneScreen({super.key});

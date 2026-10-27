@@ -348,7 +348,7 @@ const Map<String, String> en = {
   'secondPhone': 'Second phone',
   'secondPhoneApps': 'Second phone apps',
   'spIntro':
-      'Second phone creates a separate space on this device using Android\'s own "work profile" feature (the same method Shelter/Island use). It has its own Play Store where you can add a separate Google account and install apps. Apps, accounts and files stay separate from your main phone.',
+      'Second phone creates a separate space on this device using Android\'s own "work profile" feature. It has its own Play Store where you can add a separate Google account and install apps. Apps, accounts and files stay separate from your main phone.',
   'spDisclosure':
       'How it works: GizliAlan becomes the "profile owner" only of this work profile it creates. It is not an admin of your main profile or of the device; it monitors nothing, reads no other app\'s data and sends nothing anywhere. Android shows its own notice during setup. Profile apps carry a briefcase badge and also appear in the "Work" tab of your app list. Setup and management are only possible while the vault is unlocked.',
   'spSetUp': 'Set up second phone',
