@@ -703,9 +703,10 @@ const Map<String, String> en = {
       "No photos found on Wikimedia Commons for \"{q}\". Try a different spelling.",
   "joiImgOffline":
       "Couldn't reach Wikimedia (no internet or no response). Try again.",
-  "joiImgWhich": "Which photo should I download? For example, type \"Hadise\".",
+  "joiImgWhich":
+      "Which photo should I download? For example, type \"Galata Tower\".",
   "joiNoFakeAction":
-      "I can't download or save anything myself; the app does that. For a photo, type e.g. \"download a photo of Hadise\" and I'll show results here; tap one to save it.",
+      "I can't download or save anything myself; the app does that. For a photo, type e.g. \"download a photo of Galata Tower\" and I'll show results here; tap one to save it.",
   "joiImgSaveFirst": "Save the first to gallery",
   "joiMemoryTitle": "What Joi remembers",
   "joiMemorySaved": "Joi remembered this",

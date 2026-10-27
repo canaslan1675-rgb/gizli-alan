@@ -704,9 +704,9 @@ const Map<String, String> tr = {
       "Wikimedia Commons'ta \"{q}\" için fotoğraf bulamadım. Farklı bir yazımla dene.",
   "joiImgOffline":
       "Fotoğraf araması için internete bağlanılamadı ya da Wikimedia yanıt vermedi. Tekrar dene.",
-  "joiImgWhich": "Neyin fotoğrafını indireyim? Örneğin \"Hadise\" yaz.",
+  "joiImgWhich": "Neyin fotoğrafını indireyim? Örneğin \"Galata Kulesi\" yaz.",
   "joiNoFakeAction":
-      "Ben kendim bir şey indiremem ya da kaydedemem; bunu uygulama yapar. Fotoğraf için örneğin \"Hadise'nin fotoğrafını indir\" yaz, sonuçları burada gösteririm, dokununca galerine kaydedilir.",
+      "Ben kendim bir şey indiremem ya da kaydedemem; bunu uygulama yapar. Fotoğraf için örneğin \"Galata Kulesi'nin fotoğrafını indir\" yaz, sonuçları burada gösteririm, dokununca galerine kaydedilir.",
   "joiImgSaveFirst": "İlkini galeriye kaydet",
   "joiMemoryTitle": "Joi'nin hatırladıkları",
   "joiMemorySaved": "Joi bunu hatırladı",

@@ -112,7 +112,7 @@ class _ProScreenState extends State<ProScreen> {
           _PlanCard(
             key: const ValueKey('plan_free'),
             title: t('proFree'),
-            price: t('proFreePrice'),
+            price: L10n.lang == 'tr' ? t('proFreePrice') : '',
             features: [
               t('proFreeF1').replaceAll('{max}', '${ProScreen.freeItemLimit}'),
               t('proFreeF2'),
@@ -124,7 +124,7 @@ class _ProScreenState extends State<ProScreen> {
           _PlanCard(
             key: const ValueKey('plan_lifetime'),
             title: t('proLifetime'),
-            price: t('proLifetimePrice'),
+            price: L10n.lang == 'tr' ? t('proLifetimePrice') : '',
             features: [
               t('proF1'),
               t('proF2'),
@@ -197,7 +197,8 @@ class _PlanCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Text(price, style: TextStyle(fontSize: 16, color: gc.accent)),
+            if (price.isNotEmpty)
+              Text(price, style: TextStyle(fontSize: 16, color: gc.accent)),
             const SizedBox(height: 8),
             for (final f in features)
               Padding(

@@ -432,7 +432,7 @@ class JoiService {
       'show or find a photo/picture/image (any language, e.g. Turkish '
       '"fotoğrafını indir", "bir resmini at", "göster"). If yes, give the '
       'subject as a short search query (proper name or noun, no suffixes, '
-      'e.g. "Hadise", "Galata Kulesi"). If the message has no subject ("its '
+      'e.g. "Galata Kulesi", "Kapadokya"). If the message has no subject ("its '
       'photo", "fotoğrafını indir"), take it from the recent chat (the '
       'person/thing being talked about). Reply ONLY with JSON: '
       '{"is_image_request": true|false, "query": "<subject or null>"}';
@@ -501,7 +501,7 @@ class JoiService {
       'yapar. Asla "indiriyorum", "indireceğim", "kaydettim", "bekliyorum" '
       'gibi kendin bir şey indirdiğini, kaydettiğini, gönderdiğini ya da '
       'beklediğini söyleme. Kullanıcı fotoğraf isterse, bunu uygulamanın '
-      'yaptığını söyle ve örnek ifade öner: "Hadise\'nin fotoğrafını indir".';
+      'yaptığını söyle ve örnek ifade öner: "Galata Kulesi\'nin fotoğrafını indir".';
 
   /// On-device (Gemini Nano) prompt.
   static String systemPrompt(String lang) =>

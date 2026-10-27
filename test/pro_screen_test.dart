@@ -113,8 +113,10 @@ void main() {
         );
         expect(find.text('Up to 10 items'), findsOneWidget);
         expect(find.text('Usage: 1 / 10 items'), findsOneWidget);
+        // Static TL price is only shown in Turkish (no TL to foreign users).
+        expect(find.text('499 TL'), findsNothing);
         await tester.scrollUntilVisible(
-          find.text('499 TL'),
+          find.text('Pro — one-time'),
           200,
           scrollable: find.byType(Scrollable).last,
         );
