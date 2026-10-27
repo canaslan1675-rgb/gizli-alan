@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../l10n/l10n.dart';
 import '../models/note.dart';
 import '../services/notes_repository.dart';
 import '../theme.dart';
+import 'joi_screen.dart';
 
 /// Create ([note] == null) or edit an encrypted note. Empty new notes are not
 /// saved.
@@ -27,6 +29,54 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
     text: widget.note?.body ?? '',
   );
   bool _saving = false;
+  late DateTime? _remindAt = widget.note?.remindAt;
+
+  Future<void> _pickReminder() async {
+    final now = DateTime.now();
+    final init = _remindAt ?? now.add(const Duration(hours: 1));
+    final d = await showDatePicker(
+      context: context,
+      initialDate: init.isBefore(now) ? now : init,
+      firstDate: DateTime(now.year, now.month, now.day),
+      lastDate: now.add(const Duration(days: 3650)),
+    );
+    if (d == null || !mounted) return;
+    final tm = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(init),
+    );
+    if (tm == null || !mounted) return;
+    setState(
+      () => _remindAt = DateTime(d.year, d.month, d.day, tm.hour, tm.minute),
+    );
+  }
+
+  Widget _reminderRow(L10n t) {
+    final r = _remindAt;
+    return ListTile(
+      key: const ValueKey('note_reminder'),
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(
+        r == null ? Icons.alarm_add_outlined : Icons.alarm_on,
+        color: r == null ? gc.textSecondary : null,
+      ),
+      title: Text(t('remindShowAt')),
+      subtitle: Text(
+        r == null
+            ? t('remindNone')
+            : DateFormat.yMMMd(L10n.lang).add_Hm().format(r),
+      ),
+      onTap: _pickReminder,
+      trailing: r == null
+          ? null
+          : IconButton(
+              key: const ValueKey('note_reminder_clear'),
+              tooltip: t('remindClear'),
+              icon: const Icon(Icons.close),
+              onPressed: () => setState(() => _remindAt = null),
+            ),
+    );
+  }
 
   @override
   void dispose() {
@@ -43,12 +93,13 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
     final existing = widget.note;
     if (existing == null) {
       if (title.isNotEmpty || body.trim().isNotEmpty) {
-        await widget.repo.create(title: title, body: body);
+        await widget.repo.create(title: title, body: body, remindAt: _remindAt);
       }
     } else {
       existing
         ..title = title
-        ..body = body;
+        ..body = body
+        ..remindAt = _remindAt;
       await widget.repo.update(existing);
     }
     if (mounted) Navigator.of(context).pop();
@@ -92,6 +143,25 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
       appBar: AppBar(
         title: Text(widget.note == null ? t('newNote') : t('editNote')),
         actions: [
+          if (widget.note != null)
+            IconButton(
+              key: const ValueKey('note_joi_summarize'),
+              tooltip: t('joiSummarize'),
+              icon: const Icon(Icons.auto_awesome_outlined),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => JoiScreen(
+                    summarize: Note(
+                      id: widget.note!.id,
+                      title: _title.text,
+                      body: _body.text,
+                      createdAt: widget.note!.createdAt,
+                      updatedAt: widget.note!.updatedAt,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           IconButton(
             tooltip: t('delete'),
             icon: Icon(Icons.delete_outline, color: gc.danger),
@@ -123,7 +193,7 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
                 textAlignVertical: TextAlignVertical.top,
               ),
             ),
-            const SizedBox(height: 12),
+            _reminderRow(t),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

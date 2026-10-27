@@ -25,6 +25,7 @@ class MainActivity : FlutterFragmentActivity() {
     private var importChannel: MethodChannel? = null
     private var browserChannel: MethodChannel? = null
     private var tiktokChannel: MethodChannel? = null
+    private var joiChannel: JoiChannel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(
@@ -40,6 +41,7 @@ class MainActivity : FlutterFragmentActivity() {
         importChannel = ImportChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         browserChannel = BrowserChannel.attach(flutterEngine)
         tiktokChannel = TikTokChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
+        joiChannel = JoiChannel.attach(flutterEngine.dartExecutor.binaryMessenger)
         flavorFeature = FlavorFeatures.attach(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
@@ -52,6 +54,8 @@ class MainActivity : FlutterFragmentActivity() {
         browserChannel = null
         tiktokChannel?.setMethodCallHandler(null)
         tiktokChannel = null
+        joiChannel?.dispose()
+        joiChannel = null
         flavorFeature?.dispose()
         flavorFeature = null
         super.cleanUpFlutterEngine(flutterEngine)

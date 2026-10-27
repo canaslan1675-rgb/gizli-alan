@@ -31,7 +31,11 @@ class NotesRepository {
     return notes;
   }
 
-  Future<Note> create({String title = '', String body = ''}) async {
+  Future<Note> create({
+    String title = '',
+    String body = '',
+    DateTime? remindAt,
+  }) async {
     final notes = await list();
     final now = DateTime.now();
     final note = Note(
@@ -40,6 +44,7 @@ class NotesRepository {
       body: body,
       createdAt: now,
       updatedAt: now,
+      remindAt: remindAt,
     );
     notes.insert(0, note);
     await _save(notes);
@@ -64,7 +69,10 @@ class NotesRepository {
     if (gone.isEmpty) return;
     final trash = await listTrash();
     trash.removeWhere((n) => n.id == id);
-    trash.insert(0, gone.first..deletedAt = now ?? DateTime.now());
+    final moved = gone.first
+      ..deletedAt = (now ?? DateTime.now())
+      ..remindAt = null;
+    trash.insert(0, moved);
     await _saveTrash(trash);
   }
 
@@ -128,6 +136,24 @@ class NotesRepository {
     _trashFile,
     utf8.encode(jsonEncode(notes.map((n) => n.toJson()).toList())),
   );
+
+  /// Notes whose reminder is due (oldest first). Trash is never included.
+  Future<List<Note>> dueReminders({DateTime? now}) async {
+    final t = now ?? DateTime.now();
+    final due = (await list()).where((n) => n.isDue(t)).toList()
+      ..sort((a, b) => a.remindAt!.compareTo(b.remindAt!));
+    return due;
+  }
+
+  /// Sets or clears ([at] == null) a note's reminder without touching
+  /// updatedAt (list order stays as the user left it).
+  Future<void> setReminder(String id, DateTime? at) async {
+    final notes = await list();
+    final i = notes.indexWhere((n) => n.id == id);
+    if (i < 0) return;
+    notes[i].remindAt = at;
+    await _save(notes);
+  }
 
   Future<int> count() async => (await list()).length;
 

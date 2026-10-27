@@ -545,4 +545,30 @@ const Map<String, String> en = {
   'feedbackBodyExpected': 'What did you expect',
   'feedbackBodySkip': 'Skip',
   'feedbackFailed': 'No e-mail app found. The address was copied instead.',
+  // 0.6.2: note reminders + Joi
+  "remindShowAt": "Show on date",
+  "remindNone": "No reminder — shown inside the app while the vault is open",
+  "remindClear": "Remove reminder",
+  "remindDismiss": "Dismiss",
+  "remindOpenNote": "Open note",
+  "joiIntro":
+      "Hi, I'm Joi — GizliAlan's on-device assistant. Ask me anything (e.g. \"Who was Aristotle?\"), and I can summarize your notes and answer questions about them. Nothing leaves your device.",
+  "joiIntroSearch":
+      "On this device Joi can search your notes by keyword. Type a word to search.",
+  "joiNoMatch": "I found nothing matching that in your notes.",
+  "joiFoundNotes": "I found these in your notes:",
+  "joiError": "I couldn't answer right now. Please try again shortly.",
+  "joiSummarizeAsk": "Summarize the note \"{title}\"",
+  "joiSummarize": "Summarize note",
+  "joiAskNotes": "Ask my notes",
+  "joiHint": "Message Joi…",
+  "joiHintSearch": "Search your notes…",
+  "joiSend": "Send",
+  "joiUnavailable":
+      "Joi's AI (Gemini Nano) is not supported on this device. Joi only runs on-device and never sends anything to the internet, so here it can only search your notes by keyword.",
+  "joiDownloadable":
+      "Joi's on-device model (Gemini Nano) is supported on this phone but not downloaded yet. Android (AICore) does the download; your notes and questions are not sent.",
+  "joiDownloading":
+      "Android is downloading Gemini Nano. Meanwhile you can search your notes.",
+  "joiDownload": "Download model",
 };

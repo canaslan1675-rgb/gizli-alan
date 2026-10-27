@@ -18,6 +18,8 @@ import '../services/second_phone_service.dart';
 import '../widgets/pro_gate.dart';
 import '../widgets/profile_app_tile.dart';
 import 'notes_list_screen.dart';
+import 'joi_screen.dart';
+import 'note_edit_screen.dart';
 import 'notifications_screen.dart';
 import 'second_phone_screen.dart';
 import 'settings_screen.dart';
@@ -46,6 +48,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
     super.initState();
     _clock = Timer.periodic(const Duration(seconds: 20), (_) {
       if (mounted) setState(() => _now = DateTime.now());
+      _checkReminders();
     });
   }
 
@@ -59,6 +62,63 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       _loadUnread();
       _loadBackground();
       _loadCount();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkReminders());
+    }
+  }
+
+  bool _remindersOpen = false;
+
+  /// "Şu tarihte göster" (0.6.2): shows due note reminders, one after the
+  /// other, while the vault is unlocked. Only when this home is the current
+  /// route (not over another screen). Each shown reminder is cleared.
+  Future<void> _checkReminders() async {
+    if (_remindersOpen || !mounted) return;
+    final route = ModalRoute.of(context);
+    if (route != null && !route.isCurrent) return;
+    final repo = GizliAlanApp.of(context).session?.notes;
+    if (repo == null) return;
+    _remindersOpen = true;
+    try {
+      final due = await repo.dueReminders();
+      for (final n in due) {
+        if (!mounted) return;
+        await repo.setReminder(n.id, null);
+        if (!mounted) return;
+        final open = await showDialog<bool>(
+          context: context,
+          builder: (ctx) {
+            final t = L10n.of(ctx);
+            return AlertDialog(
+              key: ValueKey('reminder_dialog_${n.id}'),
+              icon: const Icon(Icons.alarm_on),
+              title: Text(n.title.isEmpty ? t('untitled') : n.title),
+              content: Text(
+                n.body.length > 300 ? '${n.body.substring(0, 300)}…' : n.body,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(t('remindDismiss')),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(t('remindOpenNote')),
+                ),
+              ],
+            );
+          },
+        );
+        if (open == true && mounted) {
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) =>
+                  NoteEditScreen(repo: repo, note: n..remindAt = null),
+            ),
+          );
+        }
+      }
+    } finally {
+      _remindersOpen = false;
     }
   }
 
@@ -217,6 +277,7 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
       _loadUnread();
       _loadBackground();
       _loadCount();
+      _checkReminders();
     });
   }
 
@@ -379,6 +440,13 @@ class _VaultHomeScreenState extends State<VaultHomeScreen> {
         t('settings'),
         GizliTheme.mint,
         () => _open(const SettingsScreen()),
+      ),
+      _AppIcon(
+        Icons.auto_awesome_outlined,
+        'Joi',
+        const Color(0xFFFF8FD8),
+        () => _open(const JoiScreen()),
+        key: const ValueKey('tile_joi'),
       ),
     ];
 

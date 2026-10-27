@@ -544,4 +544,30 @@ const Map<String, String> tr = {
   'feedbackBodySkip': 'Atla',
   'feedbackFailed':
       'E-posta uygulaması bulunamadı. Bunun yerine adres kopyalandı.',
+  // 0.6.2: note reminders + Joi
+  "remindShowAt": "Şu tarihte göster",
+  "remindNone": "Hatırlatma yok — kasa açıkken uygulama içinde gösterilir",
+  "remindClear": "Hatırlatmayı kaldır",
+  "remindDismiss": "Kapat",
+  "remindOpenNote": "Notu aç",
+  "joiIntro":
+      "Merhaba, ben Joi — GizliAlan'ın cihaz içi asistanı. Bana her şeyi sorabilirsin (ör. \"Aristoteles kim?\"), notlarını özetleyebilir ve notlarınla ilgili soruları yanıtlayabilirim. Hiçbir şey cihazından çıkmaz.",
+  "joiIntroSearch":
+      "Joi bu cihazda notlarında anahtar kelimeyle arama yapabilir. Aramak istediğin kelimeyi yaz.",
+  "joiNoMatch": "Notlarında bununla eşleşen bir şey bulamadım.",
+  "joiFoundNotes": "Notlarında bunları buldum:",
+  "joiError": "Şu an yanıt veremedim. Biraz sonra tekrar dene.",
+  "joiSummarizeAsk": "\"{title}\" notunu özetle",
+  "joiSummarize": "Notu özetle",
+  "joiAskNotes": "Notlarıma sor",
+  "joiHint": "Joi'ye yaz…",
+  "joiHintSearch": "Notlarında ara…",
+  "joiSend": "Gönder",
+  "joiUnavailable":
+      "Joi'nin yapay zekâsı (Gemini Nano) bu cihazda desteklenmiyor. Joi yalnızca cihaz içinde çalışır ve hiçbir şeyi internete göndermez; bu yüzden burada sadece notlarında anahtar kelime araması yapabilir.",
+  "joiDownloadable":
+      "Joi'nin cihaz içi modeli (Gemini Nano) bu telefonda kullanılabilir ama henüz indirilmemiş. İndirmeyi Android sistemi (AICore) yapar; notların ve soruların gönderilmez.",
+  "joiDownloading":
+      "Gemini Nano Android sistemi tarafından indiriliyor. Bu sırada notlarında arama yapabilirsin.",
+  "joiDownload": "Modeli indir",
 };

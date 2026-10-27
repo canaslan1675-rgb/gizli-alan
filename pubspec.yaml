@@ -4,7 +4,7 @@ description: >
   with an optional calculator entry. No account, no cloud; vault content never
   leaves the device (AppMetrica + TikTok install/purchase measurement only).
 publish_to: "none"
-version: 0.6.1+44
+version: 0.6.2+45
 
 environment:
   sdk: ">=3.9.0 <4.0.0"

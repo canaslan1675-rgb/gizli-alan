@@ -131,6 +131,19 @@ class _NotesListScreenState extends State<NotesListScreen> {
                                 fontSize: 12,
                               ),
                             ),
+                            trailing: n.remindAt == null
+                                ? null
+                                : Tooltip(
+                                    message: fmt.format(n.remindAt!),
+                                    child: Icon(
+                                      Icons.alarm,
+                                      key: ValueKey('reminder_icon_${n.id}'),
+                                      size: 18,
+                                      color: n.isDue(DateTime.now())
+                                          ? GizliTheme.warning
+                                          : gc.textSecondary,
+                                    ),
+                                  ),
                             onTap: () => _open(n),
                           );
                         },

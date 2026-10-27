@@ -140,4 +140,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:2.8.7")
     implementation("androidx.lifecycle:lifecycle-common-java8:2.8.7")
     implementation("com.android.installreferrer:installreferrer:2.2")
+
+    // Joi (0.6.2): Gemini Nano on-device via ML Kit GenAI Prompt API (AICore).
+    // Inference runs on the device only; no cloud fallback (JoiChannel.kt).
+    implementation("com.google.mlkit:genai-prompt:1.0.0-beta4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 }
