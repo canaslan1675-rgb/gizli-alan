@@ -563,11 +563,31 @@ const Map<String, String> tr = {
   "joiHint": "Joi'ye yaz…",
   "joiHintSearch": "Notlarında ara…",
   "joiSend": "Gönder",
-  "joiUnavailable":
-      "Joi'nin yapay zekâsı (Gemini Nano) bu cihazda desteklenmiyor. Joi yalnızca cihaz içinde çalışır ve hiçbir şeyi internete göndermez; bu yüzden burada sadece notlarında anahtar kelime araması yapabilir.",
   "joiDownloadable":
       "Joi'nin cihaz içi modeli (Gemini Nano) bu telefonda kullanılabilir ama henüz indirilmemiş. İndirmeyi Android sistemi (AICore) yapar; notların ve soruların gönderilmez.",
   "joiDownloading":
       "Gemini Nano Android sistemi tarafından indiriliyor. Bu sırada notlarında arama yapabilirsin.",
   "joiDownload": "Modeli indir",
+  "joiUnavailable":
+      "Joi'nin cihaz içi yapay zekâsı (Gemini Nano) bu cihazda desteklenmiyor. Burada notlarında sadece anahtar kelime araması yapabilir.",
+  "joiOnlineNote":
+      "Bu telefonda genel soruların (ör. \"Aristoteles kim?\") onayınla internet üzerinden Google Gemini'ye gönderilerek yanıtlanır. Not özetleme ve \"Notlarıma sor\" yalnızca cihaz içinde çalışır; notların asla gönderilmez — burada notlarında anahtar kelimeyle arama yapılır.",
+  "joiIntroOnline":
+      "Merhaba, ben Joi. Bana genel sorular sorabilirsin (ör. \"Aristoteles kim?\"); yanıtlar çevrimiçi olarak Google Gemini'den gelir. Notların asla gönderilmez; notlarında aramak için \"Notlarımda ara\"yı seç.",
+  "joiSearchNotes": "Notlarımda ara",
+  "joiConsentTitle": "Joi çevrimiçi yanıt versin mi?",
+  "joiConsentBody":
+      "Bu telefonda Joi'nin cihaz içi modeli yok. İzin verirsen yazdığın genel sorular internet üzerinden Google'a (Gemini, Firebase AI Logic) gönderilir ve yanıt oradan gelir.\n\n• Notların, dosyaların ve kasa içeriğin asla gönderilmez.\n• Sorularını biz saklamayız.\n• Bu izni istediğin zaman Ayarlar'dan geri alabilirsin.",
+  "joiConsentAllow": "İzin ver",
+  "joiConsentDeny": "Vazgeç",
+  "joiNoConsent":
+      "Çevrimiçi yanıt için izin verilmedi. Notlarında anahtar kelimeyle arama yapabilirsin; izni Ayarlar'dan açabilirsin.",
+  "joiBusy": "Joi şu an yoğun. Biraz sonra tekrar dene.",
+  "joiOffline":
+      "İnternet yok gibi görünüyor. Bağlantını kontrol edip tekrar dene.",
+  "joiBadgeOnline": "çevrimiçi",
+  "joiBadgeDevice": "cihazda",
+  "joiOnlineToggle": "Joi çevrimiçi yanıtlar",
+  "joiOnlineToggleHint":
+      "Gemini Nano olmayan telefonlarda genel sorular Google Gemini'ye gönderilir. Notlar asla gönderilmez.",
 };

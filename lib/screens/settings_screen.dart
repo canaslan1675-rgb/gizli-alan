@@ -626,6 +626,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ),
+      SwitchListTile(
+        key: const ValueKey('settings_joi_online'),
+        secondary: const Icon(Icons.cloud_outlined),
+        title: Text(t('joiOnlineToggle')),
+        subtitle: Text(t('joiOnlineToggleHint')),
+        value: s.joiOnlineConsent,
+        onChanged: (v) async {
+          await s.setJoiOnlineConsent(v);
+          setState(() {});
+        },
+      ),
       ListTile(
         key: const ValueKey('settings_theme'),
         leading: const Icon(Icons.brightness_6_outlined),

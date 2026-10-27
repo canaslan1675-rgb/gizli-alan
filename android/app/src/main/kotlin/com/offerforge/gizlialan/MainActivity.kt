@@ -41,7 +41,7 @@ class MainActivity : FlutterFragmentActivity() {
         importChannel = ImportChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         browserChannel = BrowserChannel.attach(flutterEngine)
         tiktokChannel = TikTokChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
-        joiChannel = JoiChannel.attach(flutterEngine.dartExecutor.binaryMessenger)
+        joiChannel = JoiChannel.attach(applicationContext, flutterEngine.dartExecutor.binaryMessenger)
         flavorFeature = FlavorFeatures.attach(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 

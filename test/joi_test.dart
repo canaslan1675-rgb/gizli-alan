@@ -86,23 +86,168 @@ void main() {
     L10n.setLang('tr');
   });
 
-  test(
-    'pluggable backends: first usable wins; reserved slot is a stub',
-    () async {
-      expect(await const JoiReservedBackend().status(), JoiStatus.unavailable);
-      final second = _FakeBackend(JoiStatus.available);
-      final j = JoiService(
-        backends: [_FakeBackend(JoiStatus.unavailable), second],
-      );
-      expect(await j.status(), JoiStatus.available);
-      expect(j.activeBackend, same(second));
-      expect(await j.generate('x'), 'ok');
-      expect(
-        await JoiService(backends: [const JoiReservedBackend()]).status(),
-        JoiStatus.unavailable,
-      );
-    },
-  );
+  test('pluggable backends: first usable wins', () async {
+    final second = _FakeBackend(JoiStatus.available);
+    final j = JoiService(
+      backends: [_FakeBackend(JoiStatus.unavailable), second],
+    );
+    expect(await j.status(), JoiStatus.available);
+    expect(j.activeBackend, same(second));
+    expect(await j.generate('x'), 'ok');
+  });
+
+  const cfg = JoiOnlineConfig(apiKey: 'k', appId: 'a', projectId: 'p');
+
+  test('online backend unavailable when not configured at build', () async {
+    final o = JoiOnlineBackend(hasConsent: () => true);
+    expect(o.config.configured, isFalse);
+    expect(await o.status(), JoiStatus.unavailable);
+    expect(
+      await JoiService(
+        backends: [_FakeBackend(JoiStatus.unavailable), o],
+      ).status(),
+      JoiStatus.unavailable,
+    );
+  });
+
+  test('selection: Nano available/downloadable beats online', () async {
+    final calls = <MethodCall>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(ch, (c) async {
+          calls.add(c);
+          return c.method == 'status' ? 'downloadable' : 'x';
+        });
+    for (final nano in ['available', 'downloadable']) {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(ch, (c) async => nano);
+      final j = JoiService(onlineConfig: cfg, hasOnlineConsent: () => true);
+      expect(await j.status(), JoiStatus.values.byName(nano));
+      expect(j.activeBackend, isA<NanoBackend>());
+      expect(j.isOnline, isFalse);
+      expect(j.noteFeatures, isTrue);
+    }
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(ch, (c) async => 'unavailable');
+    final j = JoiService(onlineConfig: cfg, hasOnlineConsent: () => true);
+    expect(await j.status(), JoiStatus.available);
+    expect(j.isOnline, isTrue);
+    expect(j.noteFeatures, isFalse);
+  });
+
+  test('consent gating: no network call without consent', () async {
+    final calls = <MethodCall>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(ch, (c) async {
+          calls.add(c);
+          return c.method == 'status' ? 'unavailable' : 'Bir filozof.';
+        });
+    var consent = false;
+    final j = JoiService(onlineConfig: cfg, hasOnlineConsent: () => consent);
+    await j.status();
+    var a = await j.ask('Aristoteles kim?', lang: 'tr');
+    expect(a.text, isNull);
+    expect(a.error, JoiOnlineError.noConsent);
+    expect(calls.where((c) => c.method == 'onlineGenerate'), isEmpty);
+    consent = true;
+    a = await j.ask('Aristoteles kim?', lang: 'tr');
+    expect(a.text, 'Bir filozof.');
+    expect(a.online, isTrue);
+    final sent = calls.singleWhere((c) => c.method == 'onlineGenerate');
+    expect(sent.arguments['question'], 'Aristoteles kim?');
+    expect(sent.arguments['system'], isNot(contains('cihaz içi')));
+  });
+
+  test('notes are never sent online', () async {
+    final calls = <MethodCall>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(ch, (c) async {
+          calls.add(c);
+          return c.method == 'status' ? 'unavailable' : 'cevap';
+        });
+    final secret = _n('1', 'Gizli Başlık', 'banka şifresi 1234');
+    final j = JoiService(onlineConfig: cfg, hasOnlineConsent: () => true);
+    await j.status();
+    await j.ask('şifre nedir', lang: 'tr', notes: [secret]);
+    expect(
+      await j.generate(JoiService.summarizePrompt(secret, lang: 'tr')),
+      isNull,
+    );
+    expect(
+      await j.generate(JoiService.chatPrompt('x', lang: 'tr', notes: [secret])),
+      isNull,
+    );
+    final o = j.activeBackend! as JoiOnlineBackend;
+    expect(
+      await o.generate(JoiService.chatPrompt('x', lang: 'tr', notes: [secret])),
+      isNull,
+    );
+    final online = calls.where((c) => c.method == 'onlineGenerate').toList();
+    expect(online, hasLength(1));
+    for (final c in online) {
+      final all = (c.arguments as Map).values.join('|');
+      expect(all, isNot(contains('banka')));
+      expect(all, isNot(contains('Gizli Başlık')));
+    }
+  });
+
+  test('online errors map to busy/offline, never throw', () async {
+    for (final (code, err) in [
+      ('busy', JoiOnlineError.busy),
+      ('offline', JoiOnlineError.offline),
+      ('zzz', JoiOnlineError.failed),
+    ]) {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(ch, (c) async {
+            if (c.method == 'status') return 'unavailable';
+            throw PlatformException(code: code);
+          });
+      final j = JoiService(onlineConfig: cfg, hasOnlineConsent: () => true);
+      await j.status();
+      final a = await j.ask('soru', lang: 'tr');
+      expect(a.text, isNull);
+      expect(a.error, err);
+    }
+  });
+
+  testWidgets('online: consent dialog, badge, no summarize chip', (
+    tester,
+  ) async {
+    L10n.setLang('tr');
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          ch,
+          (c) async => c.method == 'status' ? 'unavailable' : 'Filozof.',
+        );
+    var consent = false;
+    final j = JoiService(onlineConfig: cfg, hasOnlineConsent: () => consent);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: GizliTheme.dark(),
+        home: JoiScreen(
+          service: j,
+          consent: () => consent,
+          setConsent: (v) async => consent = v,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.textContaining('notların asla gönderilmez'), findsWidgets);
+    expect(find.text('Notu özetle'), findsNothing);
+    await tester.enterText(
+      find.byKey(const ValueKey('joi_input')),
+      'Aristoteles kim?',
+    );
+    await tester.tap(find.byKey(const ValueKey('joi_send')));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byKey(const ValueKey('joi_consent')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('joi_consent_allow')));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+    expect(consent, isTrue);
+    expect(find.text('Filozof.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('joi_badge_online')), findsOneWidget);
+  });
 
   testWidgets('unsupported device: Joi box shows Turkish message', (
     tester,

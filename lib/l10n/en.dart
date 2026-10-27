@@ -564,11 +564,30 @@ const Map<String, String> en = {
   "joiHint": "Message Joi…",
   "joiHintSearch": "Search your notes…",
   "joiSend": "Send",
-  "joiUnavailable":
-      "Joi's AI (Gemini Nano) is not supported on this device. Joi only runs on-device and never sends anything to the internet, so here it can only search your notes by keyword.",
   "joiDownloadable":
       "Joi's on-device model (Gemini Nano) is supported on this phone but not downloaded yet. Android (AICore) does the download; your notes and questions are not sent.",
   "joiDownloading":
       "Android is downloading Gemini Nano. Meanwhile you can search your notes.",
   "joiDownload": "Download model",
+  "joiUnavailable":
+      "Joi's on-device AI (Gemini Nano) isn't supported on this device. Here Joi can only do a keyword search in your notes.",
+  "joiOnlineNote":
+      "On this phone, general questions (e.g. \"Who was Aristotle?\") are answered by Google Gemini over the internet, with your consent. Note summaries and \"Ask my notes\" work on-device only; your notes are never sent — here your notes are searched by keyword.",
+  "joiIntroOnline":
+      "Hi, I'm Joi. Ask me general questions (e.g. \"Who was Aristotle?\"); answers come online from Google Gemini. Your notes are never sent; choose \"Search my notes\" to search them.",
+  "joiSearchNotes": "Search my notes",
+  "joiConsentTitle": "Let Joi answer online?",
+  "joiConsentBody":
+      "This phone has no on-device model for Joi. If you allow it, the general questions you type are sent over the internet to Google (Gemini, Firebase AI Logic) and the answer comes from there.\n\n• Your notes, files and vault content are never sent.\n• We don't store your questions.\n• You can revoke this any time in Settings.",
+  "joiConsentAllow": "Allow",
+  "joiConsentDeny": "Cancel",
+  "joiNoConsent":
+      "Online answers not allowed. You can search your notes by keyword; enable it in Settings.",
+  "joiBusy": "Joi is busy right now. Try again shortly.",
+  "joiOffline": "No internet connection. Check your connection and try again.",
+  "joiBadgeOnline": "online",
+  "joiBadgeDevice": "on device",
+  "joiOnlineToggle": "Joi online answers",
+  "joiOnlineToggleHint":
+      "On phones without Gemini Nano, general questions are sent to Google Gemini. Notes are never sent.",
 };

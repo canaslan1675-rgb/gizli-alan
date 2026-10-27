@@ -9,8 +9,17 @@ import '../widgets/quick_lock.dart';
 import 'note_edit_screen.dart';
 
 class _Msg {
-  _Msg(this.fromUser, this.text, {this.notes = const [], this.query = ''});
+  _Msg(
+    this.fromUser,
+    this.text, {
+    this.notes = const [],
+    this.query = '',
+    this.online,
+  });
   final bool fromUser;
+
+  /// AI answers: true = online (Gemini over internet), false = on device.
+  final bool? online;
   final String text;
   final List<Note> notes; // local search hits (tappable)
   final String query;
@@ -19,9 +28,19 @@ class _Msg {
 /// "Joi" box (0.6.2): on-device assistant. Chat lives in memory only and is
 /// dropped when the screen closes / the vault locks.
 class JoiScreen extends StatefulWidget {
-  const JoiScreen({super.key, this.service, this.summarize});
+  const JoiScreen({
+    super.key,
+    this.service,
+    this.summarize,
+    this.consent,
+    this.setConsent,
+  });
 
   final JoiService? service;
+
+  /// Test hooks for the online consent (default: SettingsService).
+  final bool Function()? consent;
+  final Future<void> Function(bool)? setConsent;
 
   /// Opens directly with a summary of this note.
   final Note? summarize;
@@ -32,13 +51,60 @@ class JoiScreen extends StatefulWidget {
 
 class _JoiScreenState extends State<JoiScreen> {
   GizliColors get gc => GizliColors.of(context);
-  late final JoiService _joi = widget.service ?? JoiService();
+  late final JoiService _joi =
+      widget.service ?? JoiService(hasOnlineConsent: _hasConsent);
   final _input = TextEditingController();
   final _scroll = ScrollController();
   final _msgs = <_Msg>[];
   JoiStatus? _status;
   bool _busy = false;
   bool _notesMode = false;
+
+  bool _hasConsent() {
+    final c = widget.consent;
+    if (c != null) return c();
+    final app = context.findAncestorStateOfType<GizliAlanAppState>();
+    return app?.settings.joiOnlineConsent ?? false;
+  }
+
+  Future<void> _storeConsent(bool v) async {
+    final c = widget.setConsent;
+    if (c != null) return c(v);
+    final app = context.findAncestorStateOfType<GizliAlanAppState>();
+    await app?.settings.setJoiOnlineConsent(v);
+  }
+
+  /// One-time consent before the first online question.
+  Future<bool> _ensureConsent() async {
+    if (_hasConsent()) return true;
+    final t = L10n.current;
+    final ok = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        key: const ValueKey('joi_consent'),
+        title: Text(t('joiConsentTitle')),
+        content: SingleChildScrollView(child: Text(t('joiConsentBody'))),
+        actions: [
+          TextButton(
+            key: const ValueKey('joi_consent_deny'),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(t('joiConsentDeny')),
+          ),
+          FilledButton(
+            key: const ValueKey('joi_consent_allow'),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(t('joiConsentAllow')),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) {
+      await _storeConsent(true);
+      return true;
+    }
+    return false;
+  }
 
   @override
   void initState() {
@@ -51,7 +117,9 @@ class _JoiScreenState extends State<JoiScreen> {
     if (!mounted) return;
     setState(() => _status = s);
     final n = widget.summarize;
-    if (n != null && s == JoiStatus.available) _summarize(n);
+    if (n != null && s == JoiStatus.available && _joi.noteFeatures) {
+      _summarize(n);
+    }
   }
 
   @override
@@ -63,8 +131,19 @@ class _JoiScreenState extends State<JoiScreen> {
 
   bool get _ai => _status == JoiStatus.available;
 
+  /// AI answers come from the online backend (general questions only).
+  bool get _online => _ai && _joi.isOnline;
+
+  /// Gemini Nano on the device: note features available.
+  bool get _nano => _ai && _joi.noteFeatures;
+
   Future<List<Note>> _notes() async =>
-      await GizliAlanApp.of(context).session?.notes.list() ?? const <Note>[];
+      await context
+          .findAncestorStateOfType<GizliAlanAppState>()
+          ?.session
+          ?.notes
+          .list() ??
+      const <Note>[];
 
   void _add(_Msg m) {
     setState(() => _msgs.add(m));
@@ -89,7 +168,13 @@ class _JoiScreenState extends State<JoiScreen> {
     try {
       final all = await _notes();
       final hits = JoiNoteSearch.search(all, q);
-      if (!_ai) {
+      var search = !_ai || (_online && _notesMode);
+      if (!search && _online && !await _ensureConsent()) {
+        if (!mounted) return;
+        _add(_Msg(false, t('joiNoConsent')));
+        search = true;
+      }
+      if (search) {
         // Every device: local keyword search over decrypted notes.
         _add(
           _Msg(
@@ -101,18 +186,36 @@ class _JoiScreenState extends State<JoiScreen> {
         );
         return;
       }
+      if (_online) {
+        // ONLY the question goes out — never notes (JoiService.ask).
+        final a = await _joi.ask(q, lang: L10n.lang);
+        if (!mounted) return;
+        _add(
+          _Msg(
+            false,
+            a.text ??
+                switch (a.error) {
+                  JoiOnlineError.busy => t('joiBusy'),
+                  JoiOnlineError.offline => t('joiOffline'),
+                  JoiOnlineError.noConsent => t('joiNoConsent'),
+                  _ => t('joiError'),
+                },
+            online: a.text == null ? null : true,
+          ),
+        );
+        return;
+      }
       final ctx = _notesMode
           ? (hits.isEmpty ? all.take(5).toList() : hits)
           : const <Note>[];
-      final answer = await _joi.generate(
-        JoiService.chatPrompt(q, lang: L10n.lang, notes: ctx),
-      );
+      final a = await _joi.ask(q, lang: L10n.lang, notes: ctx);
       _add(
         _Msg(
           false,
-          answer ?? t('joiError'),
+          a.text ?? t('joiError'),
           notes: _notesMode ? hits : const [],
           query: q,
+          online: a.text == null ? null : false,
         ),
       );
     } finally {
@@ -122,6 +225,7 @@ class _JoiScreenState extends State<JoiScreen> {
 
   Future<void> _summarize(Note n) async {
     final t = L10n.current;
+    if (!_joi.noteFeatures) return; // notes never go online
     final title = n.title.isEmpty ? t('untitled') : n.title;
     _add(_Msg(true, t('joiSummarizeAsk').replaceAll('{title}', title)));
     setState(() => _busy = true);
@@ -129,7 +233,7 @@ class _JoiScreenState extends State<JoiScreen> {
       JoiService.summarizePrompt(n, lang: L10n.lang),
     );
     if (!mounted) return;
-    _add(_Msg(false, r ?? t('joiError')));
+    _add(_Msg(false, r ?? t('joiError'), online: r == null ? null : false));
     setState(() => _busy = false);
   }
 
@@ -168,12 +272,14 @@ class _JoiScreenState extends State<JoiScreen> {
 
   Widget _statusCard(L10n t) {
     final s = _status;
-    if (s == null || s == JoiStatus.available) return const SizedBox.shrink();
-    final text = switch (s) {
-      JoiStatus.downloadable => t('joiDownloadable'),
-      JoiStatus.downloading => t('joiDownloading'),
-      _ => t('joiUnavailable'),
-    };
+    if (s == null || _nano) return const SizedBox.shrink();
+    final text = _online
+        ? t('joiOnlineNote')
+        : switch (s) {
+            JoiStatus.downloadable => t('joiDownloadable'),
+            JoiStatus.downloading => t('joiDownloading'),
+            _ => t('joiUnavailable'),
+          };
     return Card(
       key: const ValueKey('joi_status'),
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
@@ -216,6 +322,28 @@ class _JoiScreenState extends State<JoiScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (m.online != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      m.online! ? Icons.cloud_outlined : Icons.phone_android,
+                      size: 14,
+                      color: gc.textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      t(m.online! ? 'joiBadgeOnline' : 'joiBadgeDevice'),
+                      key: ValueKey(
+                        m.online! ? 'joi_badge_online' : 'joi_badge_device',
+                      ),
+                      style: TextStyle(fontSize: 11, color: gc.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
             SelectableText(m.text),
             for (final n in m.notes)
               ListTile(
@@ -260,7 +388,9 @@ class _JoiScreenState extends State<JoiScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(32),
                       child: Text(
-                        _ai || _status == null
+                        _online
+                            ? t('joiIntroOnline')
+                            : _ai || _status == null
                             ? t('joiIntro')
                             : t('joiIntroSearch'),
                         textAlign: TextAlign.center,
@@ -283,14 +413,17 @@ class _JoiScreenState extends State<JoiScreen> {
                 children: [
                   FilterChip(
                     key: const ValueKey('joi_notes_mode'),
-                    label: Text(t('joiAskNotes')),
+                    label: Text(
+                      _online ? t('joiSearchNotes') : t('joiAskNotes'),
+                    ),
                     selected: _notesMode,
                     onSelected: (v) => setState(() => _notesMode = v),
                   ),
-                  ActionChip(
-                    label: Text(t('joiSummarize')),
-                    onPressed: _busy ? null : _pickNoteToSummarize,
-                  ),
+                  if (_nano)
+                    ActionChip(
+                      label: Text(t('joiSummarize')),
+                      onPressed: _busy ? null : _pickNoteToSummarize,
+                    ),
                 ],
               ),
             ),
@@ -309,7 +442,9 @@ class _JoiScreenState extends State<JoiScreen> {
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _send(),
                       decoration: InputDecoration(
-                        hintText: _ai ? t('joiHint') : t('joiHintSearch'),
+                        hintText: _ai && !(_online && _notesMode)
+                            ? t('joiHint')
+                            : t('joiHintSearch'),
                       ),
                     ),
                   ),

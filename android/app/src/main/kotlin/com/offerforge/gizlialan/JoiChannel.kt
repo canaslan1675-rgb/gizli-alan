@@ -6,7 +6,21 @@ import com.google.mlkit.genai.prompt.Generation
 import com.google.mlkit.genai.prompt.GenerativeModel
 import com.google.mlkit.genai.prompt.TextPart
 import com.google.mlkit.genai.prompt.generateContentRequest
+import android.content.Context
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
+import com.google.firebase.ai.GenerativeModel as OnlineModel
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.QuotaExceededException
+import com.google.firebase.ai.type.ServerException
+import com.google.firebase.ai.type.content
+import com.google.firebase.ai.type.generationConfig
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import io.flutter.plugin.common.BinaryMessenger
+import java.io.IOException
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,20 +32,72 @@ import kotlinx.coroutines.launch
  * "Joi" — GizliAlan's on-device assistant (0.6.2).
  *
  * Gemini Nano through the ML Kit GenAI Prompt API, which runs inside the
- * system AICore service ON THE DEVICE. This channel never opens a network
- * connection and has no cloud fallback: if Nano is not available the Dart
- * side shows a message and only offers the local keyword search over notes.
- * (Model download, when the user asks for it, is done by AICore / Google
- * Play services itself; no prompt or note text is part of that.)
+ * system AICore service ON THE DEVICE (`status`/`download`/`generate`).
  *
- * Methods: `status` -> "available" | "downloadable" | "downloading" |
- * "unavailable"; `download` -> starts the AICore download, returns bool;
- * `generate` {prompt} -> String.
+ * `onlineGenerate` {apiKey, appId, projectId, model, system, question}:
+ * opt-in online fallback for GENERAL questions on phones without Nano —
+ * Gemini via Firebase AI Logic (Gemini Developer API). Dart only calls it
+ * after the user's consent and never with note content (joi_service.dart).
+ * Firebase is initialised lazily here from build-time values (no
+ * google-services.json), as a named app, with App Check (Play Integrity).
+ * Errors: "busy" (quota/429/5xx), "offline" (network), "failed".
  */
-class JoiChannel private constructor(messenger: BinaryMessenger) {
+class JoiChannel private constructor(
+    private val context: Context,
+    messenger: BinaryMessenger,
+) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var model: GenerativeModel? = null
     val channel = MethodChannel(messenger, NAME)
+
+    private var online: OnlineModel? = null
+    private var onlineKey: String? = null
+
+    private fun onlineModel(apiKey: String, appId: String, projectId: String, name: String, system: String): OnlineModel {
+        val key = "$appId|$name|${system.hashCode()}"
+        online?.let { if (onlineKey == key) return it }
+        val app = FirebaseApp.getApps(context).firstOrNull { it.name == APP_NAME }
+            ?: FirebaseApp.initializeApp(
+                context,
+                FirebaseOptions.Builder()
+                    .setApiKey(apiKey)
+                    .setApplicationId(appId)
+                    .setProjectId(projectId)
+                    .build(),
+                APP_NAME,
+            ).also { a ->
+                try {
+                    FirebaseAppCheck.getInstance(a).installAppCheckProviderFactory(
+                        PlayIntegrityAppCheckProviderFactory.getInstance(),
+                    )
+                } catch (_: Throwable) {}
+            }
+        val m = Firebase.ai(app, GenerativeBackend.googleAI()).generativeModel(
+            modelName = name,
+            generationConfig = generationConfig {
+                temperature = 0.4f
+                maxOutputTokens = 400
+            },
+            systemInstruction = content { text(system) },
+        )
+        online = m
+        onlineKey = key
+        return m
+    }
+
+    private fun errorCode(t: Throwable): String {
+        var c: Throwable? = t
+        while (c != null) {
+            if (c is QuotaExceededException) return "busy"
+            if (c is ServerException) return "busy"
+            if (c is IOException) return "offline"
+            val msg = c.message ?: ""
+            if (msg.contains("429") || msg.contains("RESOURCE_EXHAUSTED")) return "busy"
+            if (msg.contains("UnknownHost") || msg.contains("Unable to resolve host")) return "offline"
+            c = c.cause
+        }
+        return "failed"
+    }
 
     private fun model(): GenerativeModel = model ?: Generation.getClient().also { model = it }
 
@@ -79,6 +145,26 @@ class JoiChannel private constructor(messenger: BinaryMessenger) {
                         }
                     }
                 }
+                "onlineGenerate" -> {
+                    val apiKey = call.argument<String>("apiKey") ?: ""
+                    val appId = call.argument<String>("appId") ?: ""
+                    val projectId = call.argument<String>("projectId") ?: ""
+                    val name = call.argument<String>("model") ?: "gemini-2.5-flash"
+                    val system = call.argument<String>("system") ?: ""
+                    val question = (call.argument<String>("question") ?: "").take(500)
+                    if (apiKey.isEmpty() || appId.isEmpty() || projectId.isEmpty() || question.isBlank()) {
+                        result.error("failed", "not_configured", null)
+                    } else {
+                        scope.launch {
+                            try {
+                                val m = onlineModel(apiKey, appId, projectId, name, system)
+                                result.success(m.generateContent(question).text ?: "")
+                            } catch (t: Throwable) {
+                                result.error(errorCode(t), t.javaClass.simpleName, null)
+                            }
+                        }
+                    }
+                }
                 else -> result.notImplemented()
             }
         }
@@ -88,11 +174,13 @@ class JoiChannel private constructor(messenger: BinaryMessenger) {
         channel.setMethodCallHandler(null)
         try { model?.close() } catch (_: Throwable) {}
         model = null
+        online = null
         scope.cancel()
     }
 
     companion object {
         const val NAME = "gizlialan/joi"
-        fun attach(messenger: BinaryMessenger) = JoiChannel(messenger)
+        private const val APP_NAME = "joi"
+        fun attach(context: Context, messenger: BinaryMessenger) = JoiChannel(context, messenger)
     }
 }

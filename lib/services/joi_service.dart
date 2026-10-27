@@ -8,13 +8,12 @@ enum JoiStatus { available, downloadable, downloading, unavailable }
 
 /// "Joi" — GizliAlan's on-device assistant (0.6.2).
 ///
-/// HARD RULE: nothing leaves the device. The model is Gemini Nano via the
-/// ML Kit GenAI Prompt API running inside Android AICore
-/// (android/.../JoiChannel.kt). There is NO network call and NO cloud
-/// fallback here. On devices without Nano only [JoiNoteSearch] (plain local
-/// keyword search over the decrypted notes in memory) is offered.
-/// One model backend for Joi. Pluggable so a second backend can be added
-/// later without touching the UI (see [JoiReservedBackend]).
+/// Note content never leaves the device: note features run only on Gemini
+/// Nano (ML Kit GenAI Prompt API inside Android AICore, JoiChannel.kt). On
+/// phones without Nano, general questions may go to the opt-in online
+/// backend ([JoiOnlineBackend], consent required); notes stay with
+/// [JoiNoteSearch] (local keyword search).
+/// One model backend for Joi.
 abstract class JoiBackend {
   String get id;
   Future<JoiStatus> status();
@@ -73,33 +72,157 @@ class NanoBackend implements JoiBackend {
   }
 }
 
-/// RESERVED second backend slot (owner decision pending: Gemma 3 1B
-/// on-device via MediaPipe/LiteRT with a one-time download, or an opt-in
-/// online backend for general questions only). Intentionally a stub: no
-/// network code, no model download. Always unavailable.
-class JoiReservedBackend implements JoiBackend {
-  const JoiReservedBackend();
-  @override
-  String get id => 'reserved';
-  @override
-  Future<JoiStatus> status() async => JoiStatus.unavailable;
-  @override
-  Future<bool> download() async => false;
-  @override
-  Future<String?> generate(String prompt) async => null;
+/// Build-time config for the opt-in online backend (Firebase AI Logic,
+/// Gemini Developer API). Injected with `--dart-define`, never in git:
+/// FIREBASE_API_KEY, FIREBASE_APP_ID (1:…:android:…), FIREBASE_PROJECT_ID,
+/// optional JOI_ONLINE_MODEL (default gemini-2.5-flash). Empty => the online
+/// backend is compiled in but always unavailable (graceful fallback).
+class JoiOnlineConfig {
+  const JoiOnlineConfig({
+    this.apiKey = const String.fromEnvironment('FIREBASE_API_KEY'),
+    this.appId = const String.fromEnvironment('FIREBASE_APP_ID'),
+    this.projectId = const String.fromEnvironment('FIREBASE_PROJECT_ID'),
+    this.model = const String.fromEnvironment(
+      'JOI_ONLINE_MODEL',
+      defaultValue: 'gemini-2.5-flash',
+    ),
+  });
+
+  final String apiKey;
+  final String appId;
+  final String projectId;
+  final String model;
+
+  bool get configured =>
+      apiKey.isNotEmpty && appId.isNotEmpty && projectId.isNotEmpty;
+
+  Map<String, String> toMap() => {
+    'apiKey': apiKey,
+    'appId': appId,
+    'projectId': projectId,
+    'model': model,
+  };
 }
 
-/// "Joi" — GizliAlan's on-device assistant (0.6.2).
+/// Why an online answer failed (shown as a Turkish/EN/RU message).
+enum JoiOnlineError { busy, offline, failed, noConsent }
+
+/// Opt-in ONLINE backend (0.6.2, owner decision): Gemini via Firebase AI
+/// Logic (Gemini Developer API) — only for GENERAL questions on phones
+/// without Gemini Nano.
 ///
-/// Tries [backends] in order and uses the first usable one. Today: Gemini
-/// Nano, then the reserved stub. HARD RULE for the current backends: nothing
-/// leaves the device, no cloud fallback. When no backend is usable only
-/// [JoiNoteSearch] (local keyword search over decrypted notes) is offered.
+/// HARD RULES (enforced here and in [JoiService.ask], covered by tests):
+///  - only the user's typed question (+ fixed system prompt) is sent; note
+///    titles/bodies are NEVER sent ([JoiService] never routes note prompts
+///    here, and [generate] refuses anything carrying the notes marker);
+///  - no network call without the user's stored consent ([hasConsent]);
+///  - input capped at [maxQuestionChars], output at 400 tokens (native).
+class JoiOnlineBackend implements JoiBackend {
+  JoiOnlineBackend({
+    MethodChannel? channel,
+    this.config = const JoiOnlineConfig(),
+    required this.hasConsent,
+  }) : _ch = channel ?? const MethodChannel('gizlialan/joi');
+
+  final MethodChannel _ch;
+  final JoiOnlineConfig config;
+  final bool Function() hasConsent;
+
+  static const int maxQuestionChars = 500;
+
+  /// Error of the last failed [generate] call (null after success).
+  JoiOnlineError? lastError;
+
+  @override
+  String get id => 'gemini_online';
+
+  /// "Available" means: configured in this build. Consent is checked per
+  /// call (the UI asks for it on first use).
+  @override
+  Future<JoiStatus> status() async =>
+      config.configured ? JoiStatus.available : JoiStatus.unavailable;
+
+  @override
+  Future<bool> download() async => false;
+
+  /// [prompt] must be the bare user question (see [JoiService.ask]).
+  @override
+  Future<String?> generate(String prompt, {String lang = 'tr'}) async {
+    lastError = null;
+    if (!config.configured) {
+      lastError = JoiOnlineError.failed;
+      return null;
+    }
+    if (!hasConsent()) {
+      lastError = JoiOnlineError.noConsent;
+      return null;
+    }
+    if (prompt.contains(JoiService.notesMarker)) {
+      // Defence in depth: note content must never go online.
+      lastError = JoiOnlineError.failed;
+      return null;
+    }
+    var q = prompt.trim();
+    if (q.isEmpty) return null;
+    if (q.length > maxQuestionChars) q = q.substring(0, maxQuestionChars);
+    try {
+      final r = await _ch.invokeMethod<String>('onlineGenerate', {
+        ...config.toMap(),
+        'system': JoiService.onlineSystemPrompt(lang),
+        'question': q,
+      });
+      final s = r?.trim();
+      if (s == null || s.isEmpty) {
+        lastError = JoiOnlineError.failed;
+        return null;
+      }
+      return s;
+    } on PlatformException catch (e) {
+      lastError = switch (e.code) {
+        'busy' => JoiOnlineError.busy,
+        'offline' => JoiOnlineError.offline,
+        _ => JoiOnlineError.failed,
+      };
+      return null;
+    } catch (_) {
+      lastError = JoiOnlineError.failed;
+      return null;
+    }
+  }
+}
+
+/// Result of [JoiService.ask].
+class JoiAnswer {
+  const JoiAnswer(this.text, {required this.online, this.error});
+  final String? text;
+
+  /// true = answered by the online (Gemini over the internet) backend.
+  final bool online;
+  final JoiOnlineError? error;
+}
+
+/// "Joi" — GizliAlan's assistant (0.6.2).
+///
+/// Backends in priority order: Gemini Nano on the device (if AVAILABLE or
+/// DOWNLOADABLE), otherwise the opt-in online backend for general questions
+/// only. Note features (ask my notes / summarize) are Nano-only: on other
+/// devices they fall back to [JoiNoteSearch] (local keyword search).
 class JoiService {
-  JoiService({MethodChannel? channel, List<JoiBackend>? backends})
-    : backends =
-          backends ??
-          [NanoBackend(channel: channel), const JoiReservedBackend()];
+  JoiService({
+    MethodChannel? channel,
+    List<JoiBackend>? backends,
+    bool Function()? hasOnlineConsent,
+    JoiOnlineConfig onlineConfig = const JoiOnlineConfig(),
+  }) : backends =
+           backends ??
+           [
+             NanoBackend(channel: channel),
+             JoiOnlineBackend(
+               channel: channel,
+               config: onlineConfig,
+               hasConsent: hasOnlineConsent ?? () => false,
+             ),
+           ];
 
   final List<JoiBackend> backends;
   JoiBackend? _active;
@@ -109,14 +232,31 @@ class JoiService {
 
   static const int maxContextChars = 6000;
 
+  /// Marks prompts that contain note content (never allowed online).
+  static const String notesMarker = '\u2063[gizlialan-notes]';
+
   JoiBackend? get activeBackend => _active;
 
-  /// Best status over all backends (available > downloading > downloadable).
+  /// The active backend sends questions over the internet.
+  bool get isOnline => _active is JoiOnlineBackend;
+
+  /// Ask-my-notes / summarize may run (Nano on the device only).
+  bool get noteFeatures => _active != null && _active is! JoiOnlineBackend;
+
+  /// Picks the backend. An on-device backend that is available, downloading
+  /// or downloadable always wins over the online one (the UI offers the
+  /// Nano download); the online backend is used only when no on-device
+  /// backend is usable at all.
   Future<JoiStatus> status() async {
     JoiBackend? best;
     var bestS = JoiStatus.unavailable;
+    JoiBackend? online;
     for (final b in backends) {
       final s = await b.status();
+      if (b is JoiOnlineBackend) {
+        if (s == JoiStatus.available) online ??= b;
+        continue;
+      }
       if (s == JoiStatus.available) {
         _active = b;
         return s;
@@ -126,15 +266,43 @@ class JoiService {
         bestS = s;
       }
     }
-    _active = best;
-    return bestS;
+    if (best != null) {
+      _active = best;
+      return bestS;
+    }
+    _active = online;
+    return online != null ? JoiStatus.available : JoiStatus.unavailable;
   }
 
   Future<bool> download() async => await _active?.download() ?? false;
 
+  /// Raw generate on the active ON-DEVICE backend (note prompts). Returns
+  /// null on the online backend so note content can never go out.
   Future<String?> generate(String prompt) async {
     if (_active == null) await status();
-    return _active?.generate(prompt);
+    final a = _active;
+    if (a == null || a is JoiOnlineBackend) return null;
+    return a.generate(prompt);
+  }
+
+  /// Free question. On-device: full prompt (optionally with [notes]).
+  /// Online: ONLY the question text is sent — [notes] are ignored.
+  Future<JoiAnswer> ask(
+    String question, {
+    required String lang,
+    List<Note> notes = const [],
+  }) async {
+    if (_active == null) await status();
+    final a = _active;
+    if (a is JoiOnlineBackend) {
+      final r = await a.generate(question, lang: lang);
+      return JoiAnswer(r, online: true, error: r == null ? a.lastError : null);
+    }
+    if (a == null) return const JoiAnswer(null, online: false);
+    return JoiAnswer(
+      await a.generate(chatPrompt(question, lang: lang, notes: notes)),
+      online: false,
+    );
   }
 
   static String languageName(String lang) => switch (lang) {
@@ -152,6 +320,16 @@ class JoiService {
       'message; if unclear, answer in ${languageName(lang)}. If you do not '
       'know something, say so instead of inventing it.';
 
+  /// System prompt for the online backend (no on-device claim, no notes).
+  static String onlineSystemPrompt(String lang) =>
+      'You are Joi, GizliAlan uygulamasının asistanı (the assistant of the '
+      'GizliAlan app). This answer is produced online by Google Gemini; you '
+      'have NO access to the user\'s notes or files. Be a helpful, accurate '
+      'general assistant: answer general-knowledge questions clearly and '
+      'briefly (at most a few short paragraphs). Answer in the same language '
+      'as the user\'s message; if unclear, answer in ${languageName(lang)}. '
+      'If you do not know something, say so instead of inventing it.';
+
   /// Prompt for a free question. [notes] (optional) are added as context.
   static String chatPrompt(
     String question, {
@@ -161,6 +339,7 @@ class JoiService {
     final b = StringBuffer(systemPrompt(lang))..write('\n\n');
     if (notes.isNotEmpty) {
       b
+        ..write(notesMarker)
         ..write('The user\'s private notes (use them only if relevant):\n')
         ..write(notesContext(notes))
         ..write('\n\n');
@@ -173,9 +352,9 @@ class JoiService {
   }
 
   static String summarizePrompt(Note note, {required String lang}) =>
-      '${systemPrompt(lang)}\n\nSummarize the following note in a few short '
-      'bullet points, in ${languageName(lang)} unless the note is clearly in '
-      'another language.\n\n${notesContext([note])}\nJoi:';
+      '${systemPrompt(lang)}\n\n${notesMarker}Summarize the following note in '
+      'a few short bullet points, in ${languageName(lang)} unless the note is '
+      'clearly in another language.\n\n${notesContext([note])}\nJoi:';
 
   static String notesContext(List<Note> notes) {
     final b = StringBuffer();

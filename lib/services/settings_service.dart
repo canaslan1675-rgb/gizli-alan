@@ -37,6 +37,7 @@ class SettingsService {
   static const _kThemeMode = 'theme_mode';
   static const _kAccent = 'accent_color';
   static const _kAnalytics = 'analytics_enabled';
+  static const _kJoiOnline = 'joi_online_consent';
 
   /// Seconds before auto-lock after leaving the app or the screen turning
   /// off. 0 = immediately. Legacy values (15 s, 5 min) snap onto these.
@@ -214,6 +215,13 @@ class SettingsService {
   bool get analyticsEnabled => _prefs.getBool(_kAnalytics) ?? true;
 
   Future<void> setAnalyticsEnabled(bool v) => _prefs.setBool(_kAnalytics, v);
+
+  /// Joi online answers (0.6.2): user consented to sending general
+  /// questions (never notes) to Google Gemini. Default off; revocable in
+  /// Settings. Without it Joi makes no network call.
+  bool get joiOnlineConsent => _prefs.getBool(_kJoiOnline) ?? false;
+
+  Future<void> setJoiOnlineConsent(bool v) => _prefs.setBool(_kJoiOnline, v);
 
   String get language => _prefs.getString(_kLang) ?? 'tr';
 
