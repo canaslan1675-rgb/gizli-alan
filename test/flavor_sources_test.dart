@@ -79,7 +79,7 @@ void main() {
   });
 
   test(
-    'only USE_BIOMETRIC + INTERNET + RECORD_AUDIO (Joi voice), FLAG_SECURE stays',
+    'only USE_BIOMETRIC + INTERNET + RECORD_AUDIO (Joi voice) + AD_ID, FLAG_SECURE stays',
     () {
       final main = File('$src/main/AndroidManifest.xml').readAsStringSync();
       final full = File('$src/full/AndroidManifest.xml').readAsStringSync();
@@ -94,7 +94,17 @@ void main() {
         'android.permission.USE_BIOMETRIC',
         'android.permission.INTERNET',
         'android.permission.RECORD_AUDIO',
+        // 0.6.2+47: declared explicitly for AppMetrica/TikTok attribution
+        // (it was only library-merged before; Play requires it declared).
+        'com.google.android.gms.permission.AD_ID',
       });
+      // Voice is optional: a mic must not be a required device feature.
+      expect(
+        main,
+        contains(
+          '<uses-feature android:name="android.hardware.microphone" android:required="false" />',
+        ),
+      );
       expect(full, isNot(contains('uses-permission')));
       for (final p in ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION']) {
         expect(
