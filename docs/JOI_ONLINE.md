@@ -84,3 +84,11 @@ git like the other keys; add them as GitHub Actions secrets for CI.
 ### Other (same build)
 - Settings → "Çıkınca bıraktığım yerden devam et" (default off). On: auto-lock waits 1/5/15 min (default 5) in the background instead of the normal lock timeout; process death / reboot always locks (key is memory-only); FLAG_SECURE unchanged. Warning dialog when enabling.
 - Google Play In-App Updates (flexible, `com.google.android.play:app-update:2.1.0`): checked only after the vault opens; "Yeni sürüm mevcut" with Güncelle / Daha sonra (snooze 1 day per version) and a Play Store link; after download a "Yeniden başlat" snackbar; after an update, "Bu sürümde yenilikler" once from `assets/changelog.json`. Silent on sideloaded APKs (installer ≠ Play). Only testable via a Play track (internal testing).
+
+## Image requests (test8)
+- Local detector covers many TR/EN variants (indir/at/gönder/göster/bul/getir; fotoğraf/foto/resim/görsel; "X'in resmi", "bana X göster", "picture of X").
+- Missing subject ("fotoğrafını indir", "bir resmini at"): a small online classifier call gets `{"is_image_request","query"}` from the last 6 non-private chat turns (never notes); offline fallback = topic of the last "X kimdir/nedir/nerede" question; otherwise Joi asks "Neyin fotoğrafını indireyim?".
+- "niye inmedi / indirdin mi / hani fotoğraf" repeat the last image request.
+- Hallucination guard: chat replies claiming an action ("indireceğim", "bekliyorum"…) are replaced by an honest message and, if a subject is known, the image flow runs.
+- Explicit "indir" shows "İlkini galeriye kaydet"; nothing is saved without a tap.
+- Wikimedia HTTP 429: waits Retry-After (≤3 s) and retries once.

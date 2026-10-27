@@ -145,29 +145,233 @@ sealed class JoiIntent {
     }
 
     // ---- image search
-    final tr = RegExp(
-      r"^(.+?)\s+(?:adl[ıi]\s+)?(?:bir\s+)?(fotoğraf|fotograf|foto|resim|resm|görsel|gorsel|görüntü|goruntu)\p{L}*\s*(?:indir|bul|göster|goster|getir|ara|gönder|gonder|yolla)\p{L}*(?:\s+(?:misin|mısın|musun|bana|lütfen|lutfen))*[\s.!?]*$",
-      caseSensitive: false,
+    return parseImage(s);
+  }
+
+  static const _img =
+      r"(?:fotoğraf|fotograf|foto|resim|resm|görsel|gorsel|görüntü|goruntu|"
+      r"photo|picture|image|pic|pics|selfie)\p{L}*";
+  static const _act =
+      r"(?:indir\p{L}*|g[öo]ster\p{L}*|g[öo]nder\p{L}*|getir\p{L}*|yolla\p{L}*|"
+      r"payla[şs]\p{L}*|at|atar|atabilir\p{L}*|atsana|ats[ıi]n|at[ıi]n|atar\p{L}*|"
+      r"bul|bulur|bulabilir\p{L}*|bulsana|buls[uü]n|bulun|ara|arar|arayabilir\p{L}*|"
+      r"ver|verir|verebilir\p{L}*|versene|download\p{L}*|show|send|find|get|give|"
+      r"fetch|grab|search)";
+  static const _filler = {
+    'bana',
+    'bize',
+    'bir',
+    'bi',
+    'birkaç',
+    'birkac',
+    'tane',
+    'lütfen',
+    'lutfen',
+    'misin',
+    'mısın',
+    'musun',
+    'müsün',
+    'mi',
+    'mı',
+    'mu',
+    'mü',
+    'benim',
+    'için',
+    'icin',
+    'adlı',
+    'adli',
+    'de',
+    'da',
+    'şimdi',
+    'simdi',
+    'hemen',
+    'please',
+    'me',
+    'us',
+    'a',
+    'an',
+    'some',
+    'of',
+    'the',
+    'can',
+    'could',
+    'would',
+    'you',
+    'pls',
+    'galeriye',
+    'telefona',
+    'telefonuma',
+    'and',
+    've',
+    'ile',
+    'güzel',
+    'guzel',
+    'iyi',
+    'yeni',
+  };
+  static const _pronouns = {
+    'onun',
+    'bunun',
+    'şunun',
+    'sunun',
+    'onu',
+    'bunu',
+    'şunu',
+    'sunu',
+    'o',
+    'bu',
+    'şu',
+    'su',
+    'onların',
+    'onlarin',
+    'its',
+    'his',
+    'her',
+    'their',
+    'it',
+    'him',
+    'them',
+    'this',
+    'that',
+    'kendisinin',
+    'kendi',
+  };
+
+  /// Image words anywhere ("fotoğrafını", "resmi", "picture").
+  static bool hasImageWords(String s) => RegExp(
+    '(?<![\\p{L}])$_img',
+    caseSensitive: false,
+    unicode: true,
+  ).hasMatch(s);
+
+  /// Image request detection. Returns [JoiImageSearch] (subject known),
+  /// [JoiImageNeedsSubject] ("fotoğrafı indir", "onun resmini at"),
+  /// [JoiImageFollowUp] ("niye inmedi") or null.
+  static JoiIntent? parseImage(String s) {
+    final low = s.toLowerCase().trim();
+    if (followUpRe.hasMatch(low)) return const JoiImageFollowUp();
+    final explicit = RegExp(
+      r"(indir|download|kaydet|save)",
       unicode: true,
-    );
-    var m = tr.firstMatch(s);
-    if (m != null) {
-      return JoiImageSearch(m.group(1)!);
+    ).hasMatch(low);
+    final hasImg = hasImageWords(low);
+    // "bana Hadise göster" / "show me Hadise" without an image word.
+    if (!hasImg) {
+      final m = RegExp(
+        r"^(?:bana|bize)\s+(.+?)\s+g[öo]ster(?:ir|sene|ebilir)?\p{L}*(?:\s+(?:misin|mısın|lütfen|lutfen))*[\s.!?]*$",
+        caseSensitive: false,
+        unicode: true,
+      ).firstMatch(s.trim());
+      if (m != null &&
+          !RegExp(
+            r"(not|liste|ayar|şifre|kasa)",
+            unicode: true,
+          ).hasMatch(m.group(1)!.toLowerCase())) {
+        return JoiImageSearch(m.group(1)!, explicit: false);
+      }
+      return null;
     }
-    final tr2 = RegExp(
-      r"^(?:bana\s+)?(?:bir\s+)?(?:fotoğraf|fotograf|foto|resim|resm|görsel|gorsel)\p{L}*\s*(?:indir|bul|göster|goster|getir)\p{L}*\s*:?\s+(.+)$",
+    final hasAct = RegExp(
+      '(?<![\\p{L}])$_act(?![\\p{L}])',
       caseSensitive: false,
       unicode: true,
-    );
-    m = tr2.firstMatch(s);
-    if (m != null) return JoiImageSearch(m.group(1)!);
+    ).hasMatch(low);
+    // English "picture of X".
+    final of = RegExp(
+      r"(?:photo|picture|image|pic)s?\s+of\s+(.+?)[\s.!?]*$",
+      caseSensitive: false,
+      unicode: true,
+    ).firstMatch(s.trim());
+    if (of != null && hasAct) return _subjectOrAsk(of.group(1)!, explicit);
+    final tokens = s
+        .trim()
+        .replaceAll(RegExp(r'[.!?,;:]+'), ' ')
+        .split(RegExp(r'\s+'))
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final imgTok = RegExp('^$_img\$', caseSensitive: false, unicode: true);
+    final actTok = RegExp('^$_act\$', caseSensitive: false, unicode: true);
+    final imgIdx = tokens.indexWhere((t) => imgTok.hasMatch(t));
+    if (!hasAct) {
+      // "Hadise'nin resmi" / "Galata Kulesi fotoğrafı" (image word last).
+      if (imgIdx > 0 && imgIdx == tokens.length - 1 && tokens.length <= 5) {
+        final subj = tokens.sublist(0, imgIdx).join(' ');
+        if (!RegExp(
+          r"(?<![\p{L}])(ne|nasıl|nasil|neden|kim|hangi|what|how|why)(?![\p{L}])",
+          unicode: true,
+        ).hasMatch(subj.toLowerCase())) {
+          return _subjectOrAsk(subj, false);
+        }
+      }
+      return null; // image words but no command → caller may ask the model
+    }
+    final rest = <String>[];
+    for (final t in tokens) {
+      final l = t.toLowerCase();
+      if (imgTok.hasMatch(t) || actTok.hasMatch(t) || _filler.contains(l)) {
+        continue;
+      }
+      rest.add(t);
+    }
+    return _subjectOrAsk(rest.join(' '), explicit);
+  }
+
+  static JoiIntent _subjectOrAsk(String subj, bool explicit) {
+    final words = subj
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .where((w) => !_filler.contains(w.toLowerCase()))
+        .toList();
+    final real = words
+        .where(
+          (w) => !_pronouns.contains(
+            w.toLowerCase().replaceAll(RegExp(r"['’‘`´].*$"), ''),
+          ),
+        )
+        .toList();
+    if (real.isEmpty) return JoiImageNeedsSubject(explicit: explicit);
+    return JoiImageSearch(real.join(' '), explicit: explicit);
+  }
+
+  /// "niye inmedi", "indirdin mi", "hani fotoğraf", "where is the photo".
+  static final followUpRe = RegExp(
+    r"((niye|neden|niçin|nicin|hala|hâlâ)\s+(inmedi|indirmedin|indiremedin|gelmedi|göndermedin|gondermedin|göstermedin|olmadı|olmadi|yok)|indirdin\s*mi|indi\s*mi|inmedi|indirmedin|hani\s+(fotoğraf|fotograf|foto|resim|resm|görsel)\p{L}*|(fotoğraf|foto|resim)\p{L}*\s+(nerede|hani|gelmedi|inmedi)|where('?s| is) (the|my) (photo|picture|image)|did you download)",
+    caseSensitive: false,
+    unicode: true,
+  );
+
+  /// Topic of a factual question ("Hadise kimdir?" → "Hadise"), used to
+  /// resolve "fotoğrafını indir" without the online model.
+  static String? topicOf(String msg) {
+    final s = msg.trim().replaceAll(RegExp(r'[?!.]+$'), '').trim();
+    final tr = RegExp(
+      r"^(.+?)\s+(kimdir|kim|nedir|ne|nerededir|nerede|hakkında\p{L}*.*|kaç yaşında.*|nereli.*)$",
+      caseSensitive: false,
+      unicode: true,
+    ).firstMatch(s);
     final en = RegExp(
-      r"(?:download|find|show|get)(?: me)?(?: an?| some)? (?:photo|picture|image|pic)s? of (.+?)[.!?]*$",
+      r"^(?:who|what|where)\s+(?:is|was|are|were)\s+(.+)$",
       caseSensitive: false,
-      unicode: true,
-    );
-    m = en.firstMatch(s);
-    if (m != null) return JoiImageSearch(m.group(1)!);
+    ).firstMatch(s);
+    final t = (tr?.group(1) ?? en?.group(1))?.trim();
+    if (t == null || t.isEmpty || t.split(' ').length > 5) return null;
+    if (_pronouns.contains(t.toLowerCase()) ||
+        RegExp(r"^(sen|siz|you|bu|şu|o)$", caseSensitive: false).hasMatch(t)) {
+      return null;
+    }
+    return subjectCandidates(t).first;
+  }
+
+  /// Most recent topic in the chat (newest first), from user messages.
+  static String? topicFromHistory(List<Map<String, String>> history) {
+    for (final h in history.reversed) {
+      if (h['role'] != 'user') continue;
+      final txt = h['text'] ?? '';
+      final img = parseImage(txt);
+      if (img is JoiImageSearch) return img.query;
+      final t = topicOf(txt);
+      if (t != null) return t;
+    }
     return null;
   }
 
@@ -210,11 +414,55 @@ sealed class JoiIntent {
   }
 }
 
+/// Image request whose subject is missing ("fotoğrafı indir").
+class JoiImageNeedsSubject extends JoiIntent {
+  const JoiImageNeedsSubject({this.explicit = true});
+  final bool explicit;
+}
+
+/// "niye inmedi" / "indirdin mi": repeat the last image request.
+class JoiImageFollowUp extends JoiIntent {
+  const JoiImageFollowUp();
+}
+
+/// Parses the classifier JSON {"is_image_request":bool,"query":str|null}.
+({bool isImage, String? query})? parseImageClassifier(String? raw) {
+  if (raw == null) return null;
+  final a = raw.indexOf('{'), b = raw.lastIndexOf('}');
+  if (a < 0 || b <= a) return null;
+  try {
+    final j = jsonDecode(raw.substring(a, b + 1));
+    if (j is! Map) return null;
+    final q = (j['query'] as Object?)?.toString().trim();
+    return (
+      isImage: j['is_image_request'] == true,
+      query: (q == null || q.isEmpty || q == 'null') ? null : q,
+    );
+  } catch (_) {
+    return null;
+  }
+}
+
+class _RateLimited extends HttpException {
+  _RateLimited(this.retryAfter) : super('HTTP 429');
+  final int? retryAfter;
+}
+
+/// Model replies that claim Joi itself is doing/waiting for an action.
+bool joiClaimsAction(String text) => RegExp(
+  r"(indiriyorum|indireceğim|indirecegim|indirdim|indiriliyor|indirmeye başl|kaydediyorum|kaydedeceğim|kaydettim|gönderiyorum|göndereceğim|gönderdim|yüklüyorum|bekliyorum|bekleyelim|biraz zaman al|birazdan (iner|gelir|hazır)|galerine (ekledim|kaydettim|ekliyorum)|i'?m downloading|i('ll| will) (download|save|send)|i('ve| have) (downloaded|saved|sent)|downloading (it|now|the)|saving (it|now|the)|please wait)",
+  caseSensitive: false,
+  unicode: true,
+).hasMatch(text);
+
 class JoiImageSearch extends JoiIntent {
-  JoiImageSearch(String raw)
+  JoiImageSearch(String raw, {this.explicit = true})
     : query = JoiIntent.subjectCandidates(raw).first,
       candidates = JoiIntent.subjectCandidates(raw);
   final String query;
+
+  /// The user said "indir"/"download": offer "İlkini galeriye kaydet".
+  final bool explicit;
 
   /// All search terms to try, best first (see [JoiIntent.subjectCandidates]).
   final List<String> candidates;
@@ -296,9 +544,17 @@ class CommonsSearch {
   CommonsSearch({
     HttpClient Function()? client,
     this.timeout = const Duration(seconds: 8),
+    this.retryDelay,
+    this.testBase,
   }) : _client = client ?? HttpClient.new;
   final HttpClient Function() _client;
   final Duration timeout;
+
+  /// Test hook: delay before the 429 retry (default Retry-After, max 3 s).
+  final Duration? retryDelay;
+
+  /// Test hook: http://127.0.0.1:port instead of commons.wikimedia.org.
+  final Uri? testBase;
 
   /// Wikimedia API etiquette: descriptive UA with app id + contact URL.
   static const userAgent =
@@ -386,6 +642,10 @@ class CommonsSearch {
         req.headers.set(HttpHeaders.userAgentHeader, userAgent);
         req.headers.set('Api-User-Agent', userAgent);
         final res = await req.close();
+        if (res.statusCode == 429) {
+          final ra = int.tryParse(res.headers.value('retry-after') ?? '');
+          throw _RateLimited(ra);
+        }
         if (res.statusCode != 200) {
           throw HttpException('HTTP ${res.statusCode}');
         }
@@ -408,11 +668,24 @@ class CommonsSearch {
       return _getJsonOnce(u);
     } on SocketException {
       return _getJsonOnce(u);
+    } on _RateLimited catch (e) {
+      // Wikimedia rate limit: wait briefly (max 3 s) and retry once.
+      final s = (e.retryAfter ?? 1).clamp(1, 3);
+      await Future<void>.delayed(retryDelay ?? Duration(seconds: s));
+      return _getJsonOnce(u);
     }
   }
 
   Future<List<CommonsImage>> search(String q) async =>
-      parse(await _getJson(searchUri(q)));
+      parse(await _getJson(_at(searchUri(q))));
+
+  Uri _at(Uri u) => testBase == null
+      ? u
+      : u.replace(
+          scheme: testBase!.scheme,
+          host: testBase!.host,
+          port: testBase!.port,
+        );
 
   /// Tries [candidates] in order until at least [enough] results (merged,
   /// de-duplicated). Throws only if every attempt failed with an error.
@@ -447,6 +720,10 @@ class CommonsSearch {
         final req = await c.getUrl(Uri.parse(img.url));
         req.headers.set(HttpHeaders.userAgentHeader, userAgent);
         final res = await req.close();
+        if (res.statusCode == 429) {
+          final ra = int.tryParse(res.headers.value('retry-after') ?? '');
+          throw _RateLimited(ra);
+        }
         if (res.statusCode != 200) {
           throw HttpException('HTTP ${res.statusCode}');
         }

@@ -46,7 +46,7 @@ void main() {
       expect((b as JoiImageSearch).query, 'Kediler');
       expect(b.candidates, ['Kediler', 'Kedi', 'Kedilerin']);
       final c = JoiIntent.parse('Download a photo of the Eiffel Tower');
-      expect((c as JoiImageSearch).query, 'the Eiffel Tower');
+      expect((c as JoiImageSearch).query, 'Eiffel Tower');
     });
 
     test('write to notes: generated and literal', () {
@@ -146,6 +146,30 @@ void main() {
       s.destroy();
     }
     await server.close();
+  });
+
+  test('HTTP 429 from Wikimedia: waits and retries once', () async {
+    final prev = HttpOverrides.current;
+    HttpOverrides.global = null;
+    addTearDown(() => HttpOverrides.global = prev);
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    var hits = 0;
+    server.listen((r) {
+      hits++;
+      r.response
+        ..statusCode = hits == 1 ? 429 : 200
+        ..headers.set('retry-after', '1')
+        ..write(hits == 1 ? 'slow down' : '{"query":{"pages":[]}}')
+        ..close();
+    });
+    final c = CommonsSearch(
+      retryDelay: Duration.zero,
+      testBase: Uri.parse('http://127.0.0.1:${server.port}'),
+    );
+    expect(await c.search('Hadise'), isEmpty);
+    expect(hits, 2);
+    hits = 0;
+    await server.close(force: true);
   });
 
   testWidgets('photo search failure always ends the searching bubble', (
@@ -342,7 +366,6 @@ void main() {
     final sent = calls.singleWhere((c) => c.method == 'onlineGenerate');
     expect(sent.arguments['question'], contains("Sokrates'in hayatı"));
   });
-
 
   testWidgets('free user: tool intents upsell, no network', (tester) async {
     L10n.setLang('tr');

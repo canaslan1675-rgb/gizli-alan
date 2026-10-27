@@ -24,6 +24,7 @@ class _Msg {
     this.private = false,
     this.noteId,
     this.images = const [],
+    this.saveFirst = false,
   });
 
   factory _Msg.fromChat(JoiChatMsg c) => _Msg(
@@ -51,6 +52,9 @@ class _Msg {
 
   /// Wikimedia Commons results (not persisted).
   final List<CommonsImage> images;
+
+  /// Explicit "indir": show the "İlkini galeriye kaydet" button.
+  final bool saveFirst;
 
   /// Small grey debug line (error class / detail).
   final String? debug;
@@ -333,6 +337,29 @@ class _JoiScreenState extends State<JoiScreen> {
     if (mounted) setState(() => _speaking = false);
   }
 
+  /// Last image request (for "niye inmedi" follow-ups).
+  JoiImageSearch? _lastImage;
+
+  /// Joi asked "Neyin fotoğrafını indireyim?": the next message is the subject.
+  bool _awaitSubject = false;
+
+  /// Resolves the subject of an image request from the chat: the online
+  /// classifier first (structured JSON), then a local heuristic.
+  Future<String?> _resolveSubject(
+    String q,
+    List<Map<String, String>> history,
+  ) async {
+    if (_online && _hasConsent()) {
+      try {
+        final c = await _joi
+            .classifyImage(q, history: history)
+            .timeout(const Duration(seconds: 10));
+        if (c != null && c.isImage && c.query != null) return c.query;
+      } catch (_) {}
+    }
+    return JoiIntent.topicFromHistory(history);
+  }
+
   Future<void> _send({String? text, bool viaVoice = false}) async {
     final t = L10n.current;
     final q = (text ?? _input.text).trim();
@@ -344,16 +371,60 @@ class _JoiScreenState extends State<JoiScreen> {
     setState(() => _busy = true);
     String? spoken;
     try {
-      final intent = JoiIntent.parse(q);
+      var intent = JoiIntent.parse(q);
+      if (_awaitSubject) {
+        _awaitSubject = false;
+        intent ??= JoiImageSearch(q);
+      }
+      if (intent is JoiImageFollowUp) {
+        intent = _lastImage ?? const JoiImageNeedsSubject();
+      }
+      if (intent == null &&
+          _pro &&
+          JoiIntent.hasImageWords(q) &&
+          _online &&
+          _hasConsent()) {
+        // Regex unsure but image words present: ask the classifier.
+        try {
+          final c = await _joi
+              .classifyImage(q, history: history)
+              .timeout(const Duration(seconds: 10));
+          if (c != null && c.isImage) {
+            intent = c.query == null
+                ? const JoiImageNeedsSubject()
+                : JoiImageSearch(
+                    c.query!,
+                    explicit: RegExp(
+                      r'(indir|download|kaydet|save)',
+                    ).hasMatch(q.toLowerCase()),
+                  );
+          }
+        } catch (_) {}
+      }
       if (intent != null && !_pro) {
         // Tool intents are Pro-only: never executed for free users.
         await _upsell(
-          intent is JoiImageSearch ? t('joiProPhotos') : t('joiProWrite'),
+          intent is JoiWriteNote ? t('joiProWrite') : t('joiProPhotos'),
         );
         return;
       }
+      if (intent is JoiImageNeedsSubject) {
+        final subj = await _resolveSubject(q, history);
+        if (subj == null) {
+          _awaitSubject = true;
+          _add(_Msg(false, t('joiImgWhich')));
+          spoken = t('joiImgWhich');
+          return;
+        }
+        intent = JoiImageSearch(subj, explicit: intent.explicit);
+      }
       if (intent is JoiImageSearch) {
-        spoken = await _imageSearch(intent.query, intent.candidates);
+        _lastImage = intent;
+        spoken = await _imageSearch(
+          intent.query,
+          intent.candidates,
+          explicit: intent.explicit,
+        );
         return;
       }
       if (intent is JoiWriteNote) {
@@ -400,6 +471,26 @@ class _JoiScreenState extends State<JoiScreen> {
           },
         );
         if (!mounted || idx >= _msgs.length) return;
+        if (a.text != null && joiClaimsAction(a.text!)) {
+          // Hallucination guard: Joi never performs actions itself.
+          setState(() => _msgs[idx] = _Msg(false, t('joiNoFakeAction')));
+          spoken = t('joiNoFakeAction');
+          if (_pro &&
+              (JoiIntent.hasImageWords(q) ||
+                  JoiIntent.hasImageWords(a.text!))) {
+            final subj = await _resolveSubject(q, history);
+            if (subj != null && mounted) {
+              final i = JoiImageSearch(subj);
+              _lastImage = i;
+              spoken = await _imageSearch(
+                i.query,
+                i.candidates,
+                explicit: true,
+              );
+            }
+          }
+          return;
+        }
         setState(
           () => _msgs[idx] = a.text != null
               ? _Msg(false, a.text!, online: true)
@@ -438,7 +529,11 @@ class _JoiScreenState extends State<JoiScreen> {
 
   // ------------------------------------------------------- image search
 
-  Future<String?> _imageSearch(String query, List<String> candidates) async {
+  Future<String?> _imageSearch(
+    String query,
+    List<String> candidates, {
+    bool explicit = false,
+  }) async {
     final t = L10n.current;
     if (!await _ensureConsent()) {
       if (mounted) _add(_Msg(false, t('joiImgNeedsOnline')));
@@ -459,6 +554,7 @@ class _JoiScreenState extends State<JoiScreen> {
             ? t('joiImgNothing').replaceAll('{q}', query)
             : t('joiImgFound').replaceAll('{q}', query),
         images: r,
+        saveFirst: explicit && r.isNotEmpty,
       );
     } catch (e) {
       out = _Msg(
@@ -512,6 +608,11 @@ class _JoiScreenState extends State<JoiScreen> {
       ),
     );
     if (choice == null || !mounted) return;
+    await _saveImage(img, choice);
+  }
+
+  Future<void> _saveImage(CommonsImage img, String choice) async {
+    final t = L10n.current;
     if (choice == 'vault' && !await ItemLimit.ensureRoom(context)) return;
     setState(() => _busy = true);
     try {
@@ -534,6 +635,19 @@ class _JoiScreenState extends State<JoiScreen> {
         }
       }
       if (!mounted) return;
+      if (ok) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          SnackBar(
+            content: Text(
+              t(
+                choice == 'pictures'
+                    ? 'joiImgSavedPictures'
+                    : 'joiImgSavedVault',
+              ),
+            ),
+          ),
+        );
+      }
       _add(
         _Msg(
           false,
@@ -918,6 +1032,24 @@ class _JoiScreenState extends State<JoiScreen> {
                 icon: const Icon(Icons.sticky_note_2_outlined, size: 18),
                 label: Text(t('joiOpenNote')),
                 onPressed: () => _openNote(m.noteId!),
+              ),
+            ),
+          if (m.saveFirst && m.images.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: FilledButton.icon(
+                key: const ValueKey('joi_img_save_first'),
+                icon: const Icon(Icons.download),
+                label: Text(t('joiImgSaveFirst')),
+                onPressed: _busy
+                    ? null
+                    : () async {
+                        final p = await _platform.canSaveToPictures();
+                        await _saveImage(
+                          m.images.first,
+                          p ? 'pictures' : 'vault',
+                        );
+                      },
               ),
             ),
           if (m.images.isNotEmpty)

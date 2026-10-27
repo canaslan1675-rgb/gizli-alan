@@ -194,6 +194,7 @@ class JoiOnlineBackend implements JoiBackend {
     String lang = 'tr',
     void Function(String partial)? onPartial,
     List<Map<String, String>> history = const [],
+    String? system,
   }) async {
     lastError = null;
     lastDetail = null;
@@ -223,7 +224,7 @@ class JoiOnlineBackend implements JoiBackend {
     try {
       final r = await _ch.invokeMethod<String>('onlineGenerate', {
         ...config.toMap(),
-        'system': JoiService.onlineSystemPrompt(lang),
+        'system': system ?? JoiService.onlineSystemPrompt(lang),
         'question': q,
         'id': id,
         'history': [
@@ -384,6 +385,47 @@ class JoiService {
     );
   }
 
+  /// Cheap structured call: is [message] an image request, and about what?
+  /// Uses only the non-private chat [history] (never notes). Online only,
+  /// needs consent; returns null when that is not possible.
+  Future<({bool isImage, String? query})?> classifyImage(
+    String message, {
+    List<Map<String, String>> history = const [],
+  }) async {
+    final online = backends.whereType<JoiOnlineBackend>().firstOrNull;
+    if (online == null || !online.config.configured || !online.hasConsent()) {
+      return null;
+    }
+    final b = StringBuffer('Recent chat:\n');
+    final tail = history.length > 6
+        ? history.sublist(history.length - 6)
+        : history;
+    for (final h in tail) {
+      final txt = (h['text'] ?? '').replaceAll('\n', ' ');
+      b.writeln(
+        '${h['role'] == 'user' ? 'User' : 'Joi'}: '
+        '${txt.length > 300 ? txt.substring(0, 300) : txt}',
+      );
+    }
+    b.writeln('\nNew user message: $message');
+    final r = await online.generate(
+      b.toString(),
+      system: imageClassifierPrompt,
+    );
+    return parseImageClassifier(r);
+  }
+
+  static const String imageClassifierPrompt =
+      'You classify chat messages for a photo-search tool (Wikimedia '
+      'Commons). Decide if the NEW user message asks to download, send, '
+      'show or find a photo/picture/image (any language, e.g. Turkish '
+      '"fotoğrafını indir", "bir resmini at", "göster"). If yes, give the '
+      'subject as a short search query (proper name or noun, no suffixes, '
+      'e.g. "Hadise", "Galata Kulesi"). If the message has no subject ("its '
+      'photo", "fotoğrafını indir"), take it from the recent chat (the '
+      'person/thing being talked about). Reply ONLY with JSON: '
+      '{"is_image_request": true|false, "query": "<subject or null>"}';
+
   /// Generates the text for a new note ([JoiWriteNote.request]). Only the
   /// user's request is used — never existing notes. Nano on the device if
   /// available, otherwise the online backend (consent checked there).
@@ -421,7 +463,11 @@ class JoiService {
       'Uygulamada şunları yapabilirsin: Wikimedia Commons\'tan serbest '
       'lisanslı fotoğraf bulup indirmek ("X\'in fotoğrafını indir"), not '
       'defterine yeni not yazmak ("not defterime ... yaz"), sesli sohbet. '
-      'Bunlar sorulursa kısaca anlat.';
+      'Bunlar sorulursa kısaca anlat. ÖNEMLİ: Eylemleri sen değil uygulama '
+      'yapar. Asla "indiriyorum", "indireceğim", "kaydettim", "bekliyorum" '
+      'gibi kendin bir şey indirdiğini, kaydettiğini, gönderdiğini ya da '
+      'beklediğini söyleme. Kullanıcı fotoğraf isterse, bunu uygulamanın '
+      'yaptığını söyle ve örnek ifade öner: "Hadise\'nin fotoğrafını indir".';
 
   /// On-device (Gemini Nano) prompt.
   static String systemPrompt(String lang) =>

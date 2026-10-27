@@ -603,12 +603,11 @@ const Map<String, String> tr = {
   "joiImgNone":
       "\"{q}\" için Wikimedia Commons'ta serbest lisanslı fotoğraf bulamadım.",
   "joiImgFound":
-      "\"{q}\" için Wikimedia Commons'tan serbest lisanslı fotoğraflar. Kaydetmek için birine dokun:",
+      "\"{q}\" için Wikimedia Commons fotoğrafları. Kaydetmek için birine dokun:",
   "joiImgError": "Fotoğraf araması şu an yapılamadı. Biraz sonra tekrar dene.",
   "joiImgSavePictures": "Galeriye kaydet (Resimler/GizliAlan/Joi)",
   "joiImgSaveVault": "Kasaya kaydet",
-  "joiImgSavedPictures":
-      "Telefonun galerisine kaydedildi (Resimler/GizliAlan/Joi):",
+  "joiImgSavedPictures": "Galeriye kaydedildi ✓ (Pictures/GizliAlan/Joi)",
   "joiImgSavedVault": "Kasana kaydedildi:",
   "joiImgCredit": "Yazar/lisans",
   "joiImgSaveFailed": "Fotoğraf kaydedilemedi.",
@@ -687,4 +686,8 @@ const Map<String, String> tr = {
       "Wikimedia Commons'ta \"{q}\" için fotoğraf bulamadım. Farklı bir yazımla dene.",
   "joiImgOffline":
       "Fotoğraf araması için internete bağlanılamadı ya da Wikimedia yanıt vermedi. Tekrar dene.",
+  "joiImgWhich": "Neyin fotoğrafını indireyim? Örneğin \"Hadise\" yaz.",
+  "joiNoFakeAction":
+      "Ben kendim bir şey indiremem ya da kaydedemem; bunu uygulama yapar. Fotoğraf için örneğin \"Hadise'nin fotoğrafını indir\" yaz, sonuçları burada gösteririm, dokununca galerine kaydedilir.",
+  "joiImgSaveFirst": "İlkini galeriye kaydet",
 };
