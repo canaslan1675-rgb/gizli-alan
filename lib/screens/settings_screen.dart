@@ -1,6 +1,7 @@
 import 'joi_memory_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 import '../widgets/backup_actions.dart';
 import '../widgets/pin_hint_dialog.dart';
@@ -243,8 +244,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _copyFallback(AppActions.storeUrl, 'shareAppFailed');
   }
 
+  static bool _reviewAsked = false;
+
+  /// Explicit button only (never automatic). First tap per session tries the
+  /// Play in-app review sheet; Play may silently skip it (quota, sideload), so
+  /// later taps or any failure open the Play listing (market:// → https).
   Future<void> _rateApp() async {
     final app = GizliAlanApp.of(context);
+    if (!_reviewAsked) {
+      _reviewAsked = true;
+      try {
+        final r = InAppReview.instance;
+        if (await r.isAvailable()) {
+          await r.requestReview();
+          return;
+        }
+      } catch (_) {}
+      if (!mounted) return;
+    }
     if (await app.withExternalUi(
       () => AppActions.openStore(),
       untilResume: true,
@@ -929,9 +946,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       ListTile(
         key: const ValueKey('settings_rate'),
-        leading: const Icon(Icons.star_outline),
-        title: Text(t('rateApp')),
+        leading: const Icon(Icons.star_rounded, color: Colors.amber, size: 30),
+        title: Text(
+          '${t('rateApp')} ⭐',
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
         subtitle: Text(t('rateAppHint')),
+        trailing: const Icon(Icons.chevron_right),
         onTap: _rateApp,
       ),
       ListTile(

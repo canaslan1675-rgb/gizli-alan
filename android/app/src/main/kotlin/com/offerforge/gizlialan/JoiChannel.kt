@@ -74,6 +74,10 @@ class JoiChannel private constructor(
                     .setApiKey(apiKey)
                     .setApplicationId(appId)
                     .setProjectId(projectId)
+                    // Play Integrity App Check parses gcmSenderId as the Cloud
+                    // project number (Long.parseLong). Unset -> NumberFormatException
+                    // -> no token -> 401. Derive it from appId "1:<number>:android:...".
+                    .setGcmSenderId(appId.split(":").getOrNull(1).orEmpty())
                     .build(),
                 APP_NAME,
             ).also { a ->
