@@ -28,6 +28,7 @@ class MainActivity : FlutterFragmentActivity() {
     private var joiChannel: JoiChannel? = null
     private var voiceChannel: VoiceChannel? = null
     private var updateChannel: UpdateChannel? = null
+    private var faChannel: io.flutter.plugin.common.MethodChannel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(
@@ -43,6 +44,7 @@ class MainActivity : FlutterFragmentActivity() {
         importChannel = ImportChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         browserChannel = BrowserChannel.attach(flutterEngine)
         tiktokChannel = TikTokChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
+        faChannel = FirebaseAnalyticsChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         joiChannel = JoiChannel.attach(applicationContext, flutterEngine.dartExecutor.binaryMessenger)
         updateChannel = UpdateChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
         voiceChannel = VoiceChannel.attach(this, flutterEngine.dartExecutor.binaryMessenger)
@@ -58,6 +60,8 @@ class MainActivity : FlutterFragmentActivity() {
         browserChannel = null
         tiktokChannel?.setMethodCallHandler(null)
         tiktokChannel = null
+        faChannel?.setMethodCallHandler(null)
+        faChannel = null
         joiChannel?.dispose()
         joiChannel = null
         voiceChannel?.dispose()

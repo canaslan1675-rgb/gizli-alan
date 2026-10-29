@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'analytics.dart';
 import 'joi_tools.dart';
 
 import '../models/note.dart';
@@ -382,6 +385,7 @@ class JoiService {
             ? null
             : onlineSystemPrompt(lang, memory: memory),
       );
+      unawaited(Analytics.logJoiQuestion(online: true, ok: r != null));
       return JoiAnswer(
         r,
         online: true,
@@ -390,10 +394,11 @@ class JoiService {
       );
     }
     if (a == null) return const JoiAnswer(null, online: false);
-    return JoiAnswer(
-      await a.generate(chatPrompt(question, lang: lang, notes: notes)),
-      online: false,
+    final local = await a.generate(
+      chatPrompt(question, lang: lang, notes: notes),
     );
+    unawaited(Analytics.logJoiQuestion(online: false, ok: local != null));
+    return JoiAnswer(local, online: false);
   }
 
   /// Cheap structured call: is [message] an image request, and about what?

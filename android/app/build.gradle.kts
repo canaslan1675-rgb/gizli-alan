@@ -154,6 +154,9 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:35.1.0"))
     implementation("com.google.firebase:firebase-ai")
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    // 0.6.5: Google Analytics for Firebase (active users, joi_question,
+    // pro_purchase). Default app initialised at runtime (FirebaseAnalyticsChannel.kt).
+    implementation("com.google.firebase:firebase-analytics")
     // Debug provider: used only when built with JOI_APPCHECK_DEBUG_TOKEN
     // (sideloaded test APKs); the token must be registered in the console.
     implementation("com.google.firebase:firebase-appcheck-debug")
