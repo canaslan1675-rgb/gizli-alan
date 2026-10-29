@@ -537,8 +537,16 @@ class _JoiScreenState extends State<JoiScreen> with WidgetsBindingObserver {
       }
       final all = await _notes();
       final hits = JoiNoteSearch.search(all, q);
-      if (!_pro && (_notesMode || !_ai)) {
+      // Free tier: only notes search / summary is Pro. A plain question
+      // must never get the notes upsell (0.6.3 bug: when no AI backend was
+      // available every question showed "Notlarında arama ve özet … Pro").
+      if (!_pro && (_notesMode || JoiIntent.isNotesRequest(q))) {
         await _upsell(t('joiProNotes'));
+        return;
+      }
+      if (!_pro && !_ai) {
+        _add(_Msg(false, t('joiChatUnavailable')));
+        spoken = t('joiChatUnavailable');
         return;
       }
       var search = !_ai || (_online && _notesMode);

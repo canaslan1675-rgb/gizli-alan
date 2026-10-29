@@ -688,6 +688,8 @@ const Map<String, String> tr = {
   "joiProPhotos": "Fotoğraf indirme",
   "joiProWrite": "Not defterine yazma",
   "joiProVoice": "Sesli sohbet",
+  "joiChatUnavailable":
+      "Joi şu an çevrimiçi bağlanamıyor. İnternetini kontrol edip biraz sonra tekrar dene.",
   "joiProNotes": "Notlarında arama ve özet",
   "joiListening": "Dinliyorum… (bitince bırak ya da tekrar dokun)",
   "joiVoiceNoMatch":

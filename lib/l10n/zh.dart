@@ -545,6 +545,7 @@ const Map<String, String> zh = {
   "joiProPhotos": "照片下载",
   "joiProWrite": "写入笔记",
   "joiProVoice": "语音聊天",
+  "joiChatUnavailable": "Joi 目前无法联网。请检查网络后稍后再试。",
   "joiProNotes": "笔记搜索与总结",
   "joiListening": "正在听…（说完后松开或再次点按）",
   "joiVoiceNoMatch": "未检测到语音。请靠近麦克风清楚地说话后重试。",

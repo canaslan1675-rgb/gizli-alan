@@ -237,6 +237,22 @@ sealed class JoiIntent {
     'kendi',
   };
 
+  /// Explicit "search / summarize MY NOTES" request (Pro-only feature).
+  /// Plain questions ("Sokrates kimdir?") are NOT notes requests.
+  static bool isNotesRequest(String s) {
+    final low = s.toLowerCase();
+    if (RegExp(
+      r"(?<![\p{L}])(özetle\p{L}*|ozetle\p{L}*|summari[sz]e\p{L}*)",
+      unicode: true,
+    ).hasMatch(low)) {
+      return true;
+    }
+    return RegExp(
+      r"(?<![\p{L}])(notlar[ıi]m\p{L}*|notum\p{L}*|not defterim\p{L}*|my notes?)(?![\p{L}])",
+      unicode: true,
+    ).hasMatch(low);
+  }
+
   /// Image words anywhere ("fotoğrafını", "resmi", "picture").
   static bool hasImageWords(String s) => RegExp(
     '(?<![\\p{L}])$_img',

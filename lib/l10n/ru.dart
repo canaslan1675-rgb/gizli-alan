@@ -634,6 +634,8 @@ const Map<String, String> ru = {
   "joiProPhotos": "Photo download",
   "joiProWrite": "Writing to notes",
   "joiProVoice": "Voice chat",
+  "joiChatUnavailable":
+      "Joi сейчас не может подключиться к сети. Проверьте интернет и повторите попытку чуть позже.",
   "joiProNotes": "Note search and summaries",
   "joiListening": "Listening… (release or tap again when done)",
   "joiVoiceNoMatch":

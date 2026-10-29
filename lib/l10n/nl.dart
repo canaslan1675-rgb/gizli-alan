@@ -635,6 +635,8 @@ const Map<String, String> nl = {
   "joiProPhotos": "Foto's downloaden",
   "joiProWrite": "Schrijven in notities",
   "joiProVoice": "Spraakchat",
+  "joiChatUnavailable":
+      "Joi kan nu geen online verbinding maken. Controleer je internet en probeer het zo opnieuw.",
   "joiProNotes": "Notities zoeken en samenvatten",
   "joiListening": "Ik luister… (loslaten of nogmaals tikken als je klaar bent)",
   "joiVoiceNoMatch":

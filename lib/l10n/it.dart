@@ -637,6 +637,8 @@ const Map<String, String> it = {
   "joiProPhotos": "Il download di foto",
   "joiProWrite": "La scrittura nelle note",
   "joiProVoice": "La chat vocale",
+  "joiChatUnavailable":
+      "Joi non riesce a connettersi online in questo momento. Controlla la connessione e riprova tra poco.",
   "joiProNotes": "La ricerca e i riassunti delle note",
   "joiListening": "Ti ascolto… (rilascia o tocca di nuovo quando hai finito)",
   "joiVoiceNoMatch":
